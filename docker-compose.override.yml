@@ -9,7 +9,7 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile.dev
-    container_name: client
+    container_name: buka_client
     env_file:
       - ./client/.env.local
     volumes:
@@ -24,7 +24,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile.dev
-    container_name: server
+    container_name: bukka_server
     env_file:
       - ./server/.env
     volumes:
