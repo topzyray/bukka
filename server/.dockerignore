@@ -1,0 +1,27 @@
+# Node modules
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnp.*
+.pnpm-debug.log
+
+# Build output
+.next
+out
+
+# Local config & secrets
+.env
+.env.*
+!.env.example
+
+# Git & Docker
+.git
+.gitignore
+.dockerignore
+Dockerfile*
+docker-compose*.yml
+
+# OS junk
+.DS_Store
+Thumbs.db
