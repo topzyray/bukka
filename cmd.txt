@@ -1,0 +1,20 @@
+Development:
+docker-compose -f docker-compose.override.yml up --build
+
+Production:
+docker-compose -f docker-compose.prod.yml up --build -d
+
+Stop everything (but keep data):
+docker-compose -f docker-compose.override.yml down
+
+Rebuild only one service:
+docker-compose -f docker-compose.override.yml build server
+
+Check logs for one service:
+docker-compose -f docker-compose.override.yml logs -f server
+
+Open shell inside a container (great for debugging):
+docker exec -it server bash
+
+Clean up
+docker image prune -f
