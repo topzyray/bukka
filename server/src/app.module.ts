@@ -1,4 +1,5 @@
 import { Logger, Module } from '@nestjs/common';
+import { TerminusModule } from '@nestjs/terminus';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './UtilityLayer/Configuration/Database.module';
@@ -26,21 +27,24 @@ import { NotificationService } from './InfrastructureLayer/Services/notification
 import { AuthNotificationService } from './InfrastructureLayer/Services/notification/auth/AuthNotificationService';
 import { EmailService } from './InfrastructureLayer/Services/email/EmailService';
 import { ConfigModule } from '@nestjs/config';
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { HttpModule } from '@nestjs/axios';
 import { NodemailerProvider } from './InfrastructureLayer/Services/email/providers/NodemailerProvider';
 import { TokenRepository } from './BussinessLayer/TokenRepository';
 import { UserRepository } from './BussinessLayer/UserRepository';
 import { JwtService } from '@nestjs/jwt';
+import { HealthController } from './ServiceLayer/Controllers/HealthController';
 
 @Module({
   imports: [
     HttpModule,
     ConfigModule,
+    TerminusModule,
     DatabaseModule.forRoot({ adapter: DbAdapterEnum.PRISMA }),
     AppConfigurationModule,
   ],
   controllers: [
     AppController,
+    HealthController,
     AuthController,
     UserController,
     UserNotificationController,
