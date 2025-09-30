@@ -1,14 +1,14 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
   Query,
   Res,
-  UseGuards,
 } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -16,29 +16,23 @@ import {
   ApiTags,
   ApiParam,
 } from '@nestjs/swagger';
-import { UserNotificationRepository } from 'src/BusinessLayer/UserNotificationRepository';
-import { InuResponse } from 'src/DomainLayer/Models/InuResponse';
-import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
+import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import {
   CreateNotificationDto,
   UserNotificationFilterDto,
 } from 'src/DomainLayer/Dtos/UserNotificationDto';
-import { EmailService } from 'src/InfrastructureLayer/Services/EmailService';
-import { UserDataAgent } from 'src/DataLayer/DataAgents/UserDataAgent';
+import { UserNotificationRepository } from 'src/BussinessLayer/UserNotificationRepository';
 
-@Controller(`${BaseApiRoutesConstant.BASE_URL}/usernotification`)
-@ApiTags('User Notification API')
+@Controller(`${BaseApiRoutesConstant.BASE_URL}`)
+@ApiTags('User Notification')
 @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard)
 export class UserNotificationController {
   constructor(
     private _userNotificationRepository: UserNotificationRepository,
-    private _userDataAgent: UserDataAgent,
-    private _notif: EmailService,
   ) {}
 
-  @Post('/create')
+  @Post('users/notifications')
   @ApiOperation({ summary: "Create a user's userNotification." })
   @ApiBody({ type: CreateNotificationDto })
   async createUserNotification(
@@ -46,59 +40,22 @@ export class UserNotificationController {
     @Res() res: Response,
   ) {
     const response =
-      await this._userNotificationRepository.createUserNotificationAsync(
-        request,
-      );
+      await this._userNotificationRepository.createUserNotification(request);
     if (response.status && response.responseData) {
-      const user = await this._userDataAgent.GetUserById(
-        response.responseData?.userId,
+      BukkaResponse.SetHeaderData(
+        'createNotificationData',
+        {
+          userId: request.userId,
+          title: request.title,
+          message: request.message,
+        },
+        res,
       );
-      await this._notif.sendUserNotificationEmail({
-        email: user.email,
-        firstName: user.firstName,
-        message: response.responseData?.message,
-      });
     }
-    return InuResponse.GetStatusResponse(response, res);
+    return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Post('/read/:notificationId')
-  @ApiOperation({ summary: 'Mark a notification as read.' })
-  @ApiParam({
-    name: 'notificationId',
-    description: 'The ID of the notification',
-    example: 2,
-  })
-  async updateUserNotification(
-    @Param('notificationId') notificationId: number,
-    @Res() res: Response,
-  ) {
-    const response =
-      await this._userNotificationRepository.viewUserNotificationAsync(
-        notificationId,
-      );
-    return InuResponse.GetStatusResponse(response, res);
-  }
-
-  @Post('/readAll/:userId')
-  @ApiOperation({ summary: 'Mark all notifications as read.' })
-  @ApiParam({
-    name: 'userId',
-    description: 'The ID of the user',
-    example: 3,
-  })
-  async readAllUserNotification(
-    @Param('userId') userId: number,
-    @Res() res: Response,
-  ) {
-    const response =
-      await this._userNotificationRepository.viewAllUserNotificationAsync(
-        userId,
-      );
-    return InuResponse.GetStatusResponse(response, res);
-  }
-
-  @Get('/getById/:notificationId')
+  @Get('users/notifications/:notificationId')
   @ApiOperation({ summary: 'Get a user by notification ID' })
   @ApiParam({
     name: 'notificationId',
@@ -110,53 +67,110 @@ export class UserNotificationController {
     @Res() res: Response,
   ) {
     const response =
-      await this._userNotificationRepository.findById(notificationId);
+      await this._userNotificationRepository.findNotificationById(
+        notificationId,
+      );
 
-    const data = InuResponse.GetSingleDataResponse(
+    const data = BukkaResponse.GetSingleDataResponse(
       'User Notification',
       response,
     );
     return res.status(data.responseCode).json(data);
   }
 
-  @Get('/getByUserId/:userId')
+  @Get('users/notifications')
   @ApiOperation({
     summary: 'Get all user notifications by user Id',
   })
+  async getUserNotificationByUserId(
+    @Query() filters: UserNotificationFilterDto,
+  ) {
+    const response =
+      await this._userNotificationRepository.findNotificationsByFilters(
+        filters,
+      );
+    return BukkaResponse.GetPagedDataResponse('user notifications', response);
+  }
+
+  @Post('users/notifications/:notificationId/read')
+  @ApiOperation({ summary: 'Mark a notification as read.' })
+  @ApiParam({
+    name: 'notificationId',
+    description: 'The ID of the notification',
+    example: 2,
+  })
+  async updateUserNotification(
+    @Param('notificationId') notificationId: number,
+    @Res() res: Response,
+  ) {
+    const response =
+      await this._userNotificationRepository.viewUserNotification(
+        notificationId,
+      );
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Post('users/:userId/notifications/mark-all-read')
+  @ApiOperation({ summary: 'Mark all notifications as read.' })
   @ApiParam({
     name: 'userId',
     description: 'The ID of the user',
-    example: 2,
+    example: 3,
   })
-  async getUserNotificationByUserId(
+  async readAllUserNotification(
     @Param('userId') userId: number,
     @Res() res: Response,
-    @Query() filters?: UserNotificationFilterDto,
-  ) {
-    const response = await this._userNotificationRepository.findByUserId(
-      userId,
-      filters,
-    );
-    const data = InuResponse.GetSingleDataResponse(
-      'User notification',
-      response,
-    );
-    return res.status(data.responseCode).json(data);
-  }
-
-  @Get('/getByFilters')
-  @ApiOperation({ summary: 'Get all paginated user notifications' })
-  async getUserNotificationsByFilters(
-    @Query() filters?: UserNotificationFilterDto,
-    @Res() res?: Response,
   ) {
     const response =
-      await this._userNotificationRepository.findByFilters(filters);
+      await this._userNotificationRepository.viewAllUserNotification(userId);
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
 
-    const data = InuResponse.GetPagedDataResponse(
-      'User Notification',
-      response,
-    );
-    return res.status(data.responseCode).json(data);
+  @Get('users/:userId/notifications/unread-count')
+  @ApiOperation({ summary: 'Get the count of unread notifications' })
+  async getUnreadNotificationsCount(
+    @Param('userId') userId: string,
+    @Res() res: Response,
+  ) {
+    const response =
+      await this._userNotificationRepository.getUnreadNotificationsCount(
+        userId,
+      );
+
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Delete('notifications/:notificationId')
+  @ApiOperation({ summary: 'Delete notificaiton' })
+  @ApiParam({
+    name: 'notificationId',
+    description: 'The ID of the notificaiton',
+    example: 1,
+  })
+  async deleteNotification(
+    @Param('notificationId') notificationId: number,
+    @Res() res: Response,
+  ) {
+    const response =
+      await this._userNotificationRepository.deleteNotification(notificationId);
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Delete('users/:userId/notifications')
+  @ApiOperation({ summary: 'Delete all user notifications' })
+  @ApiParam({
+    name: 'userId',
+    description: 'The ID of the user',
+    example: '123',
+  })
+  async deleteAllUserNotifications(
+    @Param('userId') userId: number,
+    @Res() res: Response,
+  ) {
+    const response =
+      await this._userNotificationRepository.deleteAllUserNotificationsByUserId(
+        userId,
+      );
+    return BukkaResponse.GetStatusResponse(response, res);
   }
 }

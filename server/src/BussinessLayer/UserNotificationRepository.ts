@@ -1,132 +1,155 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { UserNotificationDataAgent } from 'src/DataLayer/DataAgents/UserNotificationDataAgent';
-import { UserDataAgent } from 'src/DataLayer/DataAgents/UserDataAgent';
 import {
   CreateNotificationDto,
   UserNotificationFilterDto,
 } from 'src/DomainLayer/Dtos/UserNotificationDto';
-import { InuResponse } from 'src/DomainLayer/Models/InuResponse';
-import { IUserNotification } from '../DataLayer/Abstracts/Interface/IUserNotification';
-import { PagedData } from 'src/DomainLayer/Models/PagedData';
-import { UserNotification } from '@prisma/client';
+import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
+import { UserNotification } from 'src/DomainLayer/Models/UserNotification';
+import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 
 @Injectable()
 export class UserNotificationRepository {
   constructor(
     private readonly _userNotificationDataAgent: UserNotificationDataAgent,
-    private readonly _userDataAgent: UserDataAgent,
   ) {}
 
-  async createUserNotificationAsync(
-    userNotification: CreateNotificationDto,
-  ): Promise<InuResponse> {
-    const user = await this._userDataAgent.GetUserById(userNotification.userId);
-    if (!user) {
-      return InuResponse.GetSingleDataResponse('User', null);
-    }
-
-    const result = await this._userNotificationDataAgent.CreateUserNotification(
-      userNotification as IUserNotification,
+  async createUserNotification(
+    dto: CreateNotificationDto,
+  ): Promise<BukkaResponse<UserNotification>> {
+    const result = await this._userNotificationDataAgent.createUserNotification(
+      dto as unknown as UserNotification,
     );
-    return InuResponse.createResponse('User notification', result);
+    return BukkaResponse.createResponse('user notification', result);
   }
 
-  async createMultipleUsersNotificationAsync(
-    userNotification: UserNotification[],
-  ): Promise<InuResponse> {
+  async createMultipleUsersNotification(
+    userNotifications: UserNotification[],
+  ): Promise<BukkaResponse<any>> {
     const result =
-      await this._userNotificationDataAgent.CreateUsersNotification(
-        userNotification as IUserNotification[],
+      await this._userNotificationDataAgent.createMultipleUserNotifications(
+        userNotifications as unknown as UserNotification[],
       );
-
-    return InuResponse.customResponse(
-      'Users notifications',
-      HttpStatus.CREATED,
-      true,
-      result,
+    return BukkaResponse.createMultipleResponse(
+      'user notifications',
+      [],
+      // result.count,
     );
   }
 
-  async viewUserNotificationAsync(
+  async viewUserNotification(
     notificationId: number,
-  ): Promise<InuResponse> {
-    const userNotification =
-      await this._userNotificationDataAgent.GetUserNotificationById(
-        notificationId,
+  ): Promise<BukkaResponse<UserNotification>> {
+    const notification = await this.findNotificationById(notificationId);
+    if (!notification) {
+      return BukkaResponse.errorResponse(
+        'Notification not found',
+        HttpStatus.NOT_FOUND,
       );
-    if (!userNotification) {
-      return InuResponse.GetSingleDataResponse('User notification', null);
     }
     const updatedUserNotification =
-      await this._userNotificationDataAgent.ViewUserNotification(
-        userNotification,
+      await this._userNotificationDataAgent.updateUserNotification(
+        notification.id as number,
+        { isRead: true },
       );
 
-    return InuResponse.updateResponse(
+    return BukkaResponse.updateResponse(
       'User notification',
       updatedUserNotification,
     );
   }
 
-  async viewAllUserNotificationAsync(userId: number): Promise<InuResponse> {
-    if (!userId) {
-      return InuResponse.GetSingleDataResponse('User', null);
-    }
-
-    await this._userNotificationDataAgent.ViewAllUserNotification(userId);
-
-    return InuResponse.updateResponse('User notification', true);
+  async viewAllUserNotification(userId: number): Promise<BukkaResponse<any>> {
+    const updatedUserNotifications =
+      await this._userNotificationDataAgent.viewAllUserNotification(userId);
+    return BukkaResponse.updateResponse(
+      'User notification',
+      updatedUserNotifications,
+    );
   }
 
-  async findById(userNotificationId: number): Promise<UserNotification | null> {
-    return await this._userNotificationDataAgent.GetUserNotificationById(
+  async findNotificationById(
+    userNotificationId: number,
+  ): Promise<UserNotification | null> {
+    return await this._userNotificationDataAgent.getUserNotificationById(
       userNotificationId,
     );
   }
 
-  async findByUserId(
-    userId: number,
-    filterDto: UserNotificationFilterDto,
-  ): Promise<PagedData<any[]> | null> {
-    const query: any = {};
-
-    if (userId) {
-      if (filterDto.isRead) {
-        query.isRead = filterDto.isRead;
-      }
-
-      if (filterDto.notificationType) {
-        query.notificationType = filterDto.notificationType;
-      }
-    }
-    return await this._userNotificationDataAgent.GetUserNotificationByUserId(
-      query,
-      filterDto.pageSize,
-      filterDto.pageNumber,
+  async getUnreadNotificationsCount(
+    userId: string,
+  ): Promise<BukkaResponse<number>> {
+    const result =
+      await this._userNotificationDataAgent.getUnreadNotificationsCount(userId);
+    return BukkaResponse.GetSingleDataResponse(
+      'user notification count',
+      result,
     );
   }
 
-  async findByFilters(
-    filterDto: UserNotificationFilterDto,
-  ): Promise<PagedData<any[]> | null> {
-    const query: any = {};
+  async findNotificationsByFilters(filterDto: UserNotificationFilterDto) {
+    const query = FilterQueryHelper.buildQuery({
+      dto: filterDto,
+      rules: [
+        { field: 'userId' },
+        { field: 'isRead' },
+        { field: 'notificationCategory' },
+      ],
+      searchConfig: {
+        fields: ['title', 'message'],
+        mode: 'insensitive',
+      },
+    });
 
-    if (filterDto.userId) {
-      query.userId = filterDto.userId;
-    }
+    const { pageSize, pageNumber } =
+      FilterQueryHelper.extractPagination(filterDto);
 
-    if (filterDto.isRead) {
-      query.isRead = filterDto.isRead;
-    }
-
-    if (filterDto.notificationType) {
-      query.notificationType = filterDto.notificationType;
-    }
-
-    return await this._userNotificationDataAgent.GetUserNotificationsByFilter(
+    return this._userNotificationDataAgent.getUserNotificationsByFilter(
       query,
-      filterDto.pageSize,
-      filterDto.pageNumber,
+      pageSize,
+      pageNumber,
+    );
+  }
+
+  async deleteNotification(notificationId: number) {
+    const notification = await this.findNotificationById(notificationId);
+    if (!notification) {
+      return BukkaResponse.errorResponse(
+        'Notification not found',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const deletedNotification =
+      await this._userNotificationDataAgent.deleteNotification(
+        notification.id as number,
+      );
+
+    return BukkaResponse.deleteResponse(
+      'User notification',
+      true,
+      undefined,
+      deletedNotification,
+    );
+  }
+
+  async deleteAllUserNotificationsByUserId(userId: number) {
+    const deletedUserNotifications =
+      await this._userNotificationDataAgent.deleteAllUserNotificationsByUserId(
+        userId,
+      );
+
+    if (deletedUserNotifications === null) {
+      return BukkaResponse.errorResponse(
+        'No user notification found!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return BukkaResponse.deleteResponse(
+      'User notification',
+      true,
+      undefined,
+      deletedUserNotifications,
     );
   }
 }

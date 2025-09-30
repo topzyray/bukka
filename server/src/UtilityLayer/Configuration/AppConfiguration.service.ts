@@ -10,7 +10,7 @@ export class AppConfigurationService {
     return this.configService.get<string>('NODE_ENV')?.trim() as string;
   }
 
-  get pgUri(): string {
+  get databaseUri(): string {
     return this.configService.get<string>('DATABASE_URL')?.trim() as string;
   }
 
@@ -20,47 +20,53 @@ export class AppConfigurationService {
       ?.trim() as string;
   }
 
-  // get port(): string {
-  //   return this.configService.get<string>('PORT')?.trim() as string;
-  // }
+  get port(): string {
+    return this.configService.get<string>('PORT')?.trim() as string;
+  }
 
-  // get azureServiceBusConnString(): string {
-  //   return this.configService
-  //     .get<string>('AZURE_SERVICE_BUS_CONNECTION_STRING')
-  //     ?.trim() as string;
-  // }
+  get tokenSecret(): string {
+    return this.configService.get<string>('TOKEN_SECRET')?.trim() as string;
+  }
 
-  // get azureCommunicationString(): string {
-  //   return this.configService
-  //     .get<string>('AZURE_COMMUNICATION_CONNECTION_STRING')
-  //     ?.trim() as string;
-  // }
+  get tokenExpiry(): string {
+    return this.configService
+      .get<string>('TOKEN_EXPIRY_IN_SECONDS')
+      ?.trim() as string;
+  }
 
-  // get sslKeyPath(): string {
-  //   return this.configService.get<string>('SSL_KEY_PATH')?.trim() as string;
-  // }
+  get sslKeyPath(): string {
+    return this.configService.get<string>('SSL_KEY_PATH')?.trim() as string;
+  }
 
-  // get sslCertPath(): string {
-  //   return this.configService.get<string>('SSL_CERT_PATH')?.trim() as string;
-  // }
+  get sslCertPath(): string {
+    return this.configService.get<string>('SSL_CERT_PATH')?.trim() as string;
+  }
 
-  // get smsProvider(): string {
-  //   return this.configService.get<string>('SMS_PROVIDER')?.trim() as string;
-  // }
+  get smsProvider(): string {
+    return this.configService.get<string>('SMS_PROVIDER')?.trim() as string;
+  }
 
-  // get emailProvider(): string {
-  //   return this.configService.get<string>('EMAIL_PROVIDER')?.trim() as string;
-  // }
+  get emailProvider(): string {
+    return this.configService.get<string>('EMAIL_PROVIDER')?.trim() as string;
+  }
 
-  // get senderEmail(): string {
-  //   return this.configService.get<string>('SENDER_EMAIL')?.trim() as string;
-  // }
+  get emailHost(): string {
+    return this.configService.get<string>('EMAIL_HOST')?.trim() as string;
+  }
 
-  // get emailTemplateEngine(): string {
-  //   return this.configService
-  //     .get<string>('EMAIL_TEMPLATE_ENGINE')
-  //     ?.trim() as string;
-  // }
+  get senderEmail(): string {
+    return this.configService.get<string>('SENDER_EMAIL')?.trim() as string;
+  }
+
+  get senderPassword(): string {
+    return this.configService.get<string>('SENDER_PASSWORD')?.trim() as string;
+  }
+
+  get emailTemplateEngine(): string {
+    return this.configService
+      .get<string>('EMAIL_TEMPLATE_ENGINE')
+      ?.trim() as string;
+  }
 
   // get fileProvider(): string {
   //   return this.configService.get<string>('FILE_PROVIDER')?.trim() as string;
@@ -96,5 +102,17 @@ export class AppConfigurationService {
 
   // get owoDocumentUrl(): string {
   //   return this.configService.get<string>('OWO_DOCUMENT_URL')?.trim() as string;
+  // }
+
+  // get azureServiceBusConnString(): string {
+  //   return this.configService
+  //     .get<string>('AZURE_SERVICE_BUS_CONNECTION_STRING')
+  //     ?.trim() as string;
+  // }
+
+  // get azureCommunicationString(): string {
+  //   return this.configService
+  //     .get<string>('AZURE_COMMUNICATION_CONNECTION_STRING')
+  //     ?.trim() as string;
   // }
 }

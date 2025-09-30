@@ -7,7 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Response } from 'express';
-import { OwoResponse } from 'src/DomainLayer/Models/BukkaResponse';
+import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 
 @Injectable()
 export class GlobalResponseInterceptor<T> implements NestInterceptor<T, any> {
@@ -21,7 +21,7 @@ export class GlobalResponseInterceptor<T> implements NestInterceptor<T, any> {
 
     return next.handle().pipe(
       map((data) => {
-        // If already formatted as OwoResponse, skip
+        // If already formatted as BukkaResponse, skip
         if (this.isOwoResponse(data)) {
           return data;
         }
@@ -37,22 +37,22 @@ export class GlobalResponseInterceptor<T> implements NestInterceptor<T, any> {
           'pageSize' in data;
 
         if (handler.toLowerCase().startsWith('create')) {
-          response = OwoResponse.createResponse(entityName, data);
+          response = BukkaResponse.createResponse(entityName, data);
         } else if (handler.toLowerCase().startsWith('update')) {
-          response = OwoResponse.updateResponse(entityName, data);
+          response = BukkaResponse.updateResponse(entityName, data);
         } else if (handler.toLowerCase().startsWith('delete')) {
-          response = OwoResponse.deleteResponse(
+          response = BukkaResponse.deleteResponse(
             entityName,
             !!data,
             undefined,
             data,
           );
         } else if (isPaged) {
-          response = OwoResponse.GetPagedDataResponse(entityName, data);
+          response = BukkaResponse.GetPagedDataResponse(entityName, data);
         } else if (Array.isArray(data)) {
-          response = OwoResponse.GetListDataResponse(entityName, data);
+          response = BukkaResponse.GetListDataResponse(entityName, data);
         } else {
-          response = OwoResponse.GetSingleDataResponse(entityName, data);
+          response = BukkaResponse.GetSingleDataResponse(entityName, data);
         }
 
         res.status(response.responseCode);
@@ -61,7 +61,7 @@ export class GlobalResponseInterceptor<T> implements NestInterceptor<T, any> {
     );
   }
 
-  private isOwoResponse(obj: any): obj is OwoResponse<any> {
+  private isOwoResponse(obj: any): obj is BukkaResponse<any> {
     return (
       obj &&
       typeof obj === 'object' &&

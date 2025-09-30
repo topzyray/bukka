@@ -28,8 +28,10 @@ services:
     env_file:
       - ./server/.env
     volumes:
-      - ./server/app:/app/app:cached
+      - ./server:/app:cached
+      - /app/node_modules
     ports:
-      - "8000:8000"
+      - "8006:8006"
     networks:
       - infra-net
+    command: sh -c "npx prisma db push && npm run start:dev"

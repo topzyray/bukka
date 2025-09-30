@@ -1,0 +1,26 @@
+export enum BaseApiRoutesEnum {
+  Signup = '/api/v1/auth/register',
+  Login = '/api/v1/auth/login',
+  ConfirmEmail = '/api/v1/auth/confirmEmail',
+  ResendConfirmationEmail = '/api/v1/auth/resendConfirmationEmail',
+  RefreshToken = '/api/v1/auth/refreshToken',
+  ForgotPassword = '/api/v1/auth/forgotPassword',
+  ResetPassword = '/api/v1/auth/resetPassword',
+  ChangePassword = '/api/v1/auth/changePassword',
+
+  GetUserById = '/api/v1/users/getById/:userId',
+  GetUserByEmail = '/api/v1/users/getByEmail/:email',
+  GetUserByFilters = '/api/v1/users/getByFilters',
+  UpdateUser = '/api/v1/users/update-user/:userId',
+  UpdateUserProfile = '/api/v1/users/user-profile-update/:userId',
+  DeleteUser = '/api/v1/users/delete-user/:userId',
+
+  CreateRestaurant = '/api/v1/restaurants/create',
+  GetRestaurantById = '/api/v1/restaurants/getById/:restaurantId',
+  GetPinnedRestaurantByUser = '/api/v1/restaurants/getPinnedRestaurantByUser/:userId',
+  GetRestaurantsWithinDistance = '/api/v1/restaurants/getRestaurantsWithinDistance',
+  GetRestaurantsByFilters = '/api/v1/restaurants/getByFilters',
+  UpdateRestaurant = '/api/v1/restaurants/update-restaurant/:restaurantId',
+  UpdateRestaurantAddress = '/api/v1/restaurants/update-restaurant-address/:restaurantId',
+  DeleteRestaurant = '/api/v1/restaurants/delete-restaurant/:restaurantId',
+}

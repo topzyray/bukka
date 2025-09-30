@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
+import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
 
 @Injectable()
 export class PrismaService
@@ -14,13 +15,13 @@ export class PrismaService
 {
   private logger = new Logger(PrismaService.name);
 
-  constructor() {
+  constructor(private readonly configService: AppConfigurationService) {
     super({
       log: ['warn'],
     });
 
     this.$on('query' as never, (e: any) => {
-      if (process.env.NODE_ENV !== EnvironmentTypeEnum.PROD) {
+      if (this.configService.nodeEnv !== EnvironmentTypeEnum.PROD) {
         this.logger.debug(`Query: ${e.query}`);
         this.logger.debug(`Duration: ${e.duration}ms`);
       } else if (e.duration > 200) {

@@ -4,11 +4,11 @@ import {
   UnauthorizedException,
   ExecutionContext,
 } from '@nestjs/common';
-import { CacheService } from '../../InfrastructureLayer/Services/CacheService';
+import { InMemoryCacheService } from '../../InfrastructureLayer/Services/InMemoryCacheService';
 import { UserTypeEnum } from '../../DomainLayer/Enums/UserTypeEnum';
 import { JwtAuthGuard } from './JwtAuthGuard';
 import { Reflector } from '@nestjs/core';
-import { TokenRepository } from '../../BusinessLayer/TokenRepository';
+import { TokenRepository } from 'src/BussinessLayer/TokenRepository';
 
 @Injectable()
 export class AdminAuthGuard extends JwtAuthGuard implements CanActivate {
@@ -22,7 +22,7 @@ export class AdminAuthGuard extends JwtAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     await super.canActivate(context);
 
-    const authUser = await CacheService.getFromInMemory('authUser');
+    const authUser = await InMemoryCacheService.getFromInMemory('authUser');
 
     if (authUser && authUser.role === UserTypeEnum.ADMIN) {
       return true;

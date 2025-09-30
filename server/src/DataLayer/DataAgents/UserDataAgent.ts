@@ -1,305 +1,235 @@
-import { PrismaService } from 'src/InfrastructureLayer/Services/PrismaService';
-import { FileCategory, User, UserRole, UserStatus } from '@prisma/client';
-import { Injectable } from '@nestjs/common';
+import { UserStatusEnum } from 'src/DomainLayer/Enums/UserStatusEnum';
+import { Inject, Injectable } from '@nestjs/common';
 import { PagedData } from 'src/DomainLayer/Models/PagedData';
-import { IUser } from '../Abstracts/Interface/IUser';
-import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
+import type {
+  IDatabaseAdapter,
+  ModelProxy,
+  QuerySpec,
+} from '../Adapters/DatabaseAdapter';
+import { User } from 'src/DomainLayer/Models/User';
+import { DatabaseConstant } from 'src/DomainLayer/Constants/DatabaseConstant';
+import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
+import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 
 @Injectable()
 export class UserDataAgent {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly model: ModelProxy<User>;
 
-  async CreateUserAsync(data: IUser): Promise<User> {
-    const createdUser = await this.prisma.user.create({ data: data });
-    return createdUser;
+  constructor(
+    @Inject(DatabaseConstant.DATABASE_ADAPTER)
+    private readonly db: IDatabaseAdapter,
+  ) {
+    this.model = this.db.getModel<User>('user');
   }
 
-  async GetUserByEmail(email: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-      include: {
-        location: true,
-        userFiles: {
-          where: {
-            category: FileCategory.USER_PROFILE_IMAGE,
-          },
-          select: {
-            id: true,
-            fullPath: true,
-          },
-        },
-        followers: true,
-        followees: true,
-        _count: {
-          select: {
-            followers: true,
-            followees: true,
-            comments: true,
-            userPins: true,
-          },
-        },
+  async createUserAsync(data: Partial<User>): Promise<User> {
+    return this.model.insert(data);
+  }
+
+  async getUserByEmail(email: string) {
+    const spec: QuerySpec = {
+      filter: {
+        AND: [
+          { field: 'email', op: 'eq', value: email },
+          { field: 'isDeleted', op: 'eq', value: false },
+        ],
       },
-    });
-
-    if (!user) return null;
-
-    const { _count, ...userWithoutCount } = user;
-
-    return {
-      user: userWithoutCount,
-      isFollowing: user.followers.length > 0, // I follow them
-      isFollower: user.followees.length > 0, // They follow me
-      counts: {
-        followers: _count.followers,
-        followees: _count.followees,
-        comments: _count.comments,
-        recommendations: _count.userPins, // renamed for clarity
+      extras: {
+        include: {
+          _count: {
+            select: {
+              favorites: true,
+            },
+          },
+        },
       },
     };
+    return this.model.findOne(spec);
   }
 
-  async GetUserById(userId: number): Promise<any | null> {
-    const loggedInUser = await UserHelper.getLoggedInUser();
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId, isDeleted: false },
-      include: {
-        userFiles: true,
-        userPins: true,
-        location: true,
-        followers: {
-          where: { followerId: loggedInUser?.userId }, // I follow them
-        },
-        followees: {
-          where: { followeeId: loggedInUser?.userId }, // They follow me
-        },
-        _count: {
-          select: {
-            followers: true,
-            followees: true,
-            comments: true,
-            userPins: true,
+  async getUserById(userId: number): Promise<User | null> {
+    const spec: QuerySpec = {
+      filter: {
+        AND: [
+          { field: 'id', op: 'eq', value: userId },
+          { field: 'isDeleted', op: 'eq', value: false },
+        ],
+      },
+      extras: {
+        include: {
+          _count: {
+            select: {
+              favorites: true,
+            },
           },
         },
       },
-    });
+    };
+    return this.model.findOne(spec);
+  }
 
-    if (!user) return null;
-
-    const { _count, ...userWithoutCount } = user;
-
-    return {
-      ...userWithoutCount,
-      isFollowing: user.followers.length > 0,
-      isFollower: user.followees.length > 0,
-      counts: {
-        followers: _count.followers,
-        followees: _count.followees,
-        comments: _count.comments,
-        recommendations: _count.userPins, // renamed for clarity
+  async getAdminUserById(userId: number): Promise<User | null> {
+    const spec: QuerySpec = {
+      filter: {
+        AND: [
+          { field: 'userId', op: 'eq', value: userId },
+          { field: 'role', op: 'eq', value: UserRoleEnum.ADMIN },
+          { field: 'isDeleted', op: 'eq', value: false },
+        ],
+      },
+      extras: {
+        include: {
+          _count: {
+            select: {
+              favorites: true,
+            },
+          },
+        },
       },
     };
+    return this.model.findOne(spec);
   }
 
-  async GetAdminUserById(userId: number): Promise<any | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId, role: UserRole.ADMIN, isDeleted: false },
-    });
-    return user;
+  async getAdminUserByRole(): Promise<User | null> {
+    const spec: QuerySpec = {
+      filter: {
+        AND: [
+          { field: 'role', op: 'eq', value: UserRoleEnum.ADMIN },
+          { field: 'isDeleted', op: 'eq', value: false },
+        ],
+      },
+    };
+    return this.model.findOne(spec);
   }
 
-  async GetAdminUserByRole(): Promise<any | null> {
-    const user = await this.prisma.user.findFirst({
-      where: { role: UserRole.ADMIN, isDeleted: false },
-    });
-    return user;
-  }
-
-  async UpdateUser(userId: number, data: Partial<User>): Promise<User> {
+  async updateUser(userId: number, data: Partial<User>): Promise<User | null> {
     const { id, ...updateData } = data;
-    const updatedUser = await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        ...updateData,
-      },
-      include: { userFiles: true, location: true, userPins: true },
-    });
-    return updatedUser;
+    const spec: QuerySpec = {
+      filter: { field: 'id', op: 'eq', value: userId },
+    };
+    return this.model.updateOne(spec, updateData);
   }
 
-  async DeleteUser(userId: number) {
-    const deletedUser = await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        userStatus: UserStatus.DELETED,
-        isDeleted: true,
-        deletedAt: new Date(),
-      },
+  async deleteUser(userId: number) {
+    const spec: QuerySpec = {
+      filter: { field: 'id', op: 'eq', value: userId },
+    };
+    return this.model.updateOne(spec, {
+      userStatus: UserStatusEnum.DELETED,
+      isDeleted: true,
+      deletedAt: new Date(),
     });
-    return deletedUser;
   }
 
-  async GetUsersByFilter(
-    filters: any,
+  async getUsersByFilter(
+    filter: any,
     pageSize: number,
     pageNumber: number,
-  ): Promise<PagedData<IUser[]>> {
-    const skip = (pageNumber - 1) * pageSize;
+  ): Promise<PagedData<User[]>> {
+    const pageData = new PagedData<User[]>();
+    pageData.page = pageNumber;
+    pageData.pageSize = pageSize;
 
-    const pageData = new PagedData<IUser[]>();
-    pageData.page = Number(pageNumber);
+    const mergedFilter = FilterQueryHelper.mergeFilterWithCondition(filter, {
+      field: 'isDeleted',
+      op: 'eq',
+      value: false,
+    });
 
-    const finalFilters = { ...filters, isDeleted: false };
-
-    const loggedInUser = await UserHelper.getLoggedInUser();
-    filters['userId'] = filters?.userId ?? loggedInUser?.userId;
-
-    const [totalUsers, filteredCount, users] = await Promise.all([
-      this.prisma.user.count({ where: { isDeleted: false } }),
-      this.prisma.user.count({ where: finalFilters }),
-      this.prisma.user.findMany({
-        where: {
-          ...finalFilters,
-          id: { not: filters?.userId }, // Exclude the logged-in user from the result
-        },
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: Number(pageSize),
+    const spec: QuerySpec = {
+      filter: mergedFilter,
+      sort: [{ field: 'createdAt', direction: 'desc' }],
+      pagination: { page: pageNumber, pageSize },
+      extras: {
         include: {
-          userPins: true,
-          userFiles: {
-            where: {
-              category: FileCategory.USER_PROFILE_IMAGE,
-            },
-          },
-          followers: {
-            where: { followerId: filters?.userId }, // I follow them
-          },
-          followees: {
-            where: { followeeId: filters?.userId }, // They follow me
-          },
           _count: {
             select: {
-              followers: true,
-              followees: true,
-              comments: true,
-              userPins: true,
+              favorites: true,
             },
           },
         },
-      }),
-    ]);
-
-    pageData.total = totalUsers;
-    pageData.pageSize = filteredCount;
-
-    pageData.data = users.map((user) => ({
-      ...user,
-      isFollowing: user.followers.length > 0, // I follow them
-      isFollower: user.followees.length > 0, // They follow me
-      counts: {
-        followers: user._count.followers,
-        followees: user._count.followees,
-        comments: user._count.comments,
-        recommendations: user._count.userPins, // Renamed for clarity
       },
-    }));
+    };
 
+    const total = await this.model.count({ filter: mergedFilter });
+    pageData.total = total;
+    pageData.pageCount = Math.ceil(total / pageSize);
+
+    const data = await this.model.find(spec);
+    pageData.data = data;
     return pageData;
   }
 
-  async AdminGetUsersByFilter(
-    filters: any,
+  async adminGetUsersByFilter(
+    filter: any,
     pageSize: number,
     pageNumber: number,
-  ): Promise<PagedData<IUser[]>> {
-    const skip = (pageNumber - 1) * pageSize;
+  ): Promise<PagedData<User[]>> {
+    const pageData = new PagedData<User[]>();
+    pageData.page = pageNumber;
+    pageData.pageSize = pageSize;
 
-    const pageData = new PagedData<IUser[]>();
-    pageData.page = Number(pageNumber);
+    const mergedFilter = FilterQueryHelper.mergeFilterWithCondition(filter, {
+      AND: [
+        { field: 'isDeleted', op: 'eq', value: false },
+        { field: 'id', op: 'ne', value: filter.field === 'id' },
+      ],
+    });
 
-    const finalFilters = { ...filters, isDeleted: false };
-
-    const [totalUsers, filteredCount, users] = await Promise.all([
-      this.prisma.user.count({ where: { isDeleted: false } }),
-      this.prisma.user.count({ where: finalFilters }),
-      this.prisma.user.findMany({
-        where: {
-          ...finalFilters,
-          id: { not: filters?.userId },
-        },
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: Number(pageSize),
+    const spec: QuerySpec = {
+      filter: mergedFilter,
+      sort: [{ field: 'createdAt', direction: 'desc' }],
+      pagination: { page: pageNumber, pageSize },
+      extras: {
         include: {
-          userPins: true,
-          userFiles: {
-            where: {
-              category: FileCategory.USER_PROFILE_IMAGE,
-            },
-          },
-          followers: true,
-          followees: true,
           _count: {
             select: {
-              followers: true,
-              followees: true,
-              comments: true,
+              favorites: true,
             },
           },
         },
-      }),
-    ]);
+      },
+    };
 
-    pageData.total = totalUsers;
-    pageData.pageSize = filteredCount;
+    const total = await this.model.count({ filter: mergedFilter });
+    pageData.total = total;
+    pageData.pageCount = Math.ceil(total / pageSize);
 
-    pageData.data = users.map((user) => ({
-      ...user,
-      isFollower: user.followers.length > 0,
-      isFollowing: user.followees.length > 0,
-      followers: user._count.followers,
-      followees: user._count.followees,
-      comments: user._count.comments,
-    }));
-
+    const data = await this.model.find(spec);
+    pageData.data = data;
     return pageData;
-  }
-
-  async ConnectUserFile(userId: number, fileId: number) {
-    return await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        userFiles: {
-          connect: { id: fileId },
-        },
-      },
-      include: {
-        userFiles: true,
-      },
-    });
   }
 
   async getAdminOverview() {
-    const totalUsers = await this.prisma.user.count({});
+    const totalUsers = await this.model.count({});
 
-    const newSignups = await this.prisma.user.count({
-      where: {
-        createdAt: {
-          gte: new Date(new Date().setDate(new Date().getDate() - 7)), // Last 7 days
+    const newSignups = await this.model.count({
+      filter: {
+        filter: {
+          field: 'createdAt',
+          op: 'gte',
+          value: new Date(new Date().setDate(new Date().getDate() - 7)), // Last 7 days
         },
       },
     });
 
-    const activeAccounts = await this.prisma.user.count({
-      where: {
-        userStatus: UserStatus.ACTIVE,
+    const activeAccounts = await this.model.count({
+      filter: {
+        filter: {
+          field: 'userStatus',
+          op: 'eq',
+          value: UserStatusEnum.ACTIVE,
+        },
       },
     });
 
-    const deletedAccounts = await this.prisma.user.count({
-      where: {
-        userStatus: UserStatus.DELETED,
+    const deletedAccounts = await this.model.count({
+      filter: {
+        filter: {
+          field: 'userStatus',
+          op: 'eq',
+          value: UserStatusEnum.DELETED,
+        },
       },
     });
 
@@ -311,4 +241,3 @@ export class UserDataAgent {
     };
   }
 }
-

@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -8,13 +7,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  NON_BINARY
+  OTHERS
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  DEACTIVATED
+  RESTRICTED
+  LOCKED
+  DELETED
+}
+
 model User {
-  id        Int        @id @default(autoincrement())
-  name      String
-  email     String     @unique
-  favorites Favorite[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id                      Int                @id @default(autoincrement())
+  email                   String             @unique
+  password                String
+  role                    UserRole           @default(USER)
+  firstName               String
+  lastName                String
+  username                String?            @unique
+  gender                  Gender?
+  phoneNumber             String?
+  bio                     String?
+  phoneCountryCode        String?
+  phoneNumberConfirmed    Boolean?
+  userStatus              UserStatus         @default(ACTIVE)
+  emailConfirmed          Boolean            @default(false)
+  confirmationCode        String?
+  confirmationCodeExpires DateTime?
+  refreshToken            String?
+  passwordResetToken      String?
+  passwordResetExpires    DateTime?
+  passwordChangedAt       DateTime?
+  lastLoginAt             DateTime?
+  isDeleted               Boolean            @default(false)
+  isUpdated               Boolean            @default(false)
+  deletedAt               DateTime?
+  locationId              Int?
+  userNotifications       UserNotification[]
+  favorites               Favorite[]
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+
+  @@index([email])
+  @@index([username])
+  @@index([locationId])
 }
 
 model Restaurant {
@@ -42,4 +89,31 @@ model Favorite {
   restaurant Restaurant @relation(fields: [restaurantId], references: [id])
 
   @@unique([userId, restaurantId])
+}
+
+model UserNotification {
+  id                   Int      @id @default(autoincrement())
+  userId               Int
+  title                String
+  message              String
+  notificationCategory String
+  isRead               Boolean  @default(false)
+  icon                 String?
+  link                 String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model NotificationSettings {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  userStatus  String?
+  settings    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
 }

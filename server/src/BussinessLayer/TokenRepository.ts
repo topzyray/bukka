@@ -2,22 +2,26 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenClaims } from 'src/DomainLayer/Models/TokenClaims';
 import { Generator } from 'src/InfrastructureLayer/Services/Generator';
+import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
 
 @Injectable()
 export class TokenRepository {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: AppConfigurationService,
+  ) {}
 
   async generateAccessTokenAsync(claims: TokenClaims): Promise<string> {
     const options = {
-      expiresIn: Number.parseInt(process.env.TOKEN_EXPIRY_IN_SECONDS, 10),
-      secret: process.env.TOKEN_SECRET,
+      expiresIn: Number.parseInt(this.configService.tokenExpiry as string, 10),
+      secret: this.configService.tokenSecret,
     };
     return this.jwtService.signAsync({ claims }, options);
   }
 
   verifyAccessTokenAsync(token: string): Promise<TokenClaims> {
     const options = {
-      secret: process.env.TOKEN_SECRET,
+      secret: this.configService.tokenSecret,
     };
     return this.jwtService.verifyAsync<TokenClaims>(token, options);
   }
@@ -33,14 +37,17 @@ export class TokenRepository {
 
   async generateEmailConfirmationTokenAsync(email: string): Promise<string> {
     const payload = { email, type: 'emailConfirmation' };
-    const options = { expiresIn: '24h', secret: process.env.TOKEN_SECRET }; // Token will expire in 24 hours
+    const options = {
+      expiresIn: '24h',
+      secret: this.configService.tokenSecret,
+    }; // Token will expire in 24 hours
     return await this.jwtService.signAsync(payload, options);
   }
 
   async verifyEmailConfirmationTokenAsync(token: string): Promise<any> {
     try {
       const payload = this.jwtService.verify(token, {
-        secret: process.env.TOKEN_SECRET,
+        secret: this.configService.tokenSecret,
       });
       if (payload.type !== 'emailConfirmation') {
         throw new UnauthorizedException();

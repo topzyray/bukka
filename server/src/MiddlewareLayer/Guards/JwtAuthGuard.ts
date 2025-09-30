@@ -4,9 +4,10 @@ import {
   ExecutionContext,
   ForbiddenException,
 } from '@nestjs/common';
-import { TokenRepository } from 'src/BusinessLayer/TokenRepository';
-import { CacheService } from 'src/InfrastructureLayer/Services/CacheService';
+import { TokenRepository } from 'src/BussinessLayer/TokenRepository';
+
 import { RoutePermissions } from 'src/InfrastructureLayer/Permissions/RoutePermissions';
+import { InMemoryCacheService } from 'src/InfrastructureLayer/Services/InMemoryCacheService';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -39,8 +40,8 @@ export class JwtAuthGuard implements CanActivate {
         );
       }
 
-      CacheService.saveToInMemory('authUser', claims);
-      CacheService.saveToInMemory('authToken', token);
+      InMemoryCacheService.saveToInMemory('authUser', claims);
+      InMemoryCacheService.saveToInMemory('authToken', token);
       return true;
     } catch (error: any) {
       console.log(error);

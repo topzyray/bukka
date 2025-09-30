@@ -217,7 +217,7 @@ export class BukkaResponse<K> {
     message?: string,
     errorCode?: number,
     success?: boolean,
-    data?: object,
+    data?: object | null,
   ) {
     return {
       status: success ?? false,

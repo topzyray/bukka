@@ -1,6 +1,6 @@
 import { UserRepository } from './UserRepository';
 import { Generator } from 'src/InfrastructureLayer/Services/Generator';
-import { InuResponse } from 'src/DomainLayer/Models/InuResponse';
+import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import {
   ChangePasswordDto,
   ConfirmEmailDto,
@@ -12,311 +12,397 @@ import {
   ResetPasswordDto,
 } from 'src/DomainLayer/Dtos/AuthDto';
 import { CreateUserDto, UserDto } from 'src/DomainLayer/Dtos/UserDto';
-import { User } from '@prisma/client';
 import { ValidationHelper } from 'src/InfrastructureLayer/Helpers/ValidationHelper';
 import { UserStatusEnum } from 'src/DomainLayer/Enums/UserStatusEnum';
 import { TokenRepository } from './TokenRepository';
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { mapper } from 'src/InfrastructureLayer/Services/MapperService';
 import { TokenClaims } from 'src/DomainLayer/Models/TokenClaims';
 import { UserResponse } from 'src/DomainLayer/Models/UserResponse';
-import { FollowerRepository } from './FollowRepository';
+import { User } from 'src/DomainLayer/Models/User';
+import { TypeSafeMapper } from 'src/MiddlewareLayer/Mappings/TypeSafeMapper';
+import { UserWithCounts } from 'src/DomainLayer/Models/UserWithCounts';
+import { AuthNotificationService } from 'src/InfrastructureLayer/Services/notification/auth/AuthNotificationService';
+import { NotificationSettingsDataAgent } from 'src/DataLayer/DataAgents/NotificationSettingsDataAgent';
+import { AuthQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/AuthQueueEnum';
+import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
+import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
+import { AppUrlTypeEnum } from 'src/DomainLayer/Enums/AppUrlTypeEnum';
+import { TextHelper } from 'src/InfrastructureLayer/Helpers/TextHelper';
 
 @Injectable()
 export class AuthRepository {
   constructor(
     private readonly _userRepository: UserRepository,
     private readonly _tokenRepository: TokenRepository,
-    private readonly _followerRepository: FollowerRepository,
+    private readonly _notif: AuthNotificationService,
+    private readonly _notifSetting: NotificationSettingsDataAgent,
+    private readonly _configService: AppConfigurationService,
   ) {}
 
-  async registerUser(userDto: CreateUserDto): Promise<InuResponse> {
+  async registerUser(userDto: CreateUserDto): Promise<BukkaResponse<User>> {
     const hashedPassword = await Generator.hash(userDto.password, 10);
     userDto.password = hashedPassword;
+    const data = await this._userRepository.createUserAsync(userDto);
 
-    return await this._userRepository.createUserAsync(userDto);
+    if (data.status) {
+      const newSettings = {
+        userId: data?.responseData?.id,
+        settings: {
+          isEmailTurnedOn: true,
+          isInAppTurnedOn: true,
+          isPushTurnedOn: true,
+        },
+      };
+      await this._notifSetting.createNotificationSetting(newSettings);
+
+      this._notif.processSignupWelcome(
+        {
+          userId: data?.responseData?.id,
+          email: data?.responseData?.email,
+          firstName: data?.responseData?.firstName,
+          getStartedLink:
+            this._configService.nodeEnv === EnvironmentTypeEnum.DEV
+              ? AppUrlTypeEnum.LOCAL
+              : AppUrlTypeEnum.PROD,
+          userType: data?.responseData?.userType,
+        },
+        AuthQueueMessageTypeEnum.SIGNUP,
+      );
+
+      this._notif.processAccountConfirmation(
+        {
+          userId: data?.responseData?.id,
+          email: data?.responseData?.email,
+          firstName: data?.responseData?.firstName,
+          confirmationCode: data?.responseData?.confirmationCode,
+          confirmationCodeExpires: data?.responseData?.confirmationCodeExpires,
+        },
+        AuthQueueMessageTypeEnum.SIGNUP,
+      );
+    }
+    const mappedData = TypeSafeMapper.map(
+      data?.responseData,
+      UserResponse,
+      UserDto,
+    );
+    return { ...data, responseData: mappedData };
   }
 
-  async login(loginDto: LoginDto): Promise<InuResponse> {
-    const response = await this._userRepository.findUserByEmail(loginDto.email);
+  async login(loginDto: LoginDto): Promise<BukkaResponse<User>> {
+    const response = (await this._userRepository.findUserByEmail(
+      loginDto.email,
+    )) as UserWithCounts;
     if (!response) {
-      return InuResponse.loginResponse(
+      return BukkaResponse.loginResponse(
         'user',
-        response?.user,
+        response,
         false,
-        'User with the email does not exist',
+        'Invalid Credentials!',
       );
     }
-    const validUser = await this.validateUserAsync(
-      response.user,
-      loginDto.password,
-    );
+    const validUser = await this.validateUserAsync(response, loginDto.password);
     if (!validUser) {
-      return InuResponse.loginResponse(
+      return BukkaResponse.loginResponse(
         'user',
-        response.user,
+        response,
         false,
-        'Incorrect Login Details',
+        'Invalid credentials!',
       );
     }
-    if (!response?.user.emailConfirmed) {
-      return InuResponse.loginResponse(
+    if (!response?.emailConfirmed) {
+      return BukkaResponse.loginResponse(
         'user',
-        response.user,
+        response,
         false,
-        'Please confirm your email address to be verified',
+        'Email verification required!',
       );
     }
-    if (response?.user.userStatus === UserStatusEnum.LOCKED) {
-      return InuResponse.loginResponse(
+    if (response?.userStatus === UserStatusEnum.LOCKED) {
+      return BukkaResponse.loginResponse(
         'user',
-        response.user,
+        response,
         false,
         'Your account has been locked. Please contact support.',
       );
     }
 
-    const claims = mapper.map(response.user, UserDto, TokenClaims);
+    const claims = TypeSafeMapper.map(response, TokenClaims, UserDto);
 
     const accessToken =
       await this._tokenRepository.generateAccessTokenAsync(claims);
     const refreshToken =
       await this._tokenRepository.generateRefreshTokenAsync();
-    response.user.refreshToken = refreshToken;
-    response.user.lastLoginAt = new Date();
+    response.refreshToken = refreshToken;
+    response.lastLoginAt = new Date();
 
     const loginResponse = new LoginResponseDto();
 
-    await this._userRepository.updateOtherUserAsync(response.user.id, {
-      id: response.user.id,
-      refreshToken: response.user.refreshToken,
-      lastLoginAt: response.user.lastLoginAt,
+    await this._userRepository.updateOtherUserAsync(response?.id as number, {
+      id: response?.id,
+      refreshToken: response?.refreshToken,
+      lastLoginAt: response?.lastLoginAt,
     });
 
-    loginResponse.user = mapper.map(response.user, UserDto, UserResponse);
+    loginResponse.user = TypeSafeMapper.map(response, UserResponse, UserDto);
 
     loginResponse.accessToken = accessToken;
-    loginResponse.refreshToken = response.user.refreshToken;
-    loginResponse.counts = response.counts;
+    loginResponse.refreshToken = response.refreshToken;
+    loginResponse.counts = response?.counts;
 
-    return InuResponse.loginResponse('user', loginResponse, true);
+    return BukkaResponse.loginResponse('User', loginResponse, true);
   }
 
-  async refreshToken(refreshToken: RefreshTokenDto): Promise<InuResponse> {
+  async refreshToken(
+    refreshToken: RefreshTokenDto,
+  ): Promise<BukkaResponse<User>> {
     const response = await this._userRepository.findUserById(
       refreshToken.userId,
     );
 
     if (!response) {
-      return InuResponse.GetSingleDataResponse('User', response);
+      return BukkaResponse.GetSingleDataResponse('User', response);
     }
 
-    if (response.user.refreshToken !== refreshToken.oldRefreshToken) {
-      return InuResponse.customResponse(
+    if (response.refreshToken !== refreshToken.oldRefreshToken) {
+      return BukkaResponse.errorResponse(
         'Invalid Refresh Token, Please Re-Login',
         HttpStatus.FORBIDDEN,
-        false,
-        null,
       );
     }
 
     const claims = {
-      userId: response.user.id,
-      email: response.user.email,
-      firstName: response.user.firstName,
-      lastName: response.user.lastName,
-      role: response.user.role,
+      userId: response.id as number,
+      email: response.email,
+      firstName: response.firstName,
+      lastName: response.lastName,
+      role: response.role,
     };
 
     const accessToken =
       await this._tokenRepository.generateAccessTokenAsync(claims);
 
-    response.user.refreshToken =
+    response.refreshToken =
       await this._tokenRepository.generateRefreshTokenAsync();
 
-    await this._userRepository.updateOtherUserAsync(response.user.id, {
-      refreshToken: response.user.refreshToken,
+    await this._userRepository.updateOtherUserAsync(response.id as number, {
+      refreshToken: response.refreshToken,
     });
 
-    return InuResponse.GetSingleDataResponse('token', {
+    return BukkaResponse.GetSingleDataResponse('token', {
       token: accessToken,
-      refreshToken: response.user.refreshToken,
+      refreshToken: response.refreshToken,
     });
   }
 
   async forgotPassword(
     forgotPassword: ForgotPasswordDto,
-  ): Promise<InuResponse> {
+  ): Promise<BukkaResponse<User>> {
     const response = await this._userRepository.findUserByEmail(
       forgotPassword.email,
     );
 
     if (!response) {
-      return InuResponse.GetSingleDataResponse('User', response);
+      return BukkaResponse.GetSingleDataResponse('User', response);
     }
 
-    response.user.passwordResetToken =
+    response.passwordResetToken =
       await this._tokenRepository.generatePasswordResetTokenAsync();
 
     const result = await this._userRepository.updateOtherUserAsync(
-      response.user.id,
+      response.id as number,
       {
-        passwordResetToken: response.user.passwordResetToken,
+        passwordResetToken: response.passwordResetToken,
+        passwordResetExpires: new Date(),
       },
     );
 
     if (!result) {
-      return InuResponse.customResponse(
-        'Unable to request a new password reset code',
+      return BukkaResponse.customResponse(
+        'Unable to process your request!',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
-    return InuResponse.customResponse(
+    await this._notif.processPasswordReset(
+      {
+        userId: result?.responseData?.id,
+        email: result?.responseData?.email,
+        firstName: result?.responseData?.firstName,
+        passwordResetToken: result?.responseData?.passwordResetToken,
+        passwordResetTokenExpires:
+          `${TextHelper.getFormattedDate(result?.responseData?.passwordResetTokenExpires)} at ${TextHelper.getFormattedTime(result?.responseData?.passwordResetTokenExpires)}` as unknown as Date,
+      },
+      AuthQueueMessageTypeEnum.FORGOT_PASSWORD,
+    );
+
+    return BukkaResponse.customResponse(
       `We've sent a password reset link to ${result.responseData.email}. Please check your inbox and follow the instructions.`,
       HttpStatus.OK,
       true,
-      response.user,
+      response,
     );
   }
 
-  async resetPassword(data: ResetPasswordDto): Promise<InuResponse> {
+  async resetPassword(data: ResetPasswordDto): Promise<BukkaResponse<User>> {
     const response = await this._userRepository.findUserByEmail(data.email);
 
     if (!response) {
-      return InuResponse.GetSingleDataResponse('user', response);
+      return BukkaResponse.GetSingleDataResponse('user', response);
     }
 
-    if (response.user.passwordResetToken !== data.token) {
-      return InuResponse.GetSingleDataResponse(
+    if (Date.now() > Number(response.passwordResetExpires)) {
+      return BukkaResponse.customResponse(
+        'This token has expired. Please request a new one.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (response.passwordResetToken !== data.token) {
+      return BukkaResponse.GetSingleDataResponse(
         'User',
-        response.user,
+        response,
         'Invalid password reset code',
         HttpStatus.BAD_REQUEST,
       );
     }
-    return await this.updatePassword(response.user, data.newPassword);
+    return await this.updatePassword(response, data.newPassword);
   }
 
   async changePassword(
     changePassword: ChangePasswordDto,
-  ): Promise<InuResponse> {
+  ): Promise<BukkaResponse<User>> {
     const response = await this._userRepository.findUserById(
       changePassword.userId,
     );
 
     if (!response) {
-      return InuResponse.loginResponse(
+      return BukkaResponse.loginResponse(
         'User',
-        response.user,
+        response,
         false,
         'User does not exist',
       );
     }
 
     const validUser = await this.validateUserAsync(
-      response.user,
+      response,
       changePassword.currentPassword,
     );
 
     if (!validUser) {
-      return InuResponse.loginResponse(
+      return BukkaResponse.loginResponse(
         'User',
-        response.user,
+        response,
         false,
         'Incorrect Current Password',
       );
     }
 
-    return await this.updatePassword(response.user, changePassword.newPassword);
+    return await this.updatePassword(response, changePassword.newPassword);
   }
 
   async resendConfirmationEmail(
     confirmEmailDto: ResendConfirmEmailDto,
-  ): Promise<InuResponse> {
+  ): Promise<BukkaResponse<User>> {
     const response = await this._userRepository.findUserByEmail(
       confirmEmailDto.email,
     );
 
     if (!response) {
-      return InuResponse.customResponse(
+      return BukkaResponse.customResponse(
         'User does not exist',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (response.user.emailConfirmed) {
-      return InuResponse.customResponse(
+    if (response.emailConfirmed) {
+      return BukkaResponse.customResponse(
         'Your email has already been verified. You can now log in.',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    response.user.confirmationCode = Generator.GenerateDigits(6).toString();
-    response.user.confirmationCodeExpires =
-      Generator.calculateExpirationTime(30);
+    response.confirmationCode = Generator.GenerateDigits(6).toString();
+    response.confirmationCodeExpires = Generator.calculateExpirationTime(30);
 
-    await this._userRepository.updateOtherUserAsync(response.user.id, {
-      confirmationCode: response.user.confirmationCode,
-      confirmationCodeExpires: response.user.confirmationCodeExpires,
-    });
+    const data = await this._userRepository.updateOtherUserAsync(
+      response.id as number,
+      {
+        confirmationCode: response.confirmationCode,
+        confirmationCodeExpires: response.confirmationCodeExpires,
+      },
+    );
 
-    return InuResponse.customResponse(
-      `Confirmation Email Resent Successfully to ${confirmEmailDto.email}`,
+    if (data.status) {
+      this._notif.processResendConfirmation(
+        {
+          userId: data?.responseData?.id,
+          email: data?.responseData?.email,
+          firstName: data?.responseData?.firstName,
+          confirmationCode: data?.responseData?.confirmationCode,
+          confirmationCodeExpires: data?.responseData?.confirmationCodeExpires,
+        },
+        AuthQueueMessageTypeEnum.RESEND_CONFIRMATION_EMAIL,
+      );
+    }
+
+    return BukkaResponse.customResponse(
+      `Confirmation Email Sent Successfully to ${confirmEmailDto.email}`,
       HttpStatus.OK,
       true,
-      response.user,
+      null,
     );
   }
 
-  async verifyEmail(confirmationDto: ConfirmEmailDto): Promise<InuResponse> {
+  async verifyEmail(
+    confirmationDto: ConfirmEmailDto,
+  ): Promise<BukkaResponse<User>> {
     const response = await this._userRepository.findUserByEmail(
       confirmationDto.email,
     );
 
     if (!response) {
-      return InuResponse.customResponse(
+      return BukkaResponse.customResponse(
         'User does not exist',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (response.user.emailConfirmed) {
-      return InuResponse.customResponse(
-        'Your email has already been verified. You can now log in.',
+    if (response.emailConfirmed) {
+      return BukkaResponse.customResponse(
+        'Email verification successfull. Please login.',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (Date.now() > Number(response.user.confirmationCodeExpires)) {
-      return InuResponse.customResponse(
-        'This verification link has expired. Please request a new verification email if needed.',
+    if (Date.now() > Number(response.confirmationCodeExpires)) {
+      return BukkaResponse.customResponse(
+        'This token has expired. Please request a new one.',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (confirmationDto.token !== response.user.confirmationCode) {
-      return InuResponse.customResponse(
-        'Incorrect confirmation code',
+    if (confirmationDto.token !== response.confirmationCode) {
+      return BukkaResponse.customResponse(
+        'Inavalid confirmation code',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    response.user.userStatus = UserStatusEnum.ACTIVE;
-    response.user.emailConfirmed = true;
-    response.user.confirmationCode = null;
-    response.user.confirmationCodeExpires = null;
+    response.userStatus = UserStatusEnum.ACTIVE;
+    response.emailConfirmed = true;
+    response.confirmationCode = null;
+    response.confirmationCodeExpires = null;
 
-    await this._userRepository.updateOtherUserAsync(response.user.id, {
-      userStatus: response.user.userStatus,
-      emailConfirmed: response.user.emailConfirmed,
-      confirmationCode: response.user.confirmationCode,
-      confirmationCodeExpires: response.user.confirmationCodeExpires,
+    await this._userRepository.updateOtherUserAsync(response.id as number, {
+      userStatus: response.userStatus,
+      emailConfirmed: response.emailConfirmed,
+      confirmationCode: response.confirmationCode,
+      confirmationCodeExpires: response.confirmationCodeExpires,
     });
-    await this._followerRepository.followAdmin(response.user.id);
 
-    return InuResponse.customResponse(
-      'Your email address has been successfully verified! You can now log in to your account.',
+    return BukkaResponse.customResponse(
+      'Email verification successful! Please login.',
       HttpStatus.OK,
       true,
       null,
@@ -326,25 +412,28 @@ export class AuthRepository {
   private async updatePassword(
     user: User,
     newPassword: string,
-  ): Promise<InuResponse> {
+  ): Promise<BukkaResponse<User>> {
     const hashedPassword = await Generator.hash(newPassword, 10);
     user.password = hashedPassword;
-    const result = await this._userRepository.updateOtherUserAsync(user.id, {
-      password: user.password,
-      passwordChangedAt: new Date(),
-      passwordResetToken: null,
-      passwordResetExpires: null,
-    });
+    const result = await this._userRepository.updateOtherUserAsync(
+      user.id as number,
+      {
+        password: user.password,
+        passwordChangedAt: new Date(),
+        passwordResetToken: null,
+        passwordResetExpires: null,
+      },
+    );
 
     if (!result.status) {
-      return InuResponse.customResponse(
+      return BukkaResponse.customResponse(
         'Unable to change password',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
-    return InuResponse.customResponse(
-      'Your password has been successfully reset. You can now use your new password to login',
+    return BukkaResponse.customResponse(
+      'Password reset successful. You can now login with your new password!',
       HttpStatus.OK,
       true,
     );

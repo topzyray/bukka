@@ -1,170 +1,131 @@
-import { Injectable } from '@nestjs/common';
-import { IUserNotification } from '../Abstracts/Interface/IUserNotification';
-import { PagedData } from 'src/DomainLayer/Models/PagedData';
-import { PrismaService } from 'src/InfrastructureLayer/Services/PrismaService';
-import { FileCategory, UserNotification } from '@prisma/client';
+import { DatabaseConstant } from './../../DomainLayer/Constants/DatabaseConstant';
+import { Inject, Injectable } from '@nestjs/common';
+import { PagedData } from '../../DomainLayer/Models/PagedData';
+import { ResponseHelper } from 'src/InfrastructureLayer/Helpers/ResponseHelper';
+import type {
+  IDatabaseAdapter,
+  ModelProxy,
+  QuerySpec,
+} from '../Adapters/DatabaseAdapter';
+import { UserNotification } from 'src/DomainLayer/Models/UserNotification';
 
 @Injectable()
 export class UserNotificationDataAgent {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly model: ModelProxy<UserNotification>;
 
-  async DropUserNotificationsByUserId(userId: number) {
-    await this.prisma.userNotification.deleteMany({ where: { id: userId } });
-    return null;
+  constructor(
+    @Inject(DatabaseConstant.DATABASE_ADAPTER)
+    private readonly db: IDatabaseAdapter,
+  ) {
+    this.model = this.db.getModel<UserNotification>('userNotification');
   }
 
-  async CreateUserNotification(
-    data: IUserNotification,
+  async createUserNotification(
+    data: Partial<UserNotification>,
   ): Promise<UserNotification> {
-    const result = await this.prisma.userNotification.create({ data });
-
-    return result;
+    return this.model.insert(data);
   }
 
-  async CreateUsersNotification(data: IUserNotification[]) {
-    const results = await this.prisma.userNotification.createMany({ data });
-    return results;
+  async createMultipleUserNotifications(data: Partial<UserNotification>[]) {
+    // If adapter supports bulk insert via extras, it can be used. Safe fallback: loop.
+    const out: UserNotification[] = [];
+    for (const d of data) out.push(await this.model.insert(d));
+    return out;
   }
 
-  async UpdateUserNotification(data: Partial<UserNotification>) {
-    const { id: notificationId, ...updateData } = data;
-    return await this.prisma.userNotification.update({
-      where: {
-        id: notificationId,
-      },
-      data: updateData,
-    });
-  }
-
-  async GetUserNotificationById(
-    notificaitonId: number,
+  async getUserNotificationById(
+    notificationId: number,
   ): Promise<UserNotification | null> {
-    return await this.prisma.userNotification.findUnique({
-      where: {
-        id: notificaitonId,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            username: true,
-            email: true,
-            userFiles: {
-              where: {
-                category: FileCategory.USER_PROFILE_IMAGE,
-              },
-            },
-          },
-        },
-      },
-    });
+    const spec: QuerySpec = {
+      filter: { field: 'id', op: 'eq', value: notificationId },
+    };
+    return this.model.findOne(spec);
   }
 
-  async GetUserNotificationByUserId(
-    filters: any,
+  async getUnreadNotificationsCount(userId: string): Promise<number> {
+    const spec: QuerySpec = {
+      filter: {
+        AND: [
+          { field: 'userId', op: 'eq', value: userId },
+          { field: 'isRead', op: 'eq', value: false },
+        ],
+      },
+    };
+    return this.model.count(spec);
+  }
+
+  async getUserNotificationsByFilter(
+    filter: any,
     pageSize: number,
     pageNumber: number,
-  ): Promise<PagedData<IUserNotification[]>> {
-    const { userId, ...otherFilters } = filters;
-    const skip = (pageNumber - 1) * pageSize;
-    const pageData = new PagedData<IUserNotification[]>();
+  ): Promise<PagedData<UserNotification[]>> {
+    const pageData = new PagedData<UserNotification[]>();
+    pageData.page = pageNumber;
+    pageData.pageSize = pageSize;
 
-    pageData.page = Number(pageNumber);
+    const spec: QuerySpec = {
+      filter,
+      sort: [{ field: 'createdAt', direction: 'desc' }],
+      pagination: { page: pageNumber, pageSize },
+    };
 
-    const totalNotificationsForUser = await this.prisma.userNotification.count({
-      where: {
-        userId,
-      },
-    });
-    pageData.total = totalNotificationsForUser;
+    // Use transaction if available for snapshot semantics
+    if (this.db.transaction) {
+      return this.db.transaction(async (tx) => {
+        const m = tx.getModel<UserNotification>('userNotification');
+        const total = await m.count({ filter });
+        pageData.total = total;
+        pageData.pageCount = Math.ceil(total / pageSize);
+        pageData.data = await m.find(spec);
 
-    const filteredCount = await this.prisma.userNotification.count({
-      where: otherFilters,
-    });
+        return pageData;
+      }) as any;
+    } else {
+      const total = await this.model.count({ filter });
+      pageData.total = total;
+      pageData.pageCount = Math.ceil(total / pageSize);
+      pageData.data = await this.model.find(spec);
 
-    const notificationsForUser = await this.prisma.userNotification.findMany({
-      where: {
-        userId,
-        ...otherFilters,
-      },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: Number(pageSize),
-    });
-
-    pageData.pageSize = filteredCount;
-    pageData.data = notificationsForUser;
-
-    return pageData;
+      return pageData;
+    }
   }
 
-  async GetUserNotificationsByFilter(
-    filters: any,
-    pageSize: number,
-    pageNumber: number,
-  ): Promise<PagedData<IUserNotification[]>> {
-    const skip = (pageNumber - 1) * pageSize;
-    const pageData = new PagedData<IUserNotification[]>();
+  async updateUserNotification(
+    notificationId: number,
+    updateData: Partial<UserNotification>,
+  ) {
+    const spec: QuerySpec = {
+      filter: { field: 'id', op: 'eq', value: notificationId },
+    };
+    return this.model.updateOne(spec, updateData);
+  }
 
-    pageData.page = Number(pageNumber);
-
-    const totalNotifications = await this.prisma.userNotification.count();
-    pageData.total = totalNotifications;
-
-    const filteredCount = await this.prisma.userNotification.count({
-      where: filters,
-    });
-
-    const userNotifications = await this.prisma.userNotification.findMany({
-      where: filters,
-      include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            username: true,
-            email: true,
-            userFiles: {
-              where: {
-                category: FileCategory.USER_PROFILE_IMAGE,
-              },
-            },
-          },
-        },
+  async viewAllUserNotification(userId: number) {
+    const spec: QuerySpec = {
+      filter: {
+        AND: [
+          { field: 'userId', op: 'eq', value: userId },
+          { field: 'isRead', op: 'eq', value: false },
+        ],
       },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: Number(pageSize),
-    });
-
-    pageData.pageSize = filteredCount;
-    pageData.data = userNotifications;
-
-    return pageData;
+    };
+    const result = await this.model.updateMany(spec, { isRead: true });
+    return ResponseHelper.handleResponseWithCount(result);
   }
 
-  async ViewUserNotification(
-    userNotification: UserNotification,
-  ): Promise<UserNotification> {
-    userNotification.isRead = true;
-    return await this.UpdateUserNotification(userNotification);
-  }
-
-  async ViewAllUserNotification(userId: number) {
-    await this.prisma.userNotification.updateMany({
-      where: { userId, isRead: false },
-      data: { isRead: true },
-    });
+  async deleteNotification(notificationId: number) {
+    const spec: QuerySpec = {
+      filter: { field: 'id', op: 'eq', value: notificationId },
+    };
+    await this.model.deleteOne(spec);
     return null;
   }
 
-  async DeleteUserNotification(
-    userNotification: UserNotification,
-  ): Promise<UserNotification> {
-    return await this.UpdateUserNotification(userNotification);
+  async deleteAllUserNotificationsByUserId(userId: number) {
+    const spec: QuerySpec = {
+      filter: { field: 'userId', op: 'eq', value: userId },
+    };
+    const result = await this.model.deleteMany(spec);
+    return ResponseHelper.handleResponseWithCount(result);
   }
 }
-

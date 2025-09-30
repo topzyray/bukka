@@ -4,6 +4,9 @@ docker-compose -f docker-compose.override.yml up --build
 Production:
 docker-compose -f docker-compose.prod.yml up --build -d
 
+Start:
+docker-compose -f docker-compose.override.yml up
+
 Stop everything (but keep data):
 docker-compose -f docker-compose.override.yml down
 
