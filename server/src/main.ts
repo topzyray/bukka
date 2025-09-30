@@ -39,8 +39,8 @@ async function bootstrap() {
   app.enableCors();
 
   const config = new DocumentBuilder()
-    .setTitle('Task 360')
-    .setDescription('Task 360 APIs')
+    .setTitle('Bukka Server')
+    .setDescription('Bukka Server APIs')
     .setVersion('v1')
     .setExternalDoc('API Schema', '/swagger/v1/swagger.json')
     .addBearerAuth()

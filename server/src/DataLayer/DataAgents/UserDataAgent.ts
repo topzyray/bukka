@@ -72,7 +72,7 @@ export class UserDataAgent {
     const spec: QuerySpec = {
       filter: {
         AND: [
-          { field: 'userId', op: 'eq', value: userId },
+          { field: 'id', op: 'eq', value: userId },
           { field: 'role', op: 'eq', value: UserRoleEnum.ADMIN },
           { field: 'isDeleted', op: 'eq', value: false },
         ],

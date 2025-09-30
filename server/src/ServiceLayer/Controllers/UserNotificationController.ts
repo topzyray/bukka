@@ -7,6 +7,7 @@ import {
   Post,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import {
@@ -23,8 +24,10 @@ import {
   UserNotificationFilterDto,
 } from 'src/DomainLayer/Dtos/UserNotificationDto';
 import { UserNotificationRepository } from 'src/BussinessLayer/UserNotificationRepository';
+import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}`)
+@UseGuards(JwtAuthGuard)
 @ApiTags('User Notification')
 @ApiBearerAuth()
 export class UserNotificationController {
@@ -55,6 +58,22 @@ export class UserNotificationController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
+  @Get('users/notifications')
+  @ApiOperation({
+    summary: 'Get all user notifications by user Id',
+  })
+  async getUserNotificationByUserId(
+    @Query() filters: UserNotificationFilterDto,
+  ) {
+    console.log('I AM HERE NOW');
+
+    const response =
+      await this._userNotificationRepository.findNotificationsByFilters(
+        filters,
+      );
+    return BukkaResponse.GetPagedDataResponse('user notifications', response);
+  }
+
   @Get('users/notifications/:notificationId')
   @ApiOperation({ summary: 'Get a user by notification ID' })
   @ApiParam({
@@ -76,20 +95,6 @@ export class UserNotificationController {
       response,
     );
     return res.status(data.responseCode).json(data);
-  }
-
-  @Get('users/notifications')
-  @ApiOperation({
-    summary: 'Get all user notifications by user Id',
-  })
-  async getUserNotificationByUserId(
-    @Query() filters: UserNotificationFilterDto,
-  ) {
-    const response =
-      await this._userNotificationRepository.findNotificationsByFilters(
-        filters,
-      );
-    return BukkaResponse.GetPagedDataResponse('user notifications', response);
   }
 
   @Post('users/notifications/:notificationId/read')
@@ -129,7 +134,7 @@ export class UserNotificationController {
   @Get('users/:userId/notifications/unread-count')
   @ApiOperation({ summary: 'Get the count of unread notifications' })
   async getUnreadNotificationsCount(
-    @Param('userId') userId: string,
+    @Param('userId') userId: number,
     @Res() res: Response,
   ) {
     const response =

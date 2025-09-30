@@ -8,6 +8,7 @@ import {
   Res,
   Query,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import {
   NotificationSettingsFilterDto,
@@ -23,8 +24,10 @@ import {
 } from '@nestjs/swagger';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { NotificationSettingsRepository } from 'src/BussinessLayer/NotificationSettingsRepository';
+import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/users`)
+@UseGuards(JwtAuthGuard)
 @ApiTags('Notification Settings')
 @ApiBearerAuth()
 export class NotificationSettingsController {

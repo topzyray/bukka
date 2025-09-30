@@ -42,7 +42,7 @@ export class UserNotificationDataAgent {
     return this.model.findOne(spec);
   }
 
-  async getUnreadNotificationsCount(userId: string): Promise<number> {
+  async getUnreadNotificationsCount(userId: number): Promise<number> {
     const spec: QuerySpec = {
       filter: {
         AND: [
@@ -69,7 +69,8 @@ export class UserNotificationDataAgent {
       pagination: { page: pageNumber, pageSize },
     };
 
-    // Use transaction if available for snapshot semantics
+    console.log('FILTERS: ', filter);
+
     if (this.db.transaction) {
       return this.db.transaction(async (tx) => {
         const m = tx.getModel<UserNotification>('userNotification');
@@ -77,7 +78,6 @@ export class UserNotificationDataAgent {
         pageData.total = total;
         pageData.pageCount = Math.ceil(total / pageSize);
         pageData.data = await m.find(spec);
-
         return pageData;
       }) as any;
     } else {

@@ -1,4 +1,5 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { UserDataAgent } from 'src/DataLayer/DataAgents/UserDataAgent';
 import { UserNotificationDataAgent } from 'src/DataLayer/DataAgents/UserNotificationDataAgent';
 import {
   CreateNotificationDto,
@@ -7,20 +8,26 @@ import {
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { UserNotification } from 'src/DomainLayer/Models/UserNotification';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
+import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
 
 @Injectable()
 export class UserNotificationRepository {
   constructor(
     private readonly _userNotificationDataAgent: UserNotificationDataAgent,
+    private readonly _userDataAgetn: UserDataAgent,
   ) {}
 
   async createUserNotification(
     dto: CreateNotificationDto,
   ): Promise<BukkaResponse<UserNotification>> {
+    const user = await this._userDataAgetn.getUserById(dto.userId);
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
     const result = await this._userNotificationDataAgent.createUserNotification(
       dto as unknown as UserNotification,
     );
-    return BukkaResponse.createResponse('user notification', result);
+    return BukkaResponse.createResponse('User notification', result);
   }
 
   async createMultipleUsersNotification(
@@ -52,7 +59,6 @@ export class UserNotificationRepository {
         notification.id as number,
         { isRead: true },
       );
-
     return BukkaResponse.updateResponse(
       'User notification',
       updatedUserNotification,
@@ -60,6 +66,11 @@ export class UserNotificationRepository {
   }
 
   async viewAllUserNotification(userId: number): Promise<BukkaResponse<any>> {
+    console.log('INSIDE VIEW ALL: ', userId);
+    const user = await this._userDataAgetn.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
     const updatedUserNotifications =
       await this._userNotificationDataAgent.viewAllUserNotification(userId);
     return BukkaResponse.updateResponse(
@@ -71,23 +82,29 @@ export class UserNotificationRepository {
   async findNotificationById(
     userNotificationId: number,
   ): Promise<UserNotification | null> {
+    console.log('INSIDE FIND BY NOTIFICATION ID: ', userNotificationId);
     return await this._userNotificationDataAgent.getUserNotificationById(
       userNotificationId,
     );
   }
 
   async getUnreadNotificationsCount(
-    userId: string,
+    userId: number,
   ): Promise<BukkaResponse<number>> {
+    const user = await this._userDataAgetn.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
     const result =
       await this._userNotificationDataAgent.getUnreadNotificationsCount(userId);
-    return BukkaResponse.GetSingleDataResponse(
-      'user notification count',
-      result,
-    );
+    return BukkaResponse.GetSingleDataResponse('User notification count', {
+      count: result,
+    });
   }
 
   async findNotificationsByFilters(filterDto: UserNotificationFilterDto) {
+    console.log('INDISE FILTERS: ', filterDto);
+
     const query = FilterQueryHelper.buildQuery({
       dto: filterDto,
       rules: [
@@ -112,6 +129,8 @@ export class UserNotificationRepository {
   }
 
   async deleteNotification(notificationId: number) {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+
     const notification = await this.findNotificationById(notificationId);
     if (!notification) {
       return BukkaResponse.errorResponse(
@@ -119,6 +138,14 @@ export class UserNotificationRepository {
         HttpStatus.NOT_FOUND,
       );
     }
+
+    // if (loggedInUser?.userId !== notification?.userId) {
+    //   return BukkaResponse.errorResponse(
+    //     'You do not have access to this resource!',
+    //     HttpStatus.FORBIDDEN,
+    //   );
+    // }
+    await UserHelper.hasAccess(notification?.userId);
     const deletedNotification =
       await this._userNotificationDataAgent.deleteNotification(
         notification.id as number,
@@ -137,14 +164,12 @@ export class UserNotificationRepository {
       await this._userNotificationDataAgent.deleteAllUserNotificationsByUserId(
         userId,
       );
-
     if (deletedUserNotifications === null) {
       return BukkaResponse.errorResponse(
         'No user notification found!',
         HttpStatus.NOT_FOUND,
       );
     }
-
     return BukkaResponse.deleteResponse(
       'User notification',
       true,
