@@ -1,4 +1,9 @@
-import { ConflictException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserDataAgent } from 'src/DataLayer/DataAgents/UserDataAgent';
 import {
   CreateUserDto,
@@ -54,13 +59,8 @@ export class UserRepository {
     data: Partial<User>,
   ): Promise<BukkaResponse<User>> {
     const user = await this.findUserById(userId);
-    console.log('USER: ', user);
-
     if (!user) {
-      return BukkaResponse.errorResponse(
-        'User not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException('User not found!');
     }
     const updatedUser = await this._userDataAgent.updateUser(userId, data);
     return BukkaResponse.updateResponse('User', updatedUser);
@@ -72,10 +72,7 @@ export class UserRepository {
   ): Promise<BukkaResponse<User>> {
     const user = await this.findUserById(userId);
     if (!user) {
-      return BukkaResponse.errorResponse(
-        'User not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException('User not found!');
     }
 
     // const {
@@ -126,10 +123,7 @@ export class UserRepository {
   ): Promise<BukkaResponse<User | null>> {
     const user = await this.findUserById(userId);
     if (!user) {
-      return BukkaResponse.errorResponse(
-        'User not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException('User not found!');
     }
 
     // const {
@@ -199,10 +193,7 @@ export class UserRepository {
     const { id, ...updateData } = data;
     const user = await this.findUserById(id as number);
     if (!user) {
-      return BukkaResponse.errorResponse(
-        'User not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException('User not found!');
     }
     const updatedUser = await this._userDataAgent.updateUser(
       id as number,
@@ -214,10 +205,7 @@ export class UserRepository {
   async deleteUser(userId: number): Promise<BukkaResponse<void>> {
     const user = await this.findUserById(userId);
     if (!user) {
-      return BukkaResponse.errorResponse(
-        'User not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException('User not found!');
     }
 
     await this._userDataAgent.deleteUser(userId);

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Put,
   Query,
@@ -66,14 +67,12 @@ export class UserController {
     example: 12,
   })
   async getUserById(@Param('userId') userId: number, @Res() res: Response) {
-    const response = await this._userRepository.findUserById(Number(userId));
-    const mappedData = TypeSafeMapper.map(
-      response as User,
-      UserResponse,
-      UserDto,
-    );
+    const user = await this._userRepository.findUserById(Number(userId));
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+    const mappedData = TypeSafeMapper.map(user as User, UserResponse, UserDto);
     const data = BukkaResponse.GetSingleDataResponse('user', mappedData);
-
     return BukkaResponse.GetStatusResponse(data, res);
   }
 
