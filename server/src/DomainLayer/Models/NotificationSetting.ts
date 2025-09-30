@@ -1,6 +1,6 @@
 export class NotificationSettings {
   id?: number;
-  userId: string;
+  userId: number;
   userStatus?: string | null;
   description?: string | null;
   settings?: any;

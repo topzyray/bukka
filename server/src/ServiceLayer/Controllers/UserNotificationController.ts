@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   Res,
@@ -26,7 +27,7 @@ import {
 import { UserNotificationRepository } from 'src/BussinessLayer/UserNotificationRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 
-@Controller(`${BaseApiRoutesConstant.BASE_URL}`)
+@Controller(`${BaseApiRoutesConstant.BASE_URL}/users`)
 @UseGuards(JwtAuthGuard)
 @ApiTags('User Notification')
 @ApiBearerAuth()
@@ -35,7 +36,7 @@ export class UserNotificationController {
     private _userNotificationRepository: UserNotificationRepository,
   ) {}
 
-  @Post('users/notifications')
+  @Post('notifications')
   @ApiOperation({ summary: "Create a user's userNotification." })
   @ApiBody({ type: CreateNotificationDto })
   async createUserNotification(
@@ -58,23 +59,24 @@ export class UserNotificationController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Get('users/notifications')
+  @Get(':userId/notifications')
   @ApiOperation({
     summary: 'Get all user notifications by user Id',
   })
   async getUserNotificationByUserId(
+    @Param('userId', ParseIntPipe) userId: number,
     @Query() filters: UserNotificationFilterDto,
   ) {
     console.log('I AM HERE NOW');
-
     const response =
       await this._userNotificationRepository.findNotificationsByFilters(
+        userId,
         filters,
       );
     return BukkaResponse.GetPagedDataResponse('user notifications', response);
   }
 
-  @Get('users/notifications/:notificationId')
+  @Get('notifications/:notificationId')
   @ApiOperation({ summary: 'Get a user by notification ID' })
   @ApiParam({
     name: 'notificationId',
@@ -82,7 +84,7 @@ export class UserNotificationController {
     example: 3,
   })
   async getUserNotificationById(
-    @Param('notificationId') notificationId: number,
+    @Param('notificationId', ParseIntPipe) notificationId: number,
     @Res() res: Response,
   ) {
     const response =
@@ -97,7 +99,7 @@ export class UserNotificationController {
     return res.status(data.responseCode).json(data);
   }
 
-  @Post('users/notifications/:notificationId/read')
+  @Post('notifications/:notificationId/read')
   @ApiOperation({ summary: 'Mark a notification as read.' })
   @ApiParam({
     name: 'notificationId',
@@ -115,7 +117,7 @@ export class UserNotificationController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Post('users/:userId/notifications/mark-all-read')
+  @Post(':userId/notifications/mark-all-read')
   @ApiOperation({ summary: 'Mark all notifications as read.' })
   @ApiParam({
     name: 'userId',
@@ -131,7 +133,7 @@ export class UserNotificationController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Get('users/:userId/notifications/unread-count')
+  @Get(':userId/notifications/unread-count')
   @ApiOperation({ summary: 'Get the count of unread notifications' })
   async getUnreadNotificationsCount(
     @Param('userId') userId: number,
@@ -161,7 +163,7 @@ export class UserNotificationController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Delete('users/:userId/notifications')
+  @Delete(':userId/notifications')
   @ApiOperation({ summary: 'Delete all user notifications' })
   @ApiParam({
     name: 'userId',

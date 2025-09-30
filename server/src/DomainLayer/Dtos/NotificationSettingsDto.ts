@@ -13,7 +13,7 @@ export class CreateNotificationSettingsDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({ example: '13244334' })
-  userId: string;
+  userId: number;
 
   @IsOptional()
   @ApiProperty({ type: SettingsDto })
@@ -32,6 +32,6 @@ export class UpdateNotificationSettingsDto {
 }
 
 export class NotificationSettingsFilterDto extends PaginationDto {
-  @ApiProperty({ example: '234565543', required: false })
+  @ApiProperty({ example: '1', required: false })
   userId?: string;
 }

@@ -215,14 +215,14 @@ export class BukkaResponse<K> {
 
   static customResponse(
     message?: string,
-    errorCode?: number,
+    status?: number,
     success?: boolean,
     data?: object | null,
   ) {
     return {
       status: success ?? false,
-      responseCode: errorCode ?? HttpStatus.INTERNAL_SERVER_ERROR,
-      responseMessage: message || 'Unable to process your request',
+      responseCode: status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+      responseMessage: message || 'Bukka API',
       responseData: data ?? null,
     };
   }

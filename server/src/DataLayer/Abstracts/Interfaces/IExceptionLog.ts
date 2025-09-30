@@ -1,5 +1,5 @@
 export interface IExceptionLog {
-  userId: string;
+  userId: number;
   exceptionDate: string;
   method?: string;
   url?: string;

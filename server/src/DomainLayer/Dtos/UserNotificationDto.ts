@@ -15,7 +15,7 @@ export class UserNotificationDto {
   @ApiProperty({ example: 1, required: true })
   @IsString()
   @IsNotEmpty()
-  userId: string;
+  userId: number;
 
   @ApiProperty({ example: 'Welcome to Bukka', required: true })
   @IsNotEmpty()
@@ -152,11 +152,6 @@ export class UpdateNotificationDto {
 }
 
 export class UserNotificationFilterDto extends PaginationDto {
-  @ApiProperty({ example: '123', required: true })
-  @IsString()
-  @IsNotEmpty()
-  userId: string;
-
   @ApiProperty({
     example: 'SIGN_UP',
     required: false,
@@ -165,13 +160,13 @@ export class UserNotificationFilterDto extends PaginationDto {
   @IsOptional()
   notificationCategory?: string;
 
-  @ApiProperty({
-    example: '1',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  businessId?: string;
+  // @ApiProperty({
+  //   example: '1',
+  //   required: false,
+  // })
+  // @IsOptional()
+  // @IsString()
+  // businessId?: string;
 
   @ApiProperty({
     example: false,

@@ -102,11 +102,15 @@ export class UserNotificationRepository {
     });
   }
 
-  async findNotificationsByFilters(filterDto: UserNotificationFilterDto) {
+  async findNotificationsByFilters(
+    userId: number,
+    filterDto: UserNotificationFilterDto,
+  ) {
     console.log('INDISE FILTERS: ', filterDto);
+    const mergedFilters = { ...filterDto, userId };
 
     const query = FilterQueryHelper.buildQuery({
-      dto: filterDto,
+      dto: mergedFilters,
       rules: [
         { field: 'userId' },
         { field: 'isRead' },
@@ -119,7 +123,7 @@ export class UserNotificationRepository {
     });
 
     const { pageSize, pageNumber } =
-      FilterQueryHelper.extractPagination(filterDto);
+      FilterQueryHelper.extractPagination(mergedFilters);
 
     return this._userNotificationDataAgent.getUserNotificationsByFilter(
       query,

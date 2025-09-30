@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { BukkaResponse } from './DomainLayer/Models/BukkaResponse';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Welcome to Bukka API - The First of Its Kind!';
+  root(): BukkaResponse<any> {
+    return BukkaResponse.customResponse('', HttpStatus.OK, true, {
+      message: 'Welcome to Bukka API - The First of Its Kind!',
+    });
   }
 }

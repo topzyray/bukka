@@ -30,7 +30,7 @@ export class NotificationService {
   async dispatchNotification(input: {
     channels: NotificationTypeEnum[];
     userId?: number;
-    businessId?: string;
+    // businessId?: string;
     inapp?: {
       title: string;
       message: string;
@@ -106,14 +106,14 @@ export class NotificationService {
     title: string,
     message: string,
     type: NotificationTypeEnum[],
-    businessId?: string,
+    // businessId?: string,
     link?: string,
     notificationCategory?: string,
     icon?: string,
   ): Promise<void> {
     const notifications = userIds.map((userId) => ({
       userId,
-      businessId,
+      // businessId,
       title,
       message,
       notificationType: type,

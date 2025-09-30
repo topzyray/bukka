@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 
 export interface INotificationSettings {
   id: number;
-  userId: string;
+  userId: number;
   userStatus?: string;
   settings?: Prisma.JsonValue;
 }

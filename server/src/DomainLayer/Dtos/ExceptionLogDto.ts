@@ -4,7 +4,7 @@ import { PaginationDto } from './Base/PaginationDto';
 
 export class ProcessExceptionLogDto {
   logId?: string;
-  userId: string;
+  userId: number;
   exceptionDate: string;
   method?: string;
   url?: string;
