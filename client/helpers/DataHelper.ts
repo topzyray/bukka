@@ -1,15 +1,8 @@
 import { toast } from "sonner";
-import { TextHelper } from "./TextHelper";
 
 interface ItemWithId {
   _id: string | number;
   [key: string]: any;
-}
-
-interface SubmittedData {
-  subject: string;
-  start_time: string;
-  duration: number;
 }
 
 export class DataHelper {
