@@ -1,5 +1,3 @@
-version: "3.9"
-
 networks:
   infra-net:
     external: true
