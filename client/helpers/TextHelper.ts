@@ -1,6 +1,4 @@
-// import "react-phone-number-input/style.css";
-
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 type FormatDateOptions = {
   useLocalTime?: boolean;

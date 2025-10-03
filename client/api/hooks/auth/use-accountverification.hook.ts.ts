@@ -1,0 +1,42 @@
+import { AuthApiService } from "@/api/services/AuthApiService";
+import { extractErrorMessage } from "@/utils/extract-error-utils";
+import { useCustomMutation } from "@/api/queries/use-mutation.hook";
+import { useRouter } from "next/navigation";
+import { UseFormReset } from "react-hook-form";
+import { toast } from "sonner";
+
+export const useAccountVerification = ({
+  resetForm,
+}: {
+  resetForm: UseFormReset<{
+    token: string;
+  }>;
+}) => {
+  const router = useRouter();
+  const { mutate: verifyNewUser, isPending: isVerifyingUser } =
+    useCustomMutation(AuthApiService.authVerifyEmail, {
+      onSuccessCallback: () => {
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+        resetForm();
+      },
+      onErrorCallback: (error) => {
+        if (
+          extractErrorMessage(error) ===
+          "Token does not exist or verification token has expired. You can request for another one"
+        ) {
+          setTimeout(() => {
+            router.push("/request-email-verification");
+          }, 2000);
+        } else {
+          toast.error(extractErrorMessage(error));
+        }
+      },
+    });
+
+  return {
+    verifyNewUser,
+    isVerifyingUser,
+  };
+};

@@ -28,7 +28,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
-            <Toaster />
+            <Toaster closeButton richColors position="top-center" />
           </ThemeProvider>
         </QueryClientProviders>
       </body>

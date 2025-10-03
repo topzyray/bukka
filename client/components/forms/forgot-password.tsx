@@ -45,7 +45,9 @@ export function ForgotPasswordForm() {
       <Card className="shadow-elegant">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-2xl font-bold">Forgot Password</CardTitle>
-          <p className="text-muted-foreground">Do not pannick, request reset</p>
+          <p className="text-muted-foreground">
+            If you forgot your password, do not pannick, submit a reset request
+          </p>
         </CardHeader>
 
         <CardContent className="space-y-6">
@@ -85,7 +87,7 @@ export function ForgotPasswordForm() {
           </Form>
 
           {/* Footer Links */}
-          <div className="text-center">
+          <div className="text-center space-y-2">
             <p className="text-sm text-muted-foreground">
               Already received reset email, click{" "}
               <Link
@@ -93,6 +95,14 @@ export function ForgotPasswordForm() {
                 className="text-primary hover:underline font-medium"
               >
                 here
+              </Link>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              <Link
+                href="/signin"
+                className="text-primary hover:underline font-medium"
+              >
+                Back to Signin
               </Link>
             </p>
           </div>

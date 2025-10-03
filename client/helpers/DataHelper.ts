@@ -1,5 +1,4 @@
-import toast from "react-hot-toast";
-import { Subject } from "../../types";
+import { toast } from "sonner";
 import { TextHelper } from "./TextHelper";
 
 interface ItemWithId {
@@ -18,18 +17,25 @@ export class DataHelper {
     sourceArray: T[],
     compareArray: U[],
     matcher: (sourceItem: T, compareItem: U) => boolean,
-    returnValue: (sourceItem: T) => R,
+    returnValue: (sourceItem: T) => R
   ): R[] {
     return sourceArray
-      .filter((sourceItem) => compareArray.some((compareItem) => matcher(sourceItem, compareItem)))
+      .filter((sourceItem) =>
+        compareArray.some((compareItem) => matcher(sourceItem, compareItem))
+      )
       .map(returnValue);
   }
 
   static getMatchingIds<T>(firstArray: any[], secondArray: T[]): string[] {
-    return firstArray.filter((item) => secondArray.includes(item.name)).map((item) => item._id);
+    return firstArray
+      .filter((item) => secondArray.includes(item.name))
+      .map((item) => item._id);
   }
 
-  static findMissingItemsInArray<T extends ItemWithId>(array1: T[], array2: T[]): T[] {
+  static findMissingItemsInArray<T extends ItemWithId>(
+    array1: T[],
+    array2: T[]
+  ): T[] {
     if (!Array.isArray(array1)) {
       console.warn("One or both inputs are not arrays.");
       toast.error("Array 1 inputs are not arrays.");
@@ -51,7 +57,10 @@ export class DataHelper {
 
       return !array2.some(
         (item2) =>
-          item2 && typeof item2 === "object" && item2._id !== undefined && item2._id === item1._id,
+          item2 &&
+          typeof item2 === "object" &&
+          item2._id !== undefined &&
+          item2._id === item1._id
       );
     });
   }
@@ -80,19 +89,5 @@ export class DataHelper {
     } else {
       throw Error("Only strings are allowed");
     }
-  }
-
-  static mapSubjectsToIds(
-    submittedData: SubmittedData[],
-    subjects: Subject[],
-  ): { subject_id: string; start_time: string; duration: number }[] {
-    return submittedData.map((data) => {
-      const subject = subjects.find((sub) => sub?.name === data?.subject);
-      return {
-        subject_id: subject ? subject._id : "",
-        start_time: TextHelper.toUTCISOString(data?.start_time),
-        duration: TextHelper.convertMinuteToSeconds(data?.duration),
-      };
-    });
   }
 }
