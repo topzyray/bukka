@@ -4,7 +4,7 @@ import { Transform } from 'class-transformer';
 import { UserDto } from './UserDto';
 import { UserResponse } from '../Models/UserResponse';
 
-export class LoginDto {
+export class SigninDto {
   @ApiProperty({ example: 'example@bukka.com', required: true })
   @IsNotEmpty()
   @IsEmail()

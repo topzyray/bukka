@@ -7,7 +7,7 @@ import {
   ChangePasswordDto,
   ConfirmEmailDto,
   ForgotPasswordDto,
-  LoginDto,
+  SigninDto,
   RefreshTokenDto,
   ResendConfirmEmailDto,
   ResetPasswordDto,
@@ -25,19 +25,19 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  @ApiOperation({ summary: 'Create an account.' })
+  @ApiOperation({ summary: 'Create a new account.' })
   @ApiBody({ type: CreateUserDto })
-  async signup(@Body() request: CreateUserDto, @Res() res: Response) {
-    const response = await this._authRepository.registerUser(request);
+  async signUp(@Body() request: CreateUserDto, @Res() res: Response) {
+    const response = await this._authRepository.signUp(request);
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
   @Public()
-  @Post('login')
-  @ApiOperation({ summary: 'Login to account' })
-  @ApiBody({ type: LoginDto })
-  async login(@Body() request: LoginDto, @Res() res: Response) {
-    const response = await this._authRepository.login(request);
+  @Post('signin')
+  @ApiOperation({ summary: 'Sign to account' })
+  @ApiBody({ type: SigninDto })
+  async signIn(@Body() request: SigninDto, @Res() res: Response) {
+    const response = await this._authRepository.signIn(request);
     return BukkaResponse.GetStatusResponse(response, res);
   }
 

@@ -75,6 +75,10 @@ export class CreateUserDto {
   @MinLength(1)
   lastName: string;
 
+  @IsString()
+  @IsNotEmpty()
+  role: string;
+
   @IsOptional()
   @IsString()
   phoneNumber: string;
@@ -102,10 +106,6 @@ export class CreateUserDto {
   @IsDateString()
   @IsOptional()
   passwordResetExpires: Date;
-
-  @IsString()
-  @IsOptional()
-  role?: string;
 
   @IsString()
   @IsOptional()

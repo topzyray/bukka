@@ -5,7 +5,7 @@ import {
   ChangePasswordDto,
   ConfirmEmailDto,
   ForgotPasswordDto,
-  LoginDto,
+  SigninDto,
   LoginResponseDto,
   RefreshTokenDto,
   ResendConfirmEmailDto,
@@ -39,7 +39,7 @@ export class AuthRepository {
     private readonly _configService: AppConfigurationService,
   ) {}
 
-  async registerUser(userDto: CreateUserDto): Promise<BukkaResponse<User>> {
+  async signUp(userDto: CreateUserDto): Promise<BukkaResponse<User>> {
     const hashedPassword = await Generator.hash(userDto.password, 10);
     userDto.password = hashedPassword;
     const data = await this._userRepository.createUserAsync(userDto);
@@ -88,7 +88,7 @@ export class AuthRepository {
     return { ...data, responseData: mappedData };
   }
 
-  async login(loginDto: LoginDto): Promise<BukkaResponse<User>> {
+  async signIn(loginDto: SigninDto): Promise<BukkaResponse<User>> {
     const response = (await this._userRepository.findUserByEmail(
       loginDto.email,
     )) as UserWithCounts;

@@ -1,7 +1,7 @@
 import { HttpClient } from "@/configs/http.config";
 import {
   ForgotPasswordDto,
-  LoginDto,
+  SigninDto,
   ResendEmailVerificationDto,
   RefreshTokenDto,
   ResetPasswordDto,
@@ -9,7 +9,7 @@ import {
 import { authRoutes } from "@/constants/routes/authRoutes";
 
 export class AuthApiService {
-  static async authLogin(requestBody: LoginDto) {
+  static async authLogin(requestBody: SigninDto) {
     const response = await HttpClient.getClient().post(
       `${authRoutes.login}`,
       requestBody

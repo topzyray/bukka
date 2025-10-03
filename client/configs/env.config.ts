@@ -2,29 +2,16 @@ class EnvConfig {
   public NEXT_PUBLIC_API_BASE_URL: string;
   public NEXT_PUBLIC_NODE_ENV: string;
   public NEXT_PUBLIC_SECRET_KEY: string;
-  public NEXT_PUBLIC_SCHOOL_NAME_FULL: string;
-  public NEXT_PUBLIC_SCHOOL_NAME_SHORT: string;
-  public NEXT_PUBLIC_SCHOOL_EMAIL: string;
-  public NEXT_PUBLIC_SCHOOL_PHONE: string;
-  public NEXT_PUBLIC_SCHOOL_ADDRESS: string;
-  public NEXT_PUBLIC_SCHOOL_CITY: string;
-  public NEXT_PUBLIC_SCHOOL_COUNTRY: string;
-  public NEXT_PUBLIC_SCHOOL_MOTTO: string;
-  public NEXT_PUBLIC_SCHOOL_DOMAIN: string;
+  public NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: string;
+  public NEXT_PUBLIC_DOMAIN_URL: string;
 
   constructor() {
     this.NEXT_PUBLIC_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
     this.NEXT_PUBLIC_NODE_ENV = process.env.NEXT_PUBLIC_NODE_ENV || "";
     this.NEXT_PUBLIC_SECRET_KEY = process.env.NEXT_PUBLIC_SECRET_KEY || "";
-    this.NEXT_PUBLIC_SCHOOL_NAME_FULL = process.env.NEXT_PUBLIC_SCHOOL_NAME_FULL || "";
-    this.NEXT_PUBLIC_SCHOOL_NAME_SHORT = process.env.NEXT_PUBLIC_SCHOOL_NAME_SHORT || "";
-    this.NEXT_PUBLIC_SCHOOL_EMAIL = process.env.NEXT_PUBLIC_SCHOOL_EMAIL || "";
-    this.NEXT_PUBLIC_SCHOOL_PHONE = process.env.NEXT_PUBLIC_SCHOOL_PHONE || "";
-    this.NEXT_PUBLIC_SCHOOL_ADDRESS = process.env.NEXT_PUBLIC_SCHOOL_ADDRESS || "";
-    this.NEXT_PUBLIC_SCHOOL_CITY = process.env.NEXT_PUBLIC_SCHOOL_CITY || "";
-    this.NEXT_PUBLIC_SCHOOL_COUNTRY = process.env.NEXT_PUBLIC_SCHOOL_COUNTRY || "";
-    this.NEXT_PUBLIC_SCHOOL_MOTTO = process.env.NEXT_PUBLIC_SCHOOL_MOTTO || "";
-    this.NEXT_PUBLIC_SCHOOL_DOMAIN = process.env.NEXT_PUBLIC_SCHOOL_DOMAIN || "";
+    this.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY =
+      process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
+    this.NEXT_PUBLIC_DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL || "";
   }
 
   public validateConfig(): void {
