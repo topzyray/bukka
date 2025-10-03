@@ -9,7 +9,6 @@ export const useResetPassword = ({
   resetForm: UseFormReset<{
     token: string;
     password: string;
-    confirm_password: string;
   }>;
 }) => {
   const router = useRouter();

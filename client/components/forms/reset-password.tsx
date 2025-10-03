@@ -13,34 +13,26 @@ import OtpInputComponent from "./base/OtpInputComponent";
 import { useResetPassword } from "@/api/hooks/auth/use-resetpassword.hook";
 import InputComponent from "./base/input-component";
 
-const resetPasswordSchema = z
-  .object({
-    token: z
-      .string()
-      .min(6, {
-        message: "OTP is required",
-      })
-      .regex(/^\d{6}$/, {
-        message: "OTP must consist of exactly 6 digits",
-      }),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters long")
-      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number")
-      .regex(
-        /[@$!%*?&]/,
-        "Password must contain at least one special character (@, $, !, %, *, ?, &)"
-      ),
-    confirm_password: z
-      .string()
-      .min(8, "Confirm password must be at least 8 characters long"),
-  })
-  .refine((data) => data.password === data.confirm_password, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+const resetPasswordSchema = z.object({
+  token: z
+    .string()
+    .min(6, {
+      message: "OTP is required",
+    })
+    .regex(/^\d{6}$/, {
+      message: "OTP must consist of exactly 6 digits",
+    }),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters long")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(
+      /[@$!%*?&]/,
+      "Password must contain at least one special character (@, $, !, %, *, ?, &)"
+    ),
+});
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
@@ -51,7 +43,6 @@ export function ResetPasswordForm() {
     defaultValues: {
       token: "",
       password: "",
-      confirm_password: "",
     },
   });
 

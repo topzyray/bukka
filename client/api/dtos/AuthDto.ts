@@ -16,9 +16,8 @@ export type ForgotPasswordDto = {
 };
 
 export type ResetPasswordDto = {
-  password: string;
-  confirm_password: string;
   token: string;
+  password: string;
 };
 
 export type RefreshTokenDto = {
