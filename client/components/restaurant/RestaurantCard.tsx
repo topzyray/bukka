@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Restaurant } from "@/server/interfaces/Restaurant";
+import { Restaurant } from "@/api/interfaces/Restaurant";
 import Image from "next/image";
 
 interface RestaurantCardProps {

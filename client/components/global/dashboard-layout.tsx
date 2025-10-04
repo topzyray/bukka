@@ -1,10 +1,10 @@
 import { DashBoardSidebar } from "@/components/global/dashboard-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardTitleType, NavItems } from "@/types";
-import { UserRole } from "@/server/interfaces/Auth";
-import { useAuth } from "@/server/hooks/auth/use-auth.hook";
+import { UserRole } from "@/api/interfaces/Auth";
+import { useAuth } from "@/api/hooks/auth/use-auth.hook";
 import { RouteGuard } from "@/guards/RouteGuard";
-import { User } from "@/server/interfaces/User";
+import { User } from "@/api/interfaces/User";
 import DashboardHeader from "./dashboard-header";
 
 interface IDashboardLayout {

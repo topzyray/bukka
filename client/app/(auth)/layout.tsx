@@ -31,7 +31,7 @@ export default function AuthLayout({ children }: IAuthLayout) {
         </BukkaButton>
       </header>
 
-      <section className="relative flex-1 flex items-center justify-center p-2">
+      <section className="relative flex-1 flex items-center justify-center px-3">
         <Card className="w-full max-w-md shadow-elegant py-6">
           <motion.div
             whileHover={{ rotate: 360 }}

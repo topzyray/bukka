@@ -3,7 +3,7 @@ import { Label } from "../ui/label";
 import { ThemeToggle } from "../atoms/mode-toggle";
 import { Notifications } from "../atoms/notifications";
 import UserProfileDropdown from "../atoms/user-profile-dropdown";
-import { User } from "@/server/interfaces/User";
+import { User } from "@/api/interfaces/User";
 import { DashboardTitleType } from "@/types";
 
 interface DashboardHeader {

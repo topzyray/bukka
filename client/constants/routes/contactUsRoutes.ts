@@ -1,4 +1,4 @@
-import { BackendUrlEnum } from "@/server/enums/BackendUrlEnum";
+import { BackendUrlEnum } from "@/api/enums/BackendUrlEnum";
 import { RouteHelper } from "../../helpers/RouteHelper";
 
 const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;

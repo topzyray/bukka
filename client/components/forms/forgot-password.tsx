@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Form } from "../ui/form";
 import Link from "next/link";
 import InputComponent from "./base/input-component";
-import { useForgotPassword } from "@/server/hooks/auth/use-forgotpassword.hook";
+import { useForgotPassword } from "@/api/hooks/auth/use-forgotpassword.hook";
 import { useRouter } from "next/navigation";
 
 const forgotPasswordSchema = z.object({
