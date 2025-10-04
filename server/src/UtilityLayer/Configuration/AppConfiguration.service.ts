@@ -20,10 +20,6 @@ export class AppConfigurationService {
       ?.trim() as string;
   }
 
-  get port(): string {
-    return this.configService.get<string>('PORT')?.trim() as string;
-  }
-
   get tokenSecret(): string {
     return this.configService.get<string>('TOKEN_SECRET')?.trim() as string;
   }

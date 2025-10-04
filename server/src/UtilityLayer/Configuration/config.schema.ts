@@ -7,7 +7,6 @@ export const configSchema = z.object({
   GOOGLE_MAPS_API_KEY: z.string().min(1),
   TOKEN_SECRET: z.string().min(1),
   TOKEN_EXPIRY_IN_SECONDS: z.string().min(1),
-  PORT: z.string().min(1),
   SSL_KEY_PATH: z.string().min(1),
   SSL_CERT_PATH: z.string().min(1),
   SMS_PROVIDER: z.string().min(1),

@@ -19,10 +19,10 @@ async function bootstrap() {
 
   if (isProd) {
     port = 443;
-    httpsOptions = {
-      key: fs.readFileSync(process.env.SSL_KEY_PATH as string),
-      cert: fs.readFileSync(process.env.SSL_CERT_PATH as string),
-    };
+    // httpsOptions = {
+    //   key: fs.readFileSync(process.env.SSL_KEY_PATH as string),
+    //   cert: fs.readFileSync(process.env.SSL_CERT_PATH as string),
+    // };
   }
 
   const app = await NestFactory.create(
@@ -59,9 +59,7 @@ async function bootstrap() {
   });
 
   await app.listen(port, '0.0.0.0', () => {
-    logger.log(
-      `Server running on ${isProd ? 'HTTPS' : 'HTTP'} at ${isProd ? AppUrlTypeEnum.SERVER : AppUrlTypeEnum.LOCAL}:${port}`,
-    );
+    logger.log(`Server running on ${port}`);
   });
 }
 
