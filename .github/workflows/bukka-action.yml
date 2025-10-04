@@ -5,11 +5,13 @@ on:
     branches: [main]
     paths:
       - "client/**"
+      - ".github/workflows/client.yml"
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main]
     paths:
       - "client/**"
+      - ".github/workflows/client.yml"
 
 jobs:
   build-test:
