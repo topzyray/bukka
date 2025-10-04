@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile.prod
     container_name: bukka_server
     env_file:
-      - ./server/.env
+      - ./server/.env.production
     ports:
       - "8000:8000"
     depends_on:
