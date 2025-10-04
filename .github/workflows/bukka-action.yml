@@ -32,13 +32,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
       # Install dependencies
       - name: Install Dependencies
         run: npm ci
+        working-directory: client
 
       # Inject environment variables
       - name: Set Environment Variables
