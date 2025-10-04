@@ -4,7 +4,6 @@ import { AppModule } from './app.module';
 import { Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './MiddlewareLayer/Global/Filters/GlobalExceptionFilter';
-import { AppUrlTypeEnum } from './DomainLayer/Enums/AppUrlTypeEnum';
 import { EnvironmentTypeEnum } from './DomainLayer/Enums/EnvironmentTypeEnum';
 import { Request, Response } from 'express';
 
@@ -15,14 +14,17 @@ async function bootstrap() {
     process.env.NODE_ENV?.toLowerCase() ===
     EnvironmentTypeEnum.PROD.toLowerCase();
   let httpsOptions: NestApplicationOptions['httpsOptions'] = undefined;
-  let port = 8006;
+  let port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8006;
 
-  if (isProd) {
-    port = 443;
-    // httpsOptions = {
-    //   key: fs.readFileSync(process.env.SSL_KEY_PATH as string),
-    //   cert: fs.readFileSync(process.env.SSL_CERT_PATH as string),
-    // };
+  if (isProd && !process.env.PORT) {
+    port = 8000;
+  }
+
+  if (isProd && process.env.SSL_KEY_PATH && process.env.SSL_CERT_PATH) {
+    httpsOptions = {
+      key: fs.readFileSync(process.env.SSL_KEY_PATH),
+      cert: fs.readFileSync(process.env.SSL_CERT_PATH),
+    };
   }
 
   const app = await NestFactory.create(
