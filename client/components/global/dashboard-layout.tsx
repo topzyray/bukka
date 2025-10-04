@@ -1,16 +1,11 @@
-"use client";
-
 import { DashBoardSidebar } from "@/components/global/dashboard-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { useContext, useEffect } from "react";
-import { StorageUtilsHelper } from "@/utils/storage-utils";
-import { STORE_KEYS } from "@/configs/store.config";
-import DashboardHeader from "./dashboard-header";
 import { DashboardTitleType, NavItems } from "@/types";
 import { UserRole } from "@/api/interfaces/Auth";
 import { useAuth } from "@/api/hooks/auth/use-auth.hook";
 import { RouteGuard } from "@/guards/RouteGuard";
 import { User } from "@/api/interfaces/User";
+import DashboardHeader from "./dashboard-header";
 
 interface IDashboardLayout {
   navItems: NavItems;

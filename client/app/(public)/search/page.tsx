@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { FilterDialog } from "@/components/ui/filter-dialog";
-import { Header } from "../../components/layouts/Header";
-import { Footer } from "../../components/layouts/Footer";
+import { Header } from "../../../components/layouts/Header";
+import { Footer } from "../../../components/layouts/Footer";
 
 // Mock data for search results
 const mockRestaurants = [

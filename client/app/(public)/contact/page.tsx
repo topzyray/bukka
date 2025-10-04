@@ -15,8 +15,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { toast } from "sonner";
-import { Header } from "../../components/layouts/Header";
-import { Footer } from "../../components/layouts/Footer";
+import { Header } from "../../../components/layouts/Header";
+import { Footer } from "../../../components/layouts/Footer";
+
+export const dynamic = "force-static";
 
 const Contact = () => {
   const [formData, setFormData] = useState({

@@ -5,8 +5,9 @@ import { motion } from "framer-motion";
 import { MapPin, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
-export default function BukkaWaitingList() {
+export default function BukkaWaitList() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -47,8 +48,22 @@ export default function BukkaWaitingList() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="max-w-3xl space-y-6"
+        className="max-w-4xl space-y-6"
       >
+        <motion.div
+          whileHover={{ rotate: 360 }}
+          transition={{ duration: 0.6 }}
+          className="w-24 flex items-center justify-center mx-auto hover:cursor-pointer"
+        >
+          <Image
+            src="/images/bukka.png"
+            alt="Logo"
+            width={180}
+            height={38}
+            priority
+            className="w-full h-full"
+          />
+        </motion.div>
         <h1 className="text-5xl font-bold leading-tight sm:text-6xl text-shine">
           Discover Nigeria’s Finest Meals <br /> with{" "}
           <span className="text-primary">Bukka</span>
@@ -69,7 +84,7 @@ export default function BukkaWaitingList() {
             placeholder="Your name"
             onChange={handleChange}
             required
-            className="bg-card shadow-card"
+            className="bg-card py-6"
           />
           <Input
             name="email"
@@ -77,12 +92,12 @@ export default function BukkaWaitingList() {
             placeholder="Email address"
             onChange={handleChange}
             required
-            className="bg-card shadow-card"
+            className="bg-card py-6"
           />
           <Button
             type="submit"
             disabled={isSubmitting || success}
-            className="warm-gradient text-white font-semibold px-6 py-3 rounded-lg shadow-elegant hover-glow"
+            className="warm-gradient text-white font-semibold px-6 py-6 rounded-lg shadow-elegant hover-glow cursor-pointer"
           >
             {success
               ? "You're on the list! 🎉"
@@ -123,6 +138,38 @@ export default function BukkaWaitingList() {
       <footer className="mt-24 text-sm text-muted-foreground">
         © {new Date().getFullYear()} Bukka. All rights reserved.
       </footer>
+
+      <motion.section
+        animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-20 left-10 text-6xl opacity-50"
+      >
+        🍽️
+      </motion.section>
+      <motion.section
+        animate={{ y: [0, 20, 0], rotate: [0, -5, 0] }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1,
+        }}
+        className="absolute bottom-20 right-10 text-5xl opacity-30"
+      >
+        🍕
+      </motion.section>
+      <motion.section
+        animate={{ x: [0, 20, 0] }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2,
+        }}
+        className="absolute top-1/2 right-20 text-4xl opacity-30"
+      >
+        🍜
+      </motion.section>
     </main>
   );
 }

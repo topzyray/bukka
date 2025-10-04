@@ -28,6 +28,16 @@ enum UserStatus {
   DELETED
 }
 
+model Waitlist {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  email     String   @unique
+  location  String?
+  cuisine   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
   id                      Int                @id @default(autoincrement())
   email                   String             @unique
@@ -108,12 +118,12 @@ model UserNotification {
 }
 
 model NotificationSettings {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  userStatus  String?
-  settings    Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  userStatus String?
+  settings   Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([userId])
 }

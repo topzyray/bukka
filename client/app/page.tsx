@@ -1,9 +1,9 @@
-import BukkaWaitingList from "@/components/views/waiting-list";
+import BukkaWaitList from "@/components/views/waitlist";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <BukkaWaitingList />
+      <BukkaWaitList />
     </div>
   );
 }
