@@ -1,4 +1,4 @@
-import { BackendUrlEnum } from "@/api/enums/BackendUrlEnum";
+import { BackendUrlEnum } from "@/server/enums/BackendUrlEnum";
 import { RouteHelper } from "../../helpers/RouteHelper";
 
 const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
@@ -12,7 +12,5 @@ const rawContactUsRoutes: Record<IContactUsApi, string> = {
 };
 
 // Use the function to create routes with the base path
-export const contactUsRoutes: Record<IContactUsApi, string> = RouteHelper.createRoutes(
-  BACKEND_SVC_PATH,
-  rawContactUsRoutes,
-);
+export const contactUsRoutes: Record<IContactUsApi, string> =
+  RouteHelper.createRoutes(BACKEND_SVC_PATH, rawContactUsRoutes);

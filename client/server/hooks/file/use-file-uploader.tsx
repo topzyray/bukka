@@ -1,4 +1,4 @@
-import { useCustomMutation } from "@/api/queries/use-mutation.hook";
+import { useCustomMutation } from "@/server/queries/use-mutation.hook";
 import { useState } from "react";
 
 interface UseFileUploadProps<T, P> {

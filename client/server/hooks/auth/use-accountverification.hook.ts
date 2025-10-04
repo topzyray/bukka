@@ -1,6 +1,6 @@
-import { AuthApiService } from "@/api/services/AuthApiService";
+import { AuthApiService } from "@/server/services/AuthApiService";
 import { extractErrorMessage } from "@/utils/extract-error-utils";
-import { useCustomMutation } from "@/api/queries/use-mutation.hook";
+import { useCustomMutation } from "@/server/queries/use-mutation.hook";
 import { useRouter } from "next/navigation";
 import { UseFormReset } from "react-hook-form";
 import { toast } from "sonner";

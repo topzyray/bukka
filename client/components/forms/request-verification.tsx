@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Form } from "../ui/form";
 import Link from "next/link";
 import InputComponent from "./base/input-component";
-import { useForgotPassword } from "@/api/hooks/auth/use-forgotpassword.hook";
+import { useForgotPassword } from "@/server/hooks/auth/use-forgotpassword.hook";
 
 const requestAccountSchema = z.object({
   email: z.email({ message: "Please enter a valid email address" }),

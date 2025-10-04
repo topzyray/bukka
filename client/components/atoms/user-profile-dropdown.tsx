@@ -19,8 +19,8 @@ import {
 } from "lucide-react";
 import { TextHelper } from "@/helpers/TextHelper";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/api/hooks/auth/use-auth.hook";
-import { User } from "@/api/interfaces/User";
+import { useAuth } from "@/server/hooks/auth/use-auth.hook";
+import { User } from "@/server/interfaces/User";
 import TooltipComponent from "../ui/tooltip-component";
 
 export default function UserProfileDropdown({ userData }: { userData: User }) {

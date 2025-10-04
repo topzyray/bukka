@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { motion } from "framer-motion";
 import {
@@ -18,15 +20,10 @@ import { Header } from "@/components/layouts/Header";
 import Image from "next/image";
 import { Footer } from "@/components/layouts/Footer";
 
-const RestaurantDetail = async ({
-  params,
-}: {
-  params: Promise<Record<string, any>>;
-}) => {
-  const { id } = await params;
+const RestaurantDetail = () => {
   // Mock restaurant data
   const restaurant = {
-    id: id || "1",
+    id: "1",
     name: "Mama Cass",
     rating: 4.8,
     reviewCount: 234,

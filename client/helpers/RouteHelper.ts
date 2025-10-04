@@ -1,4 +1,4 @@
-import { User } from "@/api/interfaces/User";
+import { User } from "@/server/interfaces/User";
 
 export class RouteHelper {
   static createRoutes(

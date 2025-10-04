@@ -18,8 +18,6 @@ import { toast } from "sonner";
 import { Header } from "../../../components/layouts/Header";
 import { Footer } from "../../../components/layouts/Footer";
 
-export const dynamic = "force-static";
-
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
