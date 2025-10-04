@@ -6,7 +6,7 @@ on:
     paths:
       - "client/**"
   pull_request:
-    types: [opened, synchronize, reopened, closed]
+    types: [opened, synchronize, reopened]
     branches: [main]
     paths:
       - "client/**"
@@ -62,19 +62,15 @@ jobs:
         run: npm run build
 
   deploy:
-    name: Deploy to Vercel
     needs: build-test
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
-      # Deploy to Vercel using production config
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./
-          vercel-args: ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
+          working-directory: client
+          vercel-args: "--prod"
