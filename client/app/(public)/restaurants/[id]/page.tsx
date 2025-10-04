@@ -18,10 +18,15 @@ import { Header } from "@/components/layouts/Header";
 import Image from "next/image";
 import { Footer } from "@/components/layouts/Footer";
 
-const RestaurantDetail = ({ params }: { params: Record<string, any> }) => {
+const RestaurantDetail = async ({
+  params,
+}: {
+  params: Promise<Record<string, any>>;
+}) => {
+  const { id } = await params;
   // Mock restaurant data
   const restaurant = {
-    id: params.id || "1",
+    id: id || "1",
     name: "Mama Cass",
     rating: 4.8,
     reviewCount: 234,
