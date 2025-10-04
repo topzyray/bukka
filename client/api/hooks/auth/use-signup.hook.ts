@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 export const useSignUp = () => {
   const { mutate: signUpUser, isPending: isSigningUp } = useCustomMutation(
-    AuthApiService.authRegister,
+    AuthApiService.signUp,
     {
       onSuccessCallback: (data) => {
         console.log("SIGN UP DATA: ", data);

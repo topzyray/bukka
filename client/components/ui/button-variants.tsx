@@ -25,7 +25,7 @@ const bukkaButtonVariants = cva(
         glass:
           "glass text-white hover:text-foreground hover:bg-white/90 backdrop-blur-md",
         float:
-          "bg-white text-primary shadow-card hover:shadow-elegant hover-lift",
+          "bg-white text-primary shadow-card hover:shadow-elegant hover:bg-primary hover:text-white hover-lift",
       },
       size: {
         default: "h-10 px-4 py-2",

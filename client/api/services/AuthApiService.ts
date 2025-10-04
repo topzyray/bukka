@@ -9,40 +9,40 @@ import {
 import { authRoutes } from "@/constants/routes/authRoutes";
 
 export class AuthApiService {
-  static async authLogin(requestBody: SigninDto) {
+  static async signIn(requestBody: SigninDto) {
     const response = await HttpClient.getClient().post(
-      `${authRoutes.login}`,
+      `${authRoutes.signIn}`,
       requestBody
     );
     return response.data;
   }
 
-  static async authRegister<T>(requestBody: T) {
+  static async signUp<T>(requestBody: T) {
     const response = await HttpClient.getClient().post(
-      `${authRoutes.register}`,
+      `${authRoutes.signUp}`,
       requestBody
     );
     return response.data;
   }
 
-  static async authVerifyEmail(token: string) {
+  static async confirmEmail(token: string) {
     const response = await HttpClient.getClient().get(
-      `${authRoutes.verifyEmail}/${token}`
+      `${authRoutes.confirmEmail}/${token}`
     );
     return response.data;
   }
 
-  static async authResendEmailVerification(
+  static async resendConfirmationEmail(
     requestBody: ResendEmailVerificationDto
   ) {
     const response = await HttpClient.getClient().post(
-      `${authRoutes.resendEmailVerification}`,
+      `${authRoutes.resendConfirmationEmail}`,
       requestBody
     );
     return response.data;
   }
 
-  static async authForgotPassword(requestBody: ForgotPasswordDto) {
+  static async forgotPassword(requestBody: ForgotPasswordDto) {
     const response = await HttpClient.getClient().post(
       `${authRoutes.forgotPassword}`,
       requestBody
@@ -50,7 +50,7 @@ export class AuthApiService {
     return response.data;
   }
 
-  static async authResetPassword(requestBody: ResetPasswordDto) {
+  static async resetPassword(requestBody: ResetPasswordDto) {
     const response = await HttpClient.getClient().post(
       `${authRoutes.resetPassword}`,
       requestBody
@@ -58,16 +58,11 @@ export class AuthApiService {
     return response.data;
   }
 
-  static async authRequestRefreshToken(requestBody: RefreshTokenDto) {
+  static async refreshToken(requestBody: RefreshTokenDto) {
     const response = await HttpClient.getClient().post(
       `${authRoutes.refreshToken}`,
       requestBody
     );
-    return response.data;
-  }
-
-  static async authLogout() {
-    const response = await HttpClient.getClient().post(`${authRoutes.logout}`);
     return response.data;
   }
 }

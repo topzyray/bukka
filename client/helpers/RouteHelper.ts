@@ -1,7 +1,10 @@
-import { User } from "../../types";
+import { User } from "@/api/interfaces/User";
 
 export class RouteHelper {
-  static createRoutes(basePath: string, routes: Record<string, string>): Record<string, string> {
+  static createRoutes(
+    basePath: string,
+    routes: Record<string, string>
+  ): Record<string, string> {
     const prefixedRoutes: Record<string, string> = {};
     for (const key in routes) {
       prefixedRoutes[key] = `${basePath}${routes[key]}`;
@@ -17,8 +20,8 @@ export class RouteHelper {
   static getDashboardPath<T extends User>(user: T): string {
     if (!user) return "/login";
 
-    if (user.role === "student" && !user.is_updated) {
-      return "/dashboard/student/onboarding";
+    if (!user.isUpdated) {
+      return `/dashboard/${user?.role.toLowerCase()}/onboarding`;
     }
 
     return `/dashboard/${user.role}/overview`;

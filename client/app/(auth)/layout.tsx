@@ -7,6 +7,7 @@ import { BukkaButton } from "@/components/ui/button-variants";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Card } from "@/components/ui/card";
 
 interface IAuthLayout {
   children: ReactNode;
@@ -21,7 +22,7 @@ export default function AuthLayout({ children }: IAuthLayout) {
           variant="link"
           size="sm"
           asChild
-          className="absolute cursor-pointer"
+          className="absolute cursor-pointer text-white"
         >
           <Link href="/" className="flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
@@ -30,12 +31,12 @@ export default function AuthLayout({ children }: IAuthLayout) {
         </BukkaButton>
       </header>
 
-      <section className="relative flex-1 flex items-center justify-center">
-        <section className="w-full max-w-sm">
+      <section className="relative flex-1 flex items-center justify-center p-2">
+        <Card className="w-full max-w-md shadow-elegant py-6">
           <motion.div
             whileHover={{ rotate: 360 }}
             transition={{ duration: 0.6 }}
-            className="w-24 bg-white flex items-center justify-center mx-auto hover:cursor-pointer"
+            className="w-20 h-16 flex items-center justify-center mx-auto hover:cursor-pointer"
             onClick={() => router.push("/")}
           >
             <Image
@@ -48,7 +49,7 @@ export default function AuthLayout({ children }: IAuthLayout) {
             />
           </motion.div>
           {children}
-        </section>
+        </Card>
       </section>
 
       <motion.section
@@ -66,7 +67,7 @@ export default function AuthLayout({ children }: IAuthLayout) {
           ease: "easeInOut",
           delay: 1,
         }}
-        className="absolute bottom-20 right-10 text-5xl opacity-60"
+        className="absolute bottom-20 right-10 text-5xl opacity-30"
       >
         🍕
       </motion.section>
@@ -78,7 +79,7 @@ export default function AuthLayout({ children }: IAuthLayout) {
           ease: "easeInOut",
           delay: 2,
         }}
-        className="absolute top-1/2 right-20 text-4xl opacity-50"
+        className="absolute top-1/2 right-20 text-4xl opacity-30"
       >
         🍜
       </motion.section>

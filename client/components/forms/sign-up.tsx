@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { BukkaButton } from "@/components/ui/button-variants";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
@@ -76,7 +75,7 @@ export const SignUpForm = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <Card className="glass-card">
+      <section className="space-y-5">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-primary">
             Join Bukka
@@ -146,18 +145,6 @@ export const SignUpForm = () => {
                 isPassword
               />
 
-              {/* <InputComponent
-                formControl={form.control}
-                formName="confirmPassord"
-                formLabel="Confirm Password"
-                formInputType="password"
-                formPlaceholder="Confirm your password"
-                disabled={isSigningUp}
-                icon={Lock}
-                isPassword
-                isConfirmPassword
-              /> */}
-
               <BukkaButton
                 type="submit"
                 variant="hero"
@@ -181,7 +168,7 @@ export const SignUpForm = () => {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </section>
     </motion.div>
   );
 };

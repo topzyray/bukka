@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Mail, Lock } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Form } from "../ui/form";
 import Link from "next/link";
@@ -44,7 +44,7 @@ export function SignInForm() {
       transition={{ duration: 0.6 }}
       className={cn("w-full max-w-md mx-auto")}
     >
-      <Card className="shadow-elegant">
+      <section className="space-y-5">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
           <p className="text-muted-foreground">
@@ -100,7 +100,7 @@ export function SignInForm() {
           </Form>
 
           {/* Divider */}
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
@@ -109,10 +109,10 @@ export function SignInForm() {
                 Or continue with
               </span>
             </div>
-          </div>
+          </div> */}
 
           {/* Social Sign In */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <BukkaButton variant="outline" className="w-full" disabled>
               <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                 <path
@@ -134,17 +134,17 @@ export function SignInForm() {
               </svg>
               Continue with Google
             </BukkaButton>
-          </div>
+          </div> */}
 
           {/* Footer Links */}
-          <div className="text-center space-y-2">
+          <div className="text-center">
             <Link
               href="/forgot-password"
               className="text-sm text-primary hover:underline"
             >
               Forgot your password?
             </Link>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-2">
               Don&apos;t have an account?{" "}
               <Link
                 href="/signup"
@@ -155,7 +155,7 @@ export function SignInForm() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </section>
     </motion.div>
   );
 }

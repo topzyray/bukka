@@ -8,12 +8,13 @@ export const useResetPassword = ({
 }: {
   resetForm: UseFormReset<{
     token: string;
-    password: string;
+    email: string;
+    newPassword: string;
   }>;
 }) => {
   const router = useRouter();
   const { mutate: processResetPassword, isPending: isProcessingResetPassword } =
-    useCustomMutation(AuthApiService.authResetPassword, {
+    useCustomMutation(AuthApiService.resetPassword, {
       onSuccessCallback: () => {
         resetForm();
         router.push("/login");

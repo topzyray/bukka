@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Mail } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Form } from "../ui/form";
 import Link from "next/link";
@@ -42,7 +42,7 @@ export function RequestAccountVerificationForm() {
       transition={{ duration: 0.6 }}
       className={cn("w-full max-w-md mx-auto")}
     >
-      <Card className="shadow-elegant">
+      <section className="space-y-5">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-2xl font-bold">
             Request Email Verification
@@ -110,7 +110,7 @@ export function RequestAccountVerificationForm() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </section>
     </motion.div>
   );
 }

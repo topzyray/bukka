@@ -13,6 +13,7 @@ import {
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import Image from "next/image";
 
 export function Footer() {
   const [email, setEmail] = React.useState("");
@@ -29,16 +30,20 @@ export function Footer() {
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <section className="space-y-4">
-            <section className="flex items-center space-x-2">
-              <motion.section
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.6 }}
-                className="w-10 h-10 rounded-full hero-gradient flex items-center justify-center"
-              >
-                <span className="text-white font-bold text-xl">B</span>
-              </motion.section>
-              <span className="text-2xl font-bold text-shine">Bukka</span>
-            </section>
+            <motion.div
+              whileHover={{ rotate: 360 }}
+              transition={{ duration: 0.6 }}
+              className="w-24 flex items-center hover:cursor-pointer"
+            >
+              <Image
+                src="/images/bukka.png"
+                alt="Logo"
+                width={180}
+                height={38}
+                priority
+                className="w-full h-full"
+              />
+            </motion.div>
             <p className="text-muted-foreground max-w-sm">
               Discover amazing restaurants and cuisines in your area. Join
               thousands of food lovers finding their next favorite meal.
@@ -176,7 +181,7 @@ export function Footer() {
         {/* Bottom Section */}
         <section className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <p className="text-muted-foreground text-sm">
-            © 2024 Bukka. All rights reserved.
+            © 2025 Bukka. All rights reserved.
           </p>
           <section className="flex items-center space-x-6 text-sm text-muted-foreground">
             <section className="flex items-center space-x-1">
@@ -185,7 +190,7 @@ export function Footer() {
             </section>
             <section className="flex items-center space-x-1">
               <Phone className="w-4 h-4" />
-              <span>+1 (555) 123-4567</span>
+              <span>+ (234) 703-552-7946</span>
             </section>
           </section>
         </section>

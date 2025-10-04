@@ -4,30 +4,28 @@ import { RouteHelper } from "../../helpers/RouteHelper";
 const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 
 type IAuthApi =
-  | "login"
-  | "register"
-  | "verifyEmail"
-  | "resendEmailVerification"
+  | "signIn"
+  | "signUp"
+  | "confirmEmail"
+  | "resendConfirmationEmail"
   | "forgotPassword"
   | "resetPassword"
   | "refreshToken"
-  | "changePassword"
-  | "logout";
+  | "changePassword";
 
 const rawAuthRoutes: Record<IAuthApi, string> = {
-  login: "/auth/login",
-  register: "/auth/register",
-  verifyEmail: "/auth/email-verification",
-  resendEmailVerification: "/auth/resend-email-verification",
+  signIn: "/auth/signin",
+  signUp: "/auth/signup",
+  confirmEmail: "/auth/confirm-email",
+  resendConfirmationEmail: "/auth/resend-confirmation-email",
   forgotPassword: "/auth/forgot-password",
   resetPassword: "/auth/reset-password",
-  refreshToken: "/auth/request-access-token",
+  refreshToken: "/auth/refresh-token",
   changePassword: "/auth/change-password",
-  logout: "/auth/logout",
 };
 
 // Use the function to create routes with the base path
 export const authRoutes: Record<IAuthApi, string> = RouteHelper.createRoutes(
   BACKEND_SVC_PATH,
-  rawAuthRoutes,
+  rawAuthRoutes
 );

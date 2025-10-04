@@ -17,7 +17,8 @@ export type ForgotPasswordDto = {
 
 export type ResetPasswordDto = {
   token: string;
-  password: string;
+  email: string;
+  newPassword: string;
 };
 
 export type RefreshTokenDto = {

@@ -5,15 +5,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { BukkaButton } from "@/components/ui/button-variants";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Form } from "../ui/form";
 import Link from "next/link";
 import OtpInputComponent from "./base/OtpInputComponent";
 import { useResetPassword } from "@/api/hooks/auth/use-resetpassword.hook";
 import InputComponent from "./base/input-component";
+import { Lock, Mail } from "lucide-react";
 
 const resetPasswordSchema = z.object({
+  email: z.email({ message: "Please enter a valid email address" }),
   token: z
     .string()
     .min(6, {
@@ -22,7 +24,7 @@ const resetPasswordSchema = z.object({
     .regex(/^\d{6}$/, {
       message: "OTP must consist of exactly 6 digits",
     }),
-  password: z
+  newPassword: z
     .string()
     .min(8, "Password must be at least 8 characters long")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
@@ -42,7 +44,8 @@ export function ResetPasswordForm() {
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       token: "",
-      password: "",
+      email: "",
+      newPassword: "",
     },
   });
 
@@ -63,7 +66,7 @@ export function ResetPasswordForm() {
       transition={{ duration: 0.6 }}
       className={cn("w-full max-w-md mx-auto")}
     >
-      <Card className="shadow-elegant">
+      <section className="space-y-5">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-2xl font-bold">
             Reset Your Password
@@ -89,23 +92,24 @@ export function ResetPasswordForm() {
                 <>
                   <InputComponent
                     formControl={form.control}
-                    formName="password"
+                    formName="email"
+                    formLabel="Email"
+                    formInputType="email"
+                    formPlaceholder="Enter valid email"
+                    disabled={isProcessingResetPassword}
+                    icon={Mail}
+                  />
+
+                  <InputComponent
+                    formControl={form.control}
+                    formName="newPassword"
                     formLabel="New Password"
                     formInputType="password"
                     formPlaceholder="Enter your new password"
                     disabled={isProcessingResetPassword}
                     isPassword
+                    icon={Lock}
                   />
-
-                  {/* <InputComponent
-                    formControl={form.control}
-                    formName="confirm_password"
-                    formLabel="Confirm Password"
-                    formInputType="password"
-                    formPlaceholder="Confirm your password"
-                    disabled={isProcessingResetPassword}
-                    isPassword
-                  /> */}
 
                   <BukkaButton
                     type="submit"
@@ -154,7 +158,7 @@ export function ResetPasswordForm() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </section>
     </motion.div>
   );
 }

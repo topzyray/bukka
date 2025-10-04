@@ -10,7 +10,7 @@ export const useSignIn = () => {
   const router = useRouter();
 
   const { mutate: signInUser, isPending: isSigningIn } = useCustomMutation(
-    AuthApiService.authLogin,
+    AuthApiService.signIn,
     {
       onSuccessCallback: (data) => {
         const { accessToken, refreshToken, user } = data;

@@ -45,12 +45,12 @@ export default function RootLayout({
         <QueryClientProviders>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >
             {children}
-            <Toaster closeButton richColors position="top-center" />
+            <Toaster richColors position="top-center" />
           </ThemeProvider>
         </QueryClientProviders>
       </body>

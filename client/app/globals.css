@@ -94,9 +94,21 @@
   --shadow-glow: 0 0 40px oklch(from var(--primary-glow) l c h / 0.4);
   --shadow-card: 0 4px 20px -4px oklch(from var(--primary) l c h / 0.1);
 
-  --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+  --gradient-primary: linear-gradient(
+    135deg,
+    var(--primary),
+    var(--primary-glow)
+  );
   --gradient-warm: linear-gradient(135deg, var(--accent), var(--primary));
   --gradient-subtle: linear-gradient(180deg, var(--background), var(--muted));
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
 /* Dark theme overrides */
@@ -134,6 +146,14 @@
   --shadow-elegant: 0 10px 30px -10px oklch(0 0 0 / 0.5);
   --shadow-glow: 0 0 40px oklch(from var(--primary) l c h / 0.3);
   --shadow-card: 0 4px 20px -4px oklch(0 0 0 / 0.3);
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
 /* Animations */
@@ -229,8 +249,26 @@
     }
   }
 
+  /* Hero gradient background */
+  .hero-gradient {
+    background: var(--gradient-primary);
+  }
+
+  /* Warm gradient background */
+  .warm-gradient {
+    background: var(--gradient-warm);
+  }
+
   .text-shine {
     @apply bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent;
+  }
+
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+
+  .glass-dark {
+    @apply bg-black/80 backdrop-blur-md border border-white/10;
   }
 }
 
@@ -261,4 +299,13 @@
 }
 .read-the-docs {
   color: #888;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

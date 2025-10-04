@@ -8,7 +8,7 @@ export interface Restaurant {
     lng: number;
   };
   rating: number | null;
-  priceLevel: number | null;
+  priceLevel: number;
   types: string[];
   photos: Array<{
     url: string;

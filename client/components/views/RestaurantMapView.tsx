@@ -2,9 +2,9 @@
 
 import { useState, useRef, useCallback } from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
-import RestaurantDetailsDrawer from "../drawers/RestaurantDetailsDrawer";
-import { RecommendedBy } from "@/api/interfaces/RecommendedBy";
-import { Location } from "@/api/interfaces/Location";
+// import RestaurantDetailsDrawer from "../drawers/RestaurantDetailsDrawer";
+// import { RecommendedBy } from "@/api/interfaces/RecommendedBy";
+// import { Location } from "@/api/interfaces/Location";
 
 interface Restaurant {
   latitude: number;
@@ -16,7 +16,7 @@ interface Restaurant {
   priceLevel?: number;
   photos?: string[];
   cuisine?: string;
-  recommendedBy?: RecommendedBy;
+  // recommendedBy?: RecommendedBy;
   location?: Location;
   website?: string;
   isPinnedByMe?: boolean;
@@ -180,7 +180,7 @@ export default function RestaurantMapView({
         ))}
       </GoogleMap>
 
-      {selectedRestaurant && (
+      {/* {selectedRestaurant && (
         <RestaurantDetailsDrawer
           onClose={() => setSelectedRestaurant(null)}
           restaurant={{
@@ -199,7 +199,7 @@ export default function RestaurantMapView({
             isWishlistedByMe: selectedRestaurant?.isWishlistedByMe ?? false,
           }}
         />
-      )}
+      )} */}
     </section>
   );
 }

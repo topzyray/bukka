@@ -14,7 +14,7 @@ export const useAccountVerification = ({
 }) => {
   const router = useRouter();
   const { mutate: verifyNewUser, isPending: isVerifyingUser } =
-    useCustomMutation(AuthApiService.authVerifyEmail, {
+    useCustomMutation(AuthApiService.confirmEmail, {
       onSuccessCallback: () => {
         setTimeout(() => {
           router.push("/login");
