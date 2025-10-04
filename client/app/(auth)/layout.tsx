@@ -13,6 +13,8 @@ interface IAuthLayout {
   children: ReactNode;
 }
 
+export const dynamic = "force-static";
+
 export default function AuthLayout({ children }: IAuthLayout) {
   const router = useRouter();
   return (
