@@ -26,4 +26,10 @@ export class User {
   favorites: any;
   createdAt?: Date;
   updatedAt?: Date;
+
+  // preferences?: {
+  //   cuisines: string[];
+  //   priceRange: [number, number];
+  //   radius: number;
+  // };
 }

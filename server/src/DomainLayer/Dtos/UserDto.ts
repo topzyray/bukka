@@ -75,6 +75,7 @@ export class CreateUserDto {
   @MinLength(1)
   lastName: string;
 
+  @ApiProperty({ example: 'USER' })
   @IsString()
   @IsNotEmpty()
   role: string;
