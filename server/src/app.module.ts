@@ -33,6 +33,9 @@ import { TokenRepository } from './BussinessLayer/TokenRepository';
 import { UserRepository } from './BussinessLayer/UserRepository';
 import { JwtService } from '@nestjs/jwt';
 import { HealthController } from './ServiceLayer/Controllers/HealthController';
+import { WaitListController } from './ServiceLayer/Controllers/WaitListController';
+import { WaitlistRepository } from './BussinessLayer/WaitlistRepository';
+import { WaitlistDataAgent } from './DataLayer/DataAgents/WaitlistDataAgent';
 
 @Module({
   imports: [
@@ -45,6 +48,7 @@ import { HealthController } from './ServiceLayer/Controllers/HealthController';
   controllers: [
     AppController,
     HealthController,
+    WaitListController,
     AuthController,
     UserController,
     UserNotificationController,
@@ -64,6 +68,7 @@ import { HealthController } from './ServiceLayer/Controllers/HealthController';
     EmailFactory,
     EmailTemplateFactory,
 
+    WaitlistRepository,
     AuthRepository,
     NotificationSettingsRepository,
     UserNotificationRepository,
@@ -71,6 +76,7 @@ import { HealthController } from './ServiceLayer/Controllers/HealthController';
     UserRepository,
     JwtService,
 
+    WaitlistDataAgent,
     NotificationSettingsDataAgent,
     UserNotificationDataAgent,
     UserDataAgent,

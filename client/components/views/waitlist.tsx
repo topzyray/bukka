@@ -1,43 +1,82 @@
 "use client";
 
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Utensils } from "lucide-react";
+import {
+  Mail,
+  MapPin,
+  Phone,
+  PhoneCallIcon,
+  User,
+  Utensils,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import { Form } from "../ui/form";
+import { WaitlistApiService } from "@/server/services/WaitlistApiService";
+import { useCustomMutation } from "@/server/queries/use-mutation.hook";
+import InputComponent from "../forms/base/input-component";
+import { PhoneNumberInput } from "../forms/base/PhoneNumberInput";
+import parsePhoneNumberFromString from "libphonenumber-js";
+import ContactSection from "../atoms/contact-section";
+import { TypeAnimation } from "react-type-animation";
+
+const phoneNumberSchema = z
+  .string()
+  .nonempty("Phone number is required")
+  .refine(
+    (val) => {
+      if (!val.startsWith("+")) return false; // enforce leading +
+      const phoneNumber = parsePhoneNumberFromString(val);
+      return phoneNumber?.isValid() || false;
+    },
+    {
+      message: "Please enter a valid international phone number",
+    }
+  );
+
+const joinWaitlistSchema = z.object({
+  name: z
+    .string({ error: "Please enter a valid string" })
+    .min(3, { error: "Name is required!" }),
+  email: z.email({ message: "Please enter a valid email address" }),
+  phoneNumber: phoneNumberSchema,
+});
+
+type ForgotPasswordFormData = z.infer<typeof joinWaitlistSchema>;
 
 export default function BukkaWaitList() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    location: "",
-    cuisine: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [contact, showContact] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const form = useForm<ForgotPasswordFormData>({
+    mode: "all",
+    resolver: zodResolver(joinWaitlistSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phoneNumber: undefined,
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const { mutate: addUserToWaitlist, isPending: addingUserToWaitlist } =
+    useCustomMutation(WaitlistApiService.joinWaitlist, {
+      onSuccessCallback: () => {
+        setSuccess(true);
+      },
+    });
 
-    try {
-      const res = await fetch("/api/waitlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (res.ok) setSuccess(true);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  async function onSubmit(data: z.infer<typeof joinWaitlistSchema>) {
+    addUserToWaitlist(data);
+  }
+
+  const toggleModal = () => showContact(!contact);
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-subtle overflow-hidden px-6 py-20 text-center">
+    <main className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-subtle overflow-hidden px-6 py-10 text-center">
       {/* Background decorative glow */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/10 blur-3xl rounded-full animate-pulse-glow" />
@@ -48,7 +87,7 @@ export default function BukkaWaitList() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="max-w-4xl space-y-6"
+        className="max-w-5xl space-y-4"
       >
         <motion.div
           whileHover={{ rotate: 360 }}
@@ -64,9 +103,28 @@ export default function BukkaWaitList() {
             className="w-full h-full"
           />
         </motion.div>
-        <h1 className="text-5xl font-bold leading-tight sm:text-6xl text-shine">
-          Discover Nigeria’s Finest Meals <br /> with{" "}
-          <span className="text-primary">Bukka</span>
+        <h1 className="text-4xl md:text-5xl font-bold leading-tight sm:text-6xl text-shine">
+          Discover Nigeria’s Finest{" "}
+          <TypeAnimation
+            sequence={[
+              "Tasty Meals",
+              1000,
+              "Restaurants",
+              1000,
+              "Super Bukka",
+              1000,
+              "Sharwama Spot",
+              1000,
+              "Eatries",
+              1000,
+              "Mama Put",
+              1000,
+            ]}
+            wrapper="span"
+            className="text-accent"
+            repeat={Infinity}
+          />{" "}
+          <br /> with <span className="text-primary">Bukka</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-xl mx-auto">
           We’re redefining how Nigerians find, order, and enjoy local
@@ -75,38 +133,63 @@ export default function BukkaWaitList() {
         </p>
 
         {/* Waitlist form */}
-        <form
-          onSubmit={handleSubmit}
-          className="mt-8 flex flex-col sm:flex-row items-center gap-3 justify-center max-w-2xl mx-auto"
-        >
-          <Input
-            name="name"
-            placeholder="Your name"
-            onChange={handleChange}
-            required
-            className="bg-card py-6"
-          />
-          <Input
-            name="email"
-            type="email"
-            placeholder="Email address"
-            onChange={handleChange}
-            required
-            className="bg-card py-6"
-          />
-          <Button
-            type="submit"
-            disabled={isSubmitting || success}
-            className="warm-gradient text-white font-semibold px-6 py-6 rounded-lg shadow-elegant hover-glow cursor-pointer"
-          >
-            {success
-              ? "You're on the list! 🎉"
-              : isSubmitting
-              ? "Joining..."
-              : "Join the Waitlist"}
-          </Button>
-        </form>
+        <section className="flex flex-col gap-3 max-w-sm w-full mx-auto">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+              <InputComponent
+                formControl={form.control}
+                formName="name"
+                formInputType="text"
+                formPlaceholder="Your full name"
+                disabled={addingUserToWaitlist}
+                icon={User}
+                showLabel={false}
+              />
 
+              <InputComponent
+                formControl={form.control}
+                formName="email"
+                formLabel="Email"
+                formInputType="email"
+                formPlaceholder="Enter valid email"
+                disabled={addingUserToWaitlist}
+                icon={Mail}
+                showLabel={false}
+              />
+
+              <PhoneNumberInput
+                formControl={form}
+                formName="phoneNumber"
+                autoDetect={true}
+                disabled={addingUserToWaitlist}
+                icon={Phone}
+              />
+
+              {/* <LocationInput
+                formControl={form}
+                formName="address"
+                handlePlaceSelect={FormInputHelper.handlePlaceSelect}
+                autoDetect={true}
+                disabled={addingUserToWaitlist}
+                icon={MapPin}
+              /> */}
+
+              <Button
+                type="submit"
+                disabled={
+                  addingUserToWaitlist || success || !form.formState.isValid
+                }
+                className="warm-gradient text-white font-semibold px-6 py-3 rounded-lg shadow-elegant hover-glow cursor-pointer"
+              >
+                {success
+                  ? "You're on the list! 🎉"
+                  : addingUserToWaitlist
+                  ? "Joining..."
+                  : "Join the Waitlist"}
+              </Button>
+            </form>
+          </Form>
+        </section>
         {/* Subtext */}
         <div className="flex justify-center gap-4 text-muted-foreground mt-6 text-sm">
           <div className="flex items-center gap-1">
@@ -123,19 +206,19 @@ export default function BukkaWaitList() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.8 }}
-        className="mt-20 text-center"
+        className="mt-14 text-center"
       >
         <h2 className="text-2xl font-semibold text-primary mb-2">
           Be the first to get access
         </h2>
         <p className="text-muted-foreground max-w-md mx-auto">
-          Early members get exclusive invites, rewards, and free deliveries at
-          launch.
+          Early members get exclusive invites, rewards, discounted deliveries at
+          launch and lot more.
         </p>
       </motion.div>
 
       {/* Footer */}
-      <footer className="mt-24 text-sm text-muted-foreground">
+      <footer className="w-full mt-16 text-sm text-muted-foreground">
         © {new Date().getFullYear()} Bukka. All rights reserved.
       </footer>
 
@@ -170,6 +253,39 @@ export default function BukkaWaitList() {
       >
         🍜
       </motion.section>
+
+      <motion.section
+        animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="cursor-pointer absolute bottom-0 right-0 opacity-50 border border-primary p-2 rounded-full"
+        onClick={toggleModal}
+      >
+        <PhoneCallIcon />
+      </motion.section>
+
+      {contact && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 bg-opacity-60 "
+          onClick={toggleModal} // close when clicking overlay
+        >
+          {/* Modal Content */}
+          <div
+            className="bg-white/60 backdrop-blur-md rounded-lg p-6 w-11/12 max-w-md text-primary"
+            onClick={(e) => e.stopPropagation()} // prevent closing on content click
+          >
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-lg font-bold">Get in Touch Today</h2>
+              <button
+                onClick={toggleModal}
+                className="text-2xl font-bold hover:text-amber-400"
+              >
+                &times;
+              </button>
+            </div>
+            <ContactSection />
+          </div>
+        </div>
+      )}
     </main>
   );
 }

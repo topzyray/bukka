@@ -14,8 +14,8 @@ import { StorageUtilsHelper } from "@/utils/storage-utils";
 import { STORE_KEYS } from "@/configs/store.config";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { User } from "@/api/interfaces/User";
-import { CustomJwtPayload } from "@/api/interfaces/Auth";
+import { User } from "@/server/interfaces/User";
+import { CustomJwtPayload } from "@/server/interfaces/Auth";
 
 interface IAuthContextType {
   userDetails: User | null;

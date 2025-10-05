@@ -106,9 +106,7 @@ export class UserNotificationRepository {
     userId: number,
     filterDto: UserNotificationFilterDto,
   ) {
-    console.log('INDISE FILTERS: ', filterDto);
     const mergedFilters = { ...filterDto, userId };
-
     const query = FilterQueryHelper.buildQuery({
       dto: mergedFilters,
       rules: [
@@ -121,10 +119,8 @@ export class UserNotificationRepository {
         mode: 'insensitive',
       },
     });
-
     const { pageSize, pageNumber } =
       FilterQueryHelper.extractPagination(mergedFilters);
-
     return this._userNotificationDataAgent.getUserNotificationsByFilter(
       query,
       pageSize,

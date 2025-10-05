@@ -4,8 +4,8 @@ import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { RouteHelper } from "@/helpers/RouteHelper";
 import { CircularLoader } from "@/components/loaders/circular-loader";
-import { UserRole } from "@/api/interfaces/Auth";
-import { useAuth } from "@/api/hooks/auth/use-auth.hook";
+import { UserRole } from "@/server/interfaces/Auth";
+import { useAuth } from "@/server/hooks/auth/use-auth.hook";
 
 interface RouteGuardProps {
   children: ReactNode;

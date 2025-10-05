@@ -1,102 +1,78 @@
-import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { Response } from 'express';
 import { Public } from 'src/DomainLayer/Decorators/PublicDecorator';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
-import {
-  ChangePasswordDto,
-  ConfirmEmailDto,
-  ForgotPasswordDto,
-  SigninDto,
-  RefreshTokenDto,
-  ResendConfirmEmailDto,
-  ResetPasswordDto,
-} from 'src/DomainLayer/Dtos/AuthDto';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
-import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
-import { CreateUserDto } from 'src/DomainLayer/Dtos/UserDto';
-import { AuthRepository } from 'src/BussinessLayer/AuthRepository';
+import { WaitlistRepository } from 'src/BussinessLayer/WaitlistRepository';
+import {
+  CreateWaitlistDto,
+  WaitlistFilterDto,
+} from 'src/DomainLayer/Dtos/WaitlistDto';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/waitlist`)
-@ApiTags('Auth API')
+@ApiTags('Waitlist API')
 @ApiBearerAuth()
 export class WaitListController {
-  constructor(private readonly _authRepository: AuthRepository) {}
+  constructor(private readonly _waitlistRepository: WaitlistRepository) {}
 
   @Public()
-  @Post('signup')
-  @ApiOperation({ summary: 'Create a new account.' })
-  @ApiBody({ type: CreateUserDto })
-  async signUp(@Body() request: CreateUserDto, @Res() res: Response) {
-    const response = await this._authRepository.signUp(request);
+  @Post('join')
+  @ApiOperation({ summary: 'Add user to waitlist.' })
+  @ApiBody({ type: CreateWaitlistDto })
+  async signUp(@Body() request: CreateWaitlistDto, @Res() res: Response) {
+    const response = await this._waitlistRepository.createWaitlist(request);
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Public()
-  @Post('signin')
-  @ApiOperation({ summary: 'Sign to account' })
-  @ApiBody({ type: SigninDto })
-  async signIn(@Body() request: SigninDto, @Res() res: Response) {
-    const response = await this._authRepository.signIn(request);
-    return BukkaResponse.GetStatusResponse(response, res);
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a waitlist by ID' })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the waitlist',
+    example: 1,
+  })
+  async getUserById(@Param('userId') id: number, @Res() res: Response) {
+    const response = await this._waitlistRepository.getWaitlistById(Number(id));
+    const data = BukkaResponse.GetSingleDataResponse('Waitlist', response);
+    return BukkaResponse.GetStatusResponse(data, res);
   }
 
-  @Public()
-  @Post('confirm-email')
-  @ApiOperation({ summary: 'Confirm users email' })
-  @ApiBody({ type: ConfirmEmailDto })
-  async verifyEmail(@Body() request: ConfirmEmailDto, @Res() res: Response) {
-    const response = await this._authRepository.verifyEmail(request);
-    return BukkaResponse.GetStatusResponse(response, res);
-  }
-
-  @Public()
-  @Post('resend-confirmation-email')
-  @ApiOperation({ summary: 'Resend verification email' })
-  @ApiBody({ type: ResendConfirmEmailDto })
-  async resendEmailVerification(
-    @Body() req: ResendConfirmEmailDto,
+  @Get()
+  @ApiOperation({ summary: 'Get all paginated waitlist' })
+  async getNotificationSettingsByFilters(
+    @Query() request: WaitlistFilterDto,
     @Res() res: Response,
   ) {
-    const response = await this._authRepository.resendConfirmationEmail(req);
-    return BukkaResponse.GetStatusResponse(response, res);
+    const response = await this._waitlistRepository.findByFilters(request);
+    const data = BukkaResponse.GetPagedDataResponse('Waitlist', response);
+    return res.status(data.responseCode).json(data);
   }
 
-  @Public()
-  @Post('refresh-token')
-  @ApiOperation({ summary: 'Refreshes user token' })
-  @ApiBody({ type: RefreshTokenDto })
-  async refreshToken(@Body() req: RefreshTokenDto, @Res() res: Response) {
-    const response = await this._authRepository.refreshToken(req);
-    return BukkaResponse.GetStatusResponse(response, res);
-  }
-
-  @Public()
-  @Post('forgot-password')
-  @ApiOperation({ summary: 'Forgot password api' })
-  @ApiBody({ type: ForgotPasswordDto })
-  async forgotPassword(@Body() req: ForgotPasswordDto, @Res() res: Response) {
-    const response = await this._authRepository.forgotPassword(req);
-    return BukkaResponse.GetStatusResponse(response, res);
-  }
-
-  @Public()
-  @Post('reset-password')
-  @ApiOperation({ summary: 'Reset and update user password' })
-  @ApiBody({ type: ResetPasswordDto })
-  async resetPassword(@Body() req: ResetPasswordDto, @Res() res: Response) {
-    const response = await this._authRepository.resetPassword(req);
-    return BukkaResponse.GetStatusResponse(response, res);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Post('change-password')
-  @ApiOperation({ summary: 'Change user password' })
-  @ApiBody({ type: ChangePasswordDto })
-  async changePassword(@Body() req: ChangePasswordDto, @Res() res: Response) {
-    const response = await this._authRepository.changePassword(req);
-    return BukkaResponse.GetStatusResponse(response, res);
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a waitlist by ID' })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the waitlist',
+    example: 12,
+  })
+  async deleteUserAccount(@Param('id') id: number, @Res() res: Response) {
+    const result = await this._waitlistRepository.deleteWaitlist(id);
+    return res.status(result.responseCode).json(result);
   }
 }

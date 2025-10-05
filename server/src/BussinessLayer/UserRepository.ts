@@ -15,8 +15,8 @@ import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { PagedData } from 'src/DomainLayer/Models/PagedData';
 import { Generator } from 'src/InfrastructureLayer/Services/Generator';
 import { AdminUserFilterDto } from 'src/DomainLayer/Dtos/Admin/AdminUserDto';
-import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
 import { User } from 'src/DomainLayer/Models/User';
+import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 @Injectable()
 export class UserRepository {
   constructor(private readonly _userDataAgent: UserDataAgent) {}
@@ -207,70 +207,50 @@ export class UserRepository {
     if (!user) {
       throw new NotFoundException('User not found!');
     }
-
     await this._userDataAgent.deleteUser(userId);
     return BukkaResponse.deleteResponse('User', true);
   }
 
   async findByFilters(filterDto: UserFilterDto): Promise<PagedData<any[]>> {
-    const query: any = {};
-
-    const loggedInUser = await UserHelper.getLoggedInUser();
-
-    if (filterDto.userStatus) {
-      query.userStatus = filterDto.userStatus;
-    }
-
-    if (filterDto.userId) {
-      query.id = Number(filterDto.userId) ?? loggedInUser?.userId;
-    }
-
-    if (filterDto.search) {
-      query.OR = [
-        { username: { contains: filterDto.search, mode: 'insensitive' } },
-        { firstName: { contains: filterDto.search, mode: 'insensitive' } },
-        { lastName: { contains: filterDto.search, mode: 'insensitive' } },
-        { email: { contains: filterDto.search, mode: 'insensitive' } },
-      ];
-    }
-
-    const data = await this._userDataAgent.getUsersByFilter(
+    const { userId, ...otherFilters } = filterDto;
+    const mergedFilters = { id: userId, ...otherFilters };
+    const query = FilterQueryHelper.buildQuery({
+      dto: mergedFilters,
+      rules: [{ field: 'userStatus' }, { field: 'phoneNumber' }],
+      searchConfig: {
+        fields: ['username', 'email', 'firstName', 'lastName'],
+        mode: 'insensitive',
+      },
+    });
+    const { pageSize, pageNumber } =
+      FilterQueryHelper.extractPagination(mergedFilters);
+    return await this._userDataAgent.getUsersByFilter(
       query,
-      filterDto.pageSize,
-      filterDto.pageNumber,
+      pageSize,
+      pageNumber,
     );
-
-    return data;
   }
 
   async adminFindByFilters(
     filterDto: AdminUserFilterDto,
   ): Promise<PagedData<any[]>> {
-    const query: any = {};
-
-    if (filterDto.userStatus) {
-      query.userStatus = filterDto.userStatus;
-    }
-
-    if (filterDto.userId) {
-      query.id = Number(filterDto.userId);
-    }
-
-    if (filterDto.search) {
-      query.OR = [
-        { firstName: { contains: filterDto.search, mode: 'insensitive' } },
-        { lastName: { contains: filterDto.search, mode: 'insensitive' } },
-        { email: { contains: filterDto.search, mode: 'insensitive' } },
-      ];
-    }
-
-    const data = await this._userDataAgent.adminGetUsersByFilter(
+    const { userId, ...otherFilters } = filterDto;
+    const mergedFilters = { id: userId, ...otherFilters };
+    const query = FilterQueryHelper.buildQuery({
+      dto: mergedFilters,
+      rules: [{ field: 'userStatus' }, { field: 'phoneNumber' }],
+      searchConfig: {
+        fields: ['username', 'email', 'firstName', 'lastName'],
+        mode: 'insensitive',
+      },
+    });
+    const { pageSize, pageNumber } =
+      FilterQueryHelper.extractPagination(mergedFilters);
+    return await this._userDataAgent.adminGetUsersByFilter(
       query,
-      filterDto.pageSize,
-      filterDto.pageNumber,
+      pageSize,
+      pageNumber,
     );
-
-    return data;
   }
 
   async getAdminOverview() {

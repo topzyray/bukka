@@ -3,8 +3,8 @@
 import { useState, useRef, useCallback } from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
 // import RestaurantDetailsDrawer from "../drawers/RestaurantDetailsDrawer";
-// import { RecommendedBy } from "@/api/interfaces/RecommendedBy";
-// import { Location } from "@/api/interfaces/Location";
+// import { RecommendedBy } from "@/server/interfaces/RecommendedBy";
+// import { Location } from "@/server/interfaces/Location";
 
 interface Restaurant {
   latitude: number;

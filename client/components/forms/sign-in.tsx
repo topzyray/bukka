@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Form } from "../ui/form";
 import Link from "next/link";
 import InputComponent from "./base/input-component";
-import { useSignIn } from "@/api/hooks/auth/use-signin.hook";
+import { useSignIn } from "@/server/hooks/auth/use-signin.hook";
 
 const signInSchema = z.object({
   email: z.email({ message: "Please enter a valid email address" }),

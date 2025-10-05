@@ -1,7 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FilePenIcon, LoaderCircle } from "lucide-react";
-import { useFileUpload } from "@/api/hooks/file/use-file-uploader";
+import { useFileUpload } from "@/server/hooks/file/use-file-uploader";
 
 interface FileUploadProps<T, P> {
   uploadFn: (params: P) => Promise<T>;

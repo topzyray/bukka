@@ -2,9 +2,9 @@ import { RouteHelper } from "../../../helpers/RouteHelper";
 import { useRouter } from "next/navigation";
 import { StorageUtilsHelper } from "@/utils/storage-utils";
 import { STORE_KEYS } from "@/configs/store.config";
-import { AuthApiService } from "@/api/services/AuthApiService";
+import { AuthApiService } from "@/server/services/AuthApiService";
 import { extractErrorMessage } from "@/utils/extract-error-utils";
-import { useCustomMutation } from "@/api/queries/use-mutation.hook";
+import { useCustomMutation } from "@/server/queries/use-mutation.hook";
 
 export const useSignIn = () => {
   const router = useRouter();

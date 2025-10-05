@@ -18,7 +18,7 @@ import { Lock, Mail, ShieldCheck, User } from "lucide-react";
 import { Processing } from "../loaders/processing";
 import SelectComponent from "./base/select-component";
 import { Form } from "../ui/form";
-import { useSignUp } from "@/api/hooks/auth/use-signup.hook";
+import { useSignUp } from "@/server/hooks/auth/use-signup.hook";
 
 const signUpSchema = z
   .object({

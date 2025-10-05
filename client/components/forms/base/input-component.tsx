@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 interface IInputComponentProps {
   formControl: any;
   formName: string;
-  formLabel: ReactNode;
+  formLabel?: ReactNode;
   formInputType: string;
   formPlaceholder?: string;
   isPassword?: boolean;
@@ -23,6 +23,7 @@ interface IInputComponentProps {
   editable?: boolean;
   disabled?: boolean;
   inputClassName?: string;
+  showLabel?: boolean;
   icon?: React.ElementType;
 }
 
@@ -39,6 +40,7 @@ export default function InputComponent({
   disabled,
   inputClassName,
   icon: Icon,
+  showLabel = true,
   ...props
 }: IInputComponentProps) {
   const [visible, setVisible] = useState(false);
@@ -67,26 +69,28 @@ export default function InputComponent({
             : null;
 
         return (
-          <FormItem className="space-y-1">
+          <FormItem className="space-y-0.5">
             {/* Label */}
-            <FormLabel
-              className={cn(
-                isError && "text-red-600",
-                isValid && "text-green-600",
-                isPassword && "flex items-center justify-between"
-              )}
-            >
-              {formLabel}
-              {isPassword && (
-                <span className="cursor-pointer">
-                  {visible ? (
-                    <EyeOff onClick={() => setVisible(false)} />
-                  ) : (
-                    <EyeIcon onClick={() => setVisible(true)} />
-                  )}
-                </span>
-              )}
-            </FormLabel>
+            {showLabel && (
+              <FormLabel
+                className={cn(
+                  isError && "text-red-600",
+                  isValid && "text-green-600",
+                  isPassword && "flex items-center justify-between"
+                )}
+              >
+                {formLabel}
+                {isPassword && (
+                  <span className="cursor-pointer">
+                    {visible ? (
+                      <EyeOff onClick={() => setVisible(false)} />
+                    ) : (
+                      <EyeIcon onClick={() => setVisible(true)} />
+                    )}
+                  </span>
+                )}
+              </FormLabel>
+            )}
 
             {/* Input with icons */}
             <section className="relative">
@@ -135,7 +139,7 @@ export default function InputComponent({
             {isPassword && passwordStrength && !isError && (
               <p
                 className={cn(
-                  "text-sm mt-1",
+                  "text-sm",
                   passwordStrength === "Weak" && "text-red-600",
                   passwordStrength === "Medium" && "text-yellow-600",
                   passwordStrength === "Strong" && "text-green-600"
@@ -145,7 +149,7 @@ export default function InputComponent({
               </p>
             )}
 
-            <FormMessage />
+            <FormMessage className="-mt-2 text-left" />
           </FormItem>
         );
       }}

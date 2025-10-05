@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Form } from "../ui/form";
 import Link from "next/link";
 import OtpInputComponent from "./base/OtpInputComponent";
-import { useResetPassword } from "@/api/hooks/auth/use-resetpassword.hook";
+import { useResetPassword } from "@/server/hooks/auth/use-resetpassword.hook";
 import InputComponent from "./base/input-component";
 import { Lock, Mail } from "lucide-react";
 
