@@ -52,6 +52,10 @@ export const configSchema = z.object({
     .string({ error: 'EMAIL_TEMPLATE_ENGINE is required' })
     .min(1, 'Specify the template engine (e.g., handlebars, pug, ejs)'),
 
+  EMAIL_TEMPLATES_DIR: z
+    .string({ error: 'EMAIL_TEMPLATES_DIR is required' })
+    .min(1, 'Specify the template directory'),
+
   SENDER_EMAIL: z
     .string({ error: 'SENDER_EMAIL is required' })
     .min(1, 'Provide the email address that sends system messages'),

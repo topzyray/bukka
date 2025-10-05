@@ -24,6 +24,7 @@ COPY --from=builder /app/src/UtilityLayer/Views/Templates ./dist/UtilityLayer/Vi
 COPY --from=builder /app/src/UtilityLayer/Views/Templates/Images ./dist/UtilityLayer/Views/Templates/Images
 
 ENV NODE_ENV=production
+ENV EMAIL_TEMPLATES_DIR=/app/dist/UtilityLayer/Views/Templates
 
 EXPOSE 8000
 CMD ["npm", "run", "start:prod"]

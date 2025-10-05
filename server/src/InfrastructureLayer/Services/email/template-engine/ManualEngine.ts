@@ -9,10 +9,11 @@ export class ManualTemplateEngine implements IEmailTemplateEngine {
     template: string,
     context: Record<string, any>,
   ): Promise<string> {
-    const templatePath = path.resolve(
-      'src',
-      `UtilityLayer/Views/Templates/${template}.html`,
-    );
+    const templatesDir =
+      process.env.EMAIL_TEMPLATES_DIR ||
+      path.join(__dirname, '../../../Views/Templates');
+
+    const templatePath = path.join(templatesDir, `${template}.html`);
 
     if (!fs.existsSync(templatePath)) {
       throw new Error(`Email template not found: ${templatePath}`);

@@ -10,11 +10,10 @@ export class HandlebarsEngine implements IEmailTemplateEngine {
     template: string,
     context: Record<string, any>,
   ): Promise<string> {
-    const templatePath = path.resolve(
-      'src',
-      'UtilityLayer/Views/Templates',
-      `${template}.hbs`,
-    );
+    const templatesDir =
+      process.env.EMAIL_TEMPLATES_DIR ||
+      path.join(__dirname, '../../../Views/Templates');
+    const templatePath = path.join(templatesDir, `${template}.hbs`);
     const fileContent = await fs.readFile(templatePath, 'utf-8');
     const compile = Handlebars.compile(fileContent);
     return compile(context);
