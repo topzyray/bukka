@@ -28,16 +28,16 @@ export class WaitlistRepository {
     const existingWaitlist =
       await this._waitlistDataAgent.getWaitlistByUserEmail(data.email);
     if (existingWaitlist) {
-      await this._emailService.sendTemplateMail({
-        template: 'waitingList',
-        from: 'topzyray009@gmail.com',
-        to: [existingWaitlist.email],
-        subject: 'You’re officially on the Bukka list!',
-        context: {
-          name: existingWaitlist.name,
-          getStartedLink: 'https://buuka.vercel.app',
-        },
-      });
+      // await this._emailService.sendTemplateMail({
+      //   template: 'waitingList',
+      //   from: 'topzyray009@gmail.com',
+      //   to: [existingWaitlist.email],
+      //   subject: 'You’re officially on the Bukka list!',
+      //   context: {
+      //     name: existingWaitlist.name,
+      //     getStartedLink: 'https://buuka.vercel.app',
+      //   },
+      // });
       return BukkaResponse.customResponse(
         'You’re on the list! We’ll notify you when Bukka goes live!',
         HttpStatus.CREATED,
