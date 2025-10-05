@@ -89,7 +89,6 @@ export class AuthController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('change-password')

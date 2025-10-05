@@ -7,6 +7,7 @@ import {
   Post,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -24,6 +25,7 @@ import {
   CreateWaitlistDto,
   WaitlistFilterDto,
 } from 'src/DomainLayer/Dtos/WaitlistDto';
+import { AdminAuthGuard } from 'src/MiddlewareLayer/Guards/AdminAuthGuard';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/waitlist`)
 @ApiTags('Waitlist API')
@@ -40,6 +42,7 @@ export class WaitListController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
+  @UseGuards(AdminAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Get all paginated waitlist' })
   async getNotificationSettingsByFilters(
@@ -58,6 +61,7 @@ export class WaitListController {
     return res.status(response.responseCode).json(response);
   }
 
+  @UseGuards(AdminAuthGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Get a waitlist by ID' })
   @ApiParam({
@@ -71,6 +75,7 @@ export class WaitListController {
     return BukkaResponse.GetStatusResponse(data, res);
   }
 
+  @UseGuards(AdminAuthGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a waitlist by ID' })
   @ApiParam({
