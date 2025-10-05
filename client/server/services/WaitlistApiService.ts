@@ -25,4 +25,11 @@ export class WaitlistApiService {
     );
     return response.data;
   }
+
+  static async getWaitlistCount() {
+    const response = await HttpClient.getClient().get(
+      `${waitlistRoutes.getWaitlistCount}`
+    );
+    return response.data;
+  }
 }

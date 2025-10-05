@@ -24,6 +24,9 @@ import parsePhoneNumberFromString from "libphonenumber-js";
 import ContactSection from "../atoms/contact-section";
 import { TypeAnimation } from "react-type-animation";
 import { Processing } from "../loaders/processing";
+import { useCustomQuery } from "@/server/queries/use-query.hook";
+import { useQueryClient } from "@tanstack/react-query";
+import { CircleLoader } from "react-spinners";
 
 const phoneNumberSchema = z
   .string()
@@ -53,6 +56,12 @@ export default function BukkaWaitList() {
   const [success, setSuccess] = useState(false);
   const [contact, showContact] = useState(false);
 
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, isError } = useCustomQuery(["waitlistCount"], () =>
+    WaitlistApiService.getWaitlistCount()
+  );
+
   const form = useForm<ForgotPasswordFormData>({
     mode: "all",
     resolver: zodResolver(joinWaitlistSchema),
@@ -67,6 +76,7 @@ export default function BukkaWaitList() {
     useCustomMutation(WaitlistApiService.joinWaitlist, {
       onSuccessCallback: () => {
         setSuccess(true);
+        queryClient.invalidateQueries({ queryKey: ["waitlistCount"] });
       },
     });
 
@@ -203,7 +213,15 @@ export default function BukkaWaitList() {
             <MapPin size={16} /> Available soon in Abuja, Lagos & more
           </div>
           <div className="flex items-center gap-1">
-            <Utensils size={16} /> Over 2,000+ food lovers waiting
+            <Utensils size={16} /> Over{" "}
+            {isLoading ? (
+              <CircleLoader size={15} color="#462009" />
+            ) : data ? (
+              data?.responseData?.totalWaitlist
+            ) : isError ? (
+              "0"
+            ) : null}
+            + food lovers waiting
           </div>
         </div>
       </motion.div>
