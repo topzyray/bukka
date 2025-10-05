@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
+  NotImplementedException,
 } from '@nestjs/common';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { PagedData } from 'src/DomainLayer/Models/PagedData';
@@ -14,21 +15,55 @@ import {
 } from 'src/DomainLayer/Dtos/WaitlistDto';
 import { Waitlist } from 'src/DomainLayer/Models/Waitlist';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
+import { EmailService } from 'src/InfrastructureLayer/Services/email/EmailService';
 
 @Injectable()
 export class WaitlistRepository {
-  constructor(private readonly _waitlistDataAgent: WaitlistDataAgent) {}
+  constructor(
+    private readonly _waitlistDataAgent: WaitlistDataAgent,
+    private readonly _emailService: EmailService,
+  ) {}
 
   async createWaitlist(data: CreateWaitlistDto): Promise<BukkaResponse<User>> {
     const existingWaitlist =
       await this._waitlistDataAgent.getWaitlistByUserEmail(data.email);
     if (existingWaitlist) {
-      throw new ConflictException(
+      await this._emailService.sendTemplateMail({
+        template: 'waitingList',
+        from: 'topzyray009@gmail.com',
+        to: [existingWaitlist.email],
+        subject: 'You’re officially on the Bukka list!',
+        context: {
+          name: existingWaitlist.name,
+          getStartedLink: 'https://buuka.vercel.app',
+        },
+      });
+      return BukkaResponse.customResponse(
         'You’re on the list! We’ll notify you when Bukka goes live!',
+        HttpStatus.CREATED,
+        true,
+        null,
       );
     }
     const waitlist = data as Waitlist;
     const result = await this._waitlistDataAgent.createWaitlistAsync(waitlist);
+    if (!result) {
+      throw new NotImplementedException(
+        'An error occurred while. Please try again!',
+      );
+    }
+
+    await this._emailService.sendTemplateMail({
+      template: 'waitingList',
+      from: 'topzyray009@gmail.com',
+      to: [result.email],
+      subject: 'You’re officially on the Bukka list!',
+      context: {
+        name: result.name,
+        getStartedLink: 'https://buuka.vercel.app',
+      },
+    });
+
     return BukkaResponse.customResponse(
       'You’re on the list! We’ll notify you when Bukka goes live!',
       HttpStatus.CREATED,
