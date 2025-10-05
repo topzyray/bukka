@@ -64,6 +64,28 @@ export class AppConfigurationService {
       ?.trim() as string;
   }
 
+  get mailgunApiKey(): string {
+    return this.configService.get<string>('MAILGUN_API_KEY')?.trim() as string;
+  }
+
+  get mailgunDomain(): string {
+    return this.configService.get<string>('MAILGUN_DOMAIN')?.trim() as string;
+  }
+
+  get mailjetApiKey(): string {
+    return this.configService.get<string>('MAILJET_API_KEY')?.trim() as string;
+  }
+
+  get mailjetSecretKey(): string {
+    return this.configService
+      .get<string>('MAILJET_SECRET_KEY')
+      ?.trim() as string;
+  }
+
+  get senderName(): string {
+    return this.configService.get<string>('SENDER_NAME')?.trim() as string;
+  }
+
   // get fileProvider(): string {
   //   return this.configService.get<string>('FILE_PROVIDER')?.trim() as string;
   // }

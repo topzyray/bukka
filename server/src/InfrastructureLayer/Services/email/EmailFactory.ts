@@ -6,11 +6,15 @@ import {
   IEmailProvider,
   MailOptions,
 } from 'src/DataLayer/Abstracts/Interfaces/IEmailProvider';
+import { MailjetProvider } from './providers/MailjetProvider';
+import { MailgunProvider } from './providers/MailgunProvider';
 
 @Injectable()
 export class EmailFactory {
   constructor(
     private readonly nodemailerProvider: NodemailerProvider,
+    private readonly mailjetProvider: MailjetProvider,
+    private readonly mailgunProvider: MailgunProvider,
     private readonly configService: AppConfigurationService,
   ) {}
 
@@ -20,6 +24,10 @@ export class EmailFactory {
     switch (provider) {
       case EmailProviderEnum.NODEMAILER:
         return this.nodemailerProvider;
+      case EmailProviderEnum.MAILJET:
+        return this.mailjetProvider;
+      case EmailProviderEnum.MAILGUN:
+        return this.mailgunProvider;
       default:
         throw new Error('Invalid or Missing Email Provider');
     }

@@ -44,9 +44,7 @@ export const configSchema = z.object({
     .string({ error: 'EMAIL_PROVIDER is required' })
     .min(1, 'Specify the email provider (e.g., gmail, sendgrid)'),
 
-  EMAIL_HOST: z
-    .string({ error: 'EMAIL_HOST is required' })
-    .min(1, 'Specify the SMTP host for sending emails'),
+  EMAIL_HOST: z.string().optional().describe('Email host for Nodemailer'),
 
   EMAIL_TEMPLATE_ENGINE: z
     .string({ error: 'EMAIL_TEMPLATE_ENGINE is required' })
@@ -60,9 +58,22 @@ export const configSchema = z.object({
     .string({ error: 'SENDER_EMAIL is required' })
     .min(1, 'Provide the email address that sends system messages'),
 
+  SENDER_NAME: z
+    .string({ error: 'SENDER_NAME is required' })
+    .min(1, 'Provide the sender name that sends system emails'),
+
   SENDER_PASSWORD: z
-    .string({ error: 'SENDER_PASSWORD is required' })
-    .min(1, 'Provide the sender email password or app key'),
+    .string()
+    .optional()
+    .describe('Email sender password for Nodemailer'),
+
+  MAILJET_API_KEY: z.string().optional().describe('MailJet API Key'),
+
+  MAILJET_SECRET_KEY: z.string().optional().describe('MailJet Secret Key'),
+
+  MAILGUN_API_KEY: z.string().optional().describe('MailGun API Key'),
+
+  MAILGUN_DOMAIN: z.string().optional().describe('MailGun Domain'),
 
   FILE_PROVIDER: z
     .string({ error: 'FILE_PROVIDER is required' })

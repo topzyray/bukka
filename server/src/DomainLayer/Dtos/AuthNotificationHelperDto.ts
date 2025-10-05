@@ -18,7 +18,7 @@ export class processPasswordResetDto {
   email: string;
   firstName: string;
   passwordResetToken: string;
-  passwordResetTokenExpires: Date;
+  passwordResetExpires: Date;
 }
 
 export class ProcessSignupDto {

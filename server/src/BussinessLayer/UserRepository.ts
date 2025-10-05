@@ -31,7 +31,7 @@ export class UserRepository {
     const user = data as User;
     const result = await this._userDataAgent.createUserAsync(user);
     return BukkaResponse.customResponse(
-      `We've sent a verification token to ${result.email}.`,
+      `We've sent a verification token to ${result.email}. Check your Inbox or Spam for further actions.`,
       HttpStatus.CREATED,
       true,
       result,

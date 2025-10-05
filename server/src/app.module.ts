@@ -36,6 +36,8 @@ import { HealthController } from './ServiceLayer/Controllers/HealthController';
 import { WaitListController } from './ServiceLayer/Controllers/WaitListController';
 import { WaitlistRepository } from './BussinessLayer/WaitlistRepository';
 import { WaitlistDataAgent } from './DataLayer/DataAgents/WaitlistDataAgent';
+import { MailjetProvider } from './InfrastructureLayer/Services/email/providers/MailjetProvider';
+import { MailgunProvider } from './InfrastructureLayer/Services/email/providers/MailgunProvider';
 
 @Module({
   imports: [
@@ -84,6 +86,8 @@ import { WaitlistDataAgent } from './DataLayer/DataAgents/WaitlistDataAgent';
     AuthNotificationHelper,
 
     NodemailerProvider,
+    MailjetProvider,
+    MailgunProvider,
 
     HandlebarsEngine,
     ManualTemplateEngine,

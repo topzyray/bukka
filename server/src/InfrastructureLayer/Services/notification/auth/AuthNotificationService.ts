@@ -50,7 +50,7 @@ export class AuthNotificationService extends NotificationService {
         context: {
           firstName: data.firstName,
           passwordResetToken: data.passwordResetToken,
-          passwordResetTokenExpires: data.passwordResetTokenExpires,
+          passwordResetExpires: data.passwordResetExpires,
         },
       },
     });

@@ -229,17 +229,23 @@ export class AuthRepository {
         email: result?.responseData?.email,
         firstName: result?.responseData?.firstName,
         passwordResetToken: result?.responseData?.passwordResetToken,
-        passwordResetTokenExpires:
-          `${TextHelper.getFormattedDate(result?.responseData?.passwordResetTokenExpires)} at ${TextHelper.getFormattedTime(result?.responseData?.passwordResetTokenExpires)}` as unknown as Date,
+        passwordResetExpires:
+          `${TextHelper.getFormattedDate(result?.responseData?.passwordResetExpires)} at ${TextHelper.getFormattedTime(result?.responseData?.passwordResetExpires)}` as unknown as Date,
       },
       AuthQueueMessageTypeEnum.FORGOT_PASSWORD,
     );
 
+    const mappedData = TypeSafeMapper.map(
+      result?.responseData,
+      UserResponse,
+      UserDto,
+    );
+
     return BukkaResponse.customResponse(
-      `We've sent a password reset link to ${result.responseData.email}. Please check your inbox and follow the instructions.`,
+      `We've sent a password reset link to ${result.responseData.email}. Check your Inbox or Spam for further actions.`,
       HttpStatus.OK,
       true,
-      response,
+      mappedData,
     );
   }
 
@@ -319,6 +325,8 @@ export class AuthRepository {
       return BukkaResponse.customResponse(
         'Your email has already been verified. You can now log in.',
         HttpStatus.BAD_REQUEST,
+        true,
+        null,
       );
     }
 
@@ -347,7 +355,7 @@ export class AuthRepository {
     }
 
     return BukkaResponse.customResponse(
-      `Confirmation Email Sent Successfully to ${confirmEmailDto.email}`,
+      `Confirmation Email Sent Successfully to ${confirmEmailDto.email}. Check your Inbox or Spam for further actions.`,
       HttpStatus.OK,
       true,
       null,
@@ -372,6 +380,8 @@ export class AuthRepository {
       return BukkaResponse.customResponse(
         'Email verification successfull. Please login.',
         HttpStatus.BAD_REQUEST,
+        true,
+        null,
       );
     }
 
@@ -384,7 +394,7 @@ export class AuthRepository {
 
     if (confirmationDto.token !== response.confirmationCode) {
       return BukkaResponse.customResponse(
-        'Inavalid confirmation code',
+        'Invalid confirmation code',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -432,10 +442,17 @@ export class AuthRepository {
       );
     }
 
+    const mappedData = TypeSafeMapper.map(
+      result?.responseData,
+      UserResponse,
+      UserDto,
+    );
+
     return BukkaResponse.customResponse(
       'Password reset successful. You can now login with your new password!',
       HttpStatus.OK,
       true,
+      mappedData,
     );
   }
 

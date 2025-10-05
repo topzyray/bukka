@@ -65,7 +65,7 @@ export class WaitlistRepository {
     });
 
     return BukkaResponse.customResponse(
-      'You’re on the list! We’ll notify you when Bukka goes live!',
+      'You’re on the list! We’ll notify you when Bukka goes live! Check your Inbox or Spam for further actions.',
       HttpStatus.CREATED,
       true,
       result,

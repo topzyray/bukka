@@ -40,7 +40,7 @@ export class NodemailerProvider implements IEmailProvider {
     const text = htmlToText(options.html);
 
     try {
-      this.logger.log('Begin sending email...');
+      this.logger.log('Begin sending email via Nodemailer...');
 
       const result = await this.transporter.sendMail({
         from: options.from || this.configService.senderEmail,
@@ -53,10 +53,13 @@ export class NodemailerProvider implements IEmailProvider {
         attachments: options.attachments,
       });
 
-      this.logger.log(`Email successfully sent to ${recipients}`);
+      this.logger.log(`Nodemailer email sent to ${recipients}`);
       return result;
     } catch (error) {
-      this.logger.error('Error while sending email', error.stack || error);
+      this.logger.error(
+        'Error while sending Nodemailer email',
+        error.stack || error,
+      );
       throw error;
     }
   }
