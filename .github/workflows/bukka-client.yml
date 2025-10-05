@@ -5,13 +5,7 @@ on:
     branches: [main]
     paths:
       - "client/**"
-      - ".github/workflows/client.yml"
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches: [main]
-    # paths:
-    #   - "client/**"
-    #   - ".github/workflows/client.yml"
+      - ".github/workflows/bukka-client.yml"
 
 jobs:
   build-test:
@@ -75,5 +69,5 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: client
-          vercel-args: "--prod"
+          working-directory: ./client
+          vercel-args: ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
