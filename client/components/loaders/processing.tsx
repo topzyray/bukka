@@ -1,20 +1,39 @@
-"use client";
-
+import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { PulseLoader } from "react-spinners";
 
 interface IProcessing {
   text?: string;
+  className?: string;
   lightColor?: string;
   darkColor?: string;
   size?: number;
 }
 
-export function Processing({ text, size, lightColor, darkColor }: IProcessing) {
+export function Processing({
+  text,
+  className,
+  size,
+  lightColor,
+  darkColor,
+}: IProcessing) {
   const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    // Prevent SSR mismatch
+    return null;
+  }
 
   return (
-    <span className="flex items-center justify-center gap-1">
+    <section
+      className={cn("flex items-center justify-center gap-1", className)}
+    >
       {text ?? "Processing"}
       <PulseLoader
         color={
@@ -26,6 +45,6 @@ export function Processing({ text, size, lightColor, darkColor }: IProcessing) {
         size={size || 10}
         data-testid="loader"
       />
-    </span>
+    </section>
   );
 }

@@ -23,6 +23,7 @@ import { PhoneNumberInput } from "../forms/base/PhoneNumberInput";
 import parsePhoneNumberFromString from "libphonenumber-js";
 import ContactSection from "../atoms/contact-section";
 import { TypeAnimation } from "react-type-animation";
+import { Processing } from "../loaders/processing";
 
 const phoneNumberSchema = z
   .string()
@@ -41,7 +42,7 @@ const phoneNumberSchema = z
 const joinWaitlistSchema = z.object({
   name: z
     .string({ error: "Please enter a valid string" })
-    .min(3, { error: "Name is required!" }),
+    .min(3, { error: "Please enter your full name" }),
   email: z.email({ message: "Please enter a valid email address" }),
   phoneNumber: phoneNumberSchema,
 });
@@ -58,7 +59,7 @@ export default function BukkaWaitList() {
     defaultValues: {
       name: "",
       email: "",
-      phoneNumber: undefined,
+      phoneNumber: "",
     },
   });
 
@@ -111,9 +112,11 @@ export default function BukkaWaitList() {
               1000,
               "Restaurants",
               1000,
+              "Confectionaries",
+              1000,
               "Super Bukka",
               1000,
-              "Sharwama Spot",
+              "Sharwama",
               1000,
               "Eatries",
               1000,
@@ -124,12 +127,13 @@ export default function BukkaWaitList() {
             className="text-accent"
             repeat={Infinity}
           />{" "}
-          <br /> with <span className="text-primary">Bukka</span>
+          <br />
+          nearby with <span className="text-primary">Bukka</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-xl mx-auto">
           We’re redefining how Nigerians find, order, and enjoy local
           delicacies. Join our exclusive waiting list and be first to experience
-          the future of food discovery.
+          the future of food discovery powered by modern technologies and AI.
         </p>
 
         {/* Waitlist form */}
@@ -176,16 +180,19 @@ export default function BukkaWaitList() {
 
               <Button
                 type="submit"
+                size="lg"
                 disabled={
                   addingUserToWaitlist || success || !form.formState.isValid
                 }
                 className="warm-gradient text-white font-semibold px-6 py-3 rounded-lg shadow-elegant hover-glow cursor-pointer"
               >
-                {success
-                  ? "You're on the list! 🎉"
-                  : addingUserToWaitlist
-                  ? "Joining..."
-                  : "Join the Waitlist"}
+                {success ? (
+                  "You're on the list! 🎉"
+                ) : addingUserToWaitlist ? (
+                  <Processing text="Joining" />
+                ) : (
+                  "Join the Waitlist"
+                )}
               </Button>
             </form>
           </Form>
