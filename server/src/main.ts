@@ -1,11 +1,12 @@
 import * as fs from 'fs';
+import helmet from 'helmet';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { Request, Response } from 'express';
 import { Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './MiddlewareLayer/Global/Filters/GlobalExceptionFilter';
 import { EnvironmentTypeEnum } from './DomainLayer/Enums/EnvironmentTypeEnum';
-import { Request, Response } from 'express';
 
 const logger = new Logger('Bootstrap');
 
@@ -39,6 +40,7 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.enableCors();
+  app.use(helmet());
 
   const config = new DocumentBuilder()
     .setTitle('Bukka Server')

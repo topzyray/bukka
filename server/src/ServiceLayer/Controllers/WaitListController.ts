@@ -40,19 +40,6 @@ export class WaitListController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get a waitlist by ID' })
-  @ApiParam({
-    name: 'id',
-    description: 'The ID of the waitlist',
-    example: 1,
-  })
-  async getUserById(@Param('userId') id: number, @Res() res: Response) {
-    const response = await this._waitlistRepository.getWaitlistById(Number(id));
-    const data = BukkaResponse.GetSingleDataResponse('Waitlist', response);
-    return BukkaResponse.GetStatusResponse(data, res);
-  }
-
   @Get()
   @ApiOperation({ summary: 'Get all paginated waitlist' })
   async getNotificationSettingsByFilters(
@@ -62,6 +49,26 @@ export class WaitListController {
     const response = await this._waitlistRepository.findByFilters(request);
     const data = BukkaResponse.GetPagedDataResponse('Waitlist', response);
     return res.status(data.responseCode).json(data);
+  }
+
+  @Get('count')
+  @ApiOperation({ summary: 'Get total waitlist count' })
+  async getTotalWaitlistCount(@Res() res: Response) {
+    const response = await this._waitlistRepository.getTotalWaitlistCount();
+    return res.status(response.responseCode).json(response);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a waitlist by ID' })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the waitlist',
+    example: 1,
+  })
+  async getUserById(@Param('id') id: number, @Res() res: Response) {
+    const response = await this._waitlistRepository.getWaitlistById(Number(id));
+    const data = BukkaResponse.GetSingleDataResponse('Waitlist', response);
+    return BukkaResponse.GetStatusResponse(data, res);
   }
 
   @Delete(':id')

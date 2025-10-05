@@ -21,6 +21,7 @@ export class WaitlistDto {
 export class CreateWaitlistDto {
   @ApiProperty({ example: 'Akingbade' })
   @IsString()
+  @IsNotEmpty()
   @MinLength(1)
   name: string;
 
@@ -30,18 +31,24 @@ export class CreateWaitlistDto {
   email: string;
 
   @ApiProperty({ example: '+2347035527946' })
+  @IsNotEmpty()
   @IsString()
   phoneNumber: string;
 }
 
 export class WaitlistFilterDto extends PaginationDto {
-  @ApiProperty({ example: 'example@bukka.com' })
+  @ApiProperty({ example: 'example@bukka.com', required: false })
   @IsEmail()
   @IsOptional()
   email?: string;
 
-  @ApiProperty({ example: '+2347035527946' })
+  @ApiProperty({ example: '+2347035527946', required: false })
   @IsOptional()
   @IsString()
   phoneNumber?: string;
+
+  @ApiProperty({ example: 'Search with name or email', required: false })
+  @IsOptional()
+  @IsString()
+  search?: string;
 }

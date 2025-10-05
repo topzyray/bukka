@@ -61,6 +61,11 @@ export class WaitlistDataAgent {
     return pageData;
   }
 
+  async getWaitlistCount(): Promise<number> {
+    const total = await this.model.count({});
+    return total;
+  }
+
   async deleteWaitlist(id: number): Promise<void> {
     const spec: QuerySpec = {
       filter: { field: 'id', op: 'eq', value: id },

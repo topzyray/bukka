@@ -39,7 +39,7 @@ export class WaitlistRepository {
       //   },
       // });
       return BukkaResponse.customResponse(
-        'You’re on the list! We’ll notify you when Bukka goes live!',
+        'You’re already on the list! We’ll notify you when Bukka goes live!',
         HttpStatus.CREATED,
         true,
         null,
@@ -105,6 +105,16 @@ export class WaitlistRepository {
       query,
       pageSize,
       pageNumber,
+    );
+  }
+
+  async getTotalWaitlistCount(): Promise<BukkaResponse<number>> {
+    const waitlistCount = await this._waitlistDataAgent.getWaitlistCount();
+    return BukkaResponse.customResponse(
+      'Total Waitlist count',
+      HttpStatus.OK,
+      true,
+      { totalWaitlist: waitlistCount },
     );
   }
 }
