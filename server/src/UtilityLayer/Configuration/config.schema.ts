@@ -95,6 +95,18 @@ export const configSchema = z.object({
     .string({ error: 'CLOUDINARY_FOLDER is required' })
     .min(1, 'Specify the cloudinary cloud folder'),
 
+  SWAGGER_USERNAME: z
+    .string({ error: 'SWAGGER_USERNAME is required' })
+    .min(1, 'Specify the swagger username for API authentication'),
+
+  SWAGGER_ENCRYPTED_PASSWORD: z
+    .string({ error: 'SWAGGER_ENCRYPTED_PASSWORD is required' })
+    .min(1, 'Specify the swagger username for API authentication'),
+
+  SWAGGER_PASSWORD: z
+    .string({ error: 'SWAGGER_PASSWORD is required' })
+    .min(1, 'Specify the swagger username for API authentication'),
+
   QUEUE_PROVIDER: z
     .string({ error: 'QUEUE_PROVIDER is required' })
     .min(1, 'Specify the queue provider (e.g., bull, redis, rabbitmq)'),
