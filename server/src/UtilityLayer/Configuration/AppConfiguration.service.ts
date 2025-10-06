@@ -86,9 +86,33 @@ export class AppConfigurationService {
     return this.configService.get<string>('SENDER_NAME')?.trim() as string;
   }
 
-  // get fileProvider(): string {
-  //   return this.configService.get<string>('FILE_PROVIDER')?.trim() as string;
-  // }
+  get fileProvider(): string {
+    return this.configService.get<string>('FILE_PROVIDER')?.trim() as string;
+  }
+
+  get cloudinaryCloudName(): string {
+    return this.configService
+      .get<string>('CLOUDINARY_CLOUD_NAME')
+      ?.trim() as string;
+  }
+
+  get cloudinaryApiKey(): string {
+    return this.configService
+      .get<string>('CLOUDINARY_API_KEY')
+      ?.trim() as string;
+  }
+
+  get cloudinaryApiSecret(): string {
+    return this.configService
+      .get<string>('CLOUDINARY_API_SECRET')
+      ?.trim() as string;
+  }
+
+  get cloudinaryFolder(): string {
+    return this.configService
+      .get<string>('CLOUDINARY_FOLDER')
+      ?.trim() as string;
+  }
 
   // get queueProvider(): string {
   //   return this.configService.get<string>('QUEUE_PROVIDER')?.trim() as string;

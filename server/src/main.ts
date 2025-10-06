@@ -2,11 +2,17 @@ import * as fs from 'fs';
 import helmet from 'helmet';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Request, Response } from 'express';
-import { Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import { NextFunction, Request, Response } from 'express';
+import {
+  HttpStatus,
+  Logger,
+  NestApplicationOptions,
+  ValidationPipe,
+} from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './MiddlewareLayer/Global/Filters/GlobalExceptionFilter';
 import { EnvironmentTypeEnum } from './DomainLayer/Enums/EnvironmentTypeEnum';
+import { BasicAuthMiddleware } from './MiddlewareLayer/Global/Middlewares/BasicAuthMiddleware';
 
 const logger = new Logger('Bootstrap');
 
@@ -38,9 +44,19 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  app.useGlobalFilters(new GlobalExceptionFilter());
+
+  app.use('/.well-known', (_req: Request, res: Response) => {
+    res.status(HttpStatus.NO_CONTENT).send();
+  });
+
+  // app.useGlobalFilters(new GlobalExceptionFilter());
   app.enableCors();
   app.use(helmet());
+
+  app.use(['/swagger'], (req: Request, res: Response, next: NextFunction) => {
+    const basicAuthMiddleware = new BasicAuthMiddleware();
+    basicAuthMiddleware.use(req, res, next);
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Bukka Server')
@@ -54,7 +70,7 @@ async function bootstrap() {
 
   SwaggerModule.setup('swagger', app, document, {
     swaggerOptions: {
-      url: '/swagger/v1/swagger.json',
+      persistAuthorization: true,
     },
   });
 

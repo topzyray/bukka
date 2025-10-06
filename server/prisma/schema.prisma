@@ -28,6 +28,43 @@ enum UserStatus {
   DELETED
 }
 
+enum FileCategory {
+  GENERAL
+  BUSINESS_COVER
+  USER_PROFILE_IMAGE
+  EMAIL_TEMPLATE
+}
+
+enum FileReferenceType {
+  USER
+  BUSINESS
+  GENERAL
+}
+
+model File {
+  id            Int               @id @default(autoincrement())
+  referenceId   Int?
+  category      FileCategory
+  fileName      String
+  fileType      String
+  fullPath      String
+  fileExtension String
+  relativePath  String
+  referenceType FileReferenceType
+  createdById   Int?
+  fileSize      Int? 
+  mimeType      String? 
+  isPublic      Boolean           @default(false)
+  metadata      Json? 
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([referenceId, category])
+  @@index([referenceType, referenceId])
+  @@index([createdById])
+  @@index([isPublic])
+}
+
 model Waitlist {
   id          Int      @id @default(autoincrement())
   name        String?

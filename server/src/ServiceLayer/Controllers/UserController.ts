@@ -34,7 +34,7 @@ import { User } from 'src/DomainLayer/Models/User';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/users`)
 @UseGuards(JwtAuthGuard)
-@ApiTags('User API')
+@ApiTags('User')
 @ApiBearerAuth()
 export class UserController {
   constructor(private readonly _userRepository: UserRepository) {}

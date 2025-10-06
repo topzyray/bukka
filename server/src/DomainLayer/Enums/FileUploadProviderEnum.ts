@@ -1,4 +1,4 @@
 export enum FileUploadProviderEnum {
-  AZURE = 'azure',
+  CLOUDINARY = 'cloudinary',
   LOCAL = 'local',
 }

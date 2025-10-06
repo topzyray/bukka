@@ -10,9 +10,10 @@ import { User } from 'src/DomainLayer/Models/User';
 import { DatabaseConstant } from 'src/DomainLayer/Constants/DatabaseConstant';
 import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
+import { IReferenceEntityAgent } from '../Abstracts/Interfaces/IReferenceEntityAgent';
 
 @Injectable()
-export class UserDataAgent {
+export class UserDataAgent implements IReferenceEntityAgent {
   private readonly model: ModelProxy<User>;
 
   constructor(
@@ -66,6 +67,10 @@ export class UserDataAgent {
       },
     };
     return this.model.findOne(spec);
+  }
+
+  async getById(id: number) {
+    return this.getUserById(id);
   }
 
   async getAdminUserById(userId: number): Promise<User | null> {

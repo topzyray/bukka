@@ -18,7 +18,7 @@ import { CreateUserDto } from 'src/DomainLayer/Dtos/UserDto';
 import { AuthRepository } from 'src/BussinessLayer/AuthRepository';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/auth`)
-@ApiTags('Auth API')
+@ApiTags('Auth')
 @ApiBearerAuth()
 export class AuthController {
   constructor(private readonly _authRepository: AuthRepository) {}

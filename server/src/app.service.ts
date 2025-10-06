@@ -5,7 +5,7 @@ import { BukkaResponse } from './DomainLayer/Models/BukkaResponse';
 export class AppService {
   root(): BukkaResponse<any> {
     return BukkaResponse.customResponse('', HttpStatus.OK, true, {
-      message: 'Welcome to Bukka API - The First of Its Kind!',
+      message: 'Welcome to Bukka Server!',
     });
   }
 }

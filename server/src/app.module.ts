@@ -38,6 +38,14 @@ import { WaitlistRepository } from './BussinessLayer/WaitlistRepository';
 import { WaitlistDataAgent } from './DataLayer/DataAgents/WaitlistDataAgent';
 import { MailjetProvider } from './InfrastructureLayer/Services/email/providers/MailjetProvider';
 import { MailgunProvider } from './InfrastructureLayer/Services/email/providers/MailgunProvider';
+import { FileDataAgent } from './DataLayer/DataAgents/FileDataAgent';
+import { FileRepository } from './BussinessLayer/FileRepository';
+import { FileController } from './ServiceLayer/Controllers/FileController';
+import { FileReferenceHelper } from './InfrastructureLayer/Helpers/FileReferenceHelper';
+import { FileUploadService } from './InfrastructureLayer/Services/upload/FileUploadService';
+import { FileFactory } from './InfrastructureLayer/Services/upload/FileFactory';
+import { LocalDiskProvider } from './InfrastructureLayer/Services/upload/providers/LocalDiskProvider';
+import { CloudinaryProvider } from './InfrastructureLayer/Services/upload/providers/CloudinaryProvider';
 
 @Module({
   imports: [
@@ -50,8 +58,9 @@ import { MailgunProvider } from './InfrastructureLayer/Services/email/providers/
   controllers: [
     AppController,
     HealthController,
-    WaitListController,
     AuthController,
+    WaitListController,
+    FileController,
     UserController,
     UserNotificationController,
     NotificationSettingsController,
@@ -60,15 +69,16 @@ import { MailgunProvider } from './InfrastructureLayer/Services/email/providers/
     AppService,
     AppConfigurationService,
     RestaurantSearchService,
-    HttpServiceWrapper,
-
+    JwtService,
     EmailService,
+    FileUploadService,
 
     AuthNotificationService,
     NotificationService,
 
     EmailFactory,
     EmailTemplateFactory,
+    FileFactory,
 
     WaitlistRepository,
     AuthRepository,
@@ -76,19 +86,24 @@ import { MailgunProvider } from './InfrastructureLayer/Services/email/providers/
     UserNotificationRepository,
     TokenRepository,
     UserRepository,
-    JwtService,
+    FileRepository,
 
     WaitlistDataAgent,
     NotificationSettingsDataAgent,
     UserNotificationDataAgent,
     UserDataAgent,
+    FileDataAgent,
 
     AuthNotificationHelper,
+    FileReferenceHelper,
 
     NodemailerProvider,
     MailjetProvider,
     MailgunProvider,
+    LocalDiskProvider,
+    CloudinaryProvider,
 
+    HttpServiceWrapper,
     HandlebarsEngine,
     ManualTemplateEngine,
     Logger,

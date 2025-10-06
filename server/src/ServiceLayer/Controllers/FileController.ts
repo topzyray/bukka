@@ -1,0 +1,176 @@
+import {
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+  ParseIntPipe,
+  UseGuards,
+  Res,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiConsumes,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import {
+  CreateFileDto,
+  CreateMultipleFilesDto,
+  FileFilterDto,
+  DeleteFileDto,
+} from 'src/DomainLayer/Dtos/FileDto';
+import { FileUpload } from 'src/DomainLayer/Decorators/FileUploadDecorator';
+import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
+import { FileRepository } from 'src/BussinessLayer/FileRepository';
+import { FileReferenceTypeEnum } from 'src/DomainLayer/Enums/FileReferenceTypeEnum';
+import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
+import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
+import type { Response } from 'express';
+
+@Controller(`${BaseApiRoutesConstant.BASE_URL}/files`)
+@UseGuards(JwtAuthGuard)
+@ApiTags('File')
+@ApiBearerAuth()
+export class FileController {
+  constructor(private readonly fileRepository: FileRepository) {}
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Upload a single file and save to database' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+        referenceType: {
+          type: 'string',
+          enum: ['USER', 'BUSINESS', 'GENERAL'],
+          example: 'GENERAL',
+        },
+        referenceId: {
+          type: 'number',
+          example: 1,
+        },
+        category: {
+          type: 'string',
+          example: 'EMAIL_TEMPLATE',
+        },
+        isPublic: {
+          type: 'boolean',
+          example: false,
+        },
+        metadata: {
+          type: 'object',
+          example: { altText: 'profile photo' },
+        },
+      },
+      required: ['file', 'referenceType', 'category'],
+    },
+  })
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createFileDto: CreateFileDto,
+    @Res() res: Response,
+  ) {
+    const filePath = `${createFileDto.referenceType.toLowerCase()}}`;
+    const response = await this.fileRepository.uploadFile(
+      file,
+      filePath,
+      createFileDto,
+    );
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Post('upload-multiple-from-urls')
+  @ApiOperation({
+    summary: 'Upload multiple files from URLs and save to database',
+  })
+  async uploadFilesFromUrls(
+    @Body() dto: CreateMultipleFilesDto,
+    @Res() res: Response,
+  ) {
+    const response = await this.fileRepository.uploadFilesFromUrls(dto);
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get file by ID' })
+  async getFileById(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res: Response,
+  ) {
+    const response = await this.fileRepository.getFileById(id);
+    const data = BukkaResponse.GetSingleDataResponse('File', response);
+    return BukkaResponse.GetStatusResponse(data, res);
+  }
+
+  @Get('reference/:referenceId')
+  @ApiOperation({ summary: 'Get files by reference ID' })
+  async getFilesByReferenceId(
+    @Param('referenceId', ParseIntPipe) referenceId: number,
+    @Res() res: Response,
+  ) {
+    const response =
+      await this.fileRepository.getFilesByReferenceId(referenceId);
+    const data = BukkaResponse.GetSingleDataResponse('File', response);
+    return BukkaResponse.GetStatusResponse(data, res);
+  }
+
+  @Get('reference/:referenceType/:referenceId')
+  @ApiOperation({ summary: 'Get files by reference type and ID' })
+  async getFilesByReferenceTypeAndId(
+    @Param('referenceType') referenceType: FileReferenceTypeEnum,
+    @Param('referenceId', ParseIntPipe) referenceId: number,
+    @Res() res: Response,
+  ) {
+    const response = await this.fileRepository.getFilesByReferenceTypeAndId(
+      referenceType as any,
+      referenceId,
+    );
+    const data = BukkaResponse.GetSingleDataResponse('File', response);
+    return BukkaResponse.GetStatusResponse(data, res);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get files with filters' })
+  async getFilesByFilters(
+    @Query() filterDto: FileFilterDto,
+    @Res() res: Response,
+  ) {
+    const response = await this.fileRepository.getFileByFilters(filterDto);
+    const data = BukkaResponse.GetPagedDataResponse('Files', response);
+    return BukkaResponse.GetStatusResponse(data, res);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete file by ID' })
+  async deleteFile(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() deleteFileDto: DeleteFileDto,
+    @Res() res: Response,
+  ) {
+    const response = await this.fileRepository.deleteFile(
+      id,
+      deleteFileDto.relativePath,
+    );
+    return res.status(response.responseCode).json(response);
+  }
+
+  @Delete('user/:userId')
+  @ApiOperation({ summary: 'Delete all files for a user' })
+  async deleteUserFiles(@Param('userId') userId: number, @Res() res: Response) {
+    const response = await this.fileRepository.deleteUserFiles(userId);
+    return res.status(response.responseCode).json(response);
+  }
+}

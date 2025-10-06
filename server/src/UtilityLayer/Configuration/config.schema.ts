@@ -79,6 +79,22 @@ export const configSchema = z.object({
     .string({ error: 'FILE_PROVIDER is required' })
     .min(1, 'Specify the file provider (e.g., s3, cloudinary, local)'),
 
+  CLOUDINARY_CLOUD_NAME: z
+    .string({ error: 'CLOUDINARY_CLOUD_NAME is required' })
+    .min(1, 'Specify the cloudinary cloud name'),
+
+  CLOUDINARY_API_KEY: z
+    .string({ error: 'CLOUDINARY_API_KEY is required' })
+    .min(1, 'Specify the cloudinary cloud api key'),
+
+  CLOUDINARY_API_SECRET: z
+    .string({ error: 'CLOUDINARY_API_SECRET is required' })
+    .min(1, 'Specify the cloudinary cloud key'),
+
+  CLOUDINARY_FOLDER: z
+    .string({ error: 'CLOUDINARY_FOLDER is required' })
+    .min(1, 'Specify the cloudinary cloud folder'),
+
   QUEUE_PROVIDER: z
     .string({ error: 'QUEUE_PROVIDER is required' })
     .min(1, 'Specify the queue provider (e.g., bull, redis, rabbitmq)'),

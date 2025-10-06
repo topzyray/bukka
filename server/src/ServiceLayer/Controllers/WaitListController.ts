@@ -28,7 +28,7 @@ import {
 import { AdminAuthGuard } from 'src/MiddlewareLayer/Guards/AdminAuthGuard';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/waitlist`)
-@ApiTags('Waitlist API')
+@ApiTags('Waitlist')
 @ApiBearerAuth()
 export class WaitListController {
   constructor(private readonly _waitlistRepository: WaitlistRepository) {}
