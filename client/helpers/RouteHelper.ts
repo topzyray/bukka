@@ -23,6 +23,6 @@ export class RouteHelper {
     if (!user?.isUpdated) {
       return `/onboarding/${user?.role.toLowerCase()}`;
     }
-    return `/dashboard/${user?.role}/overview`;
+    return `/dashboard/${user?.role.toLowerCase()}/overview`;
   }
 }

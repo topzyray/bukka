@@ -5,6 +5,11 @@ export const configSchema = z.object({
   NODE_ENV: z.enum([EnvironmentTypeEnum.DEV, EnvironmentTypeEnum.PROD], {
     error: 'NODE_ENV is required (must be "development" or "production")',
   }),
+
+  APP_URL: z
+    .string({ error: 'APP_URL is required' })
+    .min(1, 'APP_URL cannot be empty — used by Cron to keep app alive'),
+
   DATABASE_URL: z
     .string({ error: 'DATABASE_URL is required' })
     .min(

@@ -10,6 +10,10 @@ export class AppConfigurationService {
     return this.configService.get<string>('NODE_ENV')?.trim() as string;
   }
 
+  get appUrl(): string {
+    return this.configService.get<string>('APP_URL')?.trim() as string;
+  }
+
   get databaseUri(): string {
     return this.configService.get<string>('DATABASE_URL')?.trim() as string;
   }

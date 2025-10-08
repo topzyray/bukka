@@ -46,14 +46,17 @@ import { FileUploadService } from './InfrastructureLayer/Services/upload/FileUpl
 import { FileFactory } from './InfrastructureLayer/Services/upload/FileFactory';
 import { LocalDiskProvider } from './InfrastructureLayer/Services/upload/providers/LocalDiskProvider';
 import { CloudinaryProvider } from './InfrastructureLayer/Services/upload/providers/CloudinaryProvider';
+import { ScheduleModule } from '@nestjs/schedule';
+import { KeepAliveService } from './InfrastructureLayer/Services/KeepAliveService';
 
 @Module({
   imports: [
     HttpModule,
     ConfigModule,
     TerminusModule,
-    DatabaseModule.forRoot({ adapter: DbAdapterEnum.PRISMA }),
     AppConfigurationModule,
+    DatabaseModule.forRoot({ adapter: DbAdapterEnum.PRISMA }),
+    ScheduleModule.forRoot(),
   ],
   controllers: [
     AppController,
@@ -72,6 +75,7 @@ import { CloudinaryProvider } from './InfrastructureLayer/Services/upload/provid
     JwtService,
     EmailService,
     FileUploadService,
+    KeepAliveService,
 
     AuthNotificationService,
     NotificationService,
