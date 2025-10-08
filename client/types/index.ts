@@ -1,12 +1,6 @@
-export type DashboardTitleType =
-  | "Admin"
-  | "User"
-  | "Restaurant"
-  | "Dispatch Rider";
-
 type SubMenuItem = { title: string; url: string; icon?: string };
 
-export type NavItems = {
+export type TDashboardNavigation = {
   title: string;
   url?: string;
   icon: string;

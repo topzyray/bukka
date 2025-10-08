@@ -11,6 +11,7 @@ import {
   ResendConfirmEmailDto,
   ResetPasswordDto,
 } from 'src/DomainLayer/Dtos/AuthDto';
+import { User } from 'src/DomainLayer/Models/User';
 import { CreateUserDto, UserDto } from 'src/DomainLayer/Dtos/UserDto';
 import { ValidationHelper } from 'src/InfrastructureLayer/Helpers/ValidationHelper';
 import { UserStatusEnum } from 'src/DomainLayer/Enums/UserStatusEnum';
@@ -18,7 +19,6 @@ import { TokenRepository } from './TokenRepository';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { TokenClaims } from 'src/DomainLayer/Models/TokenClaims';
 import { UserResponse } from 'src/DomainLayer/Models/UserResponse';
-import { User } from 'src/DomainLayer/Models/User';
 import { TypeSafeMapper } from 'src/MiddlewareLayer/Mappings/TypeSafeMapper';
 import { UserWithCounts } from 'src/DomainLayer/Models/UserWithCounts';
 import { AuthNotificationService } from 'src/InfrastructureLayer/Services/notification/auth/AuthNotificationService';
@@ -28,6 +28,7 @@ import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfi
 import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
 import { AppUrlTypeEnum } from 'src/DomainLayer/Enums/AppUrlTypeEnum';
 import { TextHelper } from 'src/InfrastructureLayer/Helpers/TextHelper';
+import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Injectable()
 export class AuthRepository {
@@ -54,20 +55,6 @@ export class AuthRepository {
         },
       };
       await this._notifSetting.createNotificationSetting(newSettings);
-
-      this._notif.processSignupWelcome(
-        {
-          userId: data?.responseData?.id,
-          email: data?.responseData?.email,
-          firstName: data?.responseData?.firstName,
-          getStartedLink:
-            this._configService.nodeEnv === EnvironmentTypeEnum.DEV
-              ? AppUrlTypeEnum.LOCAL
-              : AppUrlTypeEnum.PROD,
-          userType: data?.responseData?.userType,
-        },
-        AuthQueueMessageTypeEnum.SIGNUP,
-      );
 
       this._notif.processAccountConfirmation(
         {
@@ -109,6 +96,7 @@ export class AuthRepository {
         'Invalid credentials!',
       );
     }
+
     if (!response?.emailConfirmed) {
       return BukkaResponse.loginResponse(
         'user',
@@ -117,6 +105,7 @@ export class AuthRepository {
         'Email verification required!',
       );
     }
+
     if (response?.userStatus === UserStatusEnum.LOCKED) {
       return BukkaResponse.loginResponse(
         'user',
@@ -203,6 +192,15 @@ export class AuthRepository {
 
     if (!response) {
       return BukkaResponse.GetSingleDataResponse('User', response);
+    }
+
+    if (!response?.emailConfirmed) {
+      return BukkaResponse.loginResponse(
+        'user',
+        response,
+        false,
+        'You have not verified your email!',
+      );
     }
 
     response.passwordResetToken =
@@ -365,54 +363,79 @@ export class AuthRepository {
   async verifyEmail(
     confirmationDto: ConfirmEmailDto,
   ): Promise<BukkaResponse<User>> {
-    const response = await this._userRepository.findUserByEmail(
-      confirmationDto.email,
+    const user = await this._userRepository.findUserByToken(
+      confirmationDto.token,
+      TokenTypeEnum.CONFIRMATION,
     );
 
-    if (!response) {
+    if (!user) {
       return BukkaResponse.customResponse(
-        'User does not exist',
+        'Token does not exist. Please request new one!',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (response.emailConfirmed) {
+    if (user.emailConfirmed) {
       return BukkaResponse.customResponse(
-        'Email verification successfull. Please login.',
+        'Email verification successfull. Please signin.',
         HttpStatus.BAD_REQUEST,
         true,
         null,
       );
     }
 
-    if (Date.now() > Number(response.confirmationCodeExpires)) {
+    if (Date.now() > Number(user.confirmationCodeExpires)) {
       return BukkaResponse.customResponse(
         'This token has expired. Please request a new one.',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (confirmationDto.token !== response.confirmationCode) {
+    if (confirmationDto.token !== user.confirmationCode) {
       return BukkaResponse.customResponse(
         'Invalid confirmation code',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    response.userStatus = UserStatusEnum.ACTIVE;
-    response.emailConfirmed = true;
-    response.confirmationCode = null;
-    response.confirmationCodeExpires = null;
+    user.userStatus = UserStatusEnum.ACTIVE;
+    user.emailConfirmed = true;
+    user.confirmationCode = null;
+    user.confirmationCodeExpires = null;
 
-    await this._userRepository.updateOtherUserAsync(response.id as number, {
-      userStatus: response.userStatus,
-      emailConfirmed: response.emailConfirmed,
-      confirmationCode: response.confirmationCode,
-      confirmationCodeExpires: response.confirmationCodeExpires,
-    });
+    const result = await this._userRepository.updateOtherUserAsync(
+      user.id as number,
+      {
+        userStatus: user.userStatus,
+        emailConfirmed: user.emailConfirmed,
+        confirmationCode: user.confirmationCode,
+        confirmationCodeExpires: user.confirmationCodeExpires,
+      },
+    );
+
+    if (!result?.status) {
+      return BukkaResponse.errorResponse(
+        'Verification failed! Please try again.',
+        HttpStatus.NOT_IMPLEMENTED,
+      );
+    }
+
+    this._notif.processSignupWelcome(
+      {
+        userId: result?.responseData?.id,
+        email: result?.responseData?.email,
+        firstName: result?.responseData?.firstName,
+        getStartedLink:
+          this._configService.nodeEnv === EnvironmentTypeEnum.DEV
+            ? AppUrlTypeEnum.LOCAL
+            : AppUrlTypeEnum.PROD,
+        userType: result?.responseData?.userType,
+      },
+      AuthQueueMessageTypeEnum.SIGNUP,
+    );
 
     return BukkaResponse.customResponse(
-      'Email verification successful! Please login.',
+      'Email verification successful! Please signin.',
       HttpStatus.OK,
       true,
       null,
@@ -449,7 +472,7 @@ export class AuthRepository {
     );
 
     return BukkaResponse.customResponse(
-      'Password reset successful. You can now login with your new password!',
+      'Password reset successful. You can now signin with your new password!',
       HttpStatus.OK,
       true,
       mappedData,

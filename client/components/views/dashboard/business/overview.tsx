@@ -23,8 +23,6 @@ import {
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { BukkaButton } from "@/components/ui/button-variants";
-import { Header } from "@/components/layouts/Header";
-import { Footer } from "@/components/layouts/Footer";
 
 // Mock data for restaurant metrics
 const weeklyVisitors = [
@@ -46,7 +44,7 @@ const monthlyRevenue = [
   { month: "Jun", revenue: 32000 },
 ];
 
-const RestaurantDashboard = () => {
+export function Overview() {
   const stats = [
     {
       title: "Monthly Visitors",
@@ -306,6 +304,4 @@ const RestaurantDashboard = () => {
       {/* <Footer /> */}
     </div>
   );
-};
-
-export default RestaurantDashboard;
+}

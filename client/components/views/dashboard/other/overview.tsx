@@ -27,8 +27,6 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { Header } from "@/components/layouts/Header";
-import { Footer } from "@/components/layouts/Footer";
 
 const visitData = [
   { name: "Mon", visits: 24 },
@@ -49,7 +47,7 @@ const revenueData = [
   { month: "Jun", revenue: 2390 },
 ];
 
-const Dashboard = () => {
+export function Overview() {
   return (
     <div className="min-h-screen bg-background">
       {/* <Header /> */}
@@ -218,6 +216,4 @@ const Dashboard = () => {
       {/* <Footer /> */}
     </div>
   );
-};
-
-export default Dashboard;
+}

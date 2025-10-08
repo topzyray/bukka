@@ -62,7 +62,7 @@ const orderData = [
   { day: "Sun", orders: 445 },
 ];
 
-const AdminDashboard = () => {
+export function Overview() {
   const stats = [
     {
       title: "Total Users",
@@ -311,6 +311,4 @@ const AdminDashboard = () => {
       {/* <Footer /> */}
     </div>
   );
-};
-
-export default AdminDashboard;
+}

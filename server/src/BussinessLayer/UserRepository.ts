@@ -17,6 +17,7 @@ import { Generator } from 'src/InfrastructureLayer/Services/Generator';
 import { AdminUserFilterDto } from 'src/DomainLayer/Dtos/Admin/AdminUserDto';
 import { User } from 'src/DomainLayer/Models/User';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
+import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 @Injectable()
 export class UserRepository {
   constructor(private readonly _userDataAgent: UserDataAgent) {}
@@ -40,6 +41,10 @@ export class UserRepository {
 
   async findUserById(userId: number) {
     return this._userDataAgent.getUserById(userId);
+  }
+
+  async findUserByToken(token: string, type: TokenTypeEnum) {
+    return this._userDataAgent.getUserByToken(token, type);
   }
 
   async findAdminUserById(userId: number) {

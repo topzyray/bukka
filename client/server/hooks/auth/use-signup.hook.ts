@@ -1,23 +1,18 @@
 import { AuthApiService } from "@/server/services/AuthApiService";
-import { extractErrorMessage } from "@/utils/extract-error-utils";
 import { useCustomMutation } from "@/server/queries/use-mutation.hook";
-import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export const useSignUp = () => {
+export const useSignUp = ({ resetForm }: { resetForm: any }) => {
+  const router = useRouter();
   const { mutate: signUpUser, isPending: isSigningUp } = useCustomMutation(
     AuthApiService.signUp,
     {
-      onSuccessCallback: (data) => {
-        console.log("SIGN UP DATA: ", data);
-      },
-
-      onErrorCallback: (error) => {
-        console.log("ERROR SIGNING UP USER: ", error);
-        toast.error(extractErrorMessage(error));
+      onSuccessCallback: () => {
+        resetForm();
+        router.push("/confirm-email");
       },
     }
   );
-
   return {
     signUpUser,
     isSigningUp,

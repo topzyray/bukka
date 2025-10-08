@@ -20,14 +20,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 // import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Header } from "../../components/layouts/Header";
-import { Footer } from "../../components/layouts/Footer";
+import { Header } from "../../../layouts/Header";
+import { Footer } from "../../../layouts/Footer";
 
-const Profile = () => {
+export function Profile() {
   // const { user, signOut } = useAuth();
   const user = {
     email: "topzyray@yahoo.com",
@@ -165,6 +165,4 @@ const Profile = () => {
       <Footer />
     </div>
   );
-};
-
-export default Profile;
+}

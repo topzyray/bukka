@@ -19,11 +19,11 @@ import {
 } from "lucide-react";
 import { TextHelper } from "@/helpers/TextHelper";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/server/hooks/auth/use-auth.hook";
 import { User } from "@/server/interfaces/User";
+import { useAuth } from "@/providers/auth-provider";
 import TooltipComponent from "../ui/tooltip-component";
 
-export default function UserProfileDropdown({ userData }: { userData: User }) {
+export function UserProfileDropdown({ userData }: { userData: User }) {
   const { logout } = useAuth();
   const router = useRouter();
   return (

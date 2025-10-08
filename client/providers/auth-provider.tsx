@@ -8,12 +8,12 @@ import {
   ReactNode,
   useCallback,
   useMemo,
+  useContext,
 } from "react";
 import { jwtDecode } from "jwt-decode";
 import { StorageUtilsHelper } from "@/utils/storage-utils";
 import { STORE_KEYS } from "@/configs/store.config";
 import { useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
 import { User } from "@/server/interfaces/User";
 import { CustomJwtPayload } from "@/server/interfaces/Auth";
 
@@ -47,7 +47,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       STORE_KEYS.USER_DETAILS,
       STORE_KEYS.USER_ACCESS_TOKEN,
       STORE_KEYS.USER_REFRESH_TOKEN,
-      "exam-progress",
     ]);
   }, [queryClient]);
 
@@ -106,22 +105,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     [accessTokenData, loading, logout, userDetails]
   );
 
-  if (loading)
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.6 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
-        >
-          <div className="border-primary mx-auto h-14 w-14 animate-spin rounded-full border-8 border-dashed"></div>
-          <p className="mt-4 text-base font-semibold lg:text-xl lg:font-semibold">
-            Loading...
-          </p>
-        </motion.div>
-      </div>
-    );
+  // if (loading)
+  //   return (
+  //     <div className="flex min-h-screen items-center justify-center">
+  //       <motion.div
+  //         initial={{ opacity: 0, scale: 0.6 }}
+  //         animate={{ opacity: 1, scale: 1 }}
+  //         transition={{ duration: 0.6 }}
+  //         className="text-center"
+  //       >
+  //         <div className="border-primary mx-auto h-14 w-14 animate-spin rounded-full border-8 border-dashed"></div>
+  //         <p className="mt-4 text-base font-semibold lg:text-xl lg:font-semibold">
+  //           Loading...
+  //         </p>
+  //       </motion.div>
+  //     </div>
+  //   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
 };

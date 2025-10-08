@@ -17,7 +17,7 @@ export const useResetPassword = ({
     useCustomMutation(AuthApiService.resetPassword, {
       onSuccessCallback: () => {
         resetForm();
-        router.push("/login");
+        router.push("/signin");
       },
     });
 

@@ -23,12 +23,12 @@ import {
   CollapsibleContent,
 } from "../ui/collapsible";
 import { Separator } from "../ui/separator";
-import { NavItems } from "@/types";
+import { TDashboardNavigation } from "@/types";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
 interface DashBoardSidebarInterface {
-  navItems: NavItems;
+  navItems: TDashboardNavigation;
 }
 
 export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {

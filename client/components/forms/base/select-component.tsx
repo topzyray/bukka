@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 interface ISelectComponentProps {
   formControl: any;
   formName: string;
-  formLabel: ReactNode;
+  formLabel?: ReactNode;
   formPlaceholder?: string;
   formOptionLabel: string;
   formOptionData: Record<string, string>[];
@@ -52,14 +52,16 @@ export default function SelectComponent({
         return (
           <FormItem className="space-y-0.5">
             {/* Label with dynamic color */}
-            <FormLabel
-              className={cn(
-                isError && "text-red-600",
-                isValid && "text-green-600"
-              )}
-            >
-              {formLabel}
-            </FormLabel>
+            {formLabel && (
+              <FormLabel
+                className={cn(
+                  isError && "text-red-600",
+                  isValid && "text-green-600"
+                )}
+              >
+                {formLabel}
+              </FormLabel>
+            )}
 
             <div className="relative">
               <Select
@@ -70,8 +72,8 @@ export default function SelectComponent({
                 <FormControl>
                   <SelectTrigger
                     className={cn(
-                      "w-full pr-10", // reserve space for right icon
-                      Icon && "pl-10", // reserve space for left icon if present
+                      "w-full pr-10",
+                      Icon && "pl-10",
                       inputClassName,
                       isError &&
                         "border-red-600 focus:border-red-600 focus:ring-0",
@@ -80,7 +82,6 @@ export default function SelectComponent({
                       "focus:outline-none"
                     )}
                   >
-                    {/* Left icon */}
                     {Icon && (
                       <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     )}
@@ -100,7 +101,6 @@ export default function SelectComponent({
                 </SelectContent>
               </Select>
 
-              {/* Right validation status icons */}
               {isError && (
                 <XCircle className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-red-600 pointer-events-none" />
               )}

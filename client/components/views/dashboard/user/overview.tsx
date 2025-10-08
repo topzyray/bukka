@@ -13,10 +13,8 @@ import {
 import { RestaurantCard } from "@/components/restaurant/RestaurantCard";
 import { Badge } from "@/components/ui/badge";
 import { BukkaButton } from "@/components/ui/button-variants";
-import { Header } from "@/components/layouts/Header";
-import { Footer } from "@/components/layouts/Footer";
 
-const UserDashboard = () => {
+export function Overview() {
   // Mock user data
   const userStats = [
     {
@@ -263,6 +261,4 @@ const UserDashboard = () => {
       {/* <Footer /> */}
     </div>
   );
-};
-
-export default UserDashboard;
+}

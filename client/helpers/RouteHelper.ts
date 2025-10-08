@@ -9,7 +9,6 @@ export class RouteHelper {
     for (const key in routes) {
       prefixedRoutes[key] = `${basePath}${routes[key]}`;
     }
-
     return prefixedRoutes;
   }
 
@@ -18,12 +17,12 @@ export class RouteHelper {
   }
 
   static getDashboardPath<T extends User>(user: T): string {
-    if (!user) return "/login";
-
-    if (!user.isUpdated) {
-      return `/dashboard/${user?.role.toLowerCase()}/onboarding`;
+    if (!user) {
+      return "/signin";
     }
-
-    return `/dashboard/${user.role}/overview`;
+    if (!user?.isUpdated) {
+      return `/onboarding/${user?.role.toLowerCase()}`;
+    }
+    return `/dashboard/${user?.role}/overview`;
   }
 }

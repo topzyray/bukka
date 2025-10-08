@@ -19,51 +19,45 @@ import { Processing } from "../loaders/processing";
 import SelectComponent from "./base/select-component";
 import { Form } from "../ui/form";
 import { useSignUp } from "@/server/hooks/auth/use-signup.hook";
+import { UserRoleEnum } from "@/server/enums/UserRoleEnum";
+import { useGlobalState } from "@/providers/global-state-provider";
 
-const signUpSchema = z
-  .object({
-    fullName: z.string().min(2, "Name must be at least 2 characters"),
-    email: z.email("Invalid email address"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(128, "Password must not exceed 128 characters")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number")
-      .regex(
-        /[^A-Za-z0-9]/,
-        "Password must contain at least one special character"
-      ),
-    confirmPassword: z.string(),
-    role: z.enum([
-      "user",
-      "restaurant",
-      "dispatch_rider",
-      "investor",
-      "business_owner",
-    ]),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+const signUpSchema = z.object({
+  role: z.enum(UserRoleEnum),
+  firstName: z.string().min(2, "Name must be at least 2 characters"),
+  lastName: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.email("Invalid email address"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(128, "Password must not exceed 128 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(
+      /[^A-Za-z0-9]/,
+      "Password must contain at least one special character"
+    ),
+});
 
 type SignUpFormData = z.infer<typeof signUpSchema>;
 
 export const SignUpForm = () => {
-  const { signUpUser, isSigningUp } = useSignUp();
+  const { signupAs } = useGlobalState();
 
   const form = useForm<SignUpFormData>({
     mode: "all",
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      fullName: "",
-      role: undefined,
+      role: signupAs as UserRoleEnum,
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
     },
   });
+
+  const { signUpUser, isSigningUp } = useSignUp({ resetForm: form.reset });
 
   async function onSubmit(data: z.infer<typeof signUpSchema>) {
     signUpUser(data);
@@ -87,9 +81,25 @@ export const SignUpForm = () => {
         <CardContent className="space-y-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <SelectComponent
+                formControl={form.control}
+                formName="role"
+                formLabel="Role"
+                formPlaceholder="Select a role"
+                formOptionLabel="I am a"
+                formOptionData={[
+                  { value: UserRoleEnum.USER, label: "Food Lover (User)" },
+                  { value: UserRoleEnum.BUSINESS, label: "Restaurant Owner" },
+                  { value: UserRoleEnum.RIDER, label: "Dispatch Rider" },
+                  { value: UserRoleEnum.INVESTOR, label: "Investor" },
+                ]}
+                icon={ShieldCheck}
+                disabled={isSigningUp}
+              />
+
               <InputComponent
                 formControl={form.control}
-                formName="fistName"
+                formName="firstName"
                 formLabel="First Name"
                 formInputType="text"
                 formPlaceholder="Enter your first name"
@@ -105,23 +115,6 @@ export const SignUpForm = () => {
                 formPlaceholder="Enter your last name"
                 disabled={isSigningUp}
                 icon={User}
-              />
-
-              <SelectComponent
-                formControl={form.control}
-                formName="role"
-                formLabel="Role"
-                formPlaceholder="Select a role"
-                formOptionLabel="I am a"
-                formOptionData={[
-                  { value: "user", label: "Food Lover (User)" },
-                  { value: "restaurant", label: "Restaurant Owner" },
-                  { value: "dispatch_rider", label: "Dispatch Rider" },
-                  { value: "investor", label: "Investor" },
-                  { value: "business_owner", label: "Business Owner" },
-                ]}
-                icon={ShieldCheck}
-                disabled={isSigningUp}
               />
 
               <InputComponent

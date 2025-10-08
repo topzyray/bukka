@@ -26,8 +26,9 @@ export class AuthApiService {
   }
 
   static async confirmEmail(token: string) {
-    const response = await HttpClient.getClient().get(
-      `${authRoutes.confirmEmail}/${token}`
+    const response = await HttpClient.getClient().post(
+      `${authRoutes.confirmEmail}`,
+      { token }
     );
     return response.data;
   }

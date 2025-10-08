@@ -1,6 +1,6 @@
 export enum BaseApiRoutesEnum {
   Signup = '/api/v1/auth/register',
-  Login = '/api/v1/auth/login',
+  Login = '/api/v1/auth/signin',
   ConfirmEmail = '/api/v1/auth/confirmEmail',
   ResendConfirmationEmail = '/api/v1/auth/resendConfirmationEmail',
   RefreshToken = '/api/v1/auth/refreshToken',

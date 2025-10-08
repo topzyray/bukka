@@ -41,7 +41,7 @@ export function Header({ className }: HeaderProps) {
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
               className="w-18 h-14 flex items-center justify-center mx-auto hover:cursor-pointer"
-              onClick={() => router.push("/")}
+              // onClick={() => router.push("/")}
             >
               <Image
                 src="/images/bukka.png"

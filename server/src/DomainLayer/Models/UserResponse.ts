@@ -2,6 +2,7 @@ import { UserRoleEnum } from '../Enums/UserRoleEnum';
 import { GenderEnum } from '../Enums/GenderEnum';
 import { UserStatusEnum } from '../Enums/UserStatusEnum';
 import { UserNotification } from './UserNotification';
+import { Favorite } from '@prisma/client';
 
 export class UserResponse {
   id: number;
@@ -11,6 +12,7 @@ export class UserResponse {
   lastName: string;
   username: string;
   gender: GenderEnum;
+  confirmationCodeExpires: Date;
   phoneNumber: string;
   phoneCountryCode: string;
   phoneNumberConfirmed: boolean;
@@ -22,8 +24,9 @@ export class UserResponse {
   refreshToken: string;
   lastLoginAt: Date;
   isDeleted: boolean;
+  isUpdated: boolean;
   deletedAt: Date;
-  comments: number;
+  favorites: Favorite[];
   userNotifications: UserNotification[];
   createdAt: Date;
   updatedAt: Date;

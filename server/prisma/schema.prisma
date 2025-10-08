@@ -17,6 +17,9 @@ enum Gender {
 enum UserRole {
   USER
   ADMIN
+  BUSINESS
+  RIDER
+  INVESTOR
 }
 
 enum UserStatus {

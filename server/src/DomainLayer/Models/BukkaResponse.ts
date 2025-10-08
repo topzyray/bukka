@@ -208,7 +208,7 @@ export class BukkaResponse<K> {
         message ||
         (success
           ? `${entity} logged in successfully`
-          : `${entity} login failed`),
+          : `${entity} signin failed`),
       responseData: success ? data : null,
     };
   }

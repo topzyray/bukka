@@ -49,7 +49,7 @@ export function AccountVerificationForm() {
     (data: z.infer<typeof accountVerificationSchema>) => {
       verifyNewUser(data.token);
     },
-    [verifyNewUser]
+    [, verifyNewUser]
   );
 
   useEffect(() => {

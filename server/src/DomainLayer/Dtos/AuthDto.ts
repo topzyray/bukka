@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsEmail, IsString, IsNumber } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { UserDto } from './UserDto';
 import { UserResponse } from '../Models/UserResponse';
 
 export class SigninDto {
@@ -16,10 +15,10 @@ export class SigninDto {
 }
 
 export class ConfirmEmailDto {
-  @ApiProperty({ example: 'example@bukka.com', required: true })
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
+  // @ApiProperty({ example: 'example@bukka.com', required: true })
+  // @IsNotEmpty()
+  // @IsEmail()
+  // email: string;
 
   @ApiProperty({ example: '000000', required: true })
   @IsNotEmpty()

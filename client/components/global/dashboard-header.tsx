@@ -2,12 +2,12 @@ import { CustomTrigger } from "./custom-trigger";
 import { Label } from "../ui/label";
 import { ThemeToggle } from "../atoms/mode-toggle";
 import { Notifications } from "../atoms/notifications";
-import UserProfileDropdown from "../atoms/user-profile-dropdown";
 import { User } from "@/server/interfaces/User";
-import { DashboardTitleType } from "@/types";
+import { UserProfileDropdown } from "../atoms/user-profile-dropdown";
+import { DashboardTitleEnum } from "@/server/enums/DashboardTitleEnum";
 
 interface DashboardHeader {
-  dashboardTitle: DashboardTitleType;
+  dashboardTitle: DashboardTitleEnum;
   userData: User;
 }
 

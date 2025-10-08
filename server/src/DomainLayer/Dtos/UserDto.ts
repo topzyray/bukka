@@ -27,6 +27,7 @@ export class UserDto {
   lastName: string;
   username: string;
   gender: GenderEnum;
+  confirmationCodeExpires: Date;
   phoneNumber: string;
   phoneCountryCode: string;
   phoneNumberConfirmed: boolean;
@@ -38,10 +39,10 @@ export class UserDto {
   refreshToken: string;
   lastLoginAt: Date;
   isDeleted: boolean;
+  isUpdated: boolean;
   deletedAt: Date;
-  comments: number;
-  userNotifications: UserNotification[];
   favorites: Favorite[];
+  userNotifications: UserNotification[];
   createdAt: Date;
   updatedAt: Date;
   counts: {

@@ -6,8 +6,6 @@ import { Heart, Filter, Search } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import { RestaurantCard } from "@/components/restaurant/RestaurantCard";
-import { Header } from "../../components/layouts/Header";
-import { Footer } from "../../components/layouts/Footer";
 
 const mockFavorites = [
   {
@@ -72,11 +70,9 @@ const mockFavorites = [
   },
 ];
 
-const Favorites = () => {
+export function Favorites() {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-
       <main className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -148,10 +144,6 @@ const Favorites = () => {
           )}
         </motion.div>
       </main>
-
-      <Footer />
     </div>
   );
-};
-
-export default Favorites;
+}

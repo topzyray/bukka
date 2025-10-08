@@ -1,3 +1,4 @@
 export enum TokenTypeEnum {
-  BEARER = 'BEARER',
+  CONFIRMATION = 'confirmationCode',
+  PASSWORD_RESET = 'passwordResetToken',
 }

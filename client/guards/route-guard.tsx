@@ -5,19 +5,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { RouteHelper } from "@/helpers/RouteHelper";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { UserRole } from "@/server/interfaces/Auth";
-import { useAuth } from "@/server/hooks/auth/use-auth.hook";
+import { useAuth } from "@/providers/auth-provider";
 
 interface RouteGuardProps {
   children: ReactNode;
-  protected?: boolean;
-  unprotected?: boolean;
+  isProtected: boolean;
   roles?: UserRole[];
 }
 
 export function RouteGuard({
   children,
-  protected: isProtected = false,
-  unprotected = false,
+  isProtected,
   roles = [],
 }: RouteGuardProps) {
   const { userDetails, loading } = useAuth();
@@ -30,18 +28,19 @@ export function RouteGuard({
     if (loading) return;
 
     if (isProtected) {
-      if (!userDetails && pathname !== "/login") {
-        router.replace("/login");
+      if (!userDetails && pathname !== "/signin") {
+        router.replace("/signin");
         return;
       }
 
       if (
         needsOnboarding &&
-        pathname !== `/dashboard/${userDetails?.role.toLowerCase()}/onboarding`
+        pathname !== `/onboarding/${userDetails?.role.toLowerCase()}`
       ) {
-        router.push(`/dashboard/${userDetails?.role.toLowerCase()}/onboarding`);
+        router.push(`/onboarding/${userDetails?.role.toLowerCase()}`);
         return;
       }
+
       if (
         roles.length > 0 &&
         userDetails &&
@@ -53,19 +52,18 @@ export function RouteGuard({
       }
     }
 
-    if (unprotected && userDetails) {
+    if (!isProtected && userDetails) {
       const target = RouteHelper.getDashboardPath(userDetails);
       if (pathname !== target) router.replace(target);
     }
   }, [
-    loading,
-    userDetails,
     roles,
-    isProtected,
-    unprotected,
-    needsOnboarding,
     router,
+    loading,
     pathname,
+    userDetails,
+    isProtected,
+    needsOnboarding,
   ]);
 
   if (loading || (isProtected && !userDetails)) {

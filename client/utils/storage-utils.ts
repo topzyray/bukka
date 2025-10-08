@@ -4,7 +4,10 @@ import { TokenEncryptionHelper } from "./token-encryption-utils";
 export class StorageUtilsHelper {
   static saveToLocalStorage(...args: [string, any][]) {
     args.forEach(([key, value]) => {
-      if (key === STORE_KEYS.USER_ACCESS_TOKEN || key === STORE_KEYS.USER_REFRESH_TOKEN) {
+      if (
+        key === STORE_KEYS.USER_ACCESS_TOKEN ||
+        key === STORE_KEYS.USER_REFRESH_TOKEN
+      ) {
         const encryptedValue = TokenEncryptionHelper.encryptToken(value);
         localStorage.setItem(key, encryptedValue);
       } else {
@@ -14,8 +17,12 @@ export class StorageUtilsHelper {
   }
 
   static getTokensFromLocalStorage() {
-    const encryptedAccessToken = localStorage.getItem(STORE_KEYS.USER_ACCESS_TOKEN);
-    const encryptedRefreshToken = localStorage.getItem(STORE_KEYS.USER_REFRESH_TOKEN);
+    const encryptedAccessToken = localStorage.getItem(
+      STORE_KEYS.USER_ACCESS_TOKEN
+    );
+    const encryptedRefreshToken = localStorage.getItem(
+      STORE_KEYS.USER_REFRESH_TOKEN
+    );
 
     return {
       accessToken: encryptedAccessToken
@@ -27,9 +34,32 @@ export class StorageUtilsHelper {
     };
   }
 
+  static getItemFromLocalStorage<T>(
+    key: string,
+    decrypt: boolean = true
+  ): T | null {
+    const item = localStorage.getItem(key);
+
+    if (!item) return null;
+
+    if (
+      decrypt &&
+      (key.includes(STORE_KEYS.USER_ACCESS_TOKEN) ||
+        key.includes(STORE_KEYS.USER_REFRESH_TOKEN))
+    ) {
+      return TokenEncryptionHelper.decryptToken(item) as T;
+    }
+
+    try {
+      return JSON.parse(item) as T;
+    } catch {
+      return item as T;
+    }
+  }
+
   static getItemsFromLocalStorage<T>(
     keys: string[],
-    decrypt: boolean = true,
+    decrypt: boolean = true
   ): Record<string, T | null> {
     const result: Record<string, T | null> = {};
 
@@ -39,7 +69,9 @@ export class StorageUtilsHelper {
       if (item) {
         if (
           decrypt &&
-          key.includes(STORE_KEYS.USER_ACCESS_TOKEN || STORE_KEYS.USER_REFRESH_TOKEN)
+          key.includes(
+            STORE_KEYS.USER_ACCESS_TOKEN || STORE_KEYS.USER_REFRESH_TOKEN
+          )
         ) {
           result[key] = TokenEncryptionHelper.decryptToken(item) as T;
         } else {
@@ -80,17 +112,16 @@ export class StorageUtilsHelper {
     return null;
   }
 
-  getSubdomainFromCookies = (cookieHeader: string | undefined): string | null => {
+  getSubdomainFromCookies = (
+    cookieHeader: string | undefined
+  ): string | null => {
     if (!cookieHeader) return null;
 
-    const cookies = cookieHeader.split(";").reduce(
-      (acc, curr) => {
-        const [key, val] = curr.trim().split("=");
-        acc[key] = val;
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
+    const cookies = cookieHeader.split(";").reduce((acc, curr) => {
+      const [key, val] = curr.trim().split("=");
+      acc[key] = val;
+      return acc;
+    }, {} as Record<string, string>);
 
     return cookies["school"] || null;
   };

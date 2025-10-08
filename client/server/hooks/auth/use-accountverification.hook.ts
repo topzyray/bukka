@@ -3,7 +3,6 @@ import { extractErrorMessage } from "@/utils/extract-error-utils";
 import { useCustomMutation } from "@/server/queries/use-mutation.hook";
 import { useRouter } from "next/navigation";
 import { UseFormReset } from "react-hook-form";
-import { toast } from "sonner";
 
 export const useAccountVerification = ({
   resetForm,
@@ -17,7 +16,7 @@ export const useAccountVerification = ({
     useCustomMutation(AuthApiService.confirmEmail, {
       onSuccessCallback: () => {
         setTimeout(() => {
-          router.push("/login");
+          router.push("/signin");
         }, 2000);
         resetForm();
       },
@@ -29,8 +28,6 @@ export const useAccountVerification = ({
           setTimeout(() => {
             router.push("/request-email-verification");
           }, 2000);
-        } else {
-          toast.error(extractErrorMessage(error));
         }
       },
     });

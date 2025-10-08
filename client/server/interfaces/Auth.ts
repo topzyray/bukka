@@ -6,7 +6,7 @@ export interface AuthResponse {
   token: string;
 }
 
-export type UserRole = "ADMIN" | "USER" | "RESTAURANT" | "DISPATCH_RIDER";
+export type UserRole = "ADMIN" | "USER" | "BUSINESS" | "RIDER" | "INVESTOR";
 
 export interface CustomJwtPayload extends JwtPayload {
   role: UserRole;

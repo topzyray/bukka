@@ -11,6 +11,7 @@ import { DatabaseConstant } from 'src/DomainLayer/Constants/DatabaseConstant';
 import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { IReferenceEntityAgent } from '../Abstracts/Interfaces/IReferenceEntityAgent';
+import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Injectable()
 export class UserDataAgent implements IReferenceEntityAgent {
@@ -71,6 +72,16 @@ export class UserDataAgent implements IReferenceEntityAgent {
 
   async getById(id: number) {
     return this.getUserById(id);
+  }
+
+  async getUserByToken(
+    token: string,
+    type: TokenTypeEnum,
+  ): Promise<User | null> {
+    const spec: QuerySpec = {
+      filter: { field: type, op: 'eq', value: token },
+    };
+    return this.model.findOne(spec);
   }
 
   async getAdminUserById(userId: number): Promise<User | null> {

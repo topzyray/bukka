@@ -37,7 +37,7 @@ class HttpClient {
 
         return config;
       },
-      (error) => HttpClient.buildPromiseError(error),
+      (error) => HttpClient.buildPromiseError(error)
     );
 
     this.client.interceptors.response.use(
@@ -46,7 +46,7 @@ class HttpClient {
       },
       (error: AxiosError) => {
         return this.handleErrorResponse(error);
-      },
+      }
     );
   }
 
@@ -83,7 +83,10 @@ class HttpClient {
         case HttpStatusCode.PaymentRequired:
           return await HttpClient.buildPromiseError(error);
         case HttpStatusCode.Unauthorized:
-          if (error.response.status === HttpStatusCode.Unauthorized && !originalRequest._retry) {
+          if (
+            error.response.status === HttpStatusCode.Unauthorized &&
+            !originalRequest._retry
+          ) {
             originalRequest._retry = true;
             try {
               const tokens = this.getStoredData();
@@ -91,8 +94,8 @@ class HttpClient {
 
               if (!refreshToken) {
                 this.clearUserData();
-
-                window.location.href = "/login";
+                console.log("I AM RUNNING INSIDE THE HTTP CONFIG");
+                window.location.href = "/signin";
                 throw new Error("No refresh token available");
               }
 
@@ -100,7 +103,11 @@ class HttpClient {
                 refreshToken,
               });
 
-              const { accessToken, refreshToken: newRefreshToken, user } = response.data;
+              const {
+                accessToken,
+                refreshToken: newRefreshToken,
+                user,
+              } = response.data;
 
               if (user.school) {
                 this.storeAuthData({
@@ -149,11 +156,15 @@ class HttpClient {
     ]);
   }
 
-  private static storeAuthData<T>(data: { accessToken: string; refreshToken: string; user: T }) {
+  private static storeAuthData<T>(data: {
+    accessToken: string;
+    refreshToken: string;
+    user: T;
+  }) {
     StorageUtilsHelper.saveToLocalStorage(
       [STORE_KEYS.USER_ACCESS_TOKEN, data.accessToken],
       [STORE_KEYS.USER_REFRESH_TOKEN, data.refreshToken],
-      [STORE_KEYS.USER_DETAILS, data.user],
+      [STORE_KEYS.USER_DETAILS, data.user]
     );
   }
 

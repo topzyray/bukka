@@ -8,17 +8,18 @@ import {
   FormMessage,
 } from "../../ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 type ITextAreaComponentProps = {
   formControl: any;
-  // formControl: any;
   formName: string;
-  formLabel: ReactNode;
-  formPlaceholder: string;
-  formDescription: string;
-  rows: number;
-  disabled: boolean;
-  inputClassName: string;
+  formLabel?: ReactNode;
+  formPlaceholder?: string;
+  formDescription?: string;
+  rows?: number;
+  disabled?: boolean;
+  inputClassName?: string;
+  maxLength?: number;
 };
 
 export default function TextAreaComponent({
@@ -27,27 +28,39 @@ export default function TextAreaComponent({
   formLabel,
   formPlaceholder,
   formDescription,
-  rows,
-  disabled,
+  rows = 10,
+  disabled = false,
   inputClassName,
+  maxLength,
 }: ITextAreaComponentProps) {
   return (
     <FormField
       control={formControl}
       name={formName}
       render={({ field }) => (
-        <FormItem className="flex flex-col space-y-0.5">
-          <FormLabel className="text-lg">{formLabel}</FormLabel>
+        <FormItem className="flex flex-col space-y-1 w-full">
+          {formLabel && <FormLabel>{formLabel}</FormLabel>}
+
           <FormControl>
             <Textarea
-              placeholder={formPlaceholder}
-              className={`text-lg ${inputClassName}`}
-              disabled={disabled}
-              rows={rows ?? 10}
               {...field}
+              placeholder={formPlaceholder}
+              disabled={disabled}
+              rows={rows}
+              className={cn(
+                "w-full resize-none overflow-y-auto",
+                inputClassName
+              )}
+              maxLength={maxLength}
             />
           </FormControl>
-          <FormDescription>{formDescription}</FormDescription>
+
+          {formDescription && (
+            <FormDescription className="text-xs resize-none text-muted-foreground">
+              {formDescription}
+            </FormDescription>
+          )}
+
           <FormMessage />
         </FormItem>
       )}
