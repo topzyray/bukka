@@ -5,10 +5,9 @@ import { toast } from "sonner";
 import { z } from "zod";
 import parsePhoneNumberFromString from "libphonenumber-js";
 import { GenderEnum } from "@/server/enums/GenderEnum";
-import { useQueryClient } from "@tanstack/react-query";
 
 export const useProfileUpdate = () => {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   const singleProfilePictureSchema = z.object({
     image: z
@@ -16,12 +15,12 @@ export const useProfileUpdate = () => {
       .refine((file) => file.size > 0, { message: "File is required." }),
   });
 
-  const multipleProfilePictureSchema = z.object({
-    image: z
-      .instanceof(File, { message: "A file is required." })
-      .array()
-      .refine((file) => file.size > 0, { message: "File is required." }),
-  });
+  // const multipleProfilePictureSchema = z.object({
+  //   image: z
+  //     .instanceof(File, { message: "A file is required." })
+  //     .array()
+  //     .refine((file) => file.size > 0, { message: "File is required." }),
+  // });
 
   const userProfileUpdateSchema = z.object({
     firstName: z.string().min(2, "First name is required"),
@@ -67,6 +66,6 @@ export const useProfileUpdate = () => {
     singleProfilePictureSchema,
     userProfileUpdateSchema,
     updateUserProfileMutation,
-    multipleProfilePictureSchema,
+    // multipleProfilePictureSchema,
   };
 };
