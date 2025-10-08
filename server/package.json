@@ -17,7 +17,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prepare": "husky",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
@@ -40,6 +42,7 @@
     "handlebars": "^4.7.8",
     "helmet": "^8.1.0",
     "html-to-text": "^9.0.5",
+    "husky": "^9.1.7",
     "memory-cache": "^0.2.0",
     "nanoid": "^5.1.6",
     "node-fetch": "^3.3.2",
