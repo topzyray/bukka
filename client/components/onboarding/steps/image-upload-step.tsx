@@ -72,7 +72,7 @@ export default function ImageUploadStep({
       // 2️⃣ Update user in backend
       await updateUserMutation.mutateAsync({
         userId: userDetails.id,
-        avatar: url,
+        // avatar: url,
       });
 
       // 3️⃣ Save onboarding progress

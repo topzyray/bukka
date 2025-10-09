@@ -5,9 +5,9 @@ export type OnboardingProgressDto = {
 
 export type UpdateUserDto = {
   userId: number;
-  username: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  bio: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  bio?: string;
 };
