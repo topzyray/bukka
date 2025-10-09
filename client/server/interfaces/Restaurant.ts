@@ -1,6 +1,6 @@
 export interface Restaurant {
   id: string;
-  googlePlaceId: string;
+  placeId: string;
   name: string;
   address: string;
   location: {

@@ -44,7 +44,7 @@ const monthlyRevenue = [
   { month: "Jun", revenue: 32000 },
 ];
 
-export function Overview() {
+export function BusinessOverview() {
   const stats = [
     {
       title: "Monthly Visitors",

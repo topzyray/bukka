@@ -3,20 +3,22 @@ import { RouteHelper } from "../../helpers/RouteHelper";
 
 const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 
-type IAuthApi =
-  | "joinWaitlist"
-  | "getWaitlist"
-  | "getWaitlistCount"
-  | "deleteWaitlist";
+type IUserApi =
+  | "getUsers"
+  | "getUserById"
+  | "updateUser"
+  | "updateUserProfile"
+  | "deleteUser";
 
-const rawAuthRoutes: Record<IAuthApi, string> = {
-  joinWaitlist: "/waitlist/join",
-  getWaitlist: "/waitlist",
-  getWaitlistCount: "/waitlist/count",
-  deleteWaitlist: "/waitlist",
+const rawAuthRoutes: Record<IUserApi, string> = {
+  getUsers: "/users",
+  getUserById: "/users",
+  updateUser: "/users",
+  updateUserProfile: "/users",
+  deleteUser: "/users/profile",
 };
 
-export const userRoutes: Record<IAuthApi, string> = RouteHelper.createRoutes(
+export const userRoutes: Record<IUserApi, string> = RouteHelper.createRoutes(
   BACKEND_SVC_PATH,
   rawAuthRoutes
 );

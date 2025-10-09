@@ -1,14 +1,18 @@
 "use client";
 
+import Link from "next/link";
+import Image from "next/image";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, MapPin, Heart, User, Menu, X } from "lucide-react";
+import { Search, MapPin, Menu, X } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
+import { ThemeToggle } from "../atoms/mode-toggle";
+import { useAuth } from "@/providers/auth-provider";
+import { RouteHelper } from "@/helpers/RouteHelper";
+import { User } from "@/server/interfaces/User";
 
 interface HeaderProps {
   className?: string;
@@ -18,6 +22,8 @@ export function Header({ className }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const router = useRouter();
+  const { userDetails } = useAuth();
+  const route = RouteHelper.getDashboardPath(userDetails as User);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,36 +85,39 @@ export function Header({ className }: HeaderProps) {
                 Explore
               </Link>
             </BukkaButton>
-            <BukkaButton variant="ghost" size="sm" asChild>
+            {/* <BukkaButton variant="ghost" size="sm" asChild>
               <Link href="/favorites" className="flex items-center gap-2">
                 <Heart className="w-4 h-4" />
                 Favorites
               </Link>
-            </BukkaButton>
-            <BukkaButton variant="ghost" size="sm" asChild>
+            </BukkaButton> */}
+            {/* <BukkaButton variant="ghost" size="sm" asChild>
               <Link href="/profile" className="flex items-center gap-2">
                 <User className="w-4 h-4" />
                 Profile
               </Link>
-            </BukkaButton>
+            </BukkaButton> */}
             <BukkaButton variant="hero" size="sm" asChild>
-              <Link href="/signin">Sign In</Link>
+              <Link href={route}>Sign In</Link>
             </BukkaButton>
+            <ThemeToggle />
           </nav>
 
           {/* Mobile Menu Button */}
-          <BukkaButton
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </BukkaButton>
+          <section className="space-x-2 md:hidden">
+            <ThemeToggle />
+            <BukkaButton
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </BukkaButton>
+          </section>
         </section>
 
         {/* Mobile Search Bar */}
@@ -147,7 +156,7 @@ export function Header({ className }: HeaderProps) {
                 Explore
               </Link>
             </BukkaButton>
-            <BukkaButton
+            {/* <BukkaButton
               variant="ghost"
               size="sm"
               className="w-full justify-start"
@@ -157,8 +166,8 @@ export function Header({ className }: HeaderProps) {
                 <Heart className="w-4 h-4" />
                 Favorites
               </Link>
-            </BukkaButton>
-            <BukkaButton
+            </BukkaButton> */}
+            {/* <BukkaButton
               variant="ghost"
               size="sm"
               className="w-full justify-start"
@@ -168,10 +177,10 @@ export function Header({ className }: HeaderProps) {
                 <User className="w-4 h-4" />
                 Profile
               </Link>
-            </BukkaButton>
+            </BukkaButton> */}
             <section className="pt-2">
               <BukkaButton variant="hero" size="sm" className="w-full" asChild>
-                <Link href="/signin">Sign In</Link>
+                <Link href={route}>Sign In</Link>
               </BukkaButton>
             </section>
           </section>

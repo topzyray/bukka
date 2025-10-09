@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/command";
 import { FieldValues, Path, Control } from "react-hook-form";
 import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ITagInputFieldProps<T extends FieldValues> {
   formControl: Control<T>;
@@ -50,7 +51,7 @@ export function TagInputComponent<T extends FieldValues>({
     <FormField
       name={formName}
       control={formControl}
-      render={({ field }) => {
+      render={({ field, fieldState }) => {
         const currentTags: string[] = field.value || [];
 
         const addTag = (tag: string) => {
@@ -82,10 +83,21 @@ export function TagInputComponent<T extends FieldValues>({
             s.toLowerCase().includes(inputValue.toLowerCase())
         );
 
+        const isError = !!fieldState.error;
+        const isValid = !isError && field.value?.length > 0;
+
         return (
           <FormItem>
             {formLabel && (
-              <FormLabel className="text-lg">{formLabel}</FormLabel>
+              <FormLabel
+                className={cn(
+                  "-mb-0.5",
+                  isError && "text-red-600",
+                  isValid && "text-green-600"
+                )}
+              >
+                {formLabel}
+              </FormLabel>
             )}
 
             <FormControl>

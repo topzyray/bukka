@@ -8,6 +8,7 @@ export class User {
   username?: string;
   gender?: string;
   bio?: string;
+  onboardingProgress?: number;
   phoneNumber?: string;
   phoneNumberConfirmed?: boolean;
   userStatus?: string;

@@ -55,10 +55,10 @@ model File {
   relativePath  String
   referenceType FileReferenceType
   createdById   Int?
-  fileSize      Int? 
-  mimeType      String? 
+  fileSize      Int?
+  mimeType      String?
   isPublic      Boolean           @default(false)
-  metadata      Json? 
+  metadata      Json?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
 
@@ -96,6 +96,7 @@ model User {
   emailConfirmed          Boolean            @default(false)
   confirmationCode        String?
   confirmationCodeExpires DateTime?
+  onboardingProgress      Int?
   refreshToken            String?
   passwordResetToken      String?
   passwordResetExpires    DateTime?
@@ -105,41 +106,69 @@ model User {
   isUpdated               Boolean            @default(false)
   deletedAt               DateTime?
   locationId              Int?
+  avatar                  Json?
   userNotifications       UserNotification[]
   favorites               Favorite[]
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
+  location                Location?          @relation(fields: [locationId], references: [id])
 
   @@index([email])
   @@index([username])
   @@index([locationId])
 }
 
-model Restaurant {
-  id            Int        @id @default(autoincrement())
-  googlePlaceId String     @unique
-  name          String
-  address       String
-  latitude      Float
-  longitude     Float
-  rating        Float?
-  phoneNumber   String?
-  website       String?
-  favorites     Favorite[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+model Business {
+  id           Int        @id @default(autoincrement())
+  placeId      String     @unique
+  ownerId      String
+  name         String
+  address      String
+  latitude     Float
+  longitude    Float
+  rating       Float?
+  phoneNumber  String?
+  website      String?
+  favorites    Favorite[]
+  openingHours Json?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  location     Location?  @relation(fields: [locationId], references: [id])
+  locationId   Int?
+
+  @@index([locationId])
+}
+
+model Location {
+  id        Int        @id @default(autoincrement())
+  placeId   String     @unique //google map placeId
+  latitude  Float
+  longitude Float
+  address   String?
+  city      String?
+  state     String?
+  country   String?
+  zipCode   String?
+  cityId    String?
+  stateId   String?
+  countryId String?
+  business  Business[]
+  user      User[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([placeId, id])
 }
 
 model Favorite {
-  id           Int      @id @default(autoincrement())
-  userId       Int
-  restaurantId Int
-  createdAt    DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  businessId Int
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  business   Business @relation(fields: [businessId], references: [id])
 
-  user       User       @relation(fields: [userId], references: [id])
-  restaurant Restaurant @relation(fields: [restaurantId], references: [id])
-
-  @@unique([userId, restaurantId])
+  @@unique([userId, businessId])
 }
 
 model UserNotification {

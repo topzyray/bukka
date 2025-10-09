@@ -62,7 +62,7 @@ const orderData = [
   { day: "Sun", orders: 445 },
 ];
 
-export function Overview() {
+export function AdminOverview() {
   const stats = [
     {
       title: "Total Users",

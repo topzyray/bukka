@@ -1,34 +1,59 @@
 import { HttpClient } from "@/configs/http.config";
-import { JoinWaitlistDto } from "../dtos/WaitlistDto";
-import { waitlistRoutes } from "@/constants/routes/waitlistRoutes";
+import { userRoutes } from "@/constants/routes/userRoutes";
+import { OnboardingProgressDto, UpdateUserDto } from "../dtos/UserDto";
 
 export class UserApiService {
-  static async joinWaitlist(requestBody: JoinWaitlistDto) {
-    const response = await HttpClient.getClient().post(
-      `${waitlistRoutes.joinWaitlist}`,
-      requestBody
+  static async getUsers(queryParms: Record<string, any> = {}) {
+    const response = await HttpClient.getClient().get(
+      `${userRoutes.getUsers}`,
+      {
+        params: queryParms,
+      }
     );
     return response.data;
   }
 
-  static async getWaitlistById(waitlistId: number) {
+  static async getUserById(userId: number) {
     const response = await HttpClient.getClient().get(
-      `${waitlistRoutes.getWaitlist}/${waitlistId}`
+      `${userRoutes.getUserById}/${userId}`
     );
     return response.data;
   }
 
-  static async getWaitlistByFilters(queryParams: Record<string, any> = {}) {
-    const response = await HttpClient.getClient().get(
-      `${waitlistRoutes.getWaitlist}`,
-      { params: queryParams }
+  static async getOnboardingProgress(userId: number) {
+    const response = await this.getUserById(userId);
+    return response.data.responseData.onboardingProgress ?? 0;
+  }
+
+  static async saveOnboardingProgress(payload: OnboardingProgressDto) {
+    const response = await HttpClient.getClient().put(
+      `${userRoutes.updateUser}/${payload.userId}`,
+      { onboardingProgress: payload.stepIndex }
     );
     return response.data;
   }
 
-  static async getWaitlistCount() {
-    const response = await HttpClient.getClient().get(
-      `${waitlistRoutes.getWaitlistCount}`
+  static async updateUser(payload: UpdateUserDto) {
+    const { userId, ...otherData } = payload;
+    const response = await HttpClient.getClient().put(
+      `${userRoutes.updateUser}/${userId}`,
+      otherData
+    );
+    return response.data;
+  }
+
+  static async updateUserProfile(payload: UpdateUserDto) {
+    const { userId, ...otherData } = payload;
+    const response = await HttpClient.getClient().put(
+      `${userRoutes.updateUserProfile}/${userId}`,
+      otherData
+    );
+    return response.data;
+  }
+
+  static async deleteUser(userId: number) {
+    const response = await HttpClient.getClient().delete(
+      `${userRoutes.deleteUser}/${userId}`
     );
     return response.data;
   }

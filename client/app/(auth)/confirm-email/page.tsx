@@ -1,4 +1,4 @@
-import { AccountVerificationForm } from "@/components/forms/account-verification";
+import { AccountVerificationForm } from "@/components/forms/auth/account-verification";
 
 export default function AccountVerification() {
   return <AccountVerificationForm />;

@@ -12,6 +12,7 @@ export class UserResponse {
   lastName: string;
   username: string;
   gender: GenderEnum;
+  onboardingProgress: number;
   confirmationCodeExpires: Date;
   phoneNumber: string;
   phoneCountryCode: string;

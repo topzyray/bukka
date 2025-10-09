@@ -95,7 +95,7 @@ export class UserController {
   // }
 
   @Put(':userId')
-  @ApiOperation({ summary: 'User user details' })
+  @ApiOperation({ summary: 'User details updates' })
   @ApiBody({ type: UpdateUserDto })
   async updateUser(
     @Param('userId') userId: number,

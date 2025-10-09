@@ -74,7 +74,7 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
             (Icons[item.icon as keyof typeof Icons] as React.FC<
               React.SVGProps<SVGSVGElement>
             >) || DefaultIcon;
-          return item.hasSubmenu ? (
+          return item.hasSubmenu && item.isSidebarNav ? (
             <Collapsible key={item.title} className="group/collapsible">
               <SidebarGroup className="">
                 <SidebarGroupLabel asChild className="text-text pl-0 text-sm">
@@ -124,7 +124,7 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
                 </CollapsibleContent>
               </SidebarGroup>
             </Collapsible>
-          ) : (
+          ) : item.isSidebarNav ? (
             <SidebarGroupContent key={item.title}>
               <SidebarMenu>
                 {
@@ -143,7 +143,7 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
                 }
               </SidebarMenu>
             </SidebarGroupContent>
-          );
+          ) : null;
         })}
       </SidebarContent>
       <Separator />

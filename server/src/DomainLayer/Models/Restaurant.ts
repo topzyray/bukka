@@ -1,6 +1,6 @@
 export class Restaurant {
   id?: number;
-  googlePlaceId: string;
+  placeId: string;
   name: string;
   address: string;
   latitude: number;

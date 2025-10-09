@@ -55,6 +55,7 @@ export default function SelectComponent({
             {formLabel && (
               <FormLabel
                 className={cn(
+                  "-mb-0.5",
                   isError && "text-red-600",
                   isValid && "text-green-600"
                 )}
@@ -72,8 +73,8 @@ export default function SelectComponent({
                 <FormControl>
                   <SelectTrigger
                     className={cn(
-                      "w-full pr-10",
-                      Icon && "pl-10",
+                      "w-full pr-8",
+                      Icon && "pl-8",
                       inputClassName,
                       isError &&
                         "border-red-600 focus:border-red-600 focus:ring-0",
@@ -109,7 +110,7 @@ export default function SelectComponent({
               )}
             </div>
 
-            <FormMessage />
+            <FormMessage className="-mt-2 text-left" />
           </FormItem>
         );
       }}

@@ -1,16 +1,15 @@
-"use client";
-
-import { useAuth } from "@/providers/auth-provider";
 import { RouteGuard } from "./route-guard";
 import { UserRole } from "@/server/interfaces/Auth";
 
-export function OnboardingGuard({ children }: { children: React.ReactNode }) {
-  const { userDetails } = useAuth();
+export function OnboardingGuard({
+  children,
+  roles,
+}: {
+  children: React.ReactNode;
+  roles: UserRole[];
+}) {
   return (
-    <RouteGuard
-      isProtected={true}
-      roles={[userDetails?.role.toLowerCase() as UserRole]}
-    >
+    <RouteGuard isProtected={true} roles={roles}>
       {children}
     </RouteGuard>
   );

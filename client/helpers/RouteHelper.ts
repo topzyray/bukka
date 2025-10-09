@@ -23,6 +23,7 @@ export class RouteHelper {
     if (!user?.isUpdated) {
       return `/onboarding/${user?.role.toLowerCase()}`;
     }
+    console.log("INSIDE ROUTE HELPER");
     return `/dashboard/${user?.role.toLowerCase()}/overview`;
   }
 }

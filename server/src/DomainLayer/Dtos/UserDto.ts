@@ -27,6 +27,7 @@ export class UserDto {
   lastName: string;
   username: string;
   gender: GenderEnum;
+  onboardingProgress: number;
   confirmationCodeExpires: Date;
   phoneNumber: string;
   phoneCountryCode: string;
@@ -135,15 +136,16 @@ export class UpdateUserDto {
   @IsOptional()
   phoneNumber?: string;
 
-  @ApiProperty({ example: '+447' })
-  @IsString()
-  @IsOptional()
-  phoneCountryCode?: string;
-
   @ApiProperty({ example: 'This is about me', required: false })
   @IsOptional()
   @IsString()
   bio?: string;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  @Transform(({ value }) => Number.parseInt(value, 10))
+  onboardingProgress: number;
 }
 
 export class ProfileUpdateDto {

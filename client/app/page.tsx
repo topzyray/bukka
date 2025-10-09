@@ -1,4 +1,4 @@
-import BukkaWaitList from "@/components/views/waitlist";
+import BukkaWaitList from "@/components/views/pubic/waitlist";
 
 export default function Home() {
   return (

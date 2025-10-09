@@ -10,11 +10,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { RestaurantCard } from "@/components/restaurant/RestaurantCard";
+import { RestaurantCard } from "@/components/views/restaurant/RestaurantCard";
 import { Badge } from "@/components/ui/badge";
 import { BukkaButton } from "@/components/ui/button-variants";
 
-export function Overview() {
+export function UserOverview() {
   // Mock user data
   const userStats = [
     {
@@ -46,7 +46,7 @@ export function Overview() {
   const recentlyVisited = [
     {
       id: "1",
-      googlePlaceId: "ChIJ1",
+      placeId: "ChIJ1",
       name: "Mama Cass",
       rating: 4.8,
       priceLevel: 2,

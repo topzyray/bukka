@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 import { Heart, Filter, Search } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
-import { RestaurantCard } from "@/components/restaurant/RestaurantCard";
+import { RestaurantCard } from "@/components/views/restaurant/RestaurantCard";
 
 const mockFavorites = [
   {
     restaurant: {
       id: "1",
-      googlePlaceId: "ChIJ1",
+      placeId: "ChIJ1",
       name: "Mama Cass",
       rating: 4.8,
       priceLevel: 2,
@@ -31,7 +31,7 @@ const mockFavorites = [
   {
     restaurant: {
       id: "2",
-      googlePlaceId: "ChIJ2",
+      placeId: "ChIJ2",
       name: "Nkoyo",
       rating: 4.6,
       priceLevel: 3,
@@ -51,7 +51,7 @@ const mockFavorites = [
   {
     restaurant: {
       id: "3",
-      googlePlaceId: "ChIJ3",
+      placeId: "ChIJ3",
       name: "Bungalow Restaurant",
       rating: 4.7,
       priceLevel: 3,

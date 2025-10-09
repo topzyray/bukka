@@ -69,8 +69,6 @@ export class UserNotificationDataAgent {
       pagination: { page: pageNumber, pageSize },
     };
 
-    console.log('FILTERS: ', filter);
-
     if (this.db.transaction) {
       return this.db.transaction(async (tx) => {
         const m = tx.getModel<UserNotification>('userNotification');

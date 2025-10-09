@@ -22,8 +22,8 @@ interface IInputComponentProps {
   formMinYear?: string;
   editable?: boolean;
   disabled?: boolean;
+  showPasswordStrength?: boolean;
   inputClassName?: string;
-  showLabel?: boolean;
   icon?: React.ElementType;
 }
 
@@ -38,9 +38,9 @@ export default function InputComponent({
   formMinYear,
   editable,
   disabled,
+  showPasswordStrength = true,
   inputClassName,
   icon: Icon,
-  showLabel = true,
   ...props
 }: IInputComponentProps) {
   const [visible, setVisible] = useState(false);
@@ -71,9 +71,10 @@ export default function InputComponent({
         return (
           <FormItem className="space-y-0.5">
             {/* Label */}
-            {showLabel && (
+            {formLabel && (
               <FormLabel
                 className={cn(
+                  "-mb-0.5",
                   isError && "text-red-600",
                   isValid && "text-green-600",
                   isPassword && "flex items-center justify-between"
@@ -83,9 +84,9 @@ export default function InputComponent({
                 {isPassword && (
                   <span className="cursor-pointer">
                     {visible ? (
-                      <EyeOff onClick={() => setVisible(false)} />
+                      <EyeOff size={20} onClick={() => setVisible(false)} />
                     ) : (
-                      <EyeIcon onClick={() => setVisible(true)} />
+                      <EyeIcon size={20} onClick={() => setVisible(true)} />
                     )}
                   </span>
                 )}
@@ -114,7 +115,7 @@ export default function InputComponent({
                       : field.value ?? ""
                   }
                   className={cn(
-                    Icon && "pl-10",
+                    Icon && "pl-8",
                     inputClassName,
                     isError &&
                       "border-red-600 focus-visible:ring-red-600 text-red-700",
@@ -136,18 +137,21 @@ export default function InputComponent({
             </section>
 
             {/* Password strength meter */}
-            {isPassword && passwordStrength && !isError && (
-              <p
-                className={cn(
-                  "text-sm",
-                  passwordStrength === "Weak" && "text-red-600",
-                  passwordStrength === "Medium" && "text-yellow-600",
-                  passwordStrength === "Strong" && "text-green-600"
-                )}
-              >
-                Password strength: {passwordStrength}
-              </p>
-            )}
+            {isPassword &&
+              passwordStrength &&
+              showPasswordStrength &&
+              !isError && (
+                <p
+                  className={cn(
+                    "text-sm",
+                    passwordStrength === "Weak" && "text-red-600",
+                    passwordStrength === "Medium" && "text-yellow-600",
+                    passwordStrength === "Strong" && "text-green-600"
+                  )}
+                >
+                  Password strength: {passwordStrength}
+                </p>
+              )}
 
             <FormMessage className="-mt-2 text-left" />
           </FormItem>

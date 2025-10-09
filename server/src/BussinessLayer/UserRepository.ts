@@ -73,7 +73,7 @@ export class UserRepository {
 
   async updateUserDataAsync(
     userId: number,
-    data: Partial<User & Location>,
+    data: Partial<User>,
   ): Promise<BukkaResponse<User>> {
     const user = await this.findUserById(userId);
     if (!user) {

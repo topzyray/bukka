@@ -1,4 +1,4 @@
-import { RequestAccountVerificationForm } from "@/components/forms/request-verification";
+import { RequestAccountVerificationForm } from "@/components/forms/auth/request-verification";
 
 export default function RequestionEEmailVerification() {
   return <RequestAccountVerificationForm />;

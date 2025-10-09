@@ -7,6 +7,7 @@ import { envConfig } from "@/configs/env.config";
 import { AuthProvider } from "@/providers/auth-provider";
 import { GlobalStateProvider } from "@/providers/global-state-provider";
 import { QueryClientProviders } from "@/providers/query-client-provider";
+import { BackgroundIcons } from "@/components/ui/background-icons";
 
 const urbanist = Urbanist({ subsets: ["latin"] });
 
@@ -59,6 +60,7 @@ export default function RootLayout({
             </AuthProvider>
           </ThemeProvider>
         </QueryClientProviders>
+        <BackgroundIcons />
       </body>
     </html>
   );

@@ -15,6 +15,7 @@ import {
   LogOutIcon,
   LucideMail,
   Settings,
+  Ticket,
   UserCircle,
 } from "lucide-react";
 import { TextHelper } from "@/helpers/TextHelper";
@@ -23,7 +24,11 @@ import { User } from "@/server/interfaces/User";
 import { useAuth } from "@/providers/auth-provider";
 import TooltipComponent from "../ui/tooltip-component";
 
-export function UserProfileDropdown({ userData }: { userData: User }) {
+interface IUserProfileDropdown {
+  userData: User;
+}
+
+export function UserProfileDropdown({ userData }: IUserProfileDropdown) {
   const { logout } = useAuth();
   const router = useRouter();
   return (
@@ -77,7 +82,9 @@ export function UserProfileDropdown({ userData }: { userData: User }) {
           }
         />
         <DropdownMenuItem
-          onClick={() => router.push(`/dashboard/${userData?.role}/profile`)}
+          onClick={() =>
+            router.push(`/dashboard/${userData?.role.toLowerCase()}/profile`)
+          }
           className="py-2 text-sm"
         >
           <UserCircle /> Profile
@@ -85,9 +92,9 @@ export function UserProfileDropdown({ userData }: { userData: User }) {
         <DropdownMenuItem className="py-2 text-sm">
           <Settings /> Settings
         </DropdownMenuItem>
-        {/* <DropdownMenuItem className="py-2 text-sm">
+        <DropdownMenuItem className="py-2 text-sm">
           <Ticket /> Raise a ticket
-        </DropdownMenuItem> */}
+        </DropdownMenuItem>
         <DropdownMenuItem className="py-2 text-sm">
           <HelpCircle /> Help & Support
         </DropdownMenuItem>

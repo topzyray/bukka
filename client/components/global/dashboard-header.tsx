@@ -11,10 +11,7 @@ interface DashboardHeader {
   userData: User;
 }
 
-export default function DashboardHeader({
-  dashboardTitle,
-  userData,
-}: DashboardHeader) {
+export function DashboardHeader({ dashboardTitle, userData }: DashboardHeader) {
   return (
     <header className="bg-sidebar text-sidebar-foreground fixed top-0 z-50 flex w-full items-center justify-between border-b px-2 py-2 sm:px-4">
       <section className="flex items-center gap-2">

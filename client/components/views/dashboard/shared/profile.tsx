@@ -12,6 +12,7 @@ import {
   Bell,
   LogOut,
 } from "lucide-react";
+import { toast } from "sonner";
 import { BukkaButton } from "@/components/ui/button-variants";
 import {
   Card,
@@ -22,25 +23,18 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-// import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
-import { Header } from "../../../layouts/Header";
-import { Footer } from "../../../layouts/Footer";
+import { useAuth } from "@/providers/auth-provider";
+import { useRouter } from "next/navigation";
 
 export function Profile() {
-  // const { user, signOut } = useAuth();
-  const user = {
-    email: "topzyray@yahoo.com",
-    user_metadata: { full_name: "Tope Taiwo" },
-  };
+  const { userDetails, logout } = useAuth();
+  const router = useRouter();
 
   const handleAction = (message: string) => {
     toast("Coming soon", { description: message });
   };
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-
       <main className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -53,15 +47,13 @@ export function Profile() {
             <CardHeader className="text-center">
               <Avatar className="w-24 h-24 mx-auto mb-4">
                 <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                  {user?.email?.[0].toUpperCase() || "U"}
+                  {userDetails?.email?.[0].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <CardTitle className="text-2xl">
-                {user?.user_metadata?.full_name || "User"}
+                {`${userDetails?.firstName} ${userDetails?.lastName}`}
               </CardTitle>
-              <CardDescription>
-                {user?.email || "Food Explorer"}
-              </CardDescription>
+              <CardDescription>{userDetails?.email}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4 text-center">
@@ -86,6 +78,11 @@ export function Profile() {
             <BukkaButton
               variant="outline"
               className="h-auto p-4 flex-col gap-2"
+              onClick={() =>
+                router.push(
+                  `/dashboard/${userDetails?.role.toLowerCase()}/favorites`
+                )
+              }
             >
               <Heart className="w-6 h-6" />
               <span>My Favorites</span>
@@ -151,7 +148,7 @@ export function Profile() {
                 <BukkaButton
                   variant="ghost"
                   className="w-full justify-start text-destructive"
-                  // onClick={signOut}
+                  onClick={logout}
                 >
                   <LogOut className="w-4 h-4 mr-3" />
                   Sign Out
@@ -161,8 +158,6 @@ export function Profile() {
           </Card>
         </motion.div>
       </main>
-
-      <Footer />
     </div>
   );
 }

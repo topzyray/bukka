@@ -12,7 +12,7 @@ export class KeepAliveService {
     private readonly configService: AppConfigurationService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_30_MINUTES)
   async pingSelf() {
     try {
       const res = await this.httpService.get(this.configService.appUrl);

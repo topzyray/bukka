@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search as SearchIcon, Filter, MapPin, Grid, List } from "lucide-react";
-import { RestaurantCard } from "@/components/restaurant/RestaurantCard";
+import { RestaurantCard } from "@/components/views/restaurant/RestaurantCard";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -16,7 +16,7 @@ import { Footer } from "../../../components/layouts/Footer";
 const mockRestaurants = [
   {
     id: "1",
-    googlePlaceId: "place1",
+    placeId: "place1",
     name: "Mama's Kitchen",
     address: "123 Food Street, Downtown",
     location: { lat: 40.7128, lng: -74.006 },
@@ -30,7 +30,7 @@ const mockRestaurants = [
   },
   {
     id: "2",
-    googlePlaceId: "place2",
+    placeId: "place2",
     name: "Spice Garden",
     address: "456 Flavor Ave, Midtown",
     location: { lat: 40.758, lng: -73.9855 },

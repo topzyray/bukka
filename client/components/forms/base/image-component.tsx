@@ -13,6 +13,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
+import { cn } from "@/lib/utils";
 
 interface IImageComponentProps {
   formControl: any;
@@ -65,67 +66,79 @@ export default function ImageComponent({
     <FormField
       control={formControl}
       name={formName}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel className="text-lg">{formLabel}</FormLabel>
-          <FormControl>
-            <Input
-              ref={fileInputRef} // Attach ref to input field
-              className="h-12"
-              disabled={disabled}
-              type="file"
-              accept="image/*"
-              multiple={multiple}
-              onChange={(event) => {
-                const files = event.target.files;
-                if (!files) return;
+      render={({ field, fieldState }) => {
+        const isError = !!fieldState.error;
+        const isValid = !isError && field.value?.length > 0;
+        return (
+          <FormItem>
+            <FormLabel
+              className={cn(
+                "-mb-0.5",
+                isError && "text-red-600",
+                isValid && "text-green-600"
+              )}
+            >
+              {formLabel}
+            </FormLabel>
+            <FormControl>
+              <Input
+                ref={fileInputRef} // Attach ref to input field
+                className="h-12"
+                disabled={disabled}
+                type="file"
+                accept="image/*"
+                multiple={multiple}
+                onChange={(event) => {
+                  const files = event.target.files;
+                  if (!files) return;
 
-                const newFiles = Array.from(files);
-                const updatedFiles = multiple
-                  ? [...selectedFiles, ...newFiles] // Append new images
-                  : newFiles; // Replace for single file selection
+                  const newFiles = Array.from(files);
+                  const updatedFiles = multiple
+                    ? [...selectedFiles, ...newFiles] // Append new images
+                    : newFiles; // Replace for single file selection
 
-                const previewUrls = updatedFiles.map((file) =>
-                  URL.createObjectURL(file)
-                );
+                  const previewUrls = updatedFiles.map((file) =>
+                    URL.createObjectURL(file)
+                  );
 
-                setSelectedFiles(updatedFiles);
-                setPreviews(previewUrls);
+                  setSelectedFiles(updatedFiles);
+                  setPreviews(previewUrls);
 
-                field.onChange(
-                  multiple ? updatedFiles : updatedFiles[0] || null
-                );
-              }}
-            />
-          </FormControl>
-          <FormMessage />
+                  field.onChange(
+                    multiple ? updatedFiles : updatedFiles[0] || null
+                  );
+                }}
+              />
+            </FormControl>
+            <FormMessage />
 
-          {previews.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {previews.map((src, index) => (
-                <div key={index} className="group relative h-20 w-20">
-                  <Image
-                    src={src}
-                    width={80}
-                    height={80}
-                    alt={`Preview ${index}`}
-                    className="h-full w-full rounded-md border object-cover"
-                  />
+            {previews.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {previews.map((src, index) => (
+                  <div key={index} className="group relative h-20 w-20">
+                    <Image
+                      src={src}
+                      width={80}
+                      height={80}
+                      alt={`Preview ${index}`}
+                      className="h-full w-full rounded-md border object-cover"
+                    />
 
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="absolute top-0 right-0 flex h-6 w-6 items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
-                    onClick={() => handleRemoveImage(index, field)}
-                  >
-                    <X size={14} />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </FormItem>
-      )}
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      className="absolute top-0 right-0 flex h-6 w-6 items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
+                      onClick={() => handleRemoveImage(index, field)}
+                    >
+                      <X size={14} />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </FormItem>
+        );
+      }}
     />
   );
 }
