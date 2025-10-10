@@ -10,7 +10,7 @@ import { LogOut } from "lucide-react";
 import { BackgroundIcons } from "@/components/ui/background-icons";
 import { OnboardingGuard } from "@/guards/onboarding-guard";
 import { getAllowedRoutesForRole } from "@/utils/route-access-utils";
-import { UserRoleEnum } from "@/server/enums/UserRoleEnum";
+import { UserRoleEnum } from "@/server/enums";
 import { useRouter, usePathname } from "next/navigation";
 import { UserRole } from "@/server/interfaces/Auth";
 
@@ -23,7 +23,7 @@ export default function RoleBasedOnboardingLayout({
   children,
   params,
 }: IOnboardingLayout) {
-  const { logout, userDetails, loading } = useAuth();
+  const { logout, user, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -31,13 +31,13 @@ export default function RoleBasedOnboardingLayout({
   const currentRole = unwrappedParams.role.toLowerCase() as UserRoleEnum;
 
   useEffect(() => {
-    if (loading) return;
-    if (!userDetails) {
+    if (isLoading) return;
+    if (!user) {
       router.replace("/signin");
       return;
     }
 
-    const userRole = userDetails.role.toLowerCase();
+    const userRole = user.role.toLowerCase();
     const allowedRoutes = getAllowedRoutesForRole(userRole as UserRoleEnum);
     const isRoleMismatch = userRole !== currentRole;
     const isNotAllowed = !allowedRoutes.some((route) =>
@@ -47,15 +47,15 @@ export default function RoleBasedOnboardingLayout({
     if (isRoleMismatch || isNotAllowed) {
       router.replace(`/onboarding/${userRole}`);
     }
-  }, [loading, userDetails, currentRole, pathname, router]);
+  }, [isLoading, user, currentRole, pathname, router]);
 
-  if (loading || !userDetails) return null;
+  if (isLoading || !user) return null;
 
-  const userRole = userDetails.role.toLowerCase();
+  const userRole = user.role.toLowerCase();
   if (userRole !== currentRole) return null;
 
   return (
-    <OnboardingGuard roles={[userDetails?.role.toLowerCase() as UserRole]}>
+    <OnboardingGuard roles={[user?.role.toLowerCase() as UserRole]}>
       <section className="relative min-h-screen flex flex-col md:flex-row items-center justify-center bg-gradient-primary p-4 sm:p-6 overflow-hidden">
         {/* Logout Button */}
         <div className="absolute top-3 right-3 z-50">

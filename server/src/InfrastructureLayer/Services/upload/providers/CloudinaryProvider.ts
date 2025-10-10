@@ -69,7 +69,11 @@ export class CloudinaryProvider implements IFileUploadProvider {
 
   async deleteFile(filePath: string): Promise<void> {
     try {
+      this.logger.log(`Cloudinary: Delete file with path = ${filePath}`);
       await cloudinary.v2.uploader.destroy(filePath);
+      this.logger.log(
+        `Cloudinary: File with path = ${filePath} deleted successfully`,
+      );
     } catch (error) {
       this.logger.error('Cloudinary delete error:', error);
     }

@@ -160,12 +160,30 @@ export class FileFilterDto extends PaginationDto {
   @ApiProperty({ example: 'user123', required: false })
   @IsString()
   @IsOptional()
-  createdById?: string;
+  @Transform(({ value }) => Number.parseInt(value, 10))
+  createdById?: number;
 
   @ApiProperty({ example: false, required: false })
   @IsOptional()
   @IsBoolean()
   isPublic?: boolean;
+}
+
+export class UserFileFilterDto extends PaginationDto {
+  @ApiProperty({
+    example: FileCategoryEnum.USER_PROFILE_IMAGE,
+    enum: FileCategoryEnum,
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  category?: FileCategoryEnum;
+
+  @ApiProperty({ example: 3, required: false })
+  @IsNumber()
+  @Transform(({ value }) => Number.parseInt(value, 10))
+  @IsOptional()
+  fileId?: number;
 }
 
 export class DeleteFileDto {

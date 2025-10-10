@@ -1,12 +1,12 @@
-import { HttpClient } from "@/configs/http.config";
+import { HttpClient } from "@/configs";
 import {
   ForgotPasswordDto,
   SigninDto,
   ResendEmailVerificationDto,
   RefreshTokenDto,
   ResetPasswordDto,
-} from "../dtos/AuthDto";
-import { authRoutes } from "@/constants/routes/authRoutes";
+} from "../dtos";
+import { authRoutes } from "@/constants/routes";
 
 export class AuthApiService {
   static async signIn(requestBody: SigninDto) {

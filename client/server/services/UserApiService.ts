@@ -1,6 +1,6 @@
-import { HttpClient } from "@/configs/http.config";
-import { userRoutes } from "@/constants/routes/userRoutes";
-import { OnboardingProgressDto, UpdateUserDto } from "../dtos/UserDto";
+import { HttpClient } from "@/configs";
+import { OnboardingProgressDto, UpdateUserDto } from "../dtos";
+import { userRoutes } from "@/constants/routes";
 
 export class UserApiService {
   static async getUsers(queryParms: Record<string, any> = {}) {
@@ -10,43 +10,48 @@ export class UserApiService {
         params: queryParms,
       }
     );
-    return response.data;
+    return response.data?.responseData;
   }
 
-  static async getUserById(userId: number) {
+  static async adminGetUserById(userId: number) {
     const response = await HttpClient.getClient().get(
       `${userRoutes.getUserById}/${userId}`
     );
-    return response.data;
+    return response.data?.responseData;
   }
 
-  static async getOnboardingProgress(userId: number) {
-    const response = await this.getUserById(userId);
-    return response.data.responseData.onboardingProgress ?? 0;
+  static async getLoggedInUser() {
+    const response = await HttpClient.getClient().get(
+      `${userRoutes.getLoggedInUser}`
+    );
+    return response.data?.responseData;
+  }
+
+  static async getOnboardingProgress() {
+    const response = await this.getLoggedInUser();
+    return response?.onboardingProgress;
   }
 
   static async saveOnboardingProgress(payload: OnboardingProgressDto) {
     const response = await HttpClient.getClient().put(
-      `${userRoutes.updateUser}/${payload.userId}`,
+      `${userRoutes.updateUser}`,
       { onboardingProgress: payload.stepIndex }
     );
     return response.data;
   }
 
   static async updateUser(payload: UpdateUserDto) {
-    const { userId, ...otherData } = payload;
     const response = await HttpClient.getClient().put(
-      `${userRoutes.updateUser}/${userId}`,
-      otherData
+      `${userRoutes.updateUser}`,
+      payload
     );
     return response.data;
   }
 
   static async updateUserProfile(payload: UpdateUserDto) {
-    const { userId, ...otherData } = payload;
     const response = await HttpClient.getClient().put(
-      `${userRoutes.updateUserProfile}/${userId}`,
-      otherData
+      `${userRoutes.updateUserProfile}`,
+      payload
     );
     return response.data;
   }

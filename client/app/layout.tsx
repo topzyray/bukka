@@ -2,12 +2,15 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Urbanist } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/providers/theme-provider";
-import { envConfig } from "@/configs/env.config";
-import { AuthProvider } from "@/providers/auth-provider";
-import { GlobalStateProvider } from "@/providers/global-state-provider";
-import { QueryClientProviders } from "@/providers/query-client-provider";
+import { envConfig } from "@/configs";
 import { BackgroundIcons } from "@/components/ui/background-icons";
+import {
+  AuthGate,
+  AuthProvider,
+  GlobalStateProvider,
+  ReactQueryProvider,
+  ThemeProvider,
+} from "@/providers";
 
 const urbanist = Urbanist({ subsets: ["latin"] });
 
@@ -45,7 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${urbanist.className} antialiased`}>
-        <QueryClientProviders>
+        <ReactQueryProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
@@ -53,13 +56,15 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <AuthProvider>
-              <GlobalStateProvider>
-                {children}
-                <Toaster richColors position="top-right" />
-              </GlobalStateProvider>
+              <AuthGate>
+                <GlobalStateProvider>
+                  {children}
+                  <Toaster richColors position="top-right" />
+                </GlobalStateProvider>
+              </AuthGate>
             </AuthProvider>
           </ThemeProvider>
-        </QueryClientProviders>
+        </ReactQueryProvider>
         <BackgroundIcons />
       </body>
     </html>

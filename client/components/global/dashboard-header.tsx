@@ -4,7 +4,7 @@ import { ThemeToggle } from "../atoms/mode-toggle";
 import { Notifications } from "../atoms/notifications";
 import { User } from "@/server/interfaces/User";
 import { UserProfileDropdown } from "../atoms/user-profile-dropdown";
-import { DashboardTitleEnum } from "@/server/enums/DashboardTitleEnum";
+import { DashboardTitleEnum } from "@/server/enums";
 
 interface DashboardHeader {
   dashboardTitle: DashboardTitleEnum;

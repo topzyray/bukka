@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GenderEnum } from "@/server/enums/GenderEnum";
+import { GenderEnum } from "@/server/enums";
 
 /**
  * Shared schemas

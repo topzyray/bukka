@@ -75,16 +75,10 @@ export class ChangePasswordDto {
 }
 
 export class RefreshTokenDto {
-  @ApiProperty({ example: 2, required: true })
-  @IsNotEmpty()
-  @IsNumber()
-  @Transform(({ value }) => Number.parseInt(value, 10))
-  userId: number;
-
-  @ApiProperty({ example: 'data', required: true })
+  @ApiProperty({ example: 'token_data', required: true })
   @IsNotEmpty()
   @IsString()
-  oldRefreshToken: string;
+  refreshToken: string;
 }
 
 export class LoginResponseDto {

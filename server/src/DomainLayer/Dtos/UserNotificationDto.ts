@@ -61,17 +61,6 @@ export class UserNotificationDto {
 }
 
 export class CreateNotificationDto {
-  @ApiProperty({
-    example: 1,
-    required: false,
-    description: 'Required if businessId is not provided',
-  })
-  @IsNumber()
-  @ValidateIf((o) => !o.businessId)
-  @IsNotEmpty()
-  @Transform(({ value }) => Number.parseInt(value, 10))
-  userId: number;
-
   @ApiProperty({ example: 'Welcome to Bukka', required: true })
   @IsNotEmpty()
   @IsString()

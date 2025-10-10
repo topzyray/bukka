@@ -1,6 +1,6 @@
-import { HttpClient } from "@/configs/http.config";
-import { JoinWaitlistDto } from "../dtos/WaitlistDto";
-import { waitlistRoutes } from "@/constants/routes/waitlistRoutes";
+import { HttpClient } from "@/configs";
+import { waitlistRoutes } from "@/constants/routes";
+import { JoinWaitlistDto } from "../dtos";
 
 export class WaitlistApiService {
   static async joinWaitlist(requestBody: JoinWaitlistDto) {

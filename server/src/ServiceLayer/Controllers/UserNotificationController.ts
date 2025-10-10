@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   Res,
   UseGuards,
@@ -27,7 +28,7 @@ import {
 import { UserNotificationRepository } from 'src/BussinessLayer/UserNotificationRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 
-@Controller(`${BaseApiRoutesConstant.BASE_URL}/users`)
+@Controller(`${BaseApiRoutesConstant.BASE_URL}/users/notifications`)
 @UseGuards(JwtAuthGuard)
 @ApiTags('User Notification')
 @ApiBearerAuth()
@@ -36,7 +37,7 @@ export class UserNotificationController {
     private _userNotificationRepository: UserNotificationRepository,
   ) {}
 
-  @Post('notifications')
+  @Post()
   @ApiOperation({ summary: "Create a user's userNotification." })
   @ApiBody({ type: CreateNotificationDto })
   async createUserNotification(
@@ -49,7 +50,6 @@ export class UserNotificationController {
       BukkaResponse.SetHeaderData(
         'createNotificationData',
         {
-          userId: request.userId,
           title: request.title,
           message: request.message,
         },
@@ -59,24 +59,30 @@ export class UserNotificationController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Get(':userId/notifications')
+  @Get('my-notifications')
   @ApiOperation({
     summary: 'Get all user notifications by user Id',
   })
   async getUserNotificationByUserId(
-    @Param('userId', ParseIntPipe) userId: number,
     @Query() filters: UserNotificationFilterDto,
   ) {
-    console.log('I AM HERE NOW');
     const response =
       await this._userNotificationRepository.findNotificationsByFilters(
-        userId,
         filters,
       );
     return BukkaResponse.GetPagedDataResponse('user notifications', response);
   }
 
-  @Get('notifications/:notificationId')
+  @Get('unread-count')
+  @ApiOperation({ summary: 'Get the count of unread notifications' })
+  async getUnreadNotificationsCount(@Res() res: Response) {
+    const response =
+      await this._userNotificationRepository.getUnreadNotificationsCount();
+
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Get(':notificationId')
   @ApiOperation({ summary: 'Get a user by notification ID' })
   @ApiParam({
     name: 'notificationId',
@@ -99,7 +105,7 @@ export class UserNotificationController {
     return res.status(data.responseCode).json(data);
   }
 
-  @Post('notifications/:notificationId/read')
+  @Put(':notificationId/read')
   @ApiOperation({ summary: 'Mark a notification as read.' })
   @ApiParam({
     name: 'notificationId',
@@ -117,37 +123,15 @@ export class UserNotificationController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Post(':userId/notifications/mark-all-read')
+  @Put('mark-all-read')
   @ApiOperation({ summary: 'Mark all notifications as read.' })
-  @ApiParam({
-    name: 'userId',
-    description: 'The ID of the user',
-    example: 3,
-  })
-  async readAllUserNotification(
-    @Param('userId') userId: number,
-    @Res() res: Response,
-  ) {
+  async readAllUserNotification(@Res() res: Response) {
     const response =
-      await this._userNotificationRepository.viewAllUserNotification(userId);
+      await this._userNotificationRepository.viewAllUserNotification();
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Get(':userId/notifications/unread-count')
-  @ApiOperation({ summary: 'Get the count of unread notifications' })
-  async getUnreadNotificationsCount(
-    @Param('userId') userId: number,
-    @Res() res: Response,
-  ) {
-    const response =
-      await this._userNotificationRepository.getUnreadNotificationsCount(
-        userId,
-      );
-
-    return BukkaResponse.GetStatusResponse(response, res);
-  }
-
-  @Delete('notifications/:notificationId')
+  @Delete(':notificationId')
   @ApiOperation({ summary: 'Delete notificaiton' })
   @ApiParam({
     name: 'notificationId',
@@ -163,21 +147,11 @@ export class UserNotificationController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Delete(':userId/notifications')
+  @Delete('delete-my-notifications')
   @ApiOperation({ summary: 'Delete all user notifications' })
-  @ApiParam({
-    name: 'userId',
-    description: 'The ID of the user',
-    example: '123',
-  })
-  async deleteAllUserNotifications(
-    @Param('userId') userId: number,
-    @Res() res: Response,
-  ) {
+  async deleteAllUserNotifications(@Res() res: Response) {
     const response =
-      await this._userNotificationRepository.deleteAllUserNotificationsByUserId(
-        userId,
-      );
+      await this._userNotificationRepository.deleteAllUserNotificationsByUserId();
     return BukkaResponse.GetStatusResponse(response, res);
   }
 }

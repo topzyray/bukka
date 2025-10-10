@@ -22,5 +22,5 @@ export type ResetPasswordDto = {
 };
 
 export type RefreshTokenDto = {
-  refereshToken: string;
+  refreshToken: string;
 };

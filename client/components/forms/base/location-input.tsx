@@ -8,7 +8,7 @@ import {
 import Autocomplete from "react-google-autocomplete";
 import { useEffect } from "react";
 import axios from "axios";
-import { envConfig } from "@/configs/env.config";
+import { envConfig } from "@/configs";
 import { cn } from "@/lib/utils";
 
 interface ILocationInputProps {

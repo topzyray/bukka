@@ -1,4 +1,4 @@
-import { STORE_KEYS } from "@/configs/store.config";
+import { STORE_KEYS } from "@/configs";
 import { StorageUtilsHelper } from "@/utils/storage-utils";
 
 export interface IConfirmationSession {

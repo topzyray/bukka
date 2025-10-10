@@ -1,5 +1,4 @@
 export type OnboardingProgressDto = {
-  userId: number;
   stepIndex: number;
 };
 

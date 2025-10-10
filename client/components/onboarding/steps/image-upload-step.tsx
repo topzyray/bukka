@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,15 +14,18 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { ImageUploader } from "@/components/onboarding/image-uploader";
-import { uploadFile } from "@/utils/upload-utils";
-import { useOnboarding } from "@/providers/onboarding-provider";
 import { useAuth } from "@/providers/auth-provider";
-import { useUser } from "@/server/hooks/user/use-user";
 import { toast } from "sonner";
-import { OnboardingProgressDto } from "@/server/dtos/UserDto";
+import { FileCategoryEnum, FileReferenceTypeEnum } from "@/server/enums";
+import { useFileUpload } from "@/server/mutations/file/use-file-uploader";
+import { FileApiService } from "@/server/services";
+import { useQueryClient } from "@tanstack/react-query";
+import { useUpdateUserData } from "@/server/mutations/user/use-update-user-data";
+import { OnboardingProgressDto } from "@/server/dtos";
+import { useOnboardingProgress } from "@/server/queries/use-onboarding-progress-query";
 
 const imageUploadSchema = z.object({
-  avatar: z.instanceof(File, { message: "Please upload an image file" }),
+  profileImage: z.instanceof(File, { message: "Please upload an image file" }),
 });
 
 type ImageUploadFormData = z.infer<typeof imageUploadSchema>;
@@ -30,68 +33,64 @@ type ImageUploadFormData = z.infer<typeof imageUploadSchema>;
 export default function ImageUploadStep({
   onNext,
   isLast,
-  stepIndex = 0,
+  stepIndex,
 }: {
   onNext: () => void;
   isLast?: boolean;
   stepIndex?: number;
 }) {
-  const { userDetails } = useAuth();
-  const { actions } = useOnboarding();
-  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const form = useForm<ImageUploadFormData>({
     resolver: zodResolver(imageUploadSchema),
     defaultValues: {
-      avatar: undefined,
+      profileImage: undefined,
     },
     mode: "onChange",
   });
 
-  const { updateUserMutation, saveOnboardingProgressMutation } = useUser({
-    resetForm: form.reset,
+  const { mutateAsync: saveOnboardingProgressMutation, isPending } =
+    useUpdateUserData({
+      resetForm: form.reset,
+    });
+
+  const { data: savedProgress, isLoading } = useOnboardingProgress(
+    user?.id as number
+  );
+  console.log("SAVE ONBORDING PROGRESS: ", savedProgress);
+
+  const progressPayload: OnboardingProgressDto = {
+    stepIndex: savedProgress + 1,
+  };
+
+  const { handleFileUpload, isUploading } = useFileUpload({
+    uploadFn: async (formData: FormData) => FileApiService.uploadFile(formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["userFiles"] });
+      saveOnboardingProgressMutation(progressPayload);
+      onNext();
+    },
   });
 
-  const handleSubmit = async (values: ImageUploadFormData) => {
-    if (!userDetails?.id) {
+  const onSubmit = async (data: ImageUploadFormData) => {
+    if (!user?.id) {
       toast.error("User not found. Please sign in again.");
       return;
     }
 
-    setLoading(true);
-    try {
-      // 1️⃣ Upload file
-      const file = values.avatar;
-      const res = await uploadFile(file, "USER_PROFILE_IMAGE");
-      const url = (res && (res.url || res)) ?? null;
+    const payload = {
+      referenceType: FileReferenceTypeEnum.USER,
+      category: FileCategoryEnum.USER_PROFILE_IMAGE,
+      referenceId: user?.id,
+      isPublic: true,
+      metadata: {
+        altText: `${user?.firstName} ${user?.lastName} - Profile Photo`,
+      },
+    };
 
-      if (!url) {
-        throw new Error("Upload failed: invalid response");
-      }
-
-      // 2️⃣ Update user in backend
-      await updateUserMutation.mutateAsync({
-        userId: userDetails.id,
-        // avatar: url,
-      });
-
-      // 3️⃣ Save onboarding progress
-      const progressPayload: OnboardingProgressDto = {
-        userId: userDetails.id,
-        stepIndex,
-      };
-      await saveOnboardingProgressMutation.mutateAsync(progressPayload);
-
-      // 4️⃣ Persist locally
-      actions.setUploadedImage(file, url);
-
-      toast.success("Profile image uploaded successfully!");
-      onNext();
-    } catch (err: any) {
-      toast.error(err?.message ?? "Upload failed");
-    } finally {
-      setLoading(false);
-    }
+    handleFileUpload(data?.profileImage, payload);
   };
 
   return (
@@ -104,10 +103,10 @@ export default function ImageUploadStep({
       </p>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
-            name="avatar"
+            name="profileImage"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Profile Image</FormLabel>
@@ -125,8 +124,11 @@ export default function ImageUploadStep({
           />
 
           <div className="flex justify-end gap-2 border-t border-border/30">
-            <Button type="submit" disabled={loading || !form.formState.isValid}>
-              {loading
+            <Button
+              type="submit"
+              disabled={isUploading || isPending || !form.formState.isValid}
+            >
+              {isUploading || isPending
                 ? "Uploading..."
                 : isLast
                 ? "Finish"

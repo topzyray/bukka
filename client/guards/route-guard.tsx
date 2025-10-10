@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { RouteHelper } from "@/helpers/RouteHelper";
+import { RouteHelper } from "@/helpers";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { UserRole } from "@/server/interfaces/Auth";
 import { useAuth } from "@/providers/auth-provider";
@@ -19,24 +19,24 @@ export function RouteGuard({
   isProtected,
   roles = [],
 }: RouteGuardProps) {
-  const { userDetails, loading } = useAuth();
+  const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  const needsOnboarding = userDetails?.isUpdated === false;
+  const needsOnboarding = isAuthenticated && user?.isUpdated === false;
 
   useEffect(() => {
-    if (loading) return;
+    if (isLoading) return;
 
     // Infer role from pathname for automatic restriction
     const roleFromPath = pathname
       .match(/\/(dashboard|onboarding)\/([^/]+)/)?.[2]
       ?.toLowerCase() as UserRole | undefined;
 
-    const userRole = userDetails?.role?.toLowerCase();
+    const userRole = user?.role?.toLowerCase();
 
     if (isProtected) {
-      if (!userDetails && pathname !== "/signin") {
+      if (!user && !isAuthenticated) {
         router.replace("/signin");
         return;
       }
@@ -58,27 +58,29 @@ export function RouteGuard({
         userRole &&
         !allowedRoles.includes(userRole)
       ) {
-        const target = RouteHelper.getDashboardPath(userDetails as User);
+        const target = RouteHelper.getDashboardPath(user as User);
         if (pathname !== target) router.replace(target);
         return;
       }
     }
 
-    if (!isProtected && userDetails) {
-      const target = RouteHelper.getDashboardPath(userDetails);
+    if (!isProtected && isAuthenticated && user) {
+      const target = RouteHelper.getDashboardPath(user);
       if (pathname !== target) router.replace(target);
+      return;
     }
   }, [
     roles,
     router,
-    loading,
+    isLoading,
     pathname,
-    userDetails,
+    user,
     isProtected,
     needsOnboarding,
+    isAuthenticated,
   ]);
 
-  if (loading || (isProtected && !userDetails)) {
+  if (isLoading || (isProtected && !user)) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <CircularLoader text="Loading..." />
@@ -109,55 +111,55 @@ export function RouteGuard({
 //   isProtected,
 //   roles = [],
 // }: RouteGuardProps) {
-//   const { userDetails, loading } = useAuth();
+//   const { user, isLoading } = useAuth();
 //   const router = useRouter();
 //   const pathname = usePathname();
 
-//   const needsOnboarding = userDetails?.isUpdated === false;
+//   const needsOnboarding = user?.isUpdated === false;
 
 //   useEffect(() => {
-//     if (loading) return;
+//     if (isLoading) return;
 
 //     if (isProtected) {
-//       if (!userDetails && pathname !== "/signin") {
+//       if (!user && pathname !== "/signin") {
 //         router.replace("/signin");
 //         return;
 //       }
 
 //       if (
 //         needsOnboarding &&
-//         pathname !== `/onboarding/${userDetails?.role.toLowerCase()}`
+//         pathname !== `/onboarding/${user?.role.toLowerCase()}`
 //       ) {
-//         router.push(`/onboarding/${userDetails?.role.toLowerCase()}`);
+//         router.push(`/onboarding/${user?.role.toLowerCase()}`);
 //         return;
 //       }
 
 //       if (
 //         roles.length > 0 &&
-//         userDetails &&
-//         !roles.includes(userDetails.role)
+//         user &&
+//         !roles.includes(user.role)
 //       ) {
-//         const target = RouteHelper.getDashboardPath(userDetails);
+//         const target = RouteHelper.getDashboardPath(user);
 //         if (pathname !== target) router.replace(target);
 //         return;
 //       }
 //     }
 
-//     if (!isProtected && userDetails) {
-//       const target = RouteHelper.getDashboardPath(userDetails);
+//     if (!isProtected && user) {
+//       const target = RouteHelper.getDashboardPath(user);
 //       if (pathname !== target) router.replace(target);
 //     }
 //   }, [
 //     roles,
 //     router,
-//     loading,
+//     isLoading,
 //     pathname,
-//     userDetails,
+//     user,
 //     isProtected,
 //     needsOnboarding,
 //   ]);
 
-//   if (loading || (isProtected && !userDetails)) {
+//   if (isLoading || (isProtected && !user)) {
 //     return (
 //       <div className="flex h-screen w-full items-center justify-center">
 //         <CircularLoader text="Loading..." />

@@ -16,7 +16,6 @@ export class AuthNotificationService extends NotificationService {
     _category: string,
   ): Promise<void> {
     await this.dispatchNotification({
-      userId: data.userId,
       channels: [NotificationTypeEnum.EMAIL],
       email: {
         template: 'confirmEmail',
@@ -36,7 +35,6 @@ export class AuthNotificationService extends NotificationService {
     category: string,
   ): Promise<void> {
     await this.dispatchNotification({
-      userId: data.userId,
       channels: [NotificationTypeEnum.EMAIL],
       inapp: {
         title: 'Confirm Your Email',
@@ -61,7 +59,6 @@ export class AuthNotificationService extends NotificationService {
     category: string,
   ): Promise<void> {
     await this.dispatchNotification({
-      userId: data.userId,
       channels: [NotificationTypeEnum.IN_APP, NotificationTypeEnum.EMAIL],
       inapp: {
         title: 'Confirm Your Email',
@@ -85,7 +82,6 @@ export class AuthNotificationService extends NotificationService {
     _category: string,
   ): Promise<void> {
     await this.dispatchNotification({
-      userId: data.userId,
       channels: [NotificationTypeEnum.EMAIL],
       email: {
         template: 'confirmEmail',
@@ -105,7 +101,6 @@ export class AuthNotificationService extends NotificationService {
     _category: string,
   ): Promise<void> {
     await this.dispatchNotification({
-      userId: data.userId,
       channels: [NotificationTypeEnum.EMAIL],
       email: {
         template: 'referralSignup',

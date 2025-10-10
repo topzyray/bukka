@@ -3,10 +3,10 @@
 import React, { useEffect } from "react";
 import DashboardLayout from "@/components/global/dashboard-layout";
 import { usePathname, useRouter } from "next/navigation";
-import { useAuth } from "@/providers/auth-provider";
 import { RouteGuard } from "@/guards/route-guard";
-import { UserRoleEnum } from "@/server/enums/UserRoleEnum";
-import { getAllowedRoutesForRole } from "@/utils/route-access-utils";
+import { UserRoleEnum } from "@/server/enums";
+import { useAuth } from "@/providers";
+import { getAllowedRoutesForRole } from "@/utils";
 
 export function RoleBasedDashboardLayoutClient({
   defaultOpen,
@@ -17,46 +17,48 @@ export function RoleBasedDashboardLayoutClient({
   children: React.ReactNode;
   params: Promise<{ role: string }>;
 }) {
+  const { user, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const { userDetails, loading } = useAuth();
 
   const unwrappedParams = React.use(params);
   const currentRole = unwrappedParams.role.toLowerCase() as UserRoleEnum;
 
   useEffect(() => {
-    if (loading) return;
+    if (isLoading) return;
 
-    if (!userDetails) {
+    if (!user) {
       router.replace("/signin");
       return;
     }
 
-    const userRole = userDetails?.role.toLowerCase();
+    const userRole = user?.role.toLowerCase();
     const allowedRoutes = getAllowedRoutesForRole(userRole as UserRoleEnum);
     const isRoleMismatch = userRole !== currentRole;
     const isNotAllowed = !allowedRoutes.some((route) =>
       pathname.startsWith(route)
     );
 
-    if (!userDetails?.isUpdated) {
+    if (!user?.isUpdated) {
       router.replace(`/onboarding/${userRole}`);
+      return;
     }
 
-    // if (isRoleMismatch || isNotAllowed) {
-    //   console.log("INSIDE ROLE DASHBOARD CLIENT LAYOUT");
+    if (isRoleMismatch || isNotAllowed) {
+      console.log("INSIDE ROLE DASHBOARD CLIENT LAYOUT");
 
-    //   router.replace(`/dashboard/${userRole}/overview`);
-    // }
-  }, [loading, userDetails, currentRole, pathname, router]);
+      router.replace(`/dashboard/${userRole}/overview`);
+      return;
+    }
+  }, [isLoading, user, currentRole, pathname, router]);
 
-  if (loading || !userDetails) return null;
+  if (isLoading || !user) return null;
 
-  const userRole = userDetails?.role.toLowerCase();
+  const userRole = user?.role.toLowerCase();
   if (userRole !== currentRole) return null;
 
   return (
-    <RouteGuard isProtected={true} roles={[userDetails.role]}>
+    <RouteGuard isProtected={true} roles={[user.role]}>
       <DashboardLayout defaultOpen={defaultOpen}>{children}</DashboardLayout>
     </RouteGuard>
   );

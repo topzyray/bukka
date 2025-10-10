@@ -1,5 +1,5 @@
-import { useCustomMutation } from "@/server/queries/use-mutation.hook";
-import { AuthApiService } from "@/server/services/AuthApiService";
+import { useCustomMutation } from "@/server/mutations/base";
+import { AuthApiService } from "@/server/services";
 
 export const useForgotPassword = () => {
   const { mutate: submitForgotPassord, isPending: submitingRequest } =

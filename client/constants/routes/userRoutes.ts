@@ -1,11 +1,12 @@
-import { BackendUrlEnum } from "@/server/enums/BackendUrlEnum";
-import { RouteHelper } from "../../helpers/RouteHelper";
+import { BackendUrlEnum } from "@/server/enums";
+import { RouteHelper } from "../../helpers";
 
 const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 
 type IUserApi =
   | "getUsers"
   | "getUserById"
+  | "getLoggedInUser"
   | "updateUser"
   | "updateUserProfile"
   | "deleteUser";
@@ -13,6 +14,7 @@ type IUserApi =
 const rawAuthRoutes: Record<IUserApi, string> = {
   getUsers: "/users",
   getUserById: "/users",
+  getLoggedInUser: "/users/me/profile",
   updateUser: "/users",
   updateUserProfile: "/users",
   deleteUser: "/users/profile",

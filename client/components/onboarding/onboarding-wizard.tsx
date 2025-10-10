@@ -7,9 +7,11 @@ import ImageUploadStep from "./steps/image-upload-step";
 import PersonalDetailsStep from "./steps/personal-details-step";
 import Stepper from "./ui/stepper";
 import { useAuth } from "@/providers/auth-provider";
-import { useOnboardingProgress } from "@/server/hooks/user/use-onboarding-progress-query";
-import { useSaveOnboardingProgress } from "@/server/hooks/user/use-onboarding-progress-mutation";
+import { useOnboardingProgress } from "@/server/queries/use-onboarding-progress-query";
+import { useSaveOnboardingProgress } from "@/server/mutations/user/use-onboarding-progress-mutation";
 import { UserRole } from "@/server/interfaces/Auth";
+import { User } from "@/server/interfaces/User";
+import { CircularLoader } from "../loaders/circular-loader";
 
 /* ────────────────────────────────────────────────
    Dynamically import role-specific steps
@@ -96,13 +98,16 @@ export default function OnboardingWizard({ role }: { role: UserRole }) {
    Onboarding Flow (Per-step update + Progress tracking)
 ────────────────────────────────────────────────── */
 function OnboardingFlow({ role }: { role: UserRole }) {
-  const { userDetails } = useAuth();
-  const userId = userDetails?.id as number;
+  const { user } = useAuth();
+  const userId = user?.id as number;
   const steps = useMemo(() => roleStepMap[role], [role]);
 
-  const { data: savedProgress = 0, isLoading } = useOnboardingProgress(userId);
+  const { data: savedProgress, isLoading } = useOnboardingProgress(userId);
+  console.log("SAVE ONBORDING PROGRESS: ", savedProgress);
 
-  const saveProgressMutation = useSaveOnboardingProgress();
+  const saveProgressMutation = useSaveOnboardingProgress({
+    user: user as User,
+  });
 
   const [currentStep, setCurrentStep] = useState<number>(savedProgress);
 
@@ -122,7 +127,9 @@ function OnboardingFlow({ role }: { role: UserRole }) {
     setCurrentStep(nextStep);
 
     if (userId) {
-      saveProgressMutation.mutate({ userId, stepIndex: nextStep });
+      console.log("USER ID IN ONBOARDING WIZARD: ", userId);
+
+      saveProgressMutation.mutate({ stepIndex: nextStep });
     }
   };
 
@@ -135,7 +142,7 @@ function OnboardingFlow({ role }: { role: UserRole }) {
     setCurrentStep(newStep);
   };
 
-  const StepComponent = current.Component;
+  const StepComponent = current?.Component;
 
   return (
     <div className="max-w-3xl mx-auto p-4">
@@ -147,15 +154,19 @@ function OnboardingFlow({ role }: { role: UserRole }) {
         onStepClick={(i) => {
           setCurrentStep(i);
           if (userId) {
-            saveProgressMutation.mutate({ userId, stepIndex: i });
+            saveProgressMutation.mutate({ stepIndex: i });
           }
         }}
       />
 
       <div className="mt-6 bg-card p-6 rounded-lg shadow-sm">
-        <h3 className="text-lg font-semibold mb-3">{current.title}</h3>
+        <h3 className="text-lg font-semibold mb-3">{current?.title}</h3>
 
-        <StepComponent onNext={goNext} onBack={goBack} isLast={isLast} />
+        {isLoading && <CircularLoader text="Loading Onboarding Screen" />}
+
+        {StepComponent && (
+          <StepComponent onNext={goNext} onBack={goBack} isLast={isLast} />
+        )}
       </div>
     </div>
   );
@@ -265,8 +276,8 @@ function OnboardingFlow({ role }: { role: UserRole }) {
 // }
 
 // function OnboardingFlow({ role }: { role: UserRole }) {
-//   const { userDetails } = useAuth();
-//   const userId = userDetails?.id as number;
+//   const { user } = useAuth();
+//   const userId = user?.id as number;
 
 //   const steps = useMemo(() => roleStepMap[role], [role]);
 

@@ -1,5 +1,5 @@
-import { AuthApiService } from "@/server/services/AuthApiService";
-import { useCustomMutation } from "@/server/queries/use-mutation.hook";
+import { AuthApiService } from "@/server/services";
+import { useCustomMutation } from "@/server/mutations/base";
 import { useRouter } from "next/navigation";
 import { UseFormReset } from "react-hook-form";
 

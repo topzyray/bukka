@@ -11,13 +11,13 @@ import { uploadFile } from "@/utils/upload-utils";
 import { apiRequest } from "@/utils/api-client-utils";
 import { ImageUploader } from "@/components/onboarding/image-uploader";
 import { Form } from "@/components/ui/form";
-import { GenderEnum } from "@/server/enums/GenderEnum";
+import { GenderEnum } from "@/server/enums";
 import { MessageSquareMore, Phone, User } from "lucide-react";
 import TextAreaComponent from "@/components/forms/base/text-area-component";
 import { PhoneNumberInput } from "@/components/forms/base/phone-number-component";
 import SelectComponent from "@/components/forms/base/select-component";
 import InputComponent from "@/components/forms/base/input-component";
-import { useProfileUpdate } from "@/server/hooks/auth/use-profile-update";
+import { useProfileUpdate } from "@/server/mutations/auth/use-profile-update";
 
 export default function UserOnboarding() {
   const {

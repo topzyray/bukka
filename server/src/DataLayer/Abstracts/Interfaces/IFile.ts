@@ -10,7 +10,7 @@ export interface IFile {
   category: FileCategoryEnum;
   referenceType: FileReferenceTypeEnum;
   referenceId: number;
-  createdById?: string;
+  createdById?: number;
   fileSize?: number;
   mimeType?: string;
   isPublic?: boolean;

@@ -8,7 +8,7 @@ import {
 } from "../../ui/form";
 import { ReactNode, useState } from "react";
 import { EyeIcon, EyeOff, CheckCircle2, XCircle } from "lucide-react";
-import { TextHelper } from "@/helpers/TextHelper";
+import { TextHelper } from "@/helpers/text-helper";
 import { cn } from "@/lib/utils";
 
 interface IInputComponentProps {

@@ -1,5 +1,5 @@
 import { AuthApiService } from "@/server/services/AuthApiService";
-import { useCustomMutation } from "@/server/queries/use-mutation.hook";
+import { useCustomMutation } from "@/server/mutations/base";
 import { useRouter } from "next/navigation";
 
 export const useSignUp = ({ resetForm }: { resetForm: any }) => {

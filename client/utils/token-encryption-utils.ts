@@ -1,4 +1,4 @@
-import { NotFoundError } from "@/helpers/error-handler";
+import { NotFoundError } from "@/helpers";
 import CryptoJS from "crypto-js";
 
 export class TokenEncryptionHelper {
@@ -8,7 +8,10 @@ export class TokenEncryptionHelper {
     if (!TokenEncryptionHelper.SECRET_KEY) {
       throw new NotFoundError("SECRET_KEY is not defined");
     }
-    return CryptoJS.AES.encrypt(token, TokenEncryptionHelper.SECRET_KEY).toString();
+    return CryptoJS.AES.encrypt(
+      token,
+      TokenEncryptionHelper.SECRET_KEY
+    ).toString();
   }
 
   static decryptToken(encryptedToken: string): string | null {
@@ -16,7 +19,10 @@ export class TokenEncryptionHelper {
       throw new NotFoundError("SECRET_KEY is not defined");
     }
     try {
-      const bytes = CryptoJS.AES.decrypt(encryptedToken, TokenEncryptionHelper.SECRET_KEY);
+      const bytes = CryptoJS.AES.decrypt(
+        encryptedToken,
+        TokenEncryptionHelper.SECRET_KEY
+      );
       const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
       return decryptedData || null;
     } catch (e) {

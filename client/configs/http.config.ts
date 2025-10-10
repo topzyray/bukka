@@ -1,3 +1,4 @@
+import { QueryClient } from "@tanstack/react-query";
 import axios, {
   AxiosInstance,
   AxiosResponse,
@@ -5,24 +6,25 @@ import axios, {
   HttpStatusCode,
   AxiosRequestConfig,
 } from "axios";
-import { STORE_KEYS } from "./store.config";
+import { STORE_KEYS } from ".";
 import { StorageUtilsHelper } from "@/utils/storage-utils";
-import { authRoutes } from "@/constants/routes/authRoutes";
+import { authRoutes } from "@/constants/routes";
 
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
-  _retry: boolean;
+  _retry?: boolean;
 }
 
 class HttpClient {
   private static client: AxiosInstance;
+  private static queryClient: QueryClient | null = null;
 
   static initialize() {
     this.client = axios.create({
       baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
       withCredentials: false,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      // headers: {
+      //   "Content-Type": "application/json",
+      // },
       validateStatus: (status) => status >= 200 && status < 300,
     });
 
@@ -30,42 +32,27 @@ class HttpClient {
       (config) => {
         const storedData = this.getStoredData();
         const accessToken = storedData[STORE_KEYS.USER_ACCESS_TOKEN];
-
         if (accessToken) {
           config.headers.Authorization = `Bearer ${accessToken}`;
         }
-
         return config;
       },
-      (error) => HttpClient.buildPromiseError(error)
+      (error) => Promise.reject(error)
     );
 
     this.client.interceptors.response.use(
-      (response: AxiosResponse) => {
-        return response;
-      },
-      (error: AxiosError) => {
-        return this.handleErrorResponse(error);
-      }
+      (response: AxiosResponse) => response,
+      (error: AxiosError) => this.handleErrorResponse(error)
     );
   }
 
-  private static buildPromiseError(error: Error): Promise<Error> {
-    return Promise.reject(error);
+  static setQueryClient(client: QueryClient) {
+    this.queryClient = client;
   }
 
   static getClient(): AxiosInstance {
-    if (!this.client) {
-      this.initialize();
-    }
+    if (!this.client) this.initialize();
     return this.client;
-  }
-
-  static addHeaders(headers: Record<string, string>): void {
-    this.getClient().defaults.headers = {
-      ...this.getClient().defaults.headers,
-      ...headers,
-    };
   }
 
   private static getStoredData() {
@@ -78,97 +65,64 @@ class HttpClient {
   private static async handleErrorResponse(error: AxiosError) {
     const originalRequest = error.config as CustomAxiosRequestConfig;
 
-    if (error.response) {
-      switch (error.response.status) {
-        case HttpStatusCode.PaymentRequired:
-          return await HttpClient.buildPromiseError(error);
-        case HttpStatusCode.Unauthorized:
-          if (
-            error.response.status === HttpStatusCode.Unauthorized &&
-            !originalRequest._retry
-          ) {
-            originalRequest._retry = true;
-            try {
-              const tokens = this.getStoredData();
-              const refreshToken = tokens[STORE_KEYS.USER_REFRESH_TOKEN];
+    if (
+      error.response?.status === HttpStatusCode.Unauthorized &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
 
-              if (!refreshToken) {
-                this.clearUserData();
-                console.log("I AM RUNNING INSIDE THE HTTP CONFIG");
-                window.location.href = "/signin";
-                throw new Error("No refresh token available");
-              }
+      const tokens = this.getStoredData();
+      const refreshToken = tokens[STORE_KEYS.USER_REFRESH_TOKEN];
+      if (!refreshToken) {
+        this.clearUserData();
+        window.location.href = "/signin";
+        return Promise.reject(error);
+      }
 
-              const response = await axios.post(`${authRoutes.refreshToken}`, {
-                refreshToken,
-              });
+      try {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}${authRoutes.refreshToken}`,
+          { refreshToken }
+        );
 
-              const {
-                accessToken,
-                refreshToken: newRefreshToken,
-                user,
-              } = response.data;
+        const { accessToken, refreshToken: newRefreshToken } =
+          response.data?.responseData;
 
-              if (user.school) {
-                this.storeAuthData({
-                  accessToken,
-                  refreshToken: newRefreshToken,
-                  user,
-                });
-              } else {
-                this.storeAuthData({
-                  accessToken,
-                  refreshToken: newRefreshToken,
-                  user,
-                });
-              }
+        this.storeAuthData({ accessToken, refreshToken: newRefreshToken });
 
-              this.client.defaults.headers.Authorization = `Bearer ${accessToken}`;
+        if (this.queryClient) {
+          console.log("🔄 Invalidating user query after token refresh...");
+          await this.queryClient.invalidateQueries({ queryKey: ["user"] });
+        }
 
-              if (user.school) {
-                this.client.defaults.headers.schoolid = `${user.school._id}`;
-              }
-
-              return this.client(originalRequest);
-            } catch (refreshError) {
-              this.clearUserData();
-
-              return Promise.reject(refreshError);
-            }
-          }
-          return HttpClient.buildPromiseError(error);
-        case HttpStatusCode.Forbidden:
-          this.clearUserData();
-          window.dispatchEvent(new CustomEvent("unauthorized"));
-          return await HttpClient.buildPromiseError(error);
-        default:
-          return await Promise.reject(error);
+        this.client.defaults.headers.Authorization = `Bearer ${accessToken}`;
+        return this.client(originalRequest);
+      } catch (refreshError) {
+        this.clearUserData();
+        window.location.href = "/signin";
+        return Promise.reject(refreshError);
       }
     }
+
     return Promise.reject(error);
   }
 
   private static clearUserData() {
     StorageUtilsHelper.deleteFromLocalStorage([
-      STORE_KEYS.USER_DETAILS,
       STORE_KEYS.USER_ACCESS_TOKEN,
       STORE_KEYS.USER_REFRESH_TOKEN,
     ]);
   }
 
-  private static storeAuthData<T>(data: {
+  private static storeAuthData(data: {
     accessToken: string;
     refreshToken: string;
-    user: T;
   }) {
     StorageUtilsHelper.saveToLocalStorage(
       [STORE_KEYS.USER_ACCESS_TOKEN, data.accessToken],
-      [STORE_KEYS.USER_REFRESH_TOKEN, data.refreshToken],
-      [STORE_KEYS.USER_DETAILS, data.user]
+      [STORE_KEYS.USER_REFRESH_TOKEN, data.refreshToken]
     );
   }
-
-  static readonly instantiate = () => new HttpClient();
 }
 
 export { HttpClient };

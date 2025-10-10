@@ -33,7 +33,6 @@ export class JwtAuthGuard implements CanActivate {
       }
 
       const claims = decodedToken.claims;
-
       if (!claims || !claims.role) {
         throw new ForbiddenException(
           'You are not authorized to make this request. Invalid credentials.',

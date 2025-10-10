@@ -3,20 +3,12 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
-  Param,
   Put,
   Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import {
@@ -59,20 +51,12 @@ export class UserController {
     );
   }
 
-  @Get(':userId')
-  @ApiOperation({ summary: 'Get a user by ID' })
-  @ApiParam({
-    name: 'userId',
-    description: 'The ID of the user',
-    example: 12,
-  })
-  async getUserById(@Param('userId') userId: number, @Res() res: Response) {
-    const user = await this._userRepository.findUserById(Number(userId));
-    if (!user) {
-      throw new NotFoundException('User not found!');
-    }
+  @Get('me/profile')
+  @ApiOperation({ summary: 'Get logged in user data' })
+  async getUserData(@Res() res: Response) {
+    const user = await this._userRepository.getLoggedInUserData();
     const mappedData = TypeSafeMapper.map(user as User, UserResponse, UserDto);
-    const data = BukkaResponse.GetSingleDataResponse('user', mappedData);
+    const data = BukkaResponse.GetSingleDataResponse('User', mappedData);
     return BukkaResponse.GetStatusResponse(data, res);
   }
 
@@ -94,18 +78,12 @@ export class UserController {
   //   return BukkaResponse.GetStatusResponse(data, res);
   // }
 
-  @Put(':userId')
+  @Put('')
   @ApiOperation({ summary: 'User details updates' })
   @ApiBody({ type: UpdateUserDto })
-  async updateUser(
-    @Param('userId') userId: number,
-    @Body() updateUserDto: UpdateUserDto,
-    @Res() res: Response,
-  ) {
-    const response = await this._userRepository.updateUserDataAsync(
-      userId,
-      updateUserDto,
-    );
+  async updateUser(@Body() updateUserDto: UpdateUserDto, @Res() res: Response) {
+    const response =
+      await this._userRepository.updateUserDataAsync(updateUserDto);
     response.responseData = TypeSafeMapper.map(
       response.responseData,
       UserDto,
@@ -114,18 +92,15 @@ export class UserController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Put(':userId/profile')
+  @Put('profile')
   @ApiOperation({ summary: 'User profile update details' })
   @ApiBody({ type: ProfileUpdateDto })
   async userProfileUpdate(
-    @Param('userId') userId: number,
     @Body() profileUpdateDto: ProfileUpdateDto,
     @Res() res: Response,
   ) {
-    const response = await this._userRepository.updateUserProfileAsync(
-      userId,
-      profileUpdateDto,
-    );
+    const response =
+      await this._userRepository.updateUserProfileAsync(profileUpdateDto);
     response.responseData = TypeSafeMapper.map(
       response.responseData,
       UserDto,
@@ -134,18 +109,10 @@ export class UserController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Delete(':userId')
-  @ApiOperation({ summary: 'Delete a user by user ID' })
-  @ApiParam({
-    name: 'userId',
-    description: 'The ID of the user',
-    example: 12,
-  })
-  async deleteUserAccount(
-    @Param('userId') userId: number,
-    @Res() res: Response,
-  ) {
-    const result = await this._userRepository.deleteUser(userId);
-    return res.status(result.responseCode).json(result);
-  }
+  // @Delete()
+  // @ApiOperation({ summary: 'Delete a user by user ID' })
+  // async deleteUserAccount(@Res() res: Response) {
+  //   const result = await this._userRepository.deleteUser();
+  //   return res.status(result.responseCode).json(result);
+  // }
 }

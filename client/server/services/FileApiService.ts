@@ -1,8 +1,8 @@
-import { HttpClient } from "@/configs/http.config";
-import { fileRoutes } from "@/constants/routes/fileRoutes";
+import { HttpClient } from "@/configs";
+import { fileRoutes } from "@/constants/routes";
 
 export class FileApiService {
-  static async uploadFile(payload: File) {
+  static async uploadFile(payload: FormData) {
     const response = await HttpClient.getClient().post(
       `${fileRoutes.upload}`,
       payload
@@ -16,6 +16,14 @@ export class FileApiService {
       {
         params: queryParms,
       }
+    );
+    return response.data;
+  }
+
+  static async getLoggedInUserFiles(queryParms: Record<string, any> = {}) {
+    const response = await HttpClient.getClient().get(
+      `${fileRoutes.getLoggedInUserFiles}`,
+      { params: queryParms }
     );
     return response.data;
   }
