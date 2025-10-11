@@ -47,10 +47,8 @@ export class AuthController {
     this.cookieOptions = {
       httpOnly: true,
       secure: this.isProd,
-      sameSite: this.isProd ? 'none' : 'lax', // Use 'none' for cross-site in production
-      maxAge: ACCESS_TOKEN_MAX_AGE,
+      sameSite: this.isProd ? 'none' : 'lax',
       path: '/',
-      domain: this.isProd ? AppUrlTypeEnum.PROD : undefined, // Add your production domain
     };
     this.clearCookieOptions = {
       httpOnly: true,
@@ -79,12 +77,12 @@ export class AuthController {
     res.cookie(
       TokenTypeEnum.ACCESS_TOKEN,
       response?.responseData?.accessToken,
-      this.cookieOptions,
+      { ...this.cookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE },
     );
     res.cookie(
       TokenTypeEnum.REFRESH_TOKEN,
       response?.responseData?.refreshToken,
-      this.cookieOptions,
+      { ...this.cookieOptions, REFRESH_TOKEN_MAX_AGE },
     );
     response.responseData = response?.responseData?.user;
     return BukkaResponse.GetStatusResponse(response, res);
@@ -138,12 +136,12 @@ export class AuthController {
     res.cookie(
       TokenTypeEnum.ACCESS_TOKEN,
       response?.responseData?.accessToken,
-      this.cookieOptions,
+      { ...this.cookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE },
     );
     res.cookie(
       TokenTypeEnum.REFRESH_TOKEN,
       response?.responseData?.refreshToken,
-      this.cookieOptions,
+      { ...this.cookieOptions, REFRESH_TOKEN_MAX_AGE },
     );
     response.responseData = null;
     return BukkaResponse.GetStatusResponse(response, res);

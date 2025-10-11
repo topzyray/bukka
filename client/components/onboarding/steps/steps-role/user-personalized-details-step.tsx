@@ -4,7 +4,6 @@ import React from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { investorDetailsSchema } from "@/server/schemas/onboarding";
 import { useOnboarding } from "@/providers/onboarding-provider";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
