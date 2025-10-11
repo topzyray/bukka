@@ -6,5 +6,5 @@ export type UpdateUserDto = {
   phoneNumber?: string;
   bio?: string;
   gender?: string;
-  onboardingProgress?: string;
+  onboardingProgress?: number;
 };

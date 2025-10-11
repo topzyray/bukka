@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export const useSaveOnboardingProgress = ({ user }: { user: User }) => {
   const queryClient = useQueryClient();
-  return useCustomMutation(UserApiService.saveOnboardingProgress, {
+  return useCustomMutation(UserApiService.updateUser, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
         queryKey: ["onboarding-progress", user?.id],

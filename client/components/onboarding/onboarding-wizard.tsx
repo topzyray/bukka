@@ -132,9 +132,7 @@ function OnboardingFlow({ role }: { role: UserRole }) {
     setCurrentStep(nextStep);
 
     if (userId) {
-      console.log("USER ID IN ONBOARDING WIZARD: ", userId);
-
-      saveProgressMutation.mutate({ stepIndex: nextStep });
+      saveProgressMutation.mutate({ onboardingProgress: nextStep });
     }
   };
 
@@ -159,7 +157,7 @@ function OnboardingFlow({ role }: { role: UserRole }) {
         onStepClick={(i) => {
           setCurrentStep(i);
           if (userId) {
-            saveProgressMutation.mutate({ stepIndex: i });
+            saveProgressMutation.mutate({ onboardingProgress: i });
           }
         }}
       />
