@@ -10,7 +10,7 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Form } from "../../ui/form";
 import Link from "next/link";
-import { useAccountVerification } from "@/server/hooks/auth/use-accountverification";
+import { useAccountVerification } from "@/server/mutations/auth/use-accountverification";
 import OtpInputComponent from "../base/otp-component";
 
 const accountVerificationSchema = z.object({

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { UserRoleEnum } from "@/server/enums/UserRoleEnum";
+import { UserRoleEnum } from "@/server/enums";
 import { RoleCard } from "@/components/onboarding/role-card";
 
 const roles = [
@@ -13,8 +13,8 @@ const roles = [
     icon: "🍽️",
   },
   {
-    role: UserRoleEnum.BUSINESS,
-    link: "/onboarding/business",
+    role: UserRoleEnum.VENDOR,
+    link: "/onboarding/vendor",
     description: "Showcase your business and reach more customers.",
     icon: "🏪",
   },

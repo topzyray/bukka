@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "../atoms/mode-toggle";
 import { useAuth } from "@/providers/auth-provider";
-import { RouteHelper } from "@/helpers/RouteHelper";
+import { RouteHelper } from "@/helpers";
 import { User } from "@/server/interfaces/User";
 
 interface HeaderProps {
@@ -22,8 +22,8 @@ export function Header({ className }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const router = useRouter();
-  const { userDetails } = useAuth();
-  const route = RouteHelper.getDashboardPath(userDetails as User);
+  const { user } = useAuth();
+  const route = RouteHelper.getDashboardPath(user as User);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

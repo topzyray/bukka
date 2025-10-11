@@ -1,8 +1,8 @@
-import { AuthApiService } from "@/server/services/AuthApiService";
-import { extractErrorMessage } from "@/utils/extract-error-utils";
-import { useCustomMutation } from "@/server/queries/use-mutation.hook";
+import { AuthApiService } from "@/server/services";
 import { useRouter } from "next/navigation";
 import { UseFormReset } from "react-hook-form";
+import { extractErrorMessage } from "@/utils";
+import { useCustomMutation } from "../base";
 
 export const useAccountVerification = ({
   resetForm,

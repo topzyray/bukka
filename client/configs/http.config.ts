@@ -1,174 +1,138 @@
+import { QueryClient } from "@tanstack/react-query";
 import axios, {
   AxiosInstance,
-  AxiosResponse,
   AxiosError,
-  HttpStatusCode,
   AxiosRequestConfig,
+  HttpStatusCode,
 } from "axios";
+import { envConfig } from "./env.config";
+import { authRoutes } from "@/constants/routes";
+import { AuthApiService } from "@/server/services";
+import { toast } from "sonner";
 import { STORE_KEYS } from "./store.config";
-import { StorageUtilsHelper } from "@/utils/storage-utils";
-import { authRoutes } from "@/constants/routes/authRoutes";
+import { StorageUtilsHelper } from "@/utils";
 
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
-  _retry: boolean;
+  _retry?: boolean;
 }
 
 class HttpClient {
   private static client: AxiosInstance;
+  private static queryClient: QueryClient | null = null;
+  private static sessionExpiredFired = false;
 
   static initialize() {
     this.client = axios.create({
       baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-      withCredentials: false,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      withCredentials: true,
       validateStatus: (status) => status >= 200 && status < 300,
     });
 
-    this.client.interceptors.request.use(
-      (config) => {
-        const storedData = this.getStoredData();
-        const accessToken = storedData[STORE_KEYS.USER_ACCESS_TOKEN];
-
-        if (accessToken) {
-          config.headers.Authorization = `Bearer ${accessToken}`;
-        }
-
-        return config;
-      },
-      (error) => HttpClient.buildPromiseError(error)
-    );
-
     this.client.interceptors.response.use(
-      (response: AxiosResponse) => {
-        return response;
-      },
-      (error: AxiosError) => {
-        return this.handleErrorResponse(error);
-      }
+      (response) => response,
+      async (error: AxiosError) => this.handleErrorResponse(error)
     );
   }
 
-  private static buildPromiseError(error: Error): Promise<Error> {
-    return Promise.reject(error);
+  static setQueryClient(client: QueryClient) {
+    this.queryClient = client;
+  }
+
+  static resetSessionExpiredFlag() {
+    this.sessionExpiredFired = false;
   }
 
   static getClient(): AxiosInstance {
-    if (!this.client) {
-      this.initialize();
-    }
+    if (!this.client) this.initialize();
     return this.client;
-  }
-
-  static addHeaders(headers: Record<string, string>): void {
-    this.getClient().defaults.headers = {
-      ...this.getClient().defaults.headers,
-      ...headers,
-    };
-  }
-
-  private static getStoredData() {
-    return StorageUtilsHelper.getItemsFromLocalStorage([
-      STORE_KEYS.USER_ACCESS_TOKEN,
-      STORE_KEYS.USER_REFRESH_TOKEN,
-    ]);
   }
 
   private static async handleErrorResponse(error: AxiosError) {
     const originalRequest = error.config as CustomAxiosRequestConfig;
+    const status = error.response?.status;
 
-    if (error.response) {
-      switch (error.response.status) {
-        case HttpStatusCode.PaymentRequired:
-          return await HttpClient.buildPromiseError(error);
-        case HttpStatusCode.Unauthorized:
-          if (
-            error.response.status === HttpStatusCode.Unauthorized &&
-            !originalRequest._retry
-          ) {
-            originalRequest._retry = true;
-            try {
-              const tokens = this.getStoredData();
-              const refreshToken = tokens[STORE_KEYS.USER_REFRESH_TOKEN];
+    const isRefreshRequest =
+      originalRequest?.url?.endsWith("/refresh-token") ?? false;
 
-              if (!refreshToken) {
-                this.clearUserData();
-                console.log("I AM RUNNING INSIDE THE HTTP CONFIG");
-                window.location.href = "/signin";
-                throw new Error("No refresh token available");
-              }
+    if (
+      status === HttpStatusCode.Unauthorized &&
+      !originalRequest._retry &&
+      !isRefreshRequest
+    ) {
+      const hadSession =
+        StorageUtilsHelper.getItemFromLocalStorage(
+          STORE_KEYS.HAS_SESSION_KEY
+        ) === "1";
 
-              const response = await axios.post(`${authRoutes.refreshToken}`, {
-                refreshToken,
-              });
+      if (!hadSession) {
+        return Promise.reject(error);
+      }
 
-              const {
-                accessToken,
-                refreshToken: newRefreshToken,
-                user,
-              } = response.data;
+      originalRequest._retry = true;
 
-              if (user.school) {
-                this.storeAuthData({
-                  accessToken,
-                  refreshToken: newRefreshToken,
-                  user,
-                });
-              } else {
-                this.storeAuthData({
-                  accessToken,
-                  refreshToken: newRefreshToken,
-                  user,
-                });
-              }
+      try {
+        await axios.post(
+          `${envConfig.NEXT_PUBLIC_API_BASE_URL}${authRoutes.refreshToken}`,
+          {},
+          { withCredentials: true }
+        );
 
-              this.client.defaults.headers.Authorization = `Bearer ${accessToken}`;
+        try {
+          StorageUtilsHelper.saveToLocalStorage([
+            STORE_KEYS.HAS_SESSION_KEY,
+            "1",
+          ]);
+        } catch {}
 
-              if (user.school) {
-                this.client.defaults.headers.schoolid = `${user.school._id}`;
-              }
+        if (this.queryClient) {
+          await this.queryClient.invalidateQueries({
+            queryKey: ["currentUser"],
+          });
+        }
+        return this.client(originalRequest);
+      } catch (error) {
+        try {
+          await AuthApiService.signOut();
+        } catch {}
 
-              return this.client(originalRequest);
-            } catch (refreshError) {
-              this.clearUserData();
+        if (this.queryClient) {
+          this.queryClient.clear();
+        }
 
-              return Promise.reject(refreshError);
-            }
-          }
-          return HttpClient.buildPromiseError(error);
-        case HttpStatusCode.Forbidden:
-          this.clearUserData();
-          window.dispatchEvent(new CustomEvent("unauthorized"));
-          return await HttpClient.buildPromiseError(error);
-        default:
-          return await Promise.reject(error);
+        let hadSession = false;
+        try {
+          hadSession =
+            StorageUtilsHelper.getItemFromLocalStorage(
+              STORE_KEYS.HAS_SESSION_KEY
+            ) === "1";
+        } catch {}
+
+        if (hadSession && !HttpClient.sessionExpiredFired) {
+          HttpClient.sessionExpiredFired = true;
+
+          toast.error("Your session has expired. Please sign in again.");
+
+          const sessionEvent = new CustomEvent("sessionExpired", {
+            detail: { reason: "refresh_token_failed", time: new Date() },
+          });
+          window.dispatchEvent(sessionEvent);
+        }
+
+        try {
+          StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
+        } catch {}
+
+        return Promise.reject(error);
       }
     }
+
+    if (error.response?.status === HttpStatusCode.Forbidden) {
+      toast.error("You do not have permission to perform this action.");
+      return Promise.reject(error);
+    }
+
     return Promise.reject(error);
   }
-
-  private static clearUserData() {
-    StorageUtilsHelper.deleteFromLocalStorage([
-      STORE_KEYS.USER_DETAILS,
-      STORE_KEYS.USER_ACCESS_TOKEN,
-      STORE_KEYS.USER_REFRESH_TOKEN,
-    ]);
-  }
-
-  private static storeAuthData<T>(data: {
-    accessToken: string;
-    refreshToken: string;
-    user: T;
-  }) {
-    StorageUtilsHelper.saveToLocalStorage(
-      [STORE_KEYS.USER_ACCESS_TOKEN, data.accessToken],
-      [STORE_KEYS.USER_REFRESH_TOKEN, data.refreshToken],
-      [STORE_KEYS.USER_DETAILS, data.user]
-    );
-  }
-
-  static readonly instantiate = () => new HttpClient();
 }
 
 export { HttpClient };

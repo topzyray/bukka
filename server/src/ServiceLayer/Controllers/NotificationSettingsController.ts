@@ -25,52 +25,43 @@ import {
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { NotificationSettingsRepository } from 'src/BussinessLayer/NotificationSettingsRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
+import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
-@Controller(`${BaseApiRoutesConstant.BASE_URL}/users`)
+@Controller(`${BaseApiRoutesConstant.BASE_URL}/users/notification-settings`)
+@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
 @UseGuards(JwtAuthGuard)
 @ApiTags('Notification Settings')
-@ApiBearerAuth()
 export class NotificationSettingsController {
   constructor(
     private readonly notificationSettingsRepository: NotificationSettingsRepository,
   ) {}
 
-  @Get(':userId/notification-settings')
-  @ApiOperation({ summary: 'Get user notifications settings by userId' })
-  @ApiParam({
-    name: 'userId',
-    description: 'The ID of the user',
-    example: '123',
-  })
-  async getNotificationSettings(
-    @Param('userId') userId: number,
-    @Res() res: Response,
-  ) {
+  @Get()
+  @ApiOperation({ summary: 'Get logged in user notifications settings' })
+  async getLoggedInUserNotificationSettings(@Res() res: Response) {
     const response =
-      await this.notificationSettingsRepository.findNotificationSettingByUserId(
-        userId,
-      );
+      await this.notificationSettingsRepository.getLoggedInUserNotificationSetting();
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Get('notification-settings')
-  @ApiOperation({ summary: 'Get all paginated user notifications settings' })
-  async getNotificationSettingsByFilters(
-    @Query() request: NotificationSettingsFilterDto,
-    @Res() res: Response,
-  ) {
-    const response =
-      await this.notificationSettingsRepository.findNotificationSettingByFilters(
-        request,
-      );
-    const data = BukkaResponse.GetPagedDataResponse(
-      'notification settings',
-      response,
-    );
-    return res.status(data.responseCode).json(data);
-  }
+  // @Get()
+  // @ApiOperation({ summary: 'Get all paginated user notifications settings' })
+  // async getNotificationSettingsByFilters(
+  //   @Query() request: NotificationSettingsFilterDto,
+  //   @Res() res: Response,
+  // ) {
+  //   const response =
+  //     await this.notificationSettingsRepository.findNotificationSettingByFilters(
+  //       request,
+  //     );
+  //   const data = BukkaResponse.GetPagedDataResponse(
+  //     'notification settings',
+  //     response,
+  //   );
+  //   return res.status(data.responseCode).json(data);
+  // }
 
-  @Put('notification-settings')
+  @Put()
   @ApiOperation({ summary: 'Update user notifications settings' })
   @ApiBody({ type: UpdateNotificationSettingsDto })
   async updateNotificationSettings(

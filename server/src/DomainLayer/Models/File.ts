@@ -8,7 +8,7 @@ export class File {
   fileExtension: string;
   relativePath: string;
   referenceType: string;
-  createdById?: string;
+  createdById?: number;
   fileSize?: number;
   mimeType?: string;
   isPublic: boolean;

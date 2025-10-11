@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { UserRoleEnum } from "@/server/enums/UserRoleEnum";
+import { UserRoleEnum } from "@/server/enums";
 import { RoleCard } from "@/components/auth/role-card";
 
 const roles: {
@@ -15,7 +15,7 @@ const roles: {
     icon: "🍽️",
   },
   {
-    role: UserRoleEnum.BUSINESS,
+    role: UserRoleEnum.VENDOR,
     description: "Showcase your business and reach more customers.",
     icon: "🏪",
   },

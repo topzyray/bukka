@@ -18,6 +18,7 @@ import { AdminUserFilterDto } from 'src/DomainLayer/Dtos/Admin/AdminUserDto';
 import { User } from 'src/DomainLayer/Models/User';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
+import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
 @Injectable()
 export class UserRepository {
   constructor(private readonly _userDataAgent: UserDataAgent) {}
@@ -41,6 +42,11 @@ export class UserRepository {
 
   async findUserById(userId: number) {
     return this._userDataAgent.getUserById(userId);
+  }
+
+  async getLoggedInUserData() {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    return this._userDataAgent.getUserById(loggedInUser?.id);
   }
 
   async findUserByToken(token: string, type: TokenTypeEnum) {
@@ -71,14 +77,8 @@ export class UserRepository {
     return BukkaResponse.updateResponse('User', updatedUser);
   }
 
-  async updateUserDataAsync(
-    userId: number,
-    data: Partial<User>,
-  ): Promise<BukkaResponse<User>> {
-    const user = await this.findUserById(userId);
-    if (!user) {
-      throw new NotFoundException('User not found!');
-    }
+  async updateUserDataAsync(data: Partial<User>): Promise<BukkaResponse<User>> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
 
     // const {
     //   longitude,
@@ -118,19 +118,17 @@ export class UserRepository {
     //   locationId: location.id,
     // };
 
-    const updatedUser = await this._userDataAgent.updateUser(userId, data);
+    const updatedUser = await this._userDataAgent.updateUser(
+      loggedInUser?.id,
+      data,
+    );
     return BukkaResponse.updateResponse('User', updatedUser);
   }
 
   async updateUserProfileAsync(
-    userId: number,
     userProfileDto: ProfileUpdateDto,
   ): Promise<BukkaResponse<User | null>> {
-    const user = await this.findUserById(userId);
-    if (!user) {
-      throw new NotFoundException('User not found!');
-    }
-
+    const loggedInUser = await UserHelper.getLoggedInUser();
     // const {
     //   username,
     //   phoneNumber,
@@ -186,8 +184,20 @@ export class UserRepository {
     //   locationId: location.id,
     // };
     const updatedUser = await this._userDataAgent.updateUser(
-      userId,
+      loggedInUser?.id,
       userProfileDto,
+    );
+    return BukkaResponse.updateResponse('User', updatedUser);
+  }
+
+  async completeProfileOnboarding(): Promise<BukkaResponse<User | null>> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const data = {
+      isUpdated: true,
+    } as Partial<User>;
+    const updatedUser = await this._userDataAgent.updateUser(
+      loggedInUser?.id,
+      data,
     );
     return BukkaResponse.updateResponse('User', updatedUser);
   }
@@ -212,7 +222,7 @@ export class UserRepository {
     if (!user) {
       throw new NotFoundException('User not found!');
     }
-    await this._userDataAgent.deleteUser(userId);
+    await this._userDataAgent.deleteUser(user?.id as number);
     return BukkaResponse.deleteResponse('User', true);
   }
 

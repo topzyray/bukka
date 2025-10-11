@@ -10,7 +10,7 @@ import { BukkaButton } from "@/components/ui/button-variants";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Form } from "../../ui/form";
-import { useSignIn } from "@/server/hooks/auth/use-signin";
+import { useSignIn } from "@/server/mutations/auth/use-signin";
 import Link from "next/link";
 import InputComponent from "../base/input-component";
 

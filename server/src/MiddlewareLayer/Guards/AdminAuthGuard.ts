@@ -3,6 +3,7 @@ import {
   CanActivate,
   UnauthorizedException,
   ExecutionContext,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InMemoryCacheService } from '../../InfrastructureLayer/Services/InMemoryCacheService';
 import { UserTypeEnum } from '../../DomainLayer/Enums/UserTypeEnum';
@@ -27,8 +28,8 @@ export class AdminAuthGuard extends JwtAuthGuard implements CanActivate {
     if (authUser && authUser.role === UserTypeEnum.ADMIN) {
       return true;
     } else {
-      throw new UnauthorizedException(
-        'You are not authorized to make this request. Requires an ADMIN user.',
+      throw new ForbiddenException(
+        'You are forbidden to make this request. Requires an ADMIN user.',
       );
     }
   }

@@ -10,6 +10,7 @@ import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { NotificationSettings } from 'src/DomainLayer/Models/NotificationSetting';
 import { INotificationSettings } from 'src/DataLayer/Abstracts/Interfaces/INotificationSettings';
+import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
 
 @Injectable()
 export class NotificationSettingsRepository {
@@ -35,12 +36,13 @@ export class NotificationSettingsRepository {
     );
   }
 
-  async findNotificationSettingByUserId(
-    userId: number,
-  ): Promise<BukkaResponse<NotificationSettings>> {
+  async getLoggedInUserNotificationSetting(): Promise<
+    BukkaResponse<NotificationSettings>
+  > {
+    const loggedInUser = await UserHelper.getLoggedInUser();
     const data =
       await this._notificationSettingsDataAgent.getNotificationSettingByUserId(
-        userId,
+        loggedInUser?.id,
       );
 
     return BukkaResponse.GetSingleDataResponse('User settings', data);

@@ -27,7 +27,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
 
 export function Profile() {
-  const { userDetails, logout } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
 
   const handleAction = (message: string) => {
@@ -47,13 +47,13 @@ export function Profile() {
             <CardHeader className="text-center">
               <Avatar className="w-24 h-24 mx-auto mb-4">
                 <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                  {userDetails?.email?.[0].toUpperCase()}
+                  {user?.email?.[0].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <CardTitle className="text-2xl">
-                {`${userDetails?.firstName} ${userDetails?.lastName}`}
+                {`${user?.firstName} ${user?.lastName}`}
               </CardTitle>
-              <CardDescription>{userDetails?.email}</CardDescription>
+              <CardDescription>{user?.email}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4 text-center">
@@ -79,9 +79,7 @@ export function Profile() {
               variant="outline"
               className="h-auto p-4 flex-col gap-2"
               onClick={() =>
-                router.push(
-                  `/dashboard/${userDetails?.role.toLowerCase()}/favorites`
-                )
+                router.push(`/dashboard/${user?.role.toLowerCase()}/favorites`)
               }
             >
               <Heart className="w-6 h-6" />

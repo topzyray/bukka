@@ -1,5 +1,5 @@
-import { BackendUrlEnum } from "@/server/enums/BackendUrlEnum";
-import { RouteHelper } from "../../helpers/RouteHelper";
+import { BackendUrlEnum } from "@/server/enums";
+import { RouteHelper } from "../../helpers";
 
 const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 
@@ -8,6 +8,7 @@ type IFileApi =
   | "uploadMultipleFromUrls"
   | "getFiles"
   | "getById"
+  | "getLoggedInUserFiles"
   | "deleteById"
   | "getByReferenceId"
   | "getByReferenceIdAnType"
@@ -16,8 +17,9 @@ type IFileApi =
 const rawAuthRoutes: Record<IFileApi, string> = {
   upload: "/files/upload",
   uploadMultipleFromUrls: "/files/upload-multiple-from-urls",
-  getFiles: "/files",
   getById: "/files",
+  getFiles: "/files",
+  getLoggedInUserFiles: "/files/my-files",
   deleteById: "/files",
   getByReferenceId: "/files/reference",
   getByReferenceIdAnType: "/files/reference",

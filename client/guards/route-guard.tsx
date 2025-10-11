@@ -2,8 +2,7 @@
 
 import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { RouteHelper } from "@/helpers/RouteHelper";
-import { CircularLoader } from "@/components/loaders/circular-loader";
+import { RouteHelper } from "@/helpers";
 import { UserRole } from "@/server/interfaces/Auth";
 import { useAuth } from "@/providers/auth-provider";
 import { User } from "@/server/interfaces/User";
@@ -16,34 +15,41 @@ interface RouteGuardProps {
 
 export function RouteGuard({
   children,
-  isProtected,
+  isProtected = false,
   roles = [],
 }: RouteGuardProps) {
-  const { userDetails, loading } = useAuth();
+  const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  const needsOnboarding = userDetails?.isUpdated === false;
+  const roleFromPath = pathname
+    .match(/\/(dashboard|onboarding)\/([^/]+)/)?.[2]
+    ?.toLowerCase() as UserRole | undefined;
+
+  const userRole = user?.role?.toLowerCase() as string;
 
   useEffect(() => {
-    if (loading) return;
+    if (isLoading) return;
 
-    // Infer role from pathname for automatic restriction
-    const roleFromPath = pathname
-      .match(/\/(dashboard|onboarding)\/([^/]+)/)?.[2]
-      ?.toLowerCase() as UserRole | undefined;
-
-    const userRole = userDetails?.role?.toLowerCase();
+    if (!isProtected && isAuthenticated && user) {
+      const target = RouteHelper.getDashboardPath(user);
+      if (pathname !== target && !pathname.startsWith("/dashboard")) {
+        router.replace(target);
+      }
+      return;
+    }
 
     if (isProtected) {
-      if (!userDetails && pathname !== "/signin") {
+      if (!isAuthenticated) {
         router.replace("/signin");
         return;
       }
 
-      if (needsOnboarding && pathname !== `/onboarding/${userRole}`) {
-        router.replace(`/onboarding/${userRole}`);
-        return;
+      if (user && user?.isUpdated === false) {
+        const onboardingPath = `/onboarding/${user.role.toLowerCase()}`;
+        if (!pathname.startsWith(onboardingPath)) {
+          router.replace(onboardingPath);
+        }
       }
 
       const allowedRoles =
@@ -53,117 +59,25 @@ export function RouteGuard({
           ? [roleFromPath]
           : [];
 
-      if (
-        allowedRoles.length > 0 &&
-        userRole &&
-        !allowedRoles.includes(userRole)
-      ) {
-        const target = RouteHelper.getDashboardPath(userDetails as User);
+      if (allowedRoles.length > 0 && user && !allowedRoles.includes(userRole)) {
+        const target = RouteHelper.getDashboardPath(user as User);
         if (pathname !== target) router.replace(target);
         return;
       }
     }
-
-    if (!isProtected && userDetails) {
-      const target = RouteHelper.getDashboardPath(userDetails);
-      if (pathname !== target) router.replace(target);
-    }
   }, [
     roles,
     router,
-    loading,
+    isLoading,
     pathname,
-    userDetails,
+    user,
     isProtected,
-    needsOnboarding,
+    isAuthenticated,
+    roleFromPath,
+    userRole,
   ]);
 
-  if (loading || (isProtected && !userDetails)) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <CircularLoader text="Loading..." />
-      </div>
-    );
-  }
+  if (isLoading) return null; // prevents flashing during rehydration
 
-  return children;
+  return <>{children}</>;
 }
-
-// "use client";
-
-// import { ReactNode, useEffect } from "react";
-// import { usePathname, useRouter } from "next/navigation";
-// import { RouteHelper } from "@/helpers/RouteHelper";
-// import { CircularLoader } from "@/components/loaders/circular-loader";
-// import { UserRole } from "@/server/interfaces/Auth";
-// import { useAuth } from "@/providers/auth-provider";
-
-// interface RouteGuardProps {
-//   children: ReactNode;
-//   isProtected: boolean;
-//   roles?: UserRole[];
-// }
-
-// export function RouteGuard({
-//   children,
-//   isProtected,
-//   roles = [],
-// }: RouteGuardProps) {
-//   const { userDetails, loading } = useAuth();
-//   const router = useRouter();
-//   const pathname = usePathname();
-
-//   const needsOnboarding = userDetails?.isUpdated === false;
-
-//   useEffect(() => {
-//     if (loading) return;
-
-//     if (isProtected) {
-//       if (!userDetails && pathname !== "/signin") {
-//         router.replace("/signin");
-//         return;
-//       }
-
-//       if (
-//         needsOnboarding &&
-//         pathname !== `/onboarding/${userDetails?.role.toLowerCase()}`
-//       ) {
-//         router.push(`/onboarding/${userDetails?.role.toLowerCase()}`);
-//         return;
-//       }
-
-//       if (
-//         roles.length > 0 &&
-//         userDetails &&
-//         !roles.includes(userDetails.role)
-//       ) {
-//         const target = RouteHelper.getDashboardPath(userDetails);
-//         if (pathname !== target) router.replace(target);
-//         return;
-//       }
-//     }
-
-//     if (!isProtected && userDetails) {
-//       const target = RouteHelper.getDashboardPath(userDetails);
-//       if (pathname !== target) router.replace(target);
-//     }
-//   }, [
-//     roles,
-//     router,
-//     loading,
-//     pathname,
-//     userDetails,
-//     isProtected,
-//     needsOnboarding,
-//   ]);
-
-//   if (loading || (isProtected && !userDetails)) {
-//     return (
-//       <div className="flex h-screen w-full items-center justify-center">
-//         <CircularLoader text="Loading..." />
-//       </div>
-//     );
-//   }
-
-//   return children;
-// }

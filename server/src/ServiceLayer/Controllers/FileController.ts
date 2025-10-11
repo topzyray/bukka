@@ -25,19 +25,20 @@ import {
   CreateMultipleFilesDto,
   FileFilterDto,
   DeleteFileDto,
+  UserFileFilterDto,
 } from 'src/DomainLayer/Dtos/FileDto';
-import { FileUpload } from 'src/DomainLayer/Decorators/FileUploadDecorator';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { FileRepository } from 'src/BussinessLayer/FileRepository';
 import { FileReferenceTypeEnum } from 'src/DomainLayer/Enums/FileReferenceTypeEnum';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import type { Response } from 'express';
+import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/files`)
+@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
 @UseGuards(JwtAuthGuard)
 @ApiTags('File')
-@ApiBearerAuth()
 export class FileController {
   constructor(private readonly fileRepository: FileRepository) {}
 
@@ -55,7 +56,7 @@ export class FileController {
         },
         referenceType: {
           type: 'string',
-          enum: ['USER', 'BUSINESS', 'GENERAL'],
+          enum: ['USER', 'VENDOR', 'GENERAL'],
           example: 'GENERAL',
         },
         referenceId: {
@@ -83,7 +84,7 @@ export class FileController {
     @Body() createFileDto: CreateFileDto,
     @Res() res: Response,
   ) {
-    const filePath = `${createFileDto.referenceType.toLowerCase()}}`;
+    const filePath = `${createFileDto.referenceType.toLowerCase()}`;
     const response = await this.fileRepository.uploadFile(
       file,
       filePath,
@@ -102,6 +103,17 @@ export class FileController {
   ) {
     const response = await this.fileRepository.uploadFilesFromUrls(dto);
     return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Get('my-files')
+  @ApiOperation({ summary: 'Get paginated files for a logged in user' })
+  async getLoggedInUserFiles(
+    @Query() filterDto: UserFileFilterDto,
+    @Res() res: Response,
+  ) {
+    const response = await this.fileRepository.getLoggedInUserFiles(filterDto);
+    const data = BukkaResponse.GetSingleDataResponse('User file', response);
+    return BukkaResponse.GetStatusResponse(data, res);
   }
 
   @Get(':id')
@@ -167,10 +179,10 @@ export class FileController {
     return res.status(response.responseCode).json(response);
   }
 
-  @Delete('user/:userId')
+  @Delete('user')
   @ApiOperation({ summary: 'Delete all files for a user' })
-  async deleteUserFiles(@Param('userId') userId: number, @Res() res: Response) {
-    const response = await this.fileRepository.deleteUserFiles(userId);
+  async deleteUserFiles(@Res() res: Response) {
+    const response = await this.fileRepository.deleteUserFiles();
     return res.status(response.responseCode).json(response);
   }
 }

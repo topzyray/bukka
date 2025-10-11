@@ -1,5 +1,5 @@
-import { useCustomMutation } from "@/server/queries/use-mutation.hook";
-import { AuthApiService } from "@/server/services/AuthApiService";
+import { useCustomMutation } from "@/server/mutations/base";
+import { AuthApiService } from "@/server/services";
 import { useRouter } from "next/navigation";
 
 export const useRequestConfirmationEmail = () => {

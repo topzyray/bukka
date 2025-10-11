@@ -44,8 +44,11 @@ export class FileUploadService {
   }
 
   async deleteFile(filePath: string): Promise<BukkaResponse<any>> {
+    const normalizedPath = filePath.replace(/^bukka\//, '');
+    console.log('FILE PATH TO DELETE: ', normalizedPath);
+
     const provider = this.providerFactory.getProvider();
-    await provider.deleteFile(filePath);
+    await provider.deleteFile(normalizedPath);
     return BukkaResponse.deleteResponse('File', true);
   }
 

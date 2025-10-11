@@ -17,14 +17,14 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Form } from "../../ui/form";
 import { WaitlistApiService } from "@/server/services/WaitlistApiService";
-import { useCustomMutation } from "@/server/queries/use-mutation.hook";
+import { useCustomMutation } from "@/server/mutations/base";
 import InputComponent from "../../forms/base/input-component";
 import { PhoneNumberInput } from "../../forms/base/phone-number-component";
 import parsePhoneNumberFromString from "libphonenumber-js";
 import ContactSection from "../../atoms/contact-section";
 import { TypeAnimation } from "react-type-animation";
 import { Processing } from "../../loaders/processing";
-import { useCustomQuery } from "@/server/queries/use-query.hook";
+import { useCustomQuery } from "@/server/queries/base";
 import { useQueryClient } from "@tanstack/react-query";
 import { CircleLoader } from "react-spinners";
 

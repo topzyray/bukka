@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState } from "react";
 import { useTheme } from "next-themes";
-import { UserRoleEnum } from "@/server/enums/UserRoleEnum";
+import { UserRoleEnum } from "@/server/enums";
 import Cookies from "js-cookie";
 import ServiceWorkderRegistrar from "./service-worker";
 

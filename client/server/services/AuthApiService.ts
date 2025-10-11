@@ -1,12 +1,13 @@
-import { HttpClient } from "@/configs/http.config";
+import { HttpClient, STORE_KEYS } from "@/configs";
 import {
   ForgotPasswordDto,
   SigninDto,
   ResendEmailVerificationDto,
   RefreshTokenDto,
   ResetPasswordDto,
-} from "../dtos/AuthDto";
-import { authRoutes } from "@/constants/routes/authRoutes";
+} from "../dtos";
+import { authRoutes } from "@/constants/routes";
+import { StorageUtilsHelper } from "@/utils";
 
 export class AuthApiService {
   static async signIn(requestBody: SigninDto) {
@@ -14,6 +15,13 @@ export class AuthApiService {
       `${authRoutes.signIn}`,
       requestBody
     );
+
+    try {
+      StorageUtilsHelper.saveToLocalStorage([STORE_KEYS.HAS_SESSION_KEY, "1"]);
+      window.dispatchEvent(new Event("sessionHandledReset"));
+      HttpClient.resetSessionExpiredFlag();
+    } catch {}
+
     return response.data;
   }
 
@@ -23,6 +31,29 @@ export class AuthApiService {
       requestBody
     );
     return response.data;
+  }
+
+  static async signOut() {
+    try {
+      const response = await HttpClient.getClient().post(
+        `${authRoutes.signOut}`
+      );
+
+      try {
+        StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
+        window.dispatchEvent(new Event("sessionHandledReset"));
+        HttpClient.resetSessionExpiredFlag();
+      } catch {}
+
+      return response.data;
+    } catch (error) {
+      try {
+        StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
+        window.dispatchEvent(new Event("sessionHandledReset"));
+        HttpClient.resetSessionExpiredFlag();
+      } catch {}
+      throw error;
+    }
   }
 
   static async confirmEmail(token: string) {

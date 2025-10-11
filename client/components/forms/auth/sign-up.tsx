@@ -18,8 +18,8 @@ import { Lock, Mail, ShieldCheck, User } from "lucide-react";
 import { Processing } from "../../loaders/processing";
 import SelectComponent from "../base/select-component";
 import { Form } from "../../ui/form";
-import { useSignUp } from "@/server/hooks/auth/use-signup";
-import { UserRoleEnum } from "@/server/enums/UserRoleEnum";
+import { useSignUp } from "@/server/mutations/auth/use-signup";
+import { UserRoleEnum } from "@/server/enums";
 import { useGlobalState } from "@/providers/global-state-provider";
 
 const signUpSchema = z.object({
@@ -89,7 +89,7 @@ export const SignUpForm = () => {
                 formOptionLabel="I am a"
                 formOptionData={[
                   { value: UserRoleEnum.USER, label: "Food Lover (User)" },
-                  { value: UserRoleEnum.BUSINESS, label: "Restaurant Owner" },
+                  { value: UserRoleEnum.VENDOR, label: "Restaurant Owner" },
                   { value: UserRoleEnum.RIDER, label: "Dispatch Rider" },
                   { value: UserRoleEnum.INVESTOR, label: "Investor" },
                 ]}

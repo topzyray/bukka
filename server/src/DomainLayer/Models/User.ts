@@ -16,6 +16,7 @@ export class User {
   confirmationCode?: string | null;
   confirmationCodeExpires?: Date | null;
   refreshToken?: string;
+  refreshTokenExpires?: Date | null;
   passwordResetToken?: string | null;
   passwordResetExpires?: Date | null;
   passwordChangedAt?: Date;

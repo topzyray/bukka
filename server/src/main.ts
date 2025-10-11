@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -13,6 +14,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './MiddlewareLayer/Global/Filters/GlobalExceptionFilter';
 import { EnvironmentTypeEnum } from './DomainLayer/Enums/EnvironmentTypeEnum';
 import { BasicAuthMiddleware } from './MiddlewareLayer/Global/Middlewares/BasicAuthMiddleware';
+import { AppUrlTypeEnum } from './DomainLayer/Enums/AppUrlTypeEnum';
+import { TokenTypeEnum } from './DomainLayer/Enums/TokenTypeEnum';
 
 const logger = new Logger('Bootstrap');
 
@@ -50,7 +53,11 @@ async function bootstrap() {
   });
 
   app.useGlobalFilters(new GlobalExceptionFilter());
-  app.enableCors();
+  app.use(cookieParser());
+  app.enableCors({
+    origin: [`${AppUrlTypeEnum.LOCAL}:3000`, AppUrlTypeEnum.SERVER],
+    credentials: true,
+  });
   app.use(helmet());
 
   app.use(['/swagger'], (req: Request, res: Response, next: NextFunction) => {
@@ -63,14 +70,24 @@ async function bootstrap() {
     .setDescription('Bukka Server APIs')
     .setVersion('v1')
     .setExternalDoc('API Schema', '/swagger/v1/swagger.json')
-    .addBearerAuth()
+    // .addBasicAuth({ type: 'http', scheme: 'basic' }, 'swagger-auth')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        in: 'header',
+      },
+      TokenTypeEnum.ACCESS_TOKEN,
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('swagger', app, document, {
     swaggerOptions: {
-      persistAuthorization: true,
+      // persistAuthorization: true,
     },
   });
 

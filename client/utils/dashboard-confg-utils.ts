@@ -1,5 +1,5 @@
-import { UserRoleEnum } from "@/server/enums/UserRoleEnum";
-import { DashboardTitleEnum } from "@/server/enums/DashboardTitleEnum";
+import { UserRoleEnum } from "@/server/enums";
+import { DashboardTitleEnum } from "@/server/enums";
 import {
   ADMIN,
   INVESTOR,

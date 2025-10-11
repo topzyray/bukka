@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Form } from "../../ui/form";
 import Link from "next/link";
 import InputComponent from "../base/input-component";
-import { useRequestConfirmationEmail } from "@/server/hooks/auth/use-requestconfirmationemail";
+import { useRequestConfirmationEmail } from "@/server/mutations/auth/use-requestconfirmationemail";
 
 const requestAccountSchema = z.object({
   email: z.email({ message: "Please enter a valid email address" }),

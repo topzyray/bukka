@@ -1,4 +1,4 @@
-import { STORE_KEYS } from "@/configs/store.config";
+import { STORE_KEYS } from "@/configs";
 import { TokenEncryptionHelper } from "./token-encryption-utils";
 
 export class StorageUtilsHelper {
@@ -17,6 +17,11 @@ export class StorageUtilsHelper {
   }
 
   static getTokensFromLocalStorage() {
+    if (typeof window === "undefined") {
+      console.log("Server environment — skip localStorage");
+      return null;
+    }
+
     const encryptedAccessToken = localStorage.getItem(
       STORE_KEYS.USER_ACCESS_TOKEN
     );
@@ -38,6 +43,11 @@ export class StorageUtilsHelper {
     key: string,
     decrypt: boolean = true
   ): T | null {
+    if (typeof window === "undefined") {
+      console.log("Server environment — skip localStorage");
+      return null;
+    }
+
     const item = localStorage.getItem(key);
 
     if (!item) return null;

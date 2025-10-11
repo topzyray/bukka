@@ -38,6 +38,7 @@ export class UserDto {
   userStatus: string;
   emailConfirmed: boolean;
   refreshToken: string;
+  refreshTokenExpires: Date;
   lastLoginAt: Date;
   isDeleted: boolean;
   isUpdated: boolean;

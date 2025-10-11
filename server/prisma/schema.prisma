@@ -17,8 +17,9 @@ enum Gender {
 enum UserRole {
   USER
   ADMIN
-  BUSINESS
+  VENDOR
   RIDER
+  BUSINESS
   INVESTOR
 }
 
@@ -98,6 +99,7 @@ model User {
   confirmationCodeExpires DateTime?
   onboardingProgress      Int?
   refreshToken            String?
+  refreshTokenExpires     DateTime?
   passwordResetToken      String?
   passwordResetExpires    DateTime?
   passwordChangedAt       DateTime?

@@ -1,5 +1,5 @@
-import { TextHelper } from "@/helpers/TextHelper";
-import { extractErrorMessage } from "@/utils/extract-error-utils";
+import { TextHelper } from "@/helpers/text-helper";
+import { extractErrorMessage } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 

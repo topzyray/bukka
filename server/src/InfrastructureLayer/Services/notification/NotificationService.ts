@@ -19,8 +19,6 @@ const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
 
 @Injectable()
 export class NotificationService {
-  private readonly logger = new Logger(NotificationService.name);
-
   constructor(
     protected readonly _notif: UserNotificationRepository,
     protected readonly _emailService: EmailService,
@@ -29,7 +27,6 @@ export class NotificationService {
 
   async dispatchNotification(input: {
     channels: NotificationTypeEnum[];
-    userId?: number;
     // businessId?: string;
     inapp?: {
       title: string;
@@ -45,18 +42,13 @@ export class NotificationService {
       context: any;
     };
   }) {
-    const settings = await this.getUserNotificationSettings(
-      input?.userId as number,
-    );
-
-    this.logger.log('USER NOTIFICATIONI SETTINGS: ', settings);
+    const settings = await this.getUserNotificationSettings();
 
     for (const channel of input.channels) {
       switch (channel) {
         case NotificationTypeEnum.IN_APP:
           if (settings?.isInAppTurnedOn) {
             await this._notif.createUserNotification({
-              userId: input.userId as number,
               title: input.inapp?.title as string,
               message: input.inapp?.message as string,
               link: input.inapp?.link,
@@ -83,16 +75,10 @@ export class NotificationService {
     }
   }
 
-  private async getUserNotificationSettings(
-    userId: number,
-  ): Promise<NotificationSettings> {
-    if (!userId) {
-      throw new BadRequestException('User ID is required for notifications');
-    }
-
+  private async getUserNotificationSettings(): Promise<NotificationSettings> {
     // Later: check Redis cache here
     const settings =
-      await this._settingsRepo.findNotificationSettingByUserId(userId);
+      await this._settingsRepo.getLoggedInUserNotificationSetting();
 
     const userSettings =
       settings?.responseData?.settings ?? DEFAULT_NOTIFICATION_SETTINGS;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useGlobalState } from "@/providers/global-state-provider";
-import { UserRoleEnum } from "@/server/enums/UserRoleEnum";
+import { UserRoleEnum } from "@/server/enums";
 import { motion } from "framer-motion";
 
 interface IRoleCardProps {

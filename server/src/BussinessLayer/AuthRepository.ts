@@ -10,6 +10,7 @@ import {
   RefreshTokenDto,
   ResendConfirmEmailDto,
   ResetPasswordDto,
+  RefreshTokenResponseDto,
 } from 'src/DomainLayer/Dtos/AuthDto';
 import { User } from 'src/DomainLayer/Models/User';
 import { CreateUserDto, UserDto } from 'src/DomainLayer/Dtos/UserDto';
@@ -75,7 +76,7 @@ export class AuthRepository {
     return { ...data, responseData: mappedData };
   }
 
-  async signIn(loginDto: SigninDto): Promise<BukkaResponse<User>> {
+  async signIn(loginDto: SigninDto): Promise<BukkaResponse<LoginResponseDto>> {
     const response = (await this._userRepository.findUserByEmail(
       loginDto.email,
     )) as UserWithCounts;
@@ -129,6 +130,7 @@ export class AuthRepository {
     await this._userRepository.updateOtherUserAsync(response?.id as number, {
       id: response?.id,
       refreshToken: response?.refreshToken,
+      refreshTokenExpires: Generator.calculateExpirationTime(20160), // 14 days
       lastLoginAt: response?.lastLoginAt,
     });
 
@@ -142,25 +144,36 @@ export class AuthRepository {
   }
 
   async refreshToken(
-    refreshToken: RefreshTokenDto,
-  ): Promise<BukkaResponse<User>> {
-    const response = await this._userRepository.findUserById(
-      refreshToken.userId,
+    refreshTokenDto: RefreshTokenDto,
+  ): Promise<BukkaResponse<RefreshTokenResponseDto>> {
+    const response = await this._userRepository.findUserByToken(
+      refreshTokenDto.refreshToken,
+      TokenTypeEnum.REFRESH_TOKEN,
     );
 
     if (!response) {
-      return BukkaResponse.GetSingleDataResponse('User', response);
-    }
-
-    if (response.refreshToken !== refreshToken.oldRefreshToken) {
       return BukkaResponse.errorResponse(
         'Invalid Refresh Token, Please Re-Login',
-        HttpStatus.FORBIDDEN,
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    if (response.refreshToken !== refreshTokenDto.refreshToken) {
+      return BukkaResponse.errorResponse(
+        'Invalid Refresh Token, Please Re-Login',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    if (Date.now() > Number(response.refreshTokenExpires)) {
+      return BukkaResponse.errorResponse(
+        'Refresh token expiered. Please Re-Login',
+        HttpStatus.UNAUTHORIZED,
       );
     }
 
     const claims = {
-      userId: response.id as number,
+      id: response.id as number,
       email: response.email,
       firstName: response.firstName,
       lastName: response.lastName,
@@ -175,10 +188,11 @@ export class AuthRepository {
 
     await this._userRepository.updateOtherUserAsync(response.id as number, {
       refreshToken: response.refreshToken,
+      refreshTokenExpires: Generator.calculateExpirationTime(20160), // 14 days
     });
 
-    return BukkaResponse.GetSingleDataResponse('token', {
-      token: accessToken,
+    return BukkaResponse.GetSingleDataResponse('Token', {
+      accessToken,
       refreshToken: response.refreshToken,
     });
   }

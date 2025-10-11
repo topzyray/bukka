@@ -8,7 +8,7 @@ import {
 } from "../../ui/form";
 import { ReactNode, useState } from "react";
 import { EyeIcon, EyeOff, CheckCircle2, XCircle } from "lucide-react";
-import { TextHelper } from "@/helpers/TextHelper";
+import { TextHelper } from "@/helpers/text-helper";
 import { cn } from "@/lib/utils";
 
 interface IInputComponentProps {
@@ -20,7 +20,7 @@ interface IInputComponentProps {
   isPassword?: boolean;
   formMaxYear?: string;
   formMinYear?: string;
-  editable?: boolean;
+  readOnly?: boolean;
   disabled?: boolean;
   showPasswordStrength?: boolean;
   inputClassName?: string;
@@ -36,7 +36,7 @@ export default function InputComponent({
   isPassword,
   formMaxYear,
   formMinYear,
-  editable,
+  readOnly,
   disabled,
   showPasswordStrength = true,
   inputClassName,
@@ -106,7 +106,7 @@ export default function InputComponent({
                   placeholder={formPlaceholder}
                   max={formMaxYear}
                   min={formMinYear}
-                  readOnly={editable}
+                  readOnly={readOnly}
                   {...field}
                   onChange={handleChange}
                   value={

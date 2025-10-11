@@ -11,6 +11,7 @@ import {
   CreateFileDto,
   CreateMultipleFilesDto,
   FileFilterDto,
+  UserFileFilterDto,
 } from 'src/DomainLayer/Dtos/FileDto';
 import { FileCategoryEnum } from 'src/DomainLayer/Enums/FileCategoryEnum';
 import { FileReferenceTypeEnum } from 'src/DomainLayer/Enums/FileReferenceTypeEnum';
@@ -36,6 +37,9 @@ export class FileRepository {
     filePath: string,
     createFileDto: CreateFileDto,
   ) {
+    console.log('FILE: ', file);
+    console.log('DTO: ', createFileDto);
+
     if (!file) {
       throw new BadRequestException('Invalid file or no file attached');
     }
@@ -65,7 +69,7 @@ export class FileRepository {
       await this.handleExistingFileDeletion(
         FileCategoryEnum.BUSINESS_COVER,
         createFileDto.referenceId as number,
-        FileReferenceTypeEnum.BUSINESS,
+        FileReferenceTypeEnum.VENDOR,
       );
     }
 
@@ -222,6 +226,39 @@ export class FileRepository {
     );
   }
 
+  async getLoggedInUserFiles(
+    filterDto: UserFileFilterDto,
+  ): Promise<PagedData<File[]>> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const { fileId, ...otherFiltersDto } = filterDto;
+
+    const processedFilterDto = {
+      ...otherFiltersDto,
+      id: fileId,
+      referenceType: FileReferenceTypeEnum.USER,
+      referenceId: loggedInUser?.id,
+      createdById: loggedInUser?.id,
+    };
+    const query = FilterQueryHelper.buildQuery({
+      dto: processedFilterDto,
+      rules: [
+        { field: 'id' },
+        { field: 'referenceId' },
+        { field: 'createdById' },
+        { field: 'category' },
+        { field: 'referenceType' },
+        { field: 'isPublic' },
+      ],
+    });
+    const { pageSize, pageNumber } =
+      FilterQueryHelper.extractPagination(processedFilterDto);
+    return await this.fileDataAgent.getFileByFilter(
+      query,
+      pageSize,
+      pageNumber,
+    );
+  }
+
   async deleteFile(fileId: number, filePath: string) {
     if (!fileId) {
       throw new BadRequestException('File ID is required.');
@@ -234,6 +271,7 @@ export class FileRepository {
     if (!existingFile) {
       return BukkaResponse.errorResponse(
         `File with ID ${fileId} not found in the database.`,
+        HttpStatus.NOT_FOUND,
       );
     }
 
@@ -253,6 +291,7 @@ export class FileRepository {
       category as any,
       referenceType as any,
     );
+    console.log('EXISTING FILE: ', existingFile);
 
     if (existingFile) {
       await this.deleteFile(
@@ -262,8 +301,9 @@ export class FileRepository {
     }
   }
 
-  async deleteUserFiles(userId: number): Promise<BukkaResponse<any>> {
-    const files = await this.fileDataAgent.deleteUserFiles(userId);
+  async deleteUserFiles(): Promise<BukkaResponse<void>> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const files = await this.fileDataAgent.deleteUserFiles(loggedInUser?.id);
     if (files.count === 0) {
       return BukkaResponse.errorResponse(
         'No files found for this user',

@@ -1,10 +1,10 @@
-import { AuthApiService } from "@/server/services/AuthApiService";
-import { extractErrorMessage } from "@/utils/extract-error-utils";
-import { useCustomMutation } from "@/server/queries/use-mutation.hook";
+import { AuthApiService } from "@/server/services";
+import { extractErrorMessage } from "@/utils";
+import { useCustomMutation } from "@/server/mutations/base";
 import { toast } from "sonner";
 import { z } from "zod";
 import parsePhoneNumberFromString from "libphonenumber-js";
-import { GenderEnum } from "@/server/enums/GenderEnum";
+import { GenderEnum } from "@/server/enums";
 
 export const useProfileUpdate = () => {
   // const queryClient = useQueryClient();

@@ -18,7 +18,7 @@ import {
   Ticket,
   UserCircle,
 } from "lucide-react";
-import { TextHelper } from "@/helpers/TextHelper";
+import { TextHelper } from "@/helpers/text-helper";
 import { useRouter } from "next/navigation";
 import { User } from "@/server/interfaces/User";
 import { useAuth } from "@/providers/auth-provider";
