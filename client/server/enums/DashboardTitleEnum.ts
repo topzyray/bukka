@@ -1,7 +1,7 @@
 export enum DashboardTitleEnum {
   ADMIN = "ADMIN",
   USER = "USER",
-  BUSINESS = "BUSINESS",
+  VENDOR = "VENDOR",
   RIDER = "RIDER",
   INVESTOR = "INVESTOR",
   DEFAULT = "DEFAULT",

@@ -15,7 +15,7 @@ const roles: {
     icon: "🍽️",
   },
   {
-    role: UserRoleEnum.BUSINESS,
+    role: UserRoleEnum.VENDOR,
     description: "Showcase your business and reach more customers.",
     icon: "🏪",
   },

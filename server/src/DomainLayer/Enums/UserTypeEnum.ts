@@ -1,7 +1,7 @@
 export enum UserTypeEnum {
   ADMIN = 'ADMIN',
   USER = 'USER',
-  BUSINESS = 'BUSINESS',
+  VENDOR = 'VENDOR',
   RIDER = 'RIDER',
   INVESTOR = 'INVESTOR',
 }

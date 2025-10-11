@@ -45,9 +45,10 @@ export function RoleBasedDashboardLayoutClient({
     }
 
     if (isRoleMismatch || isNotAllowed) {
-      console.log("INSIDE ROLE DASHBOARD CLIENT LAYOUT");
-
-      router.replace(`/dashboard/${userRole}/overview`);
+      const overviewPath = `/dashboard/${userRole}/overview`;
+      if (pathname !== overviewPath) {
+        router.replace(overviewPath);
+      }
       return;
     }
   }, [isLoading, user, currentRole, pathname, router]);

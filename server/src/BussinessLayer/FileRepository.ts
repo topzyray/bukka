@@ -69,7 +69,7 @@ export class FileRepository {
       await this.handleExistingFileDeletion(
         FileCategoryEnum.BUSINESS_COVER,
         createFileDto.referenceId as number,
-        FileReferenceTypeEnum.BUSINESS,
+        FileReferenceTypeEnum.VENDOR,
       );
     }
 

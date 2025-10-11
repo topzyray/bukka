@@ -1,5 +1,5 @@
 export enum FileReferenceTypeEnum {
   USER = 'USER',
-  BUSINESS = 'BUSINESS',
+  VENDOR = 'VENDOR',
   GENERAL = 'GENERAL',
 }

@@ -1,18 +1,17 @@
 import { useCustomMutation } from "@/server/mutations/base";
-import { FieldValues, UseFormReset } from "react-hook-form";
 import { UserApiService } from "@/server/services/UserApiService";
 import { useQueryClient } from "@tanstack/react-query";
 
-export const useUpdateUserData = <T extends FieldValues>({
-  resetForm,
+export const useUpdateUserData = ({
+  onSuccess,
 }: {
-  resetForm: UseFormReset<T>;
+  onSuccess?: () => void;
 }) => {
   const queryClient = useQueryClient();
-  return useCustomMutation(UserApiService.saveOnboardingProgress, {
+  return useCustomMutation(UserApiService.updateUser, {
     onSuccessCallback: async () => {
-      resetForm();
       await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      onSuccess?.();
     },
     onErrorCallback: () => {},
   });

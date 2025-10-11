@@ -1,7 +1,7 @@
 export enum UserRoleEnum {
   ADMIN = 'ADMIN',
   USER = 'USER',
-  BUSINESS = 'BUSINESS',
+  VENDOR = 'VENDOR',
   RIDER = 'RIDER',
   INVESTOR = 'INVESTOR',
 }

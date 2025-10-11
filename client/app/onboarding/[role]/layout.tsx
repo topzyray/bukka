@@ -122,16 +122,16 @@ export default function RoleBasedOnboardingLayout({
             animate={{ y: [0, -10, 0] }}
             transition={{ repeat: Infinity, duration: 4 }}
           >
-            <div className="absolute top-6 left-8">
-              <Link href="/" className="flex items-center space-x-2">
+            <div className="">
+              <Link href="/" className="hover:scale-105 transition-transform">
                 <motion.div
                   whileHover={{ rotate: 360 }}
                   transition={{ duration: 0.6 }}
-                  className="w-40 h-12 relative"
+                  className="w-44 h-16 relative"
                 >
                   <Image
                     src="/images/bukka.png"
-                    alt="Logo"
+                    alt="Bukka Logo"
                     fill
                     className="object-contain"
                   />

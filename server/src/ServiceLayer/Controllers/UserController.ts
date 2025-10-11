@@ -79,7 +79,7 @@ export class UserController {
   //   return BukkaResponse.GetStatusResponse(data, res);
   // }
 
-  @Put('')
+  @Put()
   @ApiOperation({ summary: 'User details updates' })
   @ApiBody({ type: UpdateUserDto })
   async updateUser(@Body() updateUserDto: UpdateUserDto, @Res() res: Response) {
@@ -102,6 +102,18 @@ export class UserController {
   ) {
     const response =
       await this._userRepository.updateUserProfileAsync(profileUpdateDto);
+    response.responseData = TypeSafeMapper.map(
+      response.responseData,
+      UserDto,
+      UserResponse,
+    );
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Put('profile/complete-onboarding')
+  @ApiOperation({ summary: 'Complete logged in user onboarding' })
+  async completeProfileOnboarding(@Res() res: Response) {
+    const response = await this._userRepository.completeProfileOnboarding();
     response.responseData = TypeSafeMapper.map(
       response.responseData,
       UserDto,

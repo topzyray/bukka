@@ -1,5 +1,5 @@
 import { HttpClient } from "@/configs";
-import { OnboardingProgressDto, UpdateUserDto } from "../dtos";
+import { UpdateUserDto } from "../dtos";
 import { userRoutes } from "@/constants/routes";
 
 export class UserApiService {
@@ -32,10 +32,9 @@ export class UserApiService {
     return response?.onboardingProgress;
   }
 
-  static async saveOnboardingProgress(payload: OnboardingProgressDto) {
+  static async completeProfileOnboarding() {
     const response = await HttpClient.getClient().put(
-      `${userRoutes.updateUser}`,
-      { onboardingProgress: payload.stepIndex }
+      `${userRoutes.completeOnboarding}`
     );
     return response.data;
   }

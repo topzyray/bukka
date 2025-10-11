@@ -21,8 +21,9 @@ import { useFileUpload } from "@/server/mutations/file/use-file-uploader";
 import { FileApiService } from "@/server/services";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUpdateUserData } from "@/server/mutations/user/use-update-user-data";
-import { OnboardingProgressDto } from "@/server/dtos";
 import { useOnboardingProgress } from "@/server/queries/use-onboarding-progress-query";
+import { UpdateUserDto } from "@/server/dtos";
+import { CircularLoader } from "@/components/loaders/circular-loader";
 
 const imageUploadSchema = z.object({
   profileImage: z.instanceof(File, { message: "Please upload an image file" }),
@@ -33,7 +34,6 @@ type ImageUploadFormData = z.infer<typeof imageUploadSchema>;
 export default function ImageUploadStep({
   onNext,
   isLast,
-  stepIndex,
 }: {
   onNext: () => void;
   isLast?: boolean;
@@ -47,20 +47,21 @@ export default function ImageUploadStep({
     defaultValues: {
       profileImage: undefined,
     },
-    mode: "onChange",
+    mode: "all",
   });
 
   const { mutateAsync: saveOnboardingProgressMutation, isPending } =
     useUpdateUserData({
-      resetForm: form.reset,
+      onSuccess: () => {
+        form.reset();
+      },
     });
 
-  const { data: savedProgress, isLoading } = useOnboardingProgress(
-    user?.id as number
-  );
+  const { data: savedProgress, isLoading: isFetchingProgress } =
+    useOnboardingProgress(user?.id as number);
 
-  const progressPayload: OnboardingProgressDto = {
-    stepIndex: savedProgress + 1,
+  const progressPayload: UpdateUserDto = {
+    onboardingProgress: savedProgress + 1,
   };
 
   const { handleFileUpload, isUploading } = useFileUpload({
@@ -101,41 +102,45 @@ export default function ImageUploadStep({
         Recommended size: 300x300px
       </p>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="profileImage"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Profile Image</FormLabel>
-                <FormControl>
-                  <ImageUploader
-                    label="Select image"
-                    onChange={(file) => {
-                      field.onChange(file);
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      {isFetchingProgress ? (
+        <CircularLoader text="Loading User Avatar Form" />
+      ) : (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="profileImage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Profile Image</FormLabel>
+                  <FormControl>
+                    <ImageUploader
+                      label="Select image"
+                      onChange={(file) => {
+                        field.onChange(file);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <div className="flex justify-end gap-2 border-t border-border/30">
-            <Button
-              type="submit"
-              disabled={isUploading || isPending || !form.formState.isValid}
-            >
-              {isUploading || isPending
-                ? "Uploading..."
-                : isLast
-                ? "Finish"
-                : "Upload & Continue"}
-            </Button>
-          </div>
-        </form>
-      </Form>
+            <div className="flex justify-end gap-2 border-t border-border/30">
+              <Button
+                type="submit"
+                disabled={isUploading || isPending || !form.formState.isValid}
+              >
+                {isUploading || isPending
+                  ? "Uploading..."
+                  : isLast
+                  ? "Finish"
+                  : "Upload & Continue"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      )}
     </div>
   );
 }

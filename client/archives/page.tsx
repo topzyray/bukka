@@ -13,8 +13,8 @@ const roles = [
     icon: "🍽️",
   },
   {
-    role: UserRoleEnum.BUSINESS,
-    link: "/onboarding/business",
+    role: UserRoleEnum.VENDOR,
+    link: "/onboarding/vendor",
     description: "Showcase your business and reach more customers.",
     icon: "🏪",
   },

@@ -31,45 +31,45 @@ export const ADMIN: TDashboardNavigation = [
   },
 ];
 
-export const BUSINESS: TDashboardNavigation = [
+export const VENDOR: TDashboardNavigation = [
   {
     title: "Dashboard",
-    url: "/dashboard/business/overview",
+    url: "/dashboard/vendor/overview",
     icon: "LayoutDashboard",
     hasSubmenu: false,
     isSidebarNav: true,
   },
   {
     title: "My Business",
-    url: "/dashboard/business/info",
+    url: "/dashboard/vendor/info",
     icon: "Food",
     hasSubmenu: false,
     isSidebarNav: true,
   },
   {
     title: "Histories",
-    url: "/dashboard/business/histories",
+    url: "/dashboard/vendor/histories",
     icon: "Timeline",
     hasSubmenu: false,
     isSidebarNav: true,
   },
   {
     title: "Support Tickets",
-    url: "/dashboard/business/tickets",
+    url: "/dashboard/vendor/tickets",
     icon: "Help",
     hasSubmenu: false,
     isSidebarNav: true,
   },
   {
     title: "Settings",
-    url: "/dashboard/business/settings",
+    url: "/dashboard/vendor/settings",
     icon: "Gear",
     hasSubmenu: false,
     isSidebarNav: true,
   },
   {
     title: "Profile",
-    url: "/dashboard/business/profile",
+    url: "/dashboard/vendor/profile",
     icon: "User",
     hasSubmenu: false,
     isSidebarNav: false,

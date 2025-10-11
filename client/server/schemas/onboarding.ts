@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { GenderEnum } from "@/server/enums";
+import parsePhoneNumberFromString from "libphonenumber-js";
 
 /**
  * Shared schemas
@@ -8,13 +9,35 @@ export const imageUploadSchema = z.object({
   imageFile: z.instanceof(File),
 });
 
+const allowedGenders = Object.values(GenderEnum);
+
 export const personalDetailsSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  username: z.string().min(3, "Username must be at least 3 chars"),
-  phoneNumber: z.string().optional(),
-  bio: z.string().max(150).optional(),
-  gender: z.nativeEnum(GenderEnum).optional(),
+  firstName: z.string().min(2, "First name is required"),
+  lastName: z.string().min(2, "Last name is required"),
+  username: z.string().min(2, "Username is required"),
+  phoneNumber: z
+    .string()
+    .nonempty("Phone is required")
+    .refine(
+      (val) => {
+        if (!val.startsWith("+")) return false; // enforce leading +
+        const phoneNumber = parsePhoneNumberFromString(val);
+        return phoneNumber?.isValid() || false;
+      },
+      {
+        message: "Invalid phonenumber",
+      }
+    ),
+  bio: z
+    .string()
+    .min(2, "Bio cannot be less than 2 characters")
+    .max(150, { error: "Bio cannot be greater than 100 characters" }),
+  gender: z
+    .string()
+    .min(1, { error: "Gender is required" })
+    .refine((val) => allowedGenders.includes(val as GenderEnum), {
+      message: "Invalid gender selection",
+    }),
 });
 
 /**

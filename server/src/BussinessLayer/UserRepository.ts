@@ -190,6 +190,18 @@ export class UserRepository {
     return BukkaResponse.updateResponse('User', updatedUser);
   }
 
+  async completeProfileOnboarding(): Promise<BukkaResponse<User | null>> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const data = {
+      isUpdated: true,
+    } as Partial<User>;
+    const updatedUser = await this._userDataAgent.updateUser(
+      loggedInUser?.id,
+      data,
+    );
+    return BukkaResponse.updateResponse('User', updatedUser);
+  }
+
   async adminUpdateUserAsync(
     data: Partial<UserDto>,
   ): Promise<BukkaResponse<User | null>> {

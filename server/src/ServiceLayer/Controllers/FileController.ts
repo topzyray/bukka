@@ -56,7 +56,7 @@ export class FileController {
         },
         referenceType: {
           type: 'string',
-          enum: ['USER', 'BUSINESS', 'GENERAL'],
+          enum: ['USER', 'VENDOR', 'GENERAL'],
           example: 'GENERAL',
         },
         referenceId: {

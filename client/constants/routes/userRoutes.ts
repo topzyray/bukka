@@ -9,7 +9,8 @@ type IUserApi =
   | "getLoggedInUser"
   | "updateUser"
   | "updateUserProfile"
-  | "deleteUser";
+  | "deleteUser"
+  | "completeOnboarding";
 
 const rawAuthRoutes: Record<IUserApi, string> = {
   getUsers: "/users",
@@ -18,6 +19,7 @@ const rawAuthRoutes: Record<IUserApi, string> = {
   updateUser: "/users",
   updateUserProfile: "/users",
   deleteUser: "/users/profile",
+  completeOnboarding: "/users/profile/complete-onboarding",
 };
 
 export const userRoutes: Record<IUserApi, string> = RouteHelper.createRoutes(

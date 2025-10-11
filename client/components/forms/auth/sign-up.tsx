@@ -89,7 +89,7 @@ export const SignUpForm = () => {
                 formOptionLabel="I am a"
                 formOptionData={[
                   { value: UserRoleEnum.USER, label: "Food Lover (User)" },
-                  { value: UserRoleEnum.BUSINESS, label: "Restaurant Owner" },
+                  { value: UserRoleEnum.VENDOR, label: "Restaurant Owner" },
                   { value: UserRoleEnum.RIDER, label: "Dispatch Rider" },
                   { value: UserRoleEnum.INVESTOR, label: "Investor" },
                 ]}

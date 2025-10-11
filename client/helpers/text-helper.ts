@@ -20,6 +20,14 @@ export class TextHelper {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   }
 
+  static capitalizeWords(sentence: string) {
+    if (!sentence) return "";
+    return sentence
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
   static getFormattedDate = (
     date: string,
     options: FormatDateOptions = {}

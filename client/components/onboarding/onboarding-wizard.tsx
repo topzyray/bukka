@@ -12,6 +12,7 @@ import { useSaveOnboardingProgress } from "@/server/mutations/user/use-onboardin
 import { UserRole } from "@/server/interfaces/Auth";
 import { User } from "@/server/interfaces/User";
 import { CircularLoader } from "../loaders/circular-loader";
+import UserPersonalizedDetailsStep from "./steps/steps-role/user-personalized-details-step";
 
 /* ────────────────────────────────────────────────
    Dynamically import role-specific steps
@@ -48,6 +49,11 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
       title: "Personal Details",
       Component: PersonalDetailsStep,
     },
+    {
+      id: "other",
+      title: "Other Info",
+      Component: UserPersonalizedDetailsStep,
+    },
   ],
   RIDER: [
     { id: "image", title: "Profile Photo", Component: ImageUploadStep },
@@ -58,7 +64,7 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
     },
     { id: "vehicle", title: "Vehicle Details", Component: RiderVehicleStep },
   ],
-  BUSINESS: [
+  VENDOR: [
     { id: "image", title: "Profile Photo", Component: ImageUploadStep },
     {
       id: "personal",
@@ -238,7 +244,7 @@ function OnboardingFlow({ role }: { role: UserRole }) {
 //     },
 //     { id: "vehicle", title: "Vehicle Details", Component: RiderVehicleStep },
 //   ],
-//   BUSINESS: [
+//   VENDOR: [
 //     { id: "image", title: "Profile Photo", Component: ImageUploadStep },
 //     {
 //       id: "personal",

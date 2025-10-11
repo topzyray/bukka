@@ -13,7 +13,7 @@ export default function OverviewPage() {
   switch (user?.role) {
     case UserRoleEnum.ADMIN:
       return <AdminOverview />;
-    case UserRoleEnum.BUSINESS:
+    case UserRoleEnum.VENDOR:
       return <BusinessOverview />;
     case UserRoleEnum.USER:
       return <UserOverview />;
