@@ -39,7 +39,7 @@ export const FileUploader: React.FC<FileUploadProps<any, any>> = ({
           type="file"
           accept="image/*"
           className="hidden"
-          onChange={(event) => handleFileUpload(event, extraParams, formName)}
+          // onChange={(event) => handleFileUpload(event, extraParams, formName)}
           disabled={isUploading}
         />
       </Label>
