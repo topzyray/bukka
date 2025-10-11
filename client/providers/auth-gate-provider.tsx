@@ -30,8 +30,8 @@ export const AuthGate = ({ children }: { children: React.ReactNode }) => {
           className="text-center"
         >
           <div className="border-primary mx-auto h-14 w-14 animate-spin rounded-full border-8 border-dashed"></div>
-          <p className="mt-4 text-base font-semibold lg:text-xl lg:font-semibold">
-            Loading user session...
+          <p className="mt-4 text-base font-semibold lg:text-xl lg:font-semibold animate-pulse-glow">
+            Checking Session...
           </p>
         </motion.div>
       </div>

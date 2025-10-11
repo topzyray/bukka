@@ -10,14 +10,14 @@ export class UserApiService {
         params: queryParms,
       }
     );
-    return response.data?.responseData;
+    return response.data;
   }
 
   static async adminGetUserById(userId: number) {
     const response = await HttpClient.getClient().get(
       `${userRoutes.getUserById}/${userId}`
     );
-    return response.data?.responseData;
+    return response.data;
   }
 
   static async getLoggedInUser() {

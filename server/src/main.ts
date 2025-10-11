@@ -55,7 +55,7 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.use(cookieParser());
   app.enableCors({
-    origin: [`${AppUrlTypeEnum.LOCAL}:3000`, AppUrlTypeEnum.SERVER],
+    origin: [`${AppUrlTypeEnum.LOCAL}:3000`, AppUrlTypeEnum.PROD],
     credentials: true,
   });
   app.use(helmet());
