@@ -11,7 +11,7 @@ import { BackgroundIcons } from "@/components/ui/background-icons";
 import { OnboardingGuard } from "@/guards/onboarding-guard";
 import { getAllowedRoutesForRole } from "@/utils/route-access-utils";
 import { UserRoleEnum } from "@/server/enums";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, redirect } from "next/navigation";
 import { UserRole } from "@/server/interfaces/Auth";
 
 interface IOnboardingLayout {
@@ -30,29 +30,33 @@ export default function RoleBasedOnboardingLayout({
   const unwrappedParams = React.use(params);
   const currentRole = unwrappedParams.role.toLowerCase() as UserRoleEnum;
 
-  useEffect(() => {
-    if (isLoading) return;
-    if (!user) {
-      router.replace("/signin");
-      return;
-    }
+  // useEffect(() => {
+  //   if (isLoading) return;
+  //   if (!user) {
+  //     console.log("INSIDE ONBOARDING LAYOUT: ", user);
+  //     router.replace("/signin");
+  //     return;
+  //   }
 
-    const userRole = user.role.toLowerCase();
-    const allowedRoutes = getAllowedRoutesForRole(userRole as UserRoleEnum);
-    const isRoleMismatch = userRole !== currentRole;
-    const isNotAllowed = !allowedRoutes.some((route) =>
-      pathname.startsWith(route)
-    );
+  //   const userRole = user.role.toLowerCase();
+  //   const allowedRoutes = getAllowedRoutesForRole(userRole as UserRoleEnum);
+  //   const isRoleMismatch = userRole !== currentRole;
+  //   const isNotAllowed = !allowedRoutes.some((route) =>
+  //     pathname.startsWith(route)
+  //   );
 
-    if (isRoleMismatch || isNotAllowed) {
-      router.replace(`/onboarding/${userRole}`);
-    }
-  }, [isLoading, user, currentRole, pathname, router]);
+  //   if (isRoleMismatch || isNotAllowed) {
+  //     router.replace(`/onboarding/${userRole}`);
+  //   }
+  // }, [isLoading, user, currentRole, pathname, router]);
 
-  if (isLoading || !user) return null;
+  // if (isLoading || !user) return null;
 
-  const userRole = user.role.toLowerCase();
-  if (userRole !== currentRole) return null;
+  // const userRole = user?.role.toLowerCase();
+  // if (userRole !== currentRole) return;
+  // if (!user) {
+  //   redirect("/signin");
+  // }
 
   return (
     <OnboardingGuard roles={[user?.role.toLowerCase() as UserRole]}>
@@ -72,15 +76,14 @@ export default function RoleBasedOnboardingLayout({
 
         {/* Main Card */}
         <motion.section
-          className="w-full max-w-5xl h-[80vh] bg-card text-card-foreground rounded-2xl shadow-elegant overflow-hidden flex flex-col md:flex-row"
+          className="w-full max-w-5xl h-[75vh] bg-card text-card-foreground rounded-2xl shadow-elegant overflow-hidden flex flex-col md:flex-row"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           {/* Left Section: Form / Content */}
-          {/* Left Section: Form / Content */}
           <section className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-8">
+            <div className="flex-1 overflow-y-auto px-2 sm:px-8 py-8">
               {/* Mobile Logo */}
               <div className="md:hidden flex justify-center mb-6">
                 <Link href="/" className="hover:scale-105 transition-transform">
@@ -115,7 +118,7 @@ export default function RoleBasedOnboardingLayout({
 
           {/* Right Section: Illustration */}
           <motion.section
-            className="hidden md:flex w-[45%] flex-col justify-center items-center bg-muted/30 p-8 border-l border-border relative"
+            className="hidden md:flex w-[50%] flex-col justify-center items-center bg-muted/30 p-8 border-l border-border relative"
             animate={{ y: [0, -10, 0] }}
             transition={{ repeat: Infinity, duration: 4 }}
           >

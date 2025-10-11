@@ -6,19 +6,18 @@ import {
   useMemo,
   useContext,
   useCallback,
-  useState,
   ReactNode,
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser } from "@/server/queries/use-current-user";
-import { StorageUtilsHelper } from "@/utils/storage-utils";
-import { STORE_KEYS } from "@/configs/store.config";
 import { User } from "@/server/interfaces/User";
+import { useSignOut } from "@/server/mutations/auth/use-signout";
+import { useRouter } from "next/navigation";
 
 interface IAuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  accessToken: string | null;
+  isError: boolean;
   logout: () => void;
   isLoading: boolean;
 }
@@ -26,40 +25,33 @@ interface IAuthContextType {
 const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  // const [loggingOut, setLoggingOut] = useState(false); // You can remove this later
   const queryClient = useQueryClient();
+  const { mutate: signOut } = useSignOut();
   const { data: user, isLoading, isError } = useCurrentUser();
-  const [loggingOut, setLoggingOut] = useState(false);
 
-  const accessToken = StorageUtilsHelper.getItemFromLocalStorage(
-    STORE_KEYS.USER_ACCESS_TOKEN
-  ) as string;
-
-  const isAuthenticated = !!user && !!accessToken && !isError;
+  // const isAuthenticated = !!user && !!accessToken && !isError;
 
   const logout = useCallback(() => {
-    setLoggingOut(true);
+    signOut({});
+    // setLoggingOut(true);
 
     queryClient.clear();
     Cookies.remove("sidebarState");
 
-    StorageUtilsHelper.deleteFromLocalStorage([
-      STORE_KEYS.USER_ACCESS_TOKEN,
-      STORE_KEYS.USER_REFRESH_TOKEN,
-    ]);
-
-    setLoggingOut(false);
+    // setLoggingOut(false);
     window.location.href = "/signin";
-  }, [queryClient]);
+  }, [queryClient, signOut]);
 
   const value = useMemo(
     () => ({
       user,
-      isAuthenticated,
-      accessToken,
+      isAuthenticated: !!user && !isError,
+      isError,
       logout,
-      isLoading: isLoading || loggingOut,
+      isLoading: isLoading,
     }),
-    [user, isAuthenticated, accessToken, logout, isLoading, loggingOut]
+    [user, isError, logout, isLoading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -30,7 +30,7 @@ export const useTokenRefresh = () => {
           [STORE_KEYS.USER_REFRESH_TOKEN, newRefreshToken]
         );
 
-        await queryClient.invalidateQueries({ queryKey: ["user"] });
+        await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       } catch (error) {
         console.warn("Token refresh failed", error);
         StorageUtilsHelper.deleteFromLocalStorage([

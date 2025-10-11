@@ -1,7 +1,4 @@
-import { STORE_KEYS } from "@/configs";
-import { RouteHelper } from "../../../helpers";
 import { useRouter } from "next/navigation";
-import { StorageUtilsHelper } from "@/utils/storage-utils";
 import {
   AuthApiService,
   UserApiService,
@@ -21,15 +18,13 @@ export const useSignIn = () => {
     AuthApiService.signIn,
     {
       onSuccessCallback: async (data) => {
-        const { accessToken, refreshToken, user } = data?.responseData;
-        StorageUtilsHelper.saveToLocalStorage(
-          [STORE_KEYS.USER_ACCESS_TOKEN, accessToken],
-          [STORE_KEYS.USER_REFRESH_TOKEN, refreshToken]
-        );
+        const { user } = data?.responseData;
+
+        queryClient.setQueryData(["currentUser"], user);
 
         await Promise.all([
           queryClient.prefetchQuery({
-            queryKey: ["user"],
+            queryKey: ["currentUser"],
             queryFn: () => UserApiService.getLoggedInUser(),
           }),
           queryClient.prefetchQuery({
@@ -47,7 +42,9 @@ export const useSignIn = () => {
           }),
         ]);
 
-        router.push(RouteHelper.getDashboardPath(user));
+        await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+
+        // router.push(RouteHelper.getDashboardPath(user));
       },
 
       onErrorCallback: (error) => {

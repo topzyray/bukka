@@ -10,7 +10,7 @@ export const useSaveOnboardingProgress = ({ user }: { user: User }) => {
       queryClient.invalidateQueries({
         queryKey: ["onboarding-progress", user?.id],
       });
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
     },
     onErrorCallback: () => {},
   });

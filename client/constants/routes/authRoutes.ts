@@ -6,6 +6,7 @@ const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 type IAuthApi =
   | "signIn"
   | "signUp"
+  | "signOut"
   | "confirmEmail"
   | "resendConfirmationEmail"
   | "forgotPassword"
@@ -16,6 +17,7 @@ type IAuthApi =
 const rawAuthRoutes: Record<IAuthApi, string> = {
   signIn: "/auth/signin",
   signUp: "/auth/signup",
+  signOut: "/auth/signout",
   confirmEmail: "/auth/confirm-email",
   resendConfirmationEmail: "/auth/resend-confirmation-email",
   forgotPassword: "/auth/forgot-password",

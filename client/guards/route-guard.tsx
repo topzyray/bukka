@@ -3,7 +3,6 @@
 import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { RouteHelper } from "@/helpers";
-import { CircularLoader } from "@/components/loaders/circular-loader";
 import { UserRole } from "@/server/interfaces/Auth";
 import { useAuth } from "@/providers/auth-provider";
 import { User } from "@/server/interfaces/User";
@@ -16,34 +15,40 @@ interface RouteGuardProps {
 
 export function RouteGuard({
   children,
-  isProtected,
+  isProtected = false,
   roles = [],
 }: RouteGuardProps) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  const needsOnboarding = isAuthenticated && user?.isUpdated === false;
+  const roleFromPath = pathname
+    .match(/\/(dashboard|onboarding)\/([^/]+)/)?.[2]
+    ?.toLowerCase() as UserRole | undefined;
+
+  const userRole = user?.role?.toLowerCase() as string;
 
   useEffect(() => {
-    if (isLoading) return;
-
-    // Infer role from pathname for automatic restriction
-    const roleFromPath = pathname
-      .match(/\/(dashboard|onboarding)\/([^/]+)/)?.[2]
-      ?.toLowerCase() as UserRole | undefined;
-
-    const userRole = user?.role?.toLowerCase();
+    if (!isProtected && isAuthenticated && user) {
+      const target = RouteHelper.getDashboardPath(user);
+      if (pathname !== target) router.replace(target);
+      return;
+    }
 
     if (isProtected) {
-      if (!user && !isAuthenticated) {
+      if (!isAuthenticated) {
+        console.log("I GOT HERE");
+
         router.replace("/signin");
         return;
       }
 
-      if (needsOnboarding && pathname !== `/onboarding/${userRole}`) {
-        router.replace(`/onboarding/${userRole}`);
-        return;
+      if (user && user?.isUpdated === false) {
+        const onboardingPath = RouteHelper.getDashboardPath(user);
+
+        if (!pathname.startsWith(onboardingPath)) {
+          router.replace(onboardingPath);
+        }
       }
 
       const allowedRoles =
@@ -53,21 +58,14 @@ export function RouteGuard({
           ? [roleFromPath]
           : [];
 
-      if (
-        allowedRoles.length > 0 &&
-        userRole &&
-        !allowedRoles.includes(userRole)
-      ) {
+      console.log("ROUTE GUARD: ALLOWED ROLES: ", allowedRoles);
+
+      if (allowedRoles.length > 0 && user && !allowedRoles.includes(userRole)) {
         const target = RouteHelper.getDashboardPath(user as User);
+        console.log("ROUTE GUARD: TARGET: ", target);
         if (pathname !== target) router.replace(target);
         return;
       }
-    }
-
-    if (!isProtected && isAuthenticated && user) {
-      const target = RouteHelper.getDashboardPath(user);
-      if (pathname !== target) router.replace(target);
-      return;
     }
   }, [
     roles,
@@ -76,19 +74,12 @@ export function RouteGuard({
     pathname,
     user,
     isProtected,
-    needsOnboarding,
     isAuthenticated,
+    roleFromPath,
+    userRole,
   ]);
 
-  if (isLoading || (isProtected && !user)) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <CircularLoader text="Loading..." />
-      </div>
-    );
-  }
-
-  return children;
+  return <>{children}</>;
 }
 
 // "use client";

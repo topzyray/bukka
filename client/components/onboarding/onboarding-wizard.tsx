@@ -103,7 +103,6 @@ function OnboardingFlow({ role }: { role: UserRole }) {
   const steps = useMemo(() => roleStepMap[role], [role]);
 
   const { data: savedProgress, isLoading } = useOnboardingProgress(userId);
-  console.log("SAVE ONBORDING PROGRESS: ", savedProgress);
 
   const saveProgressMutation = useSaveOnboardingProgress({
     user: user as User,
@@ -145,7 +144,7 @@ function OnboardingFlow({ role }: { role: UserRole }) {
   const StepComponent = current?.Component;
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div className="max-w-3xl mx-auto sm:p-4">
       <Stepper
         steps={steps.map((s) => s.title)}
         currentStep={currentStep}
@@ -159,7 +158,7 @@ function OnboardingFlow({ role }: { role: UserRole }) {
         }}
       />
 
-      <div className="mt-6 bg-card p-6 rounded-lg shadow-sm">
+      <div className="mt-6 bg-card p-2 rounded-lg shadow-sm">
         <h3 className="text-lg font-semibold mb-3">{current?.title}</h3>
 
         {isLoading && <CircularLoader text="Loading Onboarding Screen" />}

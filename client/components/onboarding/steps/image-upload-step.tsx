@@ -58,7 +58,6 @@ export default function ImageUploadStep({
   const { data: savedProgress, isLoading } = useOnboardingProgress(
     user?.id as number
   );
-  console.log("SAVE ONBORDING PROGRESS: ", savedProgress);
 
   const progressPayload: OnboardingProgressDto = {
     stepIndex: savedProgress + 1,
@@ -67,7 +66,7 @@ export default function ImageUploadStep({
   const { handleFileUpload, isUploading } = useFileUpload({
     uploadFn: async (formData: FormData) => FileApiService.uploadFile(formData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       queryClient.invalidateQueries({ queryKey: ["userFiles"] });
       saveOnboardingProgressMutation(progressPayload);
       onNext();

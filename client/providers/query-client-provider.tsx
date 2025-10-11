@@ -1,26 +1,28 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { envConfig, HttpClient } from "@/configs";
 import { EnvironmentTypeEnum } from "@/server/enums";
+
+interface IReactQueryClientContext {
+  isSignedIn: boolean;
+  setIsSignIn: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ReactQueryClientContext = createContext<
+  IReactQueryClientContext | undefined
+>(undefined);
 
 export function ReactQueryProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // const queryClient = new QueryClient({
-  //   defaultOptions: {
-  //     queries: {
-  //       refetchOnWindowFocus: false,
-  //       staleTime: 1000 * 60 * 5,
-  //       retry: 1,
-  //     },
-  //   },
-  // });
-  const [queryClient] = React.useState(() => {
+  const [isSignedIn, setIsSignIn] = useState(false);
+
+  const [queryClient] = useState(() => {
     const client = new QueryClient({
       defaultOptions: {
         queries: {
@@ -52,10 +54,29 @@ export function ReactQueryProvider({
     return unsubscribe;
   }, [queryClient]);
 
+  const value = useMemo(
+    () => ({
+      isSignedIn,
+      setIsSignIn,
+    }),
+    [isSignedIn]
+  );
+
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <ReactQueryClientContext.Provider value={value}>
+      <QueryClientProvider client={queryClient}>
+        {children}
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </ReactQueryClientContext.Provider>
   );
 }
+
+export const useReactQueryClient = () => {
+  const ctx = useContext(ReactQueryClientContext);
+  if (!ctx)
+    throw new Error(
+      "useReactQueryClient must be used within ReactQueryClientContext"
+    );
+  return ctx;
+};

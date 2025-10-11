@@ -12,7 +12,7 @@ export const useUpdateUserData = <T extends FieldValues>({
   return useCustomMutation(UserApiService.saveOnboardingProgress, {
     onSuccessCallback: async () => {
       resetForm();
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
     },
     onErrorCallback: () => {},
   });

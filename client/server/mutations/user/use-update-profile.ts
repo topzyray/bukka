@@ -7,7 +7,7 @@ export const useUpdateUserProfile = () => {
 
   return useCustomMutation(UserApiService.updateUserProfile, {
     onSuccessCallback: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
     },
   });
 };

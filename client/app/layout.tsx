@@ -11,6 +11,7 @@ import {
   ReactQueryProvider,
   ThemeProvider,
 } from "@/providers";
+import { SessionExpirationModal } from "@/events/session-event-listener";
 
 const urbanist = Urbanist({ subsets: ["latin"] });
 
@@ -55,6 +56,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <SessionExpirationModal />
             <AuthProvider>
               <AuthGate>
                 <GlobalStateProvider>
