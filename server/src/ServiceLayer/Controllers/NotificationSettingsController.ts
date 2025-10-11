@@ -25,11 +25,12 @@ import {
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { NotificationSettingsRepository } from 'src/BussinessLayer/NotificationSettingsRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
+import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/users/notification-settings`)
+@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
 @UseGuards(JwtAuthGuard)
 @ApiTags('Notification Settings')
-@ApiBearerAuth()
 export class NotificationSettingsController {
   constructor(
     private readonly notificationSettingsRepository: NotificationSettingsRepository,

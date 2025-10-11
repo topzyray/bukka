@@ -1,5 +1,5 @@
 export enum AppUrlTypeEnum {
   LOCAL = 'http://localhost',
-  PROD = 'https://bukka.com',
+  PROD = 'https://buuka.vercel.app',
   SERVER = 'https://api.bukka.com',
 }

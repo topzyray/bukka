@@ -10,6 +10,7 @@ import {
   RefreshTokenDto,
   ResendConfirmEmailDto,
   ResetPasswordDto,
+  RefreshTokenResponseDto,
 } from 'src/DomainLayer/Dtos/AuthDto';
 import { User } from 'src/DomainLayer/Models/User';
 import { CreateUserDto, UserDto } from 'src/DomainLayer/Dtos/UserDto';
@@ -75,7 +76,7 @@ export class AuthRepository {
     return { ...data, responseData: mappedData };
   }
 
-  async signIn(loginDto: SigninDto): Promise<BukkaResponse<User>> {
+  async signIn(loginDto: SigninDto): Promise<BukkaResponse<LoginResponseDto>> {
     const response = (await this._userRepository.findUserByEmail(
       loginDto.email,
     )) as UserWithCounts;
@@ -144,30 +145,30 @@ export class AuthRepository {
 
   async refreshToken(
     refreshTokenDto: RefreshTokenDto,
-  ): Promise<BukkaResponse<User>> {
+  ): Promise<BukkaResponse<RefreshTokenResponseDto>> {
     const response = await this._userRepository.findUserByToken(
       refreshTokenDto.refreshToken,
-      TokenTypeEnum.REFRESH_TOKIEN,
+      TokenTypeEnum.REFRESH_TOKEN,
     );
 
     if (!response) {
       return BukkaResponse.errorResponse(
         'Invalid Refresh Token, Please Re-Login',
-        HttpStatus.FORBIDDEN,
+        HttpStatus.UNAUTHORIZED,
       );
     }
 
     if (response.refreshToken !== refreshTokenDto.refreshToken) {
       return BukkaResponse.errorResponse(
         'Invalid Refresh Token, Please Re-Login',
-        HttpStatus.FORBIDDEN,
+        HttpStatus.UNAUTHORIZED,
       );
     }
 
     if (Date.now() > Number(response.refreshTokenExpires)) {
       return BukkaResponse.errorResponse(
         'Refresh token expiered. Please Re-Login',
-        HttpStatus.FORBIDDEN,
+        HttpStatus.UNAUTHORIZED,
       );
     }
 
@@ -190,8 +191,8 @@ export class AuthRepository {
       refreshTokenExpires: Generator.calculateExpirationTime(20160), // 14 days
     });
 
-    return BukkaResponse.GetSingleDataResponse('token', {
-      token: accessToken,
+    return BukkaResponse.GetSingleDataResponse('Token', {
+      accessToken,
       refreshToken: response.refreshToken,
     });
   }

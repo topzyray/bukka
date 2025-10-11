@@ -27,11 +27,12 @@ import {
 } from 'src/DomainLayer/Dtos/UserNotificationDto';
 import { UserNotificationRepository } from 'src/BussinessLayer/UserNotificationRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
+import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/users/notifications`)
+@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
 @UseGuards(JwtAuthGuard)
 @ApiTags('User Notification')
-@ApiBearerAuth()
 export class UserNotificationController {
   constructor(
     private _userNotificationRepository: UserNotificationRepository,

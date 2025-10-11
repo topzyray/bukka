@@ -23,11 +23,12 @@ import { UserResponse } from 'src/DomainLayer/Models/UserResponse';
 import { UserRepository } from 'src/BussinessLayer/UserRepository';
 import { TypeSafeMapper } from 'src/MiddlewareLayer/Mappings/TypeSafeMapper';
 import { User } from 'src/DomainLayer/Models/User';
+import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/users`)
+@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
 @UseGuards(JwtAuthGuard)
 @ApiTags('User')
-@ApiBearerAuth()
 export class UserController {
   constructor(private readonly _userRepository: UserRepository) {}
 

@@ -27,18 +27,18 @@ import {
   DeleteFileDto,
   UserFileFilterDto,
 } from 'src/DomainLayer/Dtos/FileDto';
-import { FileUpload } from 'src/DomainLayer/Decorators/FileUploadDecorator';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { FileRepository } from 'src/BussinessLayer/FileRepository';
 import { FileReferenceTypeEnum } from 'src/DomainLayer/Enums/FileReferenceTypeEnum';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import type { Response } from 'express';
+import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/files`)
+@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
 @UseGuards(JwtAuthGuard)
 @ApiTags('File')
-@ApiBearerAuth()
 export class FileController {
   constructor(private readonly fileRepository: FileRepository) {}
 

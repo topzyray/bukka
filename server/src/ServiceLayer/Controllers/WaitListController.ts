@@ -26,10 +26,10 @@ import {
   WaitlistFilterDto,
 } from 'src/DomainLayer/Dtos/WaitlistDto';
 import { AdminAuthGuard } from 'src/MiddlewareLayer/Guards/AdminAuthGuard';
+import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/waitlist`)
 @ApiTags('Waitlist')
-@ApiBearerAuth()
 export class WaitListController {
   constructor(private readonly _waitlistRepository: WaitlistRepository) {}
 
@@ -42,6 +42,7 @@ export class WaitListController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
   @UseGuards(AdminAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Get all paginated waitlist' })
@@ -61,6 +62,7 @@ export class WaitListController {
     return res.status(response.responseCode).json(response);
   }
 
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
   @UseGuards(AdminAuthGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Get a waitlist by ID' })
@@ -75,6 +77,7 @@ export class WaitListController {
     return BukkaResponse.GetStatusResponse(data, res);
   }
 
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
   @UseGuards(AdminAuthGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a waitlist by ID' })

@@ -3,6 +3,7 @@ import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { TokenRepository } from 'src/BussinessLayer/TokenRepository';
 
@@ -15,11 +16,19 @@ export class JwtAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+    let token: string | undefined;
 
-    const token = request.headers.authorization?.split(' ')[1];
+    if (request.cookies?.accessToken) {
+      token = request.cookies.accessToken;
+    } else if (
+      request.headers.authorization &&
+      request.headers.authorization.startsWith('Bearer')
+    ) {
+      token = request.headers.authorization?.split(' ')[1];
+    }
 
     if (!token) {
-      throw new ForbiddenException(
+      throw new UnauthorizedException(
         'You are not authorized to make this request. Are you signed in?',
       );
     }
@@ -29,12 +38,12 @@ export class JwtAuthGuard implements CanActivate {
         await this._tokenRepository.verifyAccessTokenAsync(token);
 
       if (!decodedToken || typeof decodedToken !== 'object') {
-        throw new ForbiddenException('Invalid token.');
+        throw new UnauthorizedException('Invalid token.');
       }
 
       const claims = decodedToken.claims;
       if (!claims || !claims.role) {
-        throw new ForbiddenException(
+        throw new UnauthorizedException(
           'You are not authorized to make this request. Invalid credentials.',
         );
       }
@@ -45,7 +54,7 @@ export class JwtAuthGuard implements CanActivate {
     } catch (error: any) {
       console.log(error);
 
-      throw new ForbiddenException(
+      throw new UnauthorizedException(
         'You are not authorized to make this request. Invalid credentials.',
       );
     }
