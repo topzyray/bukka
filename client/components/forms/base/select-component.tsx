@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Select,
   SelectContent,
@@ -28,6 +30,7 @@ interface ISelectComponentProps {
   disabled?: boolean;
   inputClassName?: string;
   icon?: React.ElementType; // Left icon support
+  multiSelect?: boolean; // NEW: enables multi-select
 }
 
 export default function SelectComponent({
@@ -40,6 +43,7 @@ export default function SelectComponent({
   disabled,
   inputClassName,
   icon: Icon,
+  multiSelect = false, // default is false for backward compatibility
 }: ISelectComponentProps) {
   return (
     <FormField
@@ -47,11 +51,28 @@ export default function SelectComponent({
       name={formName}
       render={({ field, fieldState }) => {
         const isError = !!fieldState.error;
-        const isValid = !isError && !!field.value;
+        const isValid =
+          !isError &&
+          (!!field.value ||
+            (Array.isArray(field.value) && field.value.length > 0));
+
+        // Handle multi-select changes
+        const handleSelectChange = (value: string) => {
+          if (multiSelect) {
+            const currentValues: string[] = field.value || [];
+            if (currentValues.includes(value)) {
+              field.onChange(currentValues.filter((v) => v !== value));
+            } else {
+              field.onChange([...currentValues, value]);
+            }
+          } else {
+            field.onChange(value);
+          }
+        };
 
         return (
           <FormItem className="space-y-0.5">
-            {/* Label with dynamic color */}
+            {/* Label */}
             {formLabel && (
               <FormLabel
                 className={cn(
@@ -66,8 +87,25 @@ export default function SelectComponent({
 
             <div className="relative">
               <Select
-                onValueChange={field.onChange}
-                value={field.value}
+                onValueChange={(value: string) => {
+                  if (multiSelect) {
+                    const current: string[] = Array.isArray(field.value)
+                      ? field.value
+                      : [];
+                    if (current.includes(value)) {
+                      field.onChange(current.filter((v) => v !== value));
+                    } else {
+                      field.onChange([...current, value]);
+                    }
+                  } else {
+                    field.onChange(value);
+                  }
+                }}
+                value={
+                  multiSelect && Array.isArray(field.value)
+                    ? undefined
+                    : field.value
+                }
                 disabled={disabled}
               >
                 <FormControl>
@@ -86,7 +124,13 @@ export default function SelectComponent({
                     {Icon && (
                       <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     )}
-                    <SelectValue placeholder={formPlaceholder} />
+
+                    {/* Render comma-separated values for multi-select manually */}
+                    {multiSelect && Array.isArray(field.value)
+                      ? field.value.join(", ")
+                      : !multiSelect
+                      ? field.value || formPlaceholder
+                      : formPlaceholder}
                   </SelectTrigger>
                 </FormControl>
 

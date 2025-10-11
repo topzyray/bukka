@@ -26,6 +26,7 @@ import { AuthRepository } from 'src/BussinessLayer/AuthRepository';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
 import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
+import { AppUrlTypeEnum } from 'src/DomainLayer/Enums/AppUrlTypeEnum';
 
 const ACCESS_TOKEN_MAX_AGE = 30 * 60 * 1000; // 30 minutes
 const REFRESH_TOKEN_MAX_AGE = 14 * 24 * 60 * 60 * 1000; // 14 days
@@ -35,12 +36,29 @@ const REFRESH_TOKEN_MAX_AGE = 14 * 24 * 60 * 60 * 1000; // 14 days
 @ApiBearerAuth()
 export class AuthController {
   private readonly isProd: boolean;
+  private readonly cookieOptions: any;
+  private readonly clearCookieOptions: any;
 
   constructor(
     private readonly _authRepository: AuthRepository,
     private readonly _configService: AppConfigurationService,
   ) {
     this.isProd = this._configService.nodeEnv === EnvironmentTypeEnum.PROD;
+    this.cookieOptions = {
+      httpOnly: true,
+      secure: this.isProd,
+      sameSite: this.isProd ? 'none' : 'lax', // Use 'none' for cross-site in production
+      maxAge: ACCESS_TOKEN_MAX_AGE,
+      path: '/',
+      domain: this.isProd ? AppUrlTypeEnum.PROD : undefined, // Add your production domain
+    };
+    this.clearCookieOptions = {
+      httpOnly: true,
+      secure: this.isProd,
+      sameSite: 'lax',
+      path: '/',
+      domain: this.isProd ? AppUrlTypeEnum.PROD : undefined,
+    };
   }
 
   @Public()
@@ -61,22 +79,12 @@ export class AuthController {
     res.cookie(
       TokenTypeEnum.ACCESS_TOKEN,
       response?.responseData?.accessToken,
-      {
-        httpOnly: true,
-        secure: this.isProd,
-        sameSite: 'lax',
-        maxAge: ACCESS_TOKEN_MAX_AGE,
-      },
+      this.cookieOptions,
     );
     res.cookie(
       TokenTypeEnum.REFRESH_TOKEN,
       response?.responseData?.refreshToken,
-      {
-        httpOnly: true,
-        secure: this.isProd,
-        sameSite: 'lax',
-        maxAge: REFRESH_TOKEN_MAX_AGE,
-      },
+      this.cookieOptions,
     );
     response.responseData = response?.responseData?.user;
     return BukkaResponse.GetStatusResponse(response, res);
@@ -86,19 +94,9 @@ export class AuthController {
   @Post('signout')
   @ApiOperation({ summary: 'Sign out logged in user' })
   async signOut(@Res() res: Response) {
-    res.clearCookie(TokenTypeEnum.ACCESS_TOKEN, {
-      httpOnly: true,
-      secure: this.isProd,
-      sameSite: 'lax',
-      path: '/',
-    });
+    res.clearCookie(TokenTypeEnum.ACCESS_TOKEN, this.clearCookieOptions);
 
-    res.clearCookie(TokenTypeEnum.REFRESH_TOKEN, {
-      httpOnly: true,
-      secure: this.isProd,
-      sameSite: 'lax',
-      path: '/',
-    });
+    res.clearCookie(TokenTypeEnum.REFRESH_TOKEN, this.clearCookieOptions);
 
     const response = BukkaResponse.customResponse(
       'User signed out successfully',
@@ -140,22 +138,12 @@ export class AuthController {
     res.cookie(
       TokenTypeEnum.ACCESS_TOKEN,
       response?.responseData?.accessToken,
-      {
-        httpOnly: true,
-        secure: this.isProd,
-        sameSite: 'lax',
-        maxAge: ACCESS_TOKEN_MAX_AGE,
-      },
+      this.cookieOptions,
     );
     res.cookie(
       TokenTypeEnum.REFRESH_TOKEN,
       response?.responseData?.refreshToken,
-      {
-        httpOnly: true,
-        secure: this.isProd,
-        sameSite: 'lax',
-        maxAge: REFRESH_TOKEN_MAX_AGE,
-      },
+      this.cookieOptions,
     );
     response.responseData = null;
     return BukkaResponse.GetStatusResponse(response, res);
