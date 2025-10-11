@@ -29,7 +29,7 @@ interface StepperProps {
  * - Click navigation
  * - Visual progress bar, animations, and responsiveness
  */
-export default function Stepper({
+export function Stepper({
   steps,
   currentStep,
   onStepClick,

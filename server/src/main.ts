@@ -72,7 +72,6 @@ async function bootstrap() {
     .setDescription('Bukka Server APIs')
     .setVersion('v1')
     .setExternalDoc('API Schema', '/swagger/v1/swagger.json')
-    // .addBasicAuth({ type: 'http', scheme: 'basic' }, 'swagger-auth')
     .addBearerAuth(
       {
         type: 'http',

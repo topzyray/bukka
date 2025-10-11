@@ -71,7 +71,7 @@ export class UserNotificationController {
       await this._userNotificationRepository.findNotificationsByFilters(
         filters,
       );
-    return BukkaResponse.GetPagedDataResponse('user notifications', response);
+    return BukkaResponse.GetPagedDataResponse('User notifications', response);
   }
 
   @Get('unread-count')
@@ -132,6 +132,14 @@ export class UserNotificationController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
+  @Delete('delete-my-notifications')
+  @ApiOperation({ summary: 'Delete all user notifications' })
+  async deleteAllUserNotifications(@Res() res: Response) {
+    const response =
+      await this._userNotificationRepository.deleteAllUserNotificationsByUserId();
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
   @Delete(':notificationId')
   @ApiOperation({ summary: 'Delete notificaiton' })
   @ApiParam({
@@ -145,14 +153,6 @@ export class UserNotificationController {
   ) {
     const response =
       await this._userNotificationRepository.deleteNotification(notificationId);
-    return BukkaResponse.GetStatusResponse(response, res);
-  }
-
-  @Delete('delete-my-notifications')
-  @ApiOperation({ summary: 'Delete all user notifications' })
-  async deleteAllUserNotifications(@Res() res: Response) {
-    const response =
-      await this._userNotificationRepository.deleteAllUserNotificationsByUserId();
     return BukkaResponse.GetStatusResponse(response, res);
   }
 }

@@ -20,7 +20,7 @@ export class UserNotificationApiService {
 
   static async readNotificationById(notificationId: number) {
     const response = await HttpClient.getClient().put(
-      `${userNotificationRoutes.readNotificationById}/${notificationId}`
+      `${userNotificationRoutes.readNotificationById}/${notificationId}/read`
     );
     return response.data;
   }
@@ -38,6 +38,13 @@ export class UserNotificationApiService {
   static async getNotificationById(notificationId: number) {
     const response = await HttpClient.getClient().get(
       `${userNotificationRoutes.getNotificationById}/${notificationId}`
+    );
+    return response.data;
+  }
+
+  static async getUnreadNotificationCount() {
+    const response = await HttpClient.getClient().get(
+      `${userNotificationRoutes.getUnreadNotificationCount}`
     );
     return response.data;
   }

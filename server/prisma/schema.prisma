@@ -81,20 +81,20 @@ model Waitlist {
 }
 
 model User {
-  id                      Int                @id @default(autoincrement())
-  email                   String             @unique
+  id                      Int                 @id @default(autoincrement())
+  email                   String              @unique
   password                String
-  role                    UserRole           @default(USER)
+  role                    UserRole            @default(USER)
   firstName               String
   lastName                String
-  username                String?            @unique
+  username                String?             @unique
   gender                  Gender?
   phoneNumber             String?
   bio                     String?
   phoneCountryCode        String?
   phoneNumberConfirmed    Boolean?
-  userStatus              UserStatus         @default(ACTIVE)
-  emailConfirmed          Boolean            @default(false)
+  userStatus              UserStatus          @default(ACTIVE)
+  emailConfirmed          Boolean             @default(false)
   confirmationCode        String?
   confirmationCodeExpires DateTime?
   onboardingProgress      Int?
@@ -104,16 +104,16 @@ model User {
   passwordResetExpires    DateTime?
   passwordChangedAt       DateTime?
   lastLoginAt             DateTime?
-  isDeleted               Boolean            @default(false)
-  isUpdated               Boolean            @default(false)
+  isDeleted               Boolean             @default(false)
+  isUpdated               Boolean             @default(false)
   deletedAt               DateTime?
   locationId              Int?
   avatar                  Json?
   userNotifications       UserNotification[]
   favorites               Favorite[]
-  createdAt               DateTime           @default(now())
-  updatedAt               DateTime           @updatedAt
-  location                Location?          @relation(fields: [locationId], references: [id])
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  location                Location?           @relation(fields: [locationId], references: [id])
 
   @@index([email])
   @@index([username])
@@ -196,6 +196,21 @@ model NotificationSettings {
   settings   Json?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model UserPersonalization {
+  id                    Int      @id @default(autoincrement())
+  userId                Int      @unique
+  preferredCuisines     String[]
+  dietaryRestrictions   Json? // Should be array
+  mealPreferences       Json? // Should be array
+  preferredDeliveryTime String
+  paymentPreference     Json
+  allergies             String?  @db.Text // Optional free text
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   @@index([userId])
 }

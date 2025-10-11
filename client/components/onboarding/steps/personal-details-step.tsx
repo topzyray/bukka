@@ -54,7 +54,7 @@ export const personalDetailsSchema = z.object({
 
 type ProfileDetialsFormData = z.infer<typeof personalDetailsSchema>;
 
-export default function PersonalDetailsStep({
+export function PersonalDetailsStep({
   onNext,
   onBack,
 }: {

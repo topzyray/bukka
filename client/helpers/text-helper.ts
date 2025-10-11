@@ -277,4 +277,17 @@ export class TextHelper {
     if (score >= 4) return "Strong";
     return null;
   }
+
+  static timeAgo(dateString: Date) {
+    const now = new Date();
+    const past = new Date(dateString);
+    const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+    if (diffInSeconds < 3600)
+      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    return past.toLocaleDateString();
+  }
 }

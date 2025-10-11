@@ -149,14 +149,6 @@ export class UserNotificationFilterDto extends PaginationDto {
   @IsOptional()
   notificationCategory?: string;
 
-  // @ApiProperty({
-  //   example: '1',
-  //   required: false,
-  // })
-  // @IsOptional()
-  // @IsString()
-  // businessId?: string;
-
   @ApiProperty({
     example: false,
     required: false,

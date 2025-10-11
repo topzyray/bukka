@@ -29,7 +29,7 @@ export function RouteGuard({
   const userRole = user?.role?.toLowerCase() as string;
 
   useEffect(() => {
-    if (isLoading) return;
+    // if (isLoading) return;
 
     if (!isProtected && isAuthenticated && user) {
       const target = RouteHelper.getDashboardPath(user);
@@ -77,7 +77,7 @@ export function RouteGuard({
     userRole,
   ]);
 
-  if (isLoading) return null; // prevents flashing during rehydration
+  // if (isLoading) return null; // prevents flashing during rehydration
 
   return <>{children}</>;
 }

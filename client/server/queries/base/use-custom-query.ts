@@ -4,15 +4,7 @@ import {
   QueryKey,
   UseQueryOptions,
 } from "@tanstack/react-query";
-
-export interface QueryParams {
-  page?: number;
-  limit?: number;
-  filter?: string;
-  searchParams?: string;
-  id?: string | number | string[] | number[];
-  [key: string]: any; // allow additional params if needed
-}
+import { QueryParams } from "./types";
 
 /**
  * A reusable, strongly-typed wrapper for React Query's useQuery.

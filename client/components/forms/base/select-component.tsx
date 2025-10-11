@@ -7,7 +7,6 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import {
   FormControl,
@@ -57,18 +56,18 @@ export default function SelectComponent({
             (Array.isArray(field.value) && field.value.length > 0));
 
         // Handle multi-select changes
-        const handleSelectChange = (value: string) => {
-          if (multiSelect) {
-            const currentValues: string[] = field.value || [];
-            if (currentValues.includes(value)) {
-              field.onChange(currentValues.filter((v) => v !== value));
-            } else {
-              field.onChange([...currentValues, value]);
-            }
-          } else {
-            field.onChange(value);
-          }
-        };
+        // const handleSelectChange = (value: string) => {
+        //   if (multiSelect) {
+        //     const currentValues: string[] = field.value || [];
+        //     if (currentValues.includes(value)) {
+        //       field.onChange(currentValues.filter((v) => v !== value));
+        //     } else {
+        //       field.onChange([...currentValues, value]);
+        //     }
+        //   } else {
+        //     field.onChange(value);
+        //   }
+        // };
 
         return (
           <FormItem className="space-y-0.5">
@@ -111,26 +110,40 @@ export default function SelectComponent({
                 <FormControl>
                   <SelectTrigger
                     className={cn(
-                      "w-full pr-8",
+                      "w-full pr-8 min-h-[2.5rem] flex flex-wrap gap-1",
+                      "items-center py-2 px-3",
                       Icon && "pl-8",
+                      "overflow-y-auto max-h-24 scrollbar-thin",
                       inputClassName,
-                      isError &&
-                        "border-red-600 focus:border-red-600 focus:ring-0",
-                      isValid &&
-                        "border-green-600 focus:border-green-600 focus:ring-0",
-                      "focus:outline-none"
+                      isError && "border-red-600",
+                      isValid && "border-green-600"
                     )}
                   >
-                    {Icon && (
-                      <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    {multiSelect &&
+                    Array.isArray(field.value) &&
+                    field.value.length > 0 ? (
+                      // ✅ Multi-select view: render badges
+                      <div className="flex flex-wrap gap-1">
+                        {field.value.map((val: string) => (
+                          <span
+                            key={val}
+                            className="text-xs bg-accent text-accent-foreground rounded-md px-2 py-0.5"
+                          >
+                            {val}
+                          </span>
+                        ))}
+                      </div>
+                    ) : !multiSelect && field.value ? (
+                      // ✅ Single-select view: show selected label
+                      <span className="text-foreground text-sm">
+                        {field.value}
+                      </span>
+                    ) : (
+                      // ✅ Default fallback: show placeholder
+                      <span className="text-muted-foreground text-sm">
+                        {formPlaceholder}
+                      </span>
                     )}
-
-                    {/* Render comma-separated values for multi-select manually */}
-                    {multiSelect && Array.isArray(field.value)
-                      ? field.value.join(", ")
-                      : !multiSelect
-                      ? field.value || formPlaceholder
-                      : formPlaceholder}
                   </SelectTrigger>
                 </FormControl>
 

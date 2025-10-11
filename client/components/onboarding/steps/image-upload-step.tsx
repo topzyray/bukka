@@ -31,7 +31,7 @@ const imageUploadSchema = z.object({
 
 type ImageUploadFormData = z.infer<typeof imageUploadSchema>;
 
-export default function ImageUploadStep({
+export function ImageUploadStep({
   onNext,
   isLast,
 }: {

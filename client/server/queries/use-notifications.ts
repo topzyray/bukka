@@ -1,10 +1,42 @@
+import { UserNotification } from "../interfaces/Notification";
 import { UserNotificationApiService } from "../services";
-import { useCustomQuery } from "./base";
+import { useCustomInfiniteQuery, useCustomQuery } from "./base";
 
-export const useUserNotifications = (userId?: number) => {
-  useCustomQuery(
+export const useUserNotifications = ({
+  userId,
+  isMenuOpen,
+  limit,
+  searchQuery = "",
+  initialPageParam,
+}: {
+  userId?: number;
+  isMenuOpen?: boolean;
+  limit?: number;
+  searchQuery?: string;
+  initialPageParam?: number;
+}) => {
+  return useCustomInfiniteQuery<UserNotification>(
     ["notifications", userId],
-    () => UserNotificationApiService.getAllMyNotifications(),
+    ({ pageNumber, ...rest }) =>
+      UserNotificationApiService.getAllMyNotifications({
+        page: pageNumber,
+        limit: limit ?? 10,
+        search: searchQuery,
+        ...rest,
+      }),
+    {
+      params: { searchParams: searchQuery },
+      enabled: !!userId && isMenuOpen,
+      initialPageParam: initialPageParam ?? 1,
+      staleTime: 1000 * 60 * 5,
+    }
+  );
+};
+
+export const useNotificationUnreadCount = ({ userId }: { userId?: number }) => {
+  return useCustomQuery(
+    ["unread-count", userId],
+    () => UserNotificationApiService.getUnreadNotificationCount(),
     {
       enabled: !!userId,
       staleTime: 1000 * 60 * 5,

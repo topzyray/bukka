@@ -3,16 +3,17 @@
 import React, { useMemo, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { OnboardingProvider } from "@/providers/onboarding-provider";
-import ImageUploadStep from "./steps/image-upload-step";
-import PersonalDetailsStep from "./steps/personal-details-step";
-import Stepper from "./ui/stepper";
+import { ImageUploadStep } from "./steps/image-upload-step";
+import { PersonalDetailsStep } from "./steps/personal-details-step";
 import { useAuth } from "@/providers/auth-provider";
 import { useOnboardingProgress } from "@/server/queries/use-onboarding-progress-query";
 import { useSaveOnboardingProgress } from "@/server/mutations/user/use-onboarding-progress-mutation";
 import { UserRole } from "@/server/interfaces/Auth";
 import { User } from "@/server/interfaces/User";
 import { CircularLoader } from "../loaders/circular-loader";
-import UserPersonalizedDetailsStep from "./steps/steps-role/user-personalized-details-step";
+import { UserPersonalizedDetailsStep } from "./steps/steps-role/user-personalized-details-step";
+import { Stepper } from "./ui/stepper";
+import OnboardingCompleteScreen from "./steps/onboarding-completion";
 
 /* ────────────────────────────────────────────────
    Dynamically import role-specific steps
@@ -54,6 +55,11 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
       title: "Other Info",
       Component: UserPersonalizedDetailsStep,
     },
+    {
+      id: "completion",
+      title: "Completion",
+      Component: OnboardingCompleteScreen,
+    },
   ],
   RIDER: [
     { id: "image", title: "Profile Photo", Component: ImageUploadStep },
@@ -63,6 +69,11 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
       Component: PersonalDetailsStep,
     },
     { id: "vehicle", title: "Vehicle Details", Component: RiderVehicleStep },
+    {
+      id: "completion",
+      title: "Completion",
+      Component: OnboardingCompleteScreen,
+    },
   ],
   VENDOR: [
     { id: "image", title: "Profile Photo", Component: ImageUploadStep },
@@ -76,6 +87,11 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
       title: "Business Details",
       Component: BusinessDetailsStep,
     },
+    {
+      id: "completion",
+      title: "Completion",
+      Component: OnboardingCompleteScreen,
+    },
   ],
   INVESTOR: [
     { id: "image", title: "Profile Photo", Component: ImageUploadStep },
@@ -88,6 +104,11 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
       id: "investor",
       title: "Investment Details",
       Component: InvestorDetailsStep,
+    },
+    {
+      id: "completion",
+      title: "Completion",
+      Component: OnboardingCompleteScreen,
     },
   ],
 };

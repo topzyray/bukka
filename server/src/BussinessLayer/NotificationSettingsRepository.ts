@@ -67,7 +67,10 @@ export class NotificationSettingsRepository {
 
   async updateNotificationSettings(
     dto: UpdateNotificationSettingsDto,
-  ): Promise<BukkaResponse<any>> {
+  ): Promise<BukkaResponse<NotificationSettings>> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    await UserHelper.hasAccess(loggedInUser.id);
+
     const settings =
       await this._notificationSettingsDataAgent.getNotificationSettingById(
         dto.id,

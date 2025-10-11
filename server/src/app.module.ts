@@ -48,6 +48,9 @@ import { LocalDiskProvider } from './InfrastructureLayer/Services/upload/provide
 import { CloudinaryProvider } from './InfrastructureLayer/Services/upload/providers/CloudinaryProvider';
 import { ScheduleModule } from '@nestjs/schedule';
 import { KeepAliveService } from './InfrastructureLayer/Services/KeepAliveService';
+import { UserPersonalizationController } from './ServiceLayer/Controllers/UserPersonalizationController';
+import { UserPersonalizationRepository } from './BussinessLayer/UserPersonalizationRepository';
+import { UserPersonalizationDataAgent } from './DataLayer/DataAgents/UserPersonalizationDataAgent';
 
 @Module({
   imports: [
@@ -67,6 +70,7 @@ import { KeepAliveService } from './InfrastructureLayer/Services/KeepAliveServic
     UserController,
     UserNotificationController,
     NotificationSettingsController,
+    UserPersonalizationController,
   ],
   providers: [
     AppService,
@@ -91,12 +95,14 @@ import { KeepAliveService } from './InfrastructureLayer/Services/KeepAliveServic
     TokenRepository,
     UserRepository,
     FileRepository,
+    UserPersonalizationRepository,
 
     WaitlistDataAgent,
     NotificationSettingsDataAgent,
     UserNotificationDataAgent,
     UserDataAgent,
     FileDataAgent,
+    UserPersonalizationDataAgent,
 
     AuthNotificationHelper,
     FileReferenceHelper,
