@@ -58,7 +58,7 @@ import { APP_GUARD } from '@nestjs/core';
   imports: [
     ThrottlerModule.forRoot([
       {
-        ttl: 60000, // 1 minute window
+        ttl: 60, // 1 minute window
         limit: 5, // allow max 5 requests per minute per IP
       },
     ]),
