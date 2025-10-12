@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { HttpServiceWrapper } from './HttpServiceWrapper';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
+import { BukkaCronExpression } from 'src/DomainLayer/Enums/BukkaCronExpression';
 
 @Injectable()
 export class KeepAliveService {
@@ -12,7 +13,7 @@ export class KeepAliveService {
     private readonly configService: AppConfigurationService,
   ) {}
 
-  @Cron(CronExpression.EVERY_30_MINUTES)
+  @Cron(BukkaCronExpression.EVERY_14_MINUTES)
   async pingSelf() {
     try {
       const res = await this.httpService.get(this.configService.appUrl);
