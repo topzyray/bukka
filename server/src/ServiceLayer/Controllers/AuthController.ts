@@ -52,7 +52,7 @@ export class AuthController {
     this.clearCookieOptions = {
       httpOnly: true,
       secure: this.isProd,
-      sameSite: 'lax',
+      sameSite: this.isProd ? 'none' : 'lax',
       path: '/',
       domain: this.isProd ? AppUrlTypeEnum.PROD : undefined,
     };
@@ -81,7 +81,7 @@ export class AuthController {
     res.cookie(
       TokenTypeEnum.REFRESH_TOKEN,
       response?.responseData?.refreshToken,
-      { ...this.cookieOptions, REFRESH_TOKEN_MAX_AGE },
+      { ...this.cookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE },
     );
     response.responseData = response?.responseData?.user;
     return BukkaResponse.GetStatusResponse(response, res);
