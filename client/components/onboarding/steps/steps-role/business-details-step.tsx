@@ -67,7 +67,7 @@ export default function BusinessDetailsStep({ onNext, onBack, finalize }: any) {
       <div>
         <label className="block text-sm font-medium">Business Images</label>
         <ImageUploader
-          isBusiness
+          isMultiple
           onChange={(files) =>
             setLocalImages(Array.isArray(files) ? files : files ? [files] : [])
           }
