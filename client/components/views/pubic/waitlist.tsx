@@ -27,6 +27,7 @@ import { Processing } from "../../loaders/processing";
 import { useCustomQuery } from "@/server/queries/base";
 import { useQueryClient } from "@tanstack/react-query";
 import { CircleLoader } from "react-spinners";
+import { ThemeToggle } from "@/components/atoms/mode-toggle";
 
 const phoneNumberSchema = z
   .string()
@@ -88,6 +89,10 @@ export default function BukkaWaitList() {
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-subtle overflow-hidden px-6 py-10 text-center">
+      <section className="absolute right-2 top-2">
+        <ThemeToggle />
+      </section>
+
       {/* Background decorative glow */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/10 blur-3xl rounded-full animate-pulse-glow" />

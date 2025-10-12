@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { RouteGuard } from "@/guards/route-guard";
 import { BackgroundIcons } from "@/components/ui/background-icons";
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "@/components/atoms/mode-toggle";
 
 interface IAuthLayout {
   children: ReactNode;
@@ -20,8 +21,8 @@ export default function AuthLayout({ children }: IAuthLayout) {
   return (
     <RouteGuard isProtected={false}>
       <section className="relative min-h-screen hero-gradient bg-card flex flex-col">
-        <header className="p-4">
-          <BukkaButton
+        <header className="p-4 flex justify-between items-center">
+          {/* <BukkaButton
             variant="link"
             size="sm"
             asChild
@@ -31,7 +32,11 @@ export default function AuthLayout({ children }: IAuthLayout) {
               <ArrowLeft className="w-4 h-4" />
               Back to Home
             </Link>
-          </BukkaButton>
+          </BukkaButton> */}
+
+          <section className="absolute top-2 right-0 bg-white dark:bg-primary rounded-full">
+            <ThemeToggle />
+          </section>
         </header>
 
         <section className="relative flex-1 flex items-center justify-center px-3">

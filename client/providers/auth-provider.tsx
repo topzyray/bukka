@@ -17,6 +17,7 @@ import axios from "axios";
 import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
 import { authRoutes } from "@/constants/routes";
 import { StorageUtilsHelper } from "@/utils";
+import { usePathname } from "next/navigation";
 
 interface IAuthContextType {
   user: User | null;
@@ -33,6 +34,9 @@ const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
+  const pathname = usePathname();
+  console.log("PATH NAME: ", pathname);
+
   const { data: user, isLoading, isError } = useCurrentUser();
   const {
     data: userFiles,

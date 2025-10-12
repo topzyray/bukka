@@ -9,7 +9,9 @@ export const useSignUp = ({ resetForm }: { resetForm: any }) => {
     {
       onSuccessCallback: () => {
         resetForm();
-        router.push("/confirm-email");
+        setTimeout(() => {
+          router.push("/confirm-email");
+        }, 3000);
       },
     }
   );

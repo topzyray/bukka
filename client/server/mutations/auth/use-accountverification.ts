@@ -17,7 +17,7 @@ export const useAccountVerification = ({
       onSuccessCallback: () => {
         setTimeout(() => {
           router.push("/signin");
-        }, 2000);
+        }, 3000);
         resetForm();
       },
       onErrorCallback: (error) => {
@@ -27,7 +27,7 @@ export const useAccountVerification = ({
         ) {
           setTimeout(() => {
             router.push("/request-email-verification");
-          }, 2000);
+          }, 3000);
         }
       },
     });

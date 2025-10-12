@@ -59,7 +59,7 @@ export class AuthNotificationService extends NotificationService {
     category: string,
   ): Promise<void> {
     await this.dispatchNotification({
-      channels: [NotificationTypeEnum.IN_APP, NotificationTypeEnum.EMAIL],
+      channels: [NotificationTypeEnum.EMAIL],
       inapp: {
         title: 'Confirm Your Email',
         message: 'Welcome to Bukka!',

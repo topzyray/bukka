@@ -7,35 +7,44 @@ import clsx from "clsx";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { FileHelper } from "@/helpers/file-helper";
+import { cn } from "@/lib/utils";
 
 interface IImageUploaderProp {
   onChange: (files: File[] | File | null) => void;
   label?: string;
-  isBusiness?: boolean;
+  isMultiple?: boolean;
 }
 
 export const ImageUploader = ({
   onChange,
   label,
-  isBusiness = false,
+  isMultiple = false,
 }: IImageUploaderProp) => {
   const [previews, setPreviews] = useState<{ file: File; url: string }[]>([]);
   const [coverIndex, setCoverIndex] = useState<number | null>(null);
+  const [isvalidFile, setIsValidFile] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     if (!files.length) return;
 
-    const mapped = files.map((file) => ({
+    const validFiles = await FileHelper.validateFile(files);
+
+    if (validFiles.length) {
+      setIsValidFile(true);
+    }
+
+    const mapped = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
     }));
 
-    const updated = isBusiness ? [...previews, ...mapped] : mapped;
+    const updated = isMultiple ? [...previews, ...mapped] : mapped;
     setPreviews(updated);
 
-    if (isBusiness) {
+    if (isMultiple) {
       onChange(updated.map((item) => item.file));
     } else {
       onChange(updated[0]?.file ?? null);
@@ -45,12 +54,12 @@ export const ImageUploader = ({
   const handleRemove = (index: number) => {
     const updated = previews.filter((_, i) => i !== index);
     setPreviews(updated);
-    if (isBusiness) {
+    setIsValidFile(false);
+    if (isMultiple) {
       onChange(updated.map((item) => item.file));
     } else {
       onChange(updated[0]?.file ?? null);
     }
-
     if (index === coverIndex) setCoverIndex(null);
   };
 
@@ -61,7 +70,7 @@ export const ImageUploader = ({
     newPreviews.unshift(selected);
     setPreviews(newPreviews);
     setCoverIndex(0);
-    if (isBusiness) {
+    if (isMultiple) {
       onChange(newPreviews.map((item) => item.file));
     }
   };
@@ -69,10 +78,13 @@ export const ImageUploader = ({
   const handleClick = () => fileInputRef.current?.click();
 
   return (
-    <section className="flex flex-col gap-4 w-full">
+    <section className="flex flex-col gap-0 w-full">
       {/* Upload Box */}
       <div
-        className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-6 bg-muted/40 cursor-pointer hover:bg-muted/60 hover:shadow-md transition-all text-center"
+        className={cn(
+          "flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-6 bg-muted/40 cursor-pointer hover:bg-muted/60 hover:shadow-md transition-all text-center"
+          // isvalidFile ? "border-green-600 border-2 border-dashed" : ""
+        )}
         onClick={handleClick}
         tabIndex={0}
         onKeyDown={(e) => e.key === "Enter" && handleClick()}
@@ -80,17 +92,18 @@ export const ImageUploader = ({
         <Upload className="w-8 h-8 text-muted-foreground mb-2" />
         <p className="text-sm text-muted-foreground">
           {label ||
-            (isBusiness
-              ? "Upload business photos (max 5)"
+            (isMultiple
+              ? "Upload multiple photos (max 5)"
               : "Upload your profile image")}
         </p>
+        <p className="text-sm">Note: Max Size 200kb</p>
         <Input
           type="file"
           ref={fileInputRef}
           onChange={handleFiles}
           className="hidden"
           accept="image/*"
-          multiple={isBusiness}
+          multiple={isMultiple}
         />
       </div>
 
@@ -99,7 +112,7 @@ export const ImageUploader = ({
         <div
           className={clsx(
             "grid gap-4 mt-2",
-            isBusiness
+            isMultiple
               ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4"
               : "grid-cols-1 place-items-center"
           )}
@@ -132,7 +145,7 @@ export const ImageUploader = ({
               </Button>
 
               {/* Cover Selection (Business only) */}
-              {isBusiness && (
+              {isMultiple && (
                 <button
                   type="button"
                   onClick={() => handleSelectCover(index)}

@@ -86,7 +86,7 @@ export function SelectComponent({
 
             <div className="relative">
               {Icon && (
-                <Icon className="z-10 bg-red-600 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Icon className="z-10 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               )}
 
               <Select
