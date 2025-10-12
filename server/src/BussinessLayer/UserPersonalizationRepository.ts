@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { PagedData } from 'src/DomainLayer/Models/PagedData';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
@@ -21,6 +21,17 @@ export class UserPersonalizationRepository {
     dto: CreateUserPersonalizationDto,
   ): Promise<BukkaResponse<UserPersonalization>> {
     const loggedInUser = await UserHelper.getLoggedInUser();
+
+    const existingData =
+      await this._userPersonalizationDataAgent.getUserPersonalizationByUserId(
+        loggedInUser.id,
+      );
+    if (existingData) {
+      return BukkaResponse.errorResponse(
+        'Personalization already exist for user!',
+        HttpStatus.CONFLICT,
+      );
+    }
     const data = {
       ...dto,
       userId: loggedInUser.id,
@@ -29,6 +40,7 @@ export class UserPersonalizationRepository {
       await this._userPersonalizationDataAgent.createUserPersonalization(
         data as Partial<UserPersonalization>,
       );
+
     return BukkaResponse.createResponse('User personalization', result);
   }
 
@@ -61,7 +73,7 @@ export class UserPersonalizationRepository {
         { field: 'preferredCuisines' },
         { field: 'dietaryRestrictions' },
         { field: 'mealPreferences' },
-        { field: 'paymentPreferences' },
+        { field: 'paymentPreference' },
         { field: 'preferredDeliveryTime' },
         { field: 'allergies' },
         { field: 'search' },
@@ -71,7 +83,7 @@ export class UserPersonalizationRepository {
           'preferredCuisines',
           'dietaryRestrictions',
           'mealPreferences',
-          'paymentPreferences',
+          'paymentPreference',
           'preferredDeliveryTime',
           'allergies',
         ],

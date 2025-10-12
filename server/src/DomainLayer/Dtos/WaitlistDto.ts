@@ -7,6 +7,7 @@ import {
   IsOptional,
 } from 'class-validator';
 import { PaginationDto } from './Base/PaginationDto';
+import { Transform } from 'class-transformer';
 
 export class WaitlistDto {
   id: number;
@@ -28,6 +29,7 @@ export class CreateWaitlistDto {
   @ApiProperty({ example: 'example@bukka.com' })
   @IsNotEmpty()
   @IsEmail()
+  @Transform(({ value }) => value?.trim().toLowerCase())
   email: string;
 
   @ApiProperty({ example: '+2347035527946' })
@@ -40,6 +42,7 @@ export class WaitlistFilterDto extends PaginationDto {
   @ApiProperty({ example: 'example@bukka.com', required: false })
   @IsEmail()
   @IsOptional()
+  @Transform(({ value }) => value?.trim().toLowerCase())
   email?: string;
 
   @ApiProperty({ example: '+2347035527946', required: false })

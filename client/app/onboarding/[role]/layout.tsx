@@ -2,64 +2,26 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { BackgroundIcons } from "@/components/ui/background-icons";
 import { OnboardingGuard } from "@/guards/onboarding-guard";
-import { getAllowedRoutesForRole } from "@/utils/route-access-utils";
-import { UserRoleEnum } from "@/server/enums";
-import { useRouter, usePathname, redirect } from "next/navigation";
 import { UserRole } from "@/server/interfaces/Auth";
 
 interface IOnboardingLayout {
   children: ReactNode;
-  params: Promise<{ role: string }>;
 }
 
 export default function RoleBasedOnboardingLayout({
   children,
-  params,
 }: IOnboardingLayout) {
-  const { logout, user, isLoading } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const unwrappedParams = React.use(params);
-  const currentRole = unwrappedParams.role.toLowerCase() as UserRoleEnum;
-
-  // useEffect(() => {
-  //   if (isLoading) return;
-  //   if (!user) {
-  //     console.log("INSIDE ONBOARDING LAYOUT: ", user);
-  //     router.replace("/signin");
-  //     return;
-  //   }
-
-  //   const userRole = user.role.toLowerCase();
-  //   const allowedRoutes = getAllowedRoutesForRole(userRole as UserRoleEnum);
-  //   const isRoleMismatch = userRole !== currentRole;
-  //   const isNotAllowed = !allowedRoutes.some((route) =>
-  //     pathname.startsWith(route)
-  //   );
-
-  //   if (isRoleMismatch || isNotAllowed) {
-  //     router.replace(`/onboarding/${userRole}`);
-  //   }
-  // }, [isLoading, user, currentRole, pathname, router]);
-
-  // if (isLoading || !user) return null;
-
-  // const userRole = user?.role.toLowerCase();
-  // if (userRole !== currentRole) return;
-  // if (!user) {
-  //   redirect("/signin");
-  // }
-
+  const { logout, user } = useAuth();
+  const role = user?.role ? (user.role.toLowerCase() as UserRole) : undefined;
   return (
-    <OnboardingGuard roles={[user?.role.toLowerCase() as UserRole]}>
+    <OnboardingGuard roles={role ? [role] : []}>
       <section className="relative min-h-screen flex flex-col md:flex-row items-center justify-center bg-gradient-primary p-4 sm:p-6 overflow-hidden">
         {/* Logout Button */}
         <div className="absolute top-3 right-3 z-50">
@@ -110,15 +72,15 @@ export default function RoleBasedOnboardingLayout({
                 better.
               </p>
 
-              <div className="flex justify-center md:justify-start">
-                <div className="w-full max-w-md">{children}</div>
+              <div className="flex justify-center">
+                <div className="w-full">{children}</div>
               </div>
             </div>
           </section>
 
           {/* Right Section: Illustration */}
           <motion.section
-            className="hidden md:flex w-[50%] flex-col justify-center items-center bg-muted/30 p-8 border-l border-border relative"
+            className="hidden md:flex w-[45%] flex-col justify-center items-center bg-muted/30 p-8 border-l border-border relative"
             animate={{ y: [0, -10, 0] }}
             transition={{ repeat: Infinity, duration: 4 }}
           >
@@ -139,13 +101,13 @@ export default function RoleBasedOnboardingLayout({
               </Link>
             </div>
 
-            <div className="w-full max-w-[380px] flex items-center justify-center mt-8">
+            <div className="w-full flex items-center justify-center mt-8">
               <Image
                 src="/images/onboarding-illustration-deep.png"
                 alt="Onboarding illustration"
                 width={380}
                 height={380}
-                className="w-full h-auto object-contain drop-shadow-xl"
+                className="w-full h-auto object-contain drop-shadow-xl rounded-2xl"
                 priority
               />
             </div>

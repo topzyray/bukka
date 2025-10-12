@@ -27,7 +27,7 @@ interface IInputComponentProps {
   icon?: React.ElementType;
 }
 
-export default function InputComponent({
+export function InputComponent({
   formControl,
   formName,
   formLabel,

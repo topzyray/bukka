@@ -24,7 +24,7 @@ type ITextAreaComponentProps = {
   icon?: React.ElementType;
 };
 
-export default function TextAreaComponent({
+export function TextAreaComponent({
   formControl,
   formName,
   formLabel,

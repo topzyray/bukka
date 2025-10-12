@@ -56,6 +56,7 @@ export class CreateUserDto {
   @ApiProperty({ example: 'example@bukka.com' })
   @IsNotEmpty()
   @IsEmail()
+  @Transform(({ value }) => value?.trim().toLowerCase())
   email: string;
 
   @ApiProperty({ example: 'Ad123456@' })
@@ -120,6 +121,7 @@ export class UpdateUserDto {
   @ApiProperty({ example: 'topzyray' })
   @IsString()
   @IsOptional()
+  @Transform(({ value }) => value?.trim().toLowerCase())
   username?: string;
 
   @ApiProperty({ example: 'Oluwasina' })
@@ -164,6 +166,7 @@ export class ProfileUpdateDto {
   @IsNotEmpty()
   @IsString()
   @MinLength(1)
+  @Transform(({ value }) => value?.trim().toLowerCase())
   username: string;
 
   @ApiProperty({ example: 'This is about me', required: false })

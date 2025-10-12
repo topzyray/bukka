@@ -33,7 +33,6 @@ const REFRESH_TOKEN_MAX_AGE = 14 * 24 * 60 * 60 * 1000; // 14 days
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/auth`)
 @ApiTags('Auth')
-@ApiBearerAuth()
 export class AuthController {
   private readonly isProd: boolean;
   private readonly cookieOptions: any;
@@ -141,7 +140,7 @@ export class AuthController {
     res.cookie(
       TokenTypeEnum.REFRESH_TOKEN,
       response?.responseData?.refreshToken,
-      { ...this.cookieOptions, REFRESH_TOKEN_MAX_AGE },
+      { ...this.cookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE },
     );
     response.responseData = null;
     return BukkaResponse.GetStatusResponse(response, res);

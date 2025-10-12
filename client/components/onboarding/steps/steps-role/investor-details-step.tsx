@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { investorDetailsSchema } from "@/server/schemas/onboarding";
 import { useOnboarding } from "@/providers/onboarding-provider";
-import InputComponent from "@/components/forms/base/input-component";
+import { InputComponent } from "@/components/forms/base/input-component";
 import { Button } from "@/components/ui/button";
 
 export default function InvestorDetailsStep({ onNext, onBack, finalize }: any) {

@@ -7,6 +7,7 @@ export class SigninDto {
   @ApiProperty({ example: 'example@bukka.com', required: true })
   @IsNotEmpty()
   @IsEmail()
+  @Transform(({ value }) => value?.trim().toLowerCase())
   email: string;
 
   @ApiProperty({ example: 'Ad123456@', required: true })
@@ -30,6 +31,7 @@ export class ResendConfirmEmailDto {
   @ApiProperty({ example: 'example@bukka.com', required: true })
   @IsNotEmpty()
   @IsEmail()
+  @Transform(({ value }) => value?.trim().toLowerCase())
   email: string;
 }
 
@@ -37,6 +39,7 @@ export class ForgotPasswordDto {
   @ApiProperty({ example: 'example@bukka.com', required: true })
   @IsNotEmpty()
   @IsEmail()
+  @Transform(({ value }) => value?.trim().toLowerCase())
   email: string;
 }
 
@@ -44,6 +47,7 @@ export class ResetPasswordDto {
   @ApiProperty({ example: 'example@bukka.com', required: true })
   @IsNotEmpty()
   @IsEmail()
+  @Transform(({ value }) => value?.trim().toLowerCase())
   email: string;
 
   @ApiProperty({ example: '000000', required: true })

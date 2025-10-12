@@ -32,7 +32,7 @@ interface ISelectComponentProps {
   multiSelect?: boolean; // NEW: enables multi-select
 }
 
-export default function SelectComponent({
+export function SelectComponent({
   formControl,
   formName,
   formLabel,
@@ -85,6 +85,10 @@ export default function SelectComponent({
             )}
 
             <div className="relative">
+              {Icon && (
+                <Icon className="z-10 bg-red-600 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              )}
+
               <Select
                 onValueChange={(value: string) => {
                   if (multiSelect) {

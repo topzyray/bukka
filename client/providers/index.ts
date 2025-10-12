@@ -1,4 +1,3 @@
-export * from "./auth-gate-provider";
 export * from "./auth-provider";
 export * from "./global-state-provider";
 export * from "./google-map-provider";

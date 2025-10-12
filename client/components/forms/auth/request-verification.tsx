@@ -11,7 +11,7 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Form } from "../../ui/form";
 import Link from "next/link";
-import InputComponent from "../base/input-component";
+import { InputComponent } from "../base/input-component";
 import { useRequestConfirmationEmail } from "@/server/mutations/auth/use-requestconfirmationemail";
 
 const requestAccountSchema = z.object({

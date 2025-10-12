@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { envConfig } from "@/configs";
 import { BackgroundIcons } from "@/components/ui/background-icons";
 import {
-  AuthGate,
   AuthProvider,
   GlobalStateProvider,
   ReactQueryProvider,
@@ -58,12 +57,10 @@ export default function RootLayout({
           >
             <SessionExpirationModal />
             <AuthProvider>
-              <AuthGate>
-                <GlobalStateProvider>
-                  {children}
-                  <Toaster richColors position="top-right" />
-                </GlobalStateProvider>
-              </AuthGate>
+              <GlobalStateProvider>
+                {children}
+                <Toaster richColors position="top-right" />
+              </GlobalStateProvider>
             </AuthProvider>
           </ThemeProvider>
         </ReactQueryProvider>

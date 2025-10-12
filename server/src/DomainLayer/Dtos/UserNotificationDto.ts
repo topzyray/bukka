@@ -1,13 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { NotificationTypeEnum } from '../Enums/NotificationTypeEnum';
-import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsBoolean,
-  ValidateIf,
-  IsNumber,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
 import { PaginationDto } from './Base/PaginationDto';
 import { Transform } from 'class-transformer';
 

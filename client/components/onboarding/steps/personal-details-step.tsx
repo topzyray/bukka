@@ -6,10 +6,10 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import InputComponent from "@/components/forms/base/input-component";
-import SelectComponent from "@/components/forms/base/select-component";
+import { InputComponent } from "@/components/forms/base/input-component";
+import { SelectComponent } from "@/components/forms/base/select-component";
 import { PhoneNumberInput } from "@/components/forms/base/phone-number-component";
-import TextAreaComponent from "@/components/forms/base/text-area-component";
+import { TextAreaComponent } from "@/components/forms/base/text-area-component";
 import { GenderEnum } from "@/server/enums";
 import { useAuth } from "@/providers/auth-provider";
 import { toast } from "sonner";
@@ -129,6 +129,7 @@ export function PersonalDetailsStep({
                 formInputType="text"
                 formPlaceholder="First name"
                 readOnly
+                disabled={isUpdatingUserData}
               />
               <InputComponent
                 formControl={form.control}
@@ -136,6 +137,7 @@ export function PersonalDetailsStep({
                 formInputType="text"
                 formPlaceholder="Last name"
                 readOnly
+                disabled={isUpdatingUserData}
               />
             </div>
 
@@ -146,6 +148,7 @@ export function PersonalDetailsStep({
                 formInputType="text"
                 formPlaceholder="Username"
                 readOnly
+                disabled={isUpdatingUserData}
               />
               <SelectComponent
                 formControl={form.control}
@@ -158,6 +161,7 @@ export function PersonalDetailsStep({
                   { value: GenderEnum.NON_BINARY, label: "Non-Binary" },
                   { value: GenderEnum.OTHERS, label: "Other" },
                 ]}
+                disabled={isUpdatingUserData}
               />
             </div>
 
@@ -167,12 +171,14 @@ export function PersonalDetailsStep({
               formInputType="text"
               formPlaceholder="Emil"
               readOnly
+              disabled={isUpdatingUserData}
             />
 
             <PhoneNumberInput
               formControl={form}
               formName="phoneNumber"
               autoDetect
+              disabled={isUpdatingUserData}
             />
 
             <TextAreaComponent
@@ -181,6 +187,7 @@ export function PersonalDetailsStep({
               formPlaceholder="Bio"
               formDescription="Max 150 characters"
               maxLength={150}
+              disabled={isUpdatingUserData}
             />
 
             <div className="flex gap-2 justify-end pt-4 border-t border-border/30">
@@ -189,12 +196,15 @@ export function PersonalDetailsStep({
                   type="button"
                   variant="outline"
                   onClick={onBack}
-                  disabled={isUpdatingUserData || !form.formState.isValid}
+                  disabled={isUpdatingUserData}
                 >
                   Back
                 </Button>
               )}
-              <Button type="submit" disabled={isUpdatingUserData}>
+              <Button
+                type="submit"
+                disabled={isUpdatingUserData || !form.formState.isValid}
+              >
                 {isUpdatingUserData ? "Saving..." : "Continue"}
               </Button>
             </div>

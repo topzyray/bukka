@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { riderVehicleSchema } from "@/server/schemas/onboarding";
 import { useOnboarding } from "@/providers/onboarding-provider";
-import InputComponent from "@/components/forms/base/input-component";
+import { InputComponent } from "@/components/forms/base/input-component";
 import { Button } from "@/components/ui/button";
 import { uploadFile } from "@/utils/upload-utils";
 import { toast } from "sonner";

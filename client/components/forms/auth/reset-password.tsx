@@ -11,7 +11,7 @@ import { Form } from "../../ui/form";
 import Link from "next/link";
 import OtpInputComponent from "../base/otp-component";
 import { useResetPassword } from "@/server/mutations/auth/use-resetpassword";
-import InputComponent from "../base/input-component";
+import { InputComponent } from "../base/input-component";
 import { Lock, Mail } from "lucide-react";
 
 const resetPasswordSchema = z.object({

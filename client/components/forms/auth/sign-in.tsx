@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Form } from "../../ui/form";
 import { useSignIn } from "@/server/mutations/auth/use-signin";
 import Link from "next/link";
-import InputComponent from "../base/input-component";
+import { InputComponent } from "../base/input-component";
 
 const signInSchema = z.object({
   email: z.email({ message: "Please enter a valid email address" }),

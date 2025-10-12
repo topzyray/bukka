@@ -47,7 +47,7 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
     { id: "image", title: "Profile Photo", Component: ImageUploadStep },
     {
       id: "personal",
-      title: "Personal Details",
+      title: "Bio-Data",
       Component: PersonalDetailsStep,
     },
     {
@@ -57,7 +57,7 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
     },
     {
       id: "completion",
-      title: "Completion",
+      title: "Final Step",
       Component: OnboardingCompleteScreen,
     },
   ],
@@ -65,13 +65,13 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
     { id: "image", title: "Profile Photo", Component: ImageUploadStep },
     {
       id: "personal",
-      title: "Personal Details",
+      title: "Bio-Data",
       Component: PersonalDetailsStep,
     },
     { id: "vehicle", title: "Vehicle Details", Component: RiderVehicleStep },
     {
       id: "completion",
-      title: "Completion",
+      title: "Final Step",
       Component: OnboardingCompleteScreen,
     },
   ],
@@ -79,7 +79,7 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
     { id: "image", title: "Profile Photo", Component: ImageUploadStep },
     {
       id: "personal",
-      title: "Personal Details",
+      title: "Bio-Data",
       Component: PersonalDetailsStep,
     },
     {
@@ -89,7 +89,7 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
     },
     {
       id: "completion",
-      title: "Completion",
+      title: "Final Step",
       Component: OnboardingCompleteScreen,
     },
   ],
@@ -97,7 +97,7 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
     { id: "image", title: "Profile Photo", Component: ImageUploadStep },
     {
       id: "personal",
-      title: "Personal Details",
+      title: "Bio-Data",
       Component: PersonalDetailsStep,
     },
     {
@@ -107,7 +107,7 @@ const roleStepMap: Record<UserRole, StepDescriptor[]> = {
     },
     {
       id: "completion",
-      title: "Completion",
+      title: "Final Step",
       Component: OnboardingCompleteScreen,
     },
   ],
@@ -169,7 +169,7 @@ function OnboardingFlow({ role }: { role: UserRole }) {
   const StepComponent = current?.Component;
 
   return (
-    <div className="max-w-3xl mx-auto sm:p-4">
+    <div className="max-w-3xl mx-auto sm:py-4">
       <Stepper
         steps={steps.map((s) => s.title)}
         currentStep={currentStep}

@@ -20,7 +20,7 @@ export class RouteHelper {
   static getDashboardPath<T extends User>(user: T): string {
     if (!user) return "/signin";
 
-    const role = user?.role?.toLowerCase();
+    const role = user?.role;
     if (!role) return "/signin";
 
     if (!user.isUpdated) return `/onboarding/${role}`;
@@ -37,7 +37,7 @@ export class RouteHelper {
       case UserRoleEnum.USER:
         return `/dashboard/user/overview`;
       default:
-        return `/dashboard/${role}/overview`;
+        throw new Error("Invalid role!");
     }
   }
 }

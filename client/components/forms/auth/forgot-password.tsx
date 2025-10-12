@@ -11,8 +11,7 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Form } from "../../ui/form";
 import Link from "next/link";
-import InputComponent from "../base/input-component";
-import { useRouter } from "next/navigation";
+import { InputComponent } from "../base/input-component";
 import { useForgotPassword } from "@/server/mutations/auth/use-forgotpassword";
 
 const forgotPasswordSchema = z.object({
@@ -22,7 +21,6 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordForm() {
-  const router = useRouter();
   const { submitForgotPassord, submitingRequest } = useForgotPassword();
 
   const form = useForm<ForgotPasswordFormData>({

@@ -18,7 +18,7 @@ import Image from "next/image";
 import { Form } from "../../ui/form";
 import { WaitlistApiService } from "@/server/services/WaitlistApiService";
 import { useCustomMutation } from "@/server/mutations/base";
-import InputComponent from "../../forms/base/input-component";
+import { InputComponent } from "../../forms/base/input-component";
 import { PhoneNumberInput } from "../../forms/base/phone-number-component";
 import parsePhoneNumberFromString from "libphonenumber-js";
 import ContactSection from "../../atoms/contact-section";

@@ -1,7 +1,8 @@
 export enum DietaryRestrictionEnum {
+  NONE = 'None',
   VEGETARIAN = 'Vegetarian',
   VEGAN = 'Vegan',
-  GLUIT_FREE = 'GlutenFree',
+  GLUTEN_FREE = 'Gluten Free',
   HALAL = 'Halal',
   KOSHER = 'Kosher',
 }

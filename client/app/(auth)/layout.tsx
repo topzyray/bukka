@@ -6,10 +6,10 @@ import { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { RouteGuard } from "@/guards/route-guard";
 import { BackgroundIcons } from "@/components/ui/background-icons";
+import { useRouter } from "next/navigation";
 
 interface IAuthLayout {
   children: ReactNode;

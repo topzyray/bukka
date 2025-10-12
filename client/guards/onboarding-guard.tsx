@@ -6,7 +6,7 @@ export function OnboardingGuard({
   roles,
 }: {
   children: React.ReactNode;
-  roles: UserRole[];
+  roles?: UserRole[];
 }) {
   return (
     <RouteGuard isProtected={true} roles={roles}>

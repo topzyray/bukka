@@ -13,6 +13,5 @@ export const useCompleteProfileOnboarding = ({
       await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       onSuccess?.();
     },
-    onErrorCallback: () => {},
   });
 };

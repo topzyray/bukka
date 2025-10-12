@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { RouteHelper } from "@/helpers";
 import { UserRole } from "@/server/interfaces/Auth";
@@ -20,64 +20,95 @@ export function RouteGuard({
 }: RouteGuardProps) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
 
-  const roleFromPath = pathname
-    .match(/\/(dashboard|onboarding)\/([^/]+)/)?.[2]
-    ?.toLowerCase() as UserRole | undefined;
+  const roleFromPath = useMemo(() => {
+    const matched = pathname.match(/\/(dashboard|onboarding)\/([^/]+)/);
+    return (matched?.[2]?.toLowerCase() ?? undefined) as UserRole | undefined;
+  }, [pathname]);
 
-  const userRole = user?.role?.toLowerCase() as string;
+  const userRole = user?.role?.toLowerCase();
 
   useEffect(() => {
-    // if (isLoading) return;
+    // Wait until we know whether current user is loaded
+    if (isLoading) return;
 
+    // If the route is PUBLIC (isProtected === false)
+    // and user is authenticated, route them to their dashboard.
     if (!isProtected && isAuthenticated && user) {
       const target = RouteHelper.getDashboardPath(user);
-      if (pathname !== target && !pathname.startsWith("/dashboard")) {
+      // only redirect if not already within dashboard of the same role
+      if (!pathname.startsWith("/dashboard") || pathname !== target) {
         router.replace(target);
       }
       return;
     }
 
+    // For protected routes:
     if (isProtected) {
+      // Not authenticated → force signin
       if (!isAuthenticated) {
         router.replace("/signin");
         return;
       }
 
-      if (user && user?.isUpdated === false) {
+      // Ensure we have a user object (should if isAuthenticated)
+      if (!user) {
+        // Defensive: revalidate current user query or sign out
+        router.replace("/signin");
+        return;
+      }
+
+      // If user has not completed onboarding, they must be on their onboarding path
+      if (user.isUpdated === false) {
         const onboardingPath = `/onboarding/${user.role.toLowerCase()}`;
         if (!pathname.startsWith(onboardingPath)) {
           router.replace(onboardingPath);
         }
+        return;
       }
 
-      const allowedRoles =
-        roles.length > 0
-          ? roles.map((r) => r.toLowerCase())
-          : roleFromPath
-          ? [roleFromPath]
-          : [];
-
-      if (allowedRoles.length > 0 && user && !allowedRoles.includes(userRole)) {
-        const target = RouteHelper.getDashboardPath(user as User);
-        if (pathname !== target) router.replace(target);
+      // If user has completed onboarding, they must NOT be on any /onboarding/* page
+      if (user.isUpdated === true && pathname.startsWith("/onboarding")) {
+        const target = RouteHelper.getDashboardPath(user);
+        router.replace(target);
         return;
+      }
+
+      // Enforce role-based path isolation when path includes role segment
+      if (roleFromPath && userRole && roleFromPath !== userRole) {
+        // Role mismatch — take user to their dashboard
+        const target = RouteHelper.getDashboardPath(user as User);
+        router.replace(target);
+        return;
+      }
+
+      // If explicit roles were passed to RouteGuard (component-level),
+      // ensure user role is included.
+      if (roles.length > 0) {
+        const normalizedAllowed = roles.map((r) => String(r).toLowerCase());
+        if (!normalizedAllowed.includes(userRole ?? "")) {
+          const target = RouteHelper.getDashboardPath(user as User);
+          router.replace(target);
+          return;
+        }
       }
     }
   }, [
-    roles,
-    router,
     isLoading,
-    pathname,
-    user,
-    isProtected,
     isAuthenticated,
+    user,
+    pathname,
     roleFromPath,
     userRole,
+    isProtected,
+    roles,
+    router,
   ]);
 
-  // if (isLoading) return null; // prevents flashing during rehydration
+  if (isLoading) {
+    return null;
+  }
 
   return <>{children}</>;
 }

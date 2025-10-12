@@ -9,7 +9,6 @@ import {
 import { extractErrorMessage } from "@/utils";
 import { useCustomMutation } from "@/server/mutations/base";
 import { useQueryClient } from "@tanstack/react-query";
-import { RouteHelper } from "@/helpers";
 
 export const useSignIn = () => {
   const queryClient = useQueryClient();
@@ -23,7 +22,7 @@ export const useSignIn = () => {
 
         queryClient.setQueryData(["currentUser"], user);
 
-        await Promise.all([
+        await Promise.allSettled([
           queryClient.prefetchQuery({
             queryKey: ["currentUser"],
             queryFn: () => UserApiService.getLoggedInUser(),
@@ -44,8 +43,6 @@ export const useSignIn = () => {
         ]);
 
         await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-
-        router.push(RouteHelper.getDashboardPath(user));
       },
 
       onErrorCallback: (error) => {

@@ -50,7 +50,7 @@ export class UserPersonalizationDto {
   })
   @IsNotEmpty()
   @IsEnum(PaymentMethodEnum)
-  paymentPreferences: PaymentMethodEnum;
+  paymentPreference: PaymentMethodEnum;
 
   @ApiProperty({
     example: DeliveryTimeEnum.AFTERNOON,
@@ -111,7 +111,7 @@ export class UpdateUserPersonalizationDto {
   })
   @IsOptional()
   @IsEnum(PaymentMethodEnum)
-  paymentPreferences?: PaymentMethodEnum;
+  paymentPreference?: PaymentMethodEnum;
 
   @ApiProperty({
     example: DeliveryTimeEnum.AFTERNOON,
@@ -164,7 +164,7 @@ export class UserPersonalizationFilterDto extends PaginationDto {
   })
   @IsOptional()
   @IsEnum(PaymentMethodEnum)
-  paymentPreferences?: PaymentMethodEnum;
+  paymentPreference?: PaymentMethodEnum;
 
   @ApiProperty({
     example: DeliveryTimeEnum.AFTERNOON,

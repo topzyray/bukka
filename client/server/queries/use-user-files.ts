@@ -1,7 +1,7 @@
 import { FileApiService } from "@/server/services/FileApiService";
 import { useCustomQuery } from "./base";
 
-export const useUserFiles = (userId?: number) => {
+export const useUserFiles = ({ userId }: { userId?: number }) => {
   return useCustomQuery(
     ["userFiles", userId],
     () => FileApiService.getLoggedInUserFiles(),

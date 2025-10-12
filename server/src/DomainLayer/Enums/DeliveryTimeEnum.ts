@@ -3,4 +3,5 @@ export enum DeliveryTimeEnum {
   AFTERNOON = 'Afternoon',
   EVENING = 'Evening',
   NIGHT = 'Night',
+  ANYTIME = 'Anytime of the day',
 }

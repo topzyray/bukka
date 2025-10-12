@@ -13,10 +13,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import InputComponent from "../base/input-component";
+import { InputComponent } from "../base/input-component";
 import { Lock, Mail, ShieldCheck, User } from "lucide-react";
 import { Processing } from "../../loaders/processing";
-import SelectComponent from "../base/select-component";
+import { SelectComponent } from "../base/select-component";
 import { Form } from "../../ui/form";
 import { useSignUp } from "@/server/mutations/auth/use-signup";
 import { UserRoleEnum } from "@/server/enums";
