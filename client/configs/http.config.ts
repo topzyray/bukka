@@ -7,7 +7,6 @@ import axios, {
 } from "axios";
 import { envConfig } from "./env.config";
 import { authRoutes } from "@/constants/routes";
-import { AuthApiService } from "@/server/services";
 import { toast } from "sonner";
 import { STORE_KEYS } from "./store.config";
 import { StorageUtilsHelper } from "@/utils";
@@ -25,7 +24,6 @@ class HttpClient {
     this.client = axios.create({
       baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
       withCredentials: true,
-      validateStatus: (status) => status >= 200 && status < 300,
     });
 
     this.client.interceptors.response.use(
@@ -92,7 +90,11 @@ class HttpClient {
         return this.client(originalRequest);
       } catch (error) {
         try {
-          await AuthApiService.signOut();
+          await axios.post(
+            `${envConfig.NEXT_PUBLIC_API_BASE_URL}${authRoutes.signOut}`,
+            {},
+            { withCredentials: true }
+          );
         } catch {}
 
         if (this.queryClient) {

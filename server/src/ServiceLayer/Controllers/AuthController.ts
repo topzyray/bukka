@@ -1,13 +1,15 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpStatus,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { Public } from 'src/DomainLayer/Decorators/PublicDecorator';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import {
@@ -15,7 +17,6 @@ import {
   ConfirmEmailDto,
   ForgotPasswordDto,
   SigninDto,
-  RefreshTokenDto,
   ResendConfirmEmailDto,
   ResetPasswordDto,
 } from 'src/DomainLayer/Dtos/AuthDto';
@@ -26,7 +27,7 @@ import { AuthRepository } from 'src/BussinessLayer/AuthRepository';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
 import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
-import { AppUrlTypeEnum } from 'src/DomainLayer/Enums/AppUrlTypeEnum';
+import { Throttle } from '@nestjs/throttler';
 
 const ACCESS_TOKEN_MAX_AGE = 30 * 60 * 1000; // 30 minutes
 const REFRESH_TOKEN_MAX_AGE = 14 * 24 * 60 * 60 * 1000; // 14 days
@@ -48,13 +49,14 @@ export class AuthController {
       secure: this.isProd,
       sameSite: this.isProd ? 'none' : 'lax',
       path: '/',
+      // domain: this.isProd ? '.yourdomain.com' : undefined, // Add this later if the domain of both client and server are the same
     };
     this.clearCookieOptions = {
       httpOnly: true,
       secure: this.isProd,
       sameSite: this.isProd ? 'none' : 'lax',
       path: '/',
-      domain: this.isProd ? AppUrlTypeEnum.PROD : undefined,
+      // domain: this.isProd ? AppUrlTypeEnum.PROD : undefined,
     };
   }
 
@@ -69,6 +71,7 @@ export class AuthController {
 
   @Public()
   @Post('signin')
+  @Throttle({ default: { limit: 5, ttl: 60 } })
   @ApiOperation({ summary: 'Sign to account' })
   @ApiBody({ type: SigninDto })
   async signIn(@Body() request: SigninDto, @Res() res: Response) {
@@ -90,18 +93,25 @@ export class AuthController {
   @Public()
   @Post('signout')
   @ApiOperation({ summary: 'Sign out logged in user' })
-  async signOut(@Res() res: Response) {
-    res.clearCookie(TokenTypeEnum.ACCESS_TOKEN, this.clearCookieOptions);
+  async signOut(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.cookies?.refreshToken;
 
+    if (!refreshToken) {
+      return BukkaResponse.GetStatusResponse(
+        {
+          status: true,
+          responseCode: HttpStatus.OK,
+          responseMessage: 'User already signed out',
+          responseData: null,
+        },
+        res,
+      );
+    }
+
+    res.clearCookie(TokenTypeEnum.ACCESS_TOKEN, this.clearCookieOptions);
     res.clearCookie(TokenTypeEnum.REFRESH_TOKEN, this.clearCookieOptions);
 
-    const response = BukkaResponse.customResponse(
-      'User signed out successfully',
-      HttpStatus.NO_CONTENT,
-      true,
-      null,
-    );
-
+    const response = await this._authRepository.signOut(refreshToken);
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
@@ -129,9 +139,12 @@ export class AuthController {
   @Public()
   @Post('refresh-token')
   @ApiOperation({ summary: 'Refreshes user token' })
-  @ApiBody({ type: RefreshTokenDto })
-  async refreshToken(@Body() req: RefreshTokenDto, @Res() res: Response) {
-    const response = await this._authRepository.refreshToken(req);
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      throw new BadRequestException('Refresh token not found.');
+    }
+    const response = await this._authRepository.refreshToken(refreshToken);
     res.cookie(
       TokenTypeEnum.ACCESS_TOKEN,
       response?.responseData?.accessToken,

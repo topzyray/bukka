@@ -11,9 +11,12 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser } from "@/server/queries/use-current-user";
 import { User } from "@/server/interfaces/User";
-import { useSignOut } from "@/server/mutations/auth/use-signout";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { useUserFiles } from "@/server/queries";
+import axios from "axios";
+import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
+import { authRoutes } from "@/constants/routes";
+import { StorageUtilsHelper } from "@/utils";
 
 interface IAuthContextType {
   user: User | null;
@@ -30,7 +33,6 @@ const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
-  const { mutate: signOut } = useSignOut();
   const { data: user, isLoading, isError } = useCurrentUser();
   const {
     data: userFiles,
@@ -38,16 +40,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isError: isUserFilesError,
   } = useUserFiles({ userId: user?.id });
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     try {
-      signOut({});
-    } catch (e) {}
+      await axios.post(
+        `${envConfig.NEXT_PUBLIC_API_BASE_URL}${authRoutes.signOut}`,
+        {},
+        { withCredentials: true }
+      );
+
+      try {
+        StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
+        window.dispatchEvent(new Event("sessionHandledReset"));
+        HttpClient.resetSessionExpiredFlag();
+      } catch {}
+    } catch (error) {
+      try {
+        StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
+        window.dispatchEvent(new Event("sessionHandledReset"));
+        HttpClient.resetSessionExpiredFlag();
+      } catch {}
+      throw error;
+    }
     try {
       queryClient.clear();
       Cookies.remove("sidebarState");
     } catch (e) {}
     window.location.href = "/signin";
-  }, [queryClient, signOut]);
+  }, [queryClient]);
 
   const value = useMemo(
     () => ({

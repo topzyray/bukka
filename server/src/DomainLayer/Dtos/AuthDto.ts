@@ -44,11 +44,11 @@ export class ForgotPasswordDto {
 }
 
 export class ResetPasswordDto {
-  @ApiProperty({ example: 'example@bukka.com', required: true })
-  @IsNotEmpty()
-  @IsEmail()
-  @Transform(({ value }) => value?.trim().toLowerCase())
-  email: string;
+  // @ApiProperty({ example: 'example@bukka.com', required: true })
+  // @IsNotEmpty()
+  // @IsEmail()
+  // @Transform(({ value }) => value?.trim().toLowerCase())
+  // email: string;
 
   @ApiProperty({ example: '000000', required: true })
   @IsNotEmpty()

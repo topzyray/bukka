@@ -15,7 +15,7 @@ export class User {
   emailConfirmed?: boolean;
   confirmationCode?: string | null;
   confirmationCodeExpires?: Date | null;
-  refreshToken?: string;
+  refreshToken?: string | null;
   refreshTokenExpires?: Date | null;
   passwordResetToken?: string | null;
   passwordResetExpires?: Date | null;

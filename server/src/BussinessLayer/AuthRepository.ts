@@ -143,11 +143,11 @@ export class AuthRepository {
     return BukkaResponse.loginResponse('User', loginResponse, true);
   }
 
-  async refreshToken(
-    refreshTokenDto: RefreshTokenDto,
+  async signOut(
+    refreshToken: string,
   ): Promise<BukkaResponse<RefreshTokenResponseDto>> {
     const response = await this._userRepository.findUserByToken(
-      refreshTokenDto.refreshToken,
+      refreshToken,
       TokenTypeEnum.REFRESH_TOKEN,
     );
 
@@ -158,19 +158,72 @@ export class AuthRepository {
       );
     }
 
-    if (response.refreshToken !== refreshTokenDto.refreshToken) {
+    await this._userRepository.updateOtherUserAsync(response.id as number, {
+      refreshToken: null,
+      refreshTokenExpires: null,
+    });
+
+    return BukkaResponse.customResponse(
+      'User signed out successfully',
+      HttpStatus.OK,
+      true,
+      null,
+    );
+  }
+
+  async refreshToken(
+    refreshToken: string,
+  ): Promise<BukkaResponse<RefreshTokenResponseDto>> {
+    // TODO: Implement the below in the future for logging purpose to detect a token replay attack
+    //     if (!response) {
+    //   // Potential token replay attack
+    //   await this._userRepository.flagSuspiciousActivity(userId);
+    //   return BukkaResponse.errorResponse('Invalid Refresh Token', HttpStatus.UNAUTHORIZED);
+    // }
+
+    const response = await this._userRepository.findUserByToken(
+      refreshToken,
+      TokenTypeEnum.REFRESH_TOKEN,
+    );
+
+    if (!response) {
       return BukkaResponse.errorResponse(
         'Invalid Refresh Token, Please Re-Login',
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    if (Date.now() > Number(response.refreshTokenExpires)) {
+    if (response.refreshToken !== refreshToken) {
       return BukkaResponse.errorResponse(
-        'Refresh token expiered. Please Re-Login',
+        'Invalid Refresh Token, Please Re-Login',
         HttpStatus.UNAUTHORIZED,
       );
     }
+
+    if (
+      !response.refreshTokenExpires ||
+      Date.now() > Number(response.refreshTokenExpires)
+    ) {
+      return BukkaResponse.errorResponse(
+        'Refresh token expired. Please Re-Login.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    // Enable and implement this if you want to implement more security hardening, session lifetime control and some compliance
+    // if (user.refreshTokenRotationCount >= user.maxRotationCount) {
+    //   return BukkaResponse.errorResponse(
+    //     'Session expired. Please login again.',
+    //     HttpStatus.UNAUTHORIZED,
+    //   );
+    // }
+
+    // user.refreshTokenRotationCount += 1;
+    // await this._userRepository.updateOtherUserAsync(user.id, {
+    //   refreshToken: newRefreshToken,
+    //   refreshTokenExpires: newExpiry,
+    //   refreshTokenRotationCount: user.refreshTokenRotationCount,
+    // });
 
     const claims = {
       id: response.id as number,
@@ -262,27 +315,35 @@ export class AuthRepository {
   }
 
   async resetPassword(data: ResetPasswordDto): Promise<BukkaResponse<User>> {
-    const response = await this._userRepository.findUserByEmail(data.email);
+    const response = await this._userRepository.findUserByToken(
+      data.token,
+      TokenTypeEnum.PASSWORD_RESET,
+    );
 
     if (!response) {
-      return BukkaResponse.GetSingleDataResponse('user', response);
+      return BukkaResponse.errorResponse(
+        'Token not found. Please request a new one!',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
-    if (Date.now() > Number(response.passwordResetExpires)) {
+    if (response.passwordResetToken !== data.token) {
+      return BukkaResponse.errorResponse(
+        'Token not found. Please request a new one!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (
+      !response.passwordResetExpires ||
+      Date.now() > Number(response.passwordResetExpires)
+    ) {
       return BukkaResponse.customResponse(
         'This token has expired. Please request a new one.',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (response.passwordResetToken !== data.token) {
-      return BukkaResponse.GetSingleDataResponse(
-        'User',
-        response,
-        'Invalid password reset code',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
     return await this.updatePassword(response, data.newPassword);
   }
 
@@ -398,7 +459,10 @@ export class AuthRepository {
       );
     }
 
-    if (Date.now() > Number(user.confirmationCodeExpires)) {
+    if (
+      !user.confirmationCodeExpires ||
+      Date.now() > Number(user.confirmationCodeExpires)
+    ) {
       return BukkaResponse.customResponse(
         'This token has expired. Please request a new one.',
         HttpStatus.BAD_REQUEST,

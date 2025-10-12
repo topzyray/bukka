@@ -115,6 +115,10 @@ model User {
   updatedAt               DateTime            @updatedAt
   location                Location?           @relation(fields: [locationId], references: [id])
 
+  // Enable this if you want to implement more security hardening, session lifetime control and some compliance
+  // refreshTokenRotationCount Int?
+  // maxRotationCount          Int?
+
   @@index([email])
   @@index([username])
   @@index([locationId])
@@ -214,3 +218,24 @@ model UserPersonalization {
 
   @@index([userId])
 }
+
+
+// TODO: Implement this for multiple device support in the future
+// model RefreshToken {
+//   id          Int       @id @default(autoincrement())
+//   token       String    @unique
+//   userId      Int
+//   deviceId    String?   // e.g. browser fingerprint or device name
+//   expiresAt   DateTime
+//   isRevoked   Boolean   @default(false)
+//   createdAt   DateTime  @default(now())
+
+// lastUsedAt
+
+// ipAddress
+
+// userAgent
+
+// refreshTokenRotationCount: number
+// maxRotationCount: number // e.g., 100
+// }

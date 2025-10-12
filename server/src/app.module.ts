@@ -51,9 +51,28 @@ import { KeepAliveService } from './InfrastructureLayer/Services/KeepAliveServic
 import { UserPersonalizationController } from './ServiceLayer/Controllers/UserPersonalizationController';
 import { UserPersonalizationRepository } from './BussinessLayer/UserPersonalizationRepository';
 import { UserPersonalizationDataAgent } from './DataLayer/DataAgents/UserPersonalizationDataAgent';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 1 minute window
+        limit: 5, // allow max 5 requests per minute per IP
+      },
+    ]),
+
+    // ThrottlerModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: (config: ConfigService) => [
+    //     {
+    //       ttl: config.get('THROTTLE_TTL'),
+    //       limit: config.get('THROTTLE_LIMIT'),
+    //     },
+    //   ],
+    // }),
     HttpModule,
     ConfigModule,
     TerminusModule,
@@ -73,6 +92,11 @@ import { UserPersonalizationDataAgent } from './DataLayer/DataAgents/UserPersona
     UserPersonalizationController,
   ],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+
     AppService,
     AppConfigurationService,
     RestaurantSearchService,
