@@ -34,9 +34,6 @@ const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
-  const pathname = usePathname();
-  console.log("PATH NAME: ", pathname);
-
   const { data: user, isLoading, isError } = useCurrentUser();
   const {
     data: userFiles,
