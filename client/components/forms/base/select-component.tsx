@@ -114,7 +114,7 @@ export function SelectComponent({
                 <FormControl>
                   <SelectTrigger
                     className={cn(
-                      "w-full pr-8 min-h-[2.5rem] flex flex-wrap gap-1",
+                      "w-full pr-8 flex flex-wrap gap-1",
                       "items-center py-2 px-3",
                       Icon && "pl-8",
                       "overflow-y-auto max-h-24 scrollbar-thin",

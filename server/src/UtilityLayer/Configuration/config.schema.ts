@@ -111,6 +111,13 @@ export const configSchema = z.object({
     .string({ error: 'FILE_PROVIDER is required' })
     .min(1, 'Specify the file provider (e.g., s3, cloudinary, local)'),
 
+  FILE_UPLOAD_TIMEOUT: z
+    .string({ error: 'FILE_UPLOAD_TIMEOUT is required' })
+    .min(
+      1,
+      'Specify the file upload time use for retries incase of failed upload',
+    ),
+
   CLOUDINARY_CLOUD_NAME: z
     .string({ error: 'CLOUDINARY_CLOUD_NAME is required' })
     .min(1, 'Specify the cloudinary cloud name'),

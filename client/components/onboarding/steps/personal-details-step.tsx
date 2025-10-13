@@ -147,7 +147,6 @@ export function PersonalDetailsStep({
                 formName="username"
                 formInputType="text"
                 formPlaceholder="Username"
-                readOnly
                 disabled={isUpdatingUserData}
               />
               <SelectComponent

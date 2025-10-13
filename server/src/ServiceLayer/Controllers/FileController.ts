@@ -11,8 +11,9 @@ import {
   ParseIntPipe,
   UseGuards,
   Res,
+  UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -91,6 +92,53 @@ export class FileController {
       file,
       filePath,
       createFileDto,
+    );
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Post('upload-multiple')
+  @UseInterceptors(FilesInterceptor('files'))
+  @ApiOperation({ summary: 'Upload multiple files and save to database' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: { type: 'string', format: 'binary' },
+        },
+        referenceType: {
+          type: 'string',
+          enum: ['USER', 'VENDOR', 'GENERAL'],
+          example: 'GENERAL',
+        },
+
+        category: {
+          type: 'string',
+          enum: ['GENERAL', 'EMAIL_TEMPLATE', 'BUSINESS_COVER', 'GALLERY'],
+          example: 'GENERAL',
+        },
+        referenceId: { type: 'number', example: 1 },
+        isPublic: { type: 'boolean', example: false },
+        metadata: {
+          type: 'object',
+          example: { altText: 'menu image' },
+        },
+      },
+      required: ['files', 'referenceType', 'category'],
+    },
+  })
+  async uploadMultipleFiles(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() dto: CreateFileDto,
+    @Res() res: Response,
+  ) {
+    const filePath = `${dto.referenceType.toLowerCase()}`;
+    const response = await this.fileRepository.uploadMultipleFiles(
+      files,
+      filePath,
+      dto,
     );
     return BukkaResponse.GetStatusResponse(response, res);
   }

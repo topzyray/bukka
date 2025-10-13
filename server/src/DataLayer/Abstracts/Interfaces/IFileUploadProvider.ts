@@ -1,4 +1,3 @@
-import { Readable } from 'stream';
 import { FileDocDto } from 'src/DomainLayer/Dtos/Base/FileDocDto';
 
 export interface IFileUploadProvider {
@@ -7,9 +6,14 @@ export interface IFileUploadProvider {
     filePath: string,
     fileName: string,
     fileType: string,
-    stream: Readable,
+    buffer: Buffer,
     containerName?: string,
   ): Promise<FileDocDto>;
+  uploadMultipleFiles(
+    basePath: string,
+    files: Express.Multer.File[],
+    containerName?: string,
+  ): Promise<FileDocDto[]>;
   deleteFile(filePath: string): Promise<void>;
   deleteMultipleFiles(filePaths: string[]): Promise<void>;
   getBinaryFile(filePath: string, client_path?: string): Promise<Buffer>;

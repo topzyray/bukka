@@ -4,10 +4,15 @@ import { IFileUploadProvider } from 'src/DataLayer/Abstracts/Interfaces/IFileUpl
 import { FileDocDto } from 'src/DomainLayer/Dtos/Base/FileDocDto';
 import { FileHelper } from 'src/InfrastructureLayer/Helpers/FileHelper';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
-import { Readable } from 'stream';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { RetryHelper } from 'src/InfrastructureLayer/Helpers/RetryHelper';
+import { FileValidationHelper } from 'src/InfrastructureLayer/Helpers/FileValidationHelper';
 
 export class LocalDiskProvider implements IFileUploadProvider {
-  private uploadRoot: string;
+  private readonly uploadRoot: string;
 
   constructor(private readonly configService: AppConfigurationService) {
     this.uploadRoot = process.env.LOCAL_STORAGE_PATH || path.resolve('uploads');
@@ -17,58 +22,85 @@ export class LocalDiskProvider implements IFileUploadProvider {
     filePath: string,
     file: Express.Multer.File,
   ): Promise<FileDocDto> {
+    const validatedFile =
+      await FileValidationHelper.validateAndPrepareFile(file);
+
     const dirPath = path.join(this.uploadRoot, path.dirname(filePath));
+    const extension = FileHelper.getFileExtension(validatedFile) as string;
+    const fullPath = path.join(this.uploadRoot, `${filePath}.${extension}`);
+
     await fs.mkdir(dirPath, { recursive: true });
 
-    const fullPath = path.join(
-      this.uploadRoot,
-      `${filePath}.${FileHelper.getFileExtension(file)}`,
-    );
-    await fs.writeFile(fullPath, file.buffer);
+    await RetryHelper.withExponentialBackoff(async () => {
+      await fs.writeFile(fullPath, validatedFile.buffer);
+    });
 
-    return {
-      fileName: file.originalname,
-      fileType: file.mimetype,
-      filePath: fullPath,
-      fileExtension: FileHelper.getFileExtension(file) as string,
-      blobUrl: `${process.env.OWO_DOCUMENT_URL || 'http://localhost:3000'}/${fullPath}`, // static serving URL
-    };
+    return this.buildFileDoc(
+      validatedFile.originalname,
+      validatedFile.mimetype,
+      fullPath,
+      extension,
+    );
   }
 
   async uploadStream(
     filePath: string,
     fileName: string,
     fileType: string,
-    stream: Readable,
+    buffer: Buffer,
   ): Promise<FileDocDto> {
+    const extension = path.extname(fileName) || 'dat';
     const dirPath = path.join(this.uploadRoot, path.dirname(filePath));
+    const fullPath = path.join(
+      this.uploadRoot,
+      `${filePath}${extension.startsWith('.') ? extension : '.' + extension}`,
+    );
+
     await fs.mkdir(dirPath, { recursive: true });
 
-    const fullPath = path.join(this.uploadRoot, filePath);
-
-    const writeStream = await fs.open(fullPath, 'w');
-    await new Promise<void>((resolve, reject) => {
-      const writable = writeStream.createWriteStream();
-      stream.pipe(writable);
-      stream.on('end', () => {
-        writable.close();
-        resolve();
-      });
-      stream.on('error', reject);
+    await RetryHelper.withExponentialBackoff(async () => {
+      await fs.writeFile(fullPath, buffer);
     });
 
-    return {
-      fileName,
-      fileType,
-      filePath: fullPath,
-    };
+    return this.buildFileDoc(fileName, fileType, fullPath, extension);
+  }
+
+  async uploadMultipleFiles(
+    basePath: string,
+    files: Express.Multer.File[],
+  ): Promise<FileDocDto[]> {
+    if (!files?.length) {
+      throw new BadRequestException('No files provided for upload.');
+    }
+
+    const results: FileDocDto[] = [];
+
+    for (const [index, file] of files.entries()) {
+      try {
+        const filePath = path.join(basePath, `${Date.now()}_${index}`);
+        const uploaded = await this.uploadFile(filePath, file);
+        results.push(uploaded);
+      } catch (error) {
+        console.error(
+          `Failed to upload file "${file.originalname}": ${error.message}`,
+        );
+        // You can decide here to either continue or throw
+        continue;
+      }
+    }
+
+    return results;
   }
 
   async deleteFile(filePath: string): Promise<void> {
     const fullPath = path.join(this.uploadRoot, filePath);
-    await fs.unlink(fullPath).catch(() => {
-      console.warn(`File not found: ${fullPath}`);
-    });
+    try {
+      await fs.unlink(fullPath);
+    } catch (error: any) {
+      if (error.code !== 'ENOENT') {
+        console.warn(`Failed to delete ${fullPath}: ${error.message}`);
+      }
+    }
   }
 
   async deleteMultipleFiles(filePaths: string[]): Promise<void> {
@@ -76,26 +108,46 @@ export class LocalDiskProvider implements IFileUploadProvider {
   }
 
   async getBinaryFile(filePath: string, client_path?: string): Promise<Buffer> {
+    const rootPath = client_path
+      ? path.resolve(this.uploadRoot, client_path)
+      : this.uploadRoot;
+
+    const fullPath = path.join(rootPath, filePath);
+
     try {
-      // if client_path is given, use it as root, otherwise use configured upload root
-      const rootPath = client_path
-        ? path.resolve(this.uploadRoot, client_path)
-        : this.uploadRoot;
-
-      const fullPath = path.join(rootPath, filePath);
-
-      // check if file exists
-      try {
-        await fs.access(fullPath);
-      } catch {
-        throw new Error(`File not found: ${fullPath}`);
+      await fs.access(fullPath);
+      return await fs.readFile(fullPath);
+    } catch (error: any) {
+      if (error.code === 'ENOENT') {
+        throw new BadRequestException(`File not found: ${fullPath}`);
       }
-
-      // read and return as buffer
-      const buffer = await fs.readFile(fullPath);
-      return buffer;
-    } catch (error) {
-      throw new Error('Error reading binary file:', error);
+      throw new InternalServerErrorException(
+        `Failed to read file: ${error.message}`,
+      );
     }
+  }
+
+  private buildFileDoc(
+    fileName: string,
+    fileType: string,
+    fullPath: string,
+    extension: string,
+  ): FileDocDto {
+    const blobUrl = this.getBlobUrl(fullPath);
+    return {
+      fileName,
+      fileType,
+      filePath: fullPath,
+      fileExtension: extension.replace('.', ''),
+      blobUrl,
+    };
+  }
+
+  private getBlobUrl(fullPath: string): string {
+    const baseUrl = process.env.OWO_DOCUMENT_URL || 'http://localhost:3000';
+    const relativePath = path
+      .relative(this.uploadRoot, fullPath)
+      .replace(/\\/g, '/');
+    return `${baseUrl}/uploads/${relativePath}`;
   }
 }

@@ -23,6 +23,7 @@ import { FileReferenceHelper } from 'src/InfrastructureLayer/Helpers/FileReferen
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { FileUploadService } from 'src/InfrastructureLayer/Services/upload/FileUploadService';
 import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
+import { FileValidationHelper } from 'src/InfrastructureLayer/Helpers/FileValidationHelper';
 
 @Injectable()
 export class FileRepository {
@@ -37,12 +38,8 @@ export class FileRepository {
     filePath: string,
     createFileDto: CreateFileDto,
   ) {
-    console.log('FILE: ', file);
-    console.log('DTO: ', createFileDto);
-
-    if (!file) {
-      throw new BadRequestException('Invalid file or no file attached');
-    }
+    const validatedFile =
+      await FileValidationHelper.validateAndPrepareFile(file);
 
     const loggedInUser = await UserHelper.getLoggedInUser();
 
@@ -75,7 +72,7 @@ export class FileRepository {
 
     const fileResponse = await this.fileUploadService.uploadFile(
       filePath,
-      file,
+      validatedFile,
     );
 
     if (!fileResponse?.responseData) {
@@ -97,8 +94,8 @@ export class FileRepository {
       relativePath: fileData.filePath,
       fullPath: fileData.blobUrl || fileData.filePath,
       createdById: loggedInUser?.id,
-      fileSize: file.buffer.length,
-      mimeType: file.mimetype,
+      fileSize: validatedFile.buffer.length,
+      mimeType: validatedFile.mimetype,
       isPublic: createFileDto.isPublic || false,
       metadata: createFileDto.metadata,
     } as File;
@@ -110,6 +107,80 @@ export class FileRepository {
     }
 
     return BukkaResponse.createResponse('File', newFile);
+  }
+
+  async uploadMultipleFiles(
+    files: Express.Multer.File[],
+    filePath: string,
+    createFileDto: CreateFileDto,
+  ) {
+    if (!files?.length) {
+      throw new BadRequestException('No files provided.');
+    }
+
+    const loggedInUser = await UserHelper.getLoggedInUser();
+
+    let record: any;
+    if (createFileDto.referenceType !== FileReferenceTypeEnum.GENERAL) {
+      record = await this.fileReferenceHelper.validateFileReference(
+        createFileDto.referenceType as any,
+        createFileDto.referenceId as number,
+      );
+    } else {
+      record = null;
+    }
+
+    // Validate and upload all files in parallel
+    const uploadPromises = files.map(async (file) => {
+      const validatedFile =
+        await FileValidationHelper.validateAndPrepareFile(file);
+
+      const fileResponse = await this.fileUploadService.uploadFile(
+        filePath,
+        validatedFile,
+      );
+
+      if (!fileResponse?.responseData) {
+        throw new BadRequestException('Error uploading one of the files.');
+      }
+
+      const fileData = fileResponse.responseData;
+
+      const newFileData = {
+        referenceId:
+          createFileDto.referenceType !== FileReferenceTypeEnum.GENERAL
+            ? record?.id
+            : null,
+        fileName: fileData.fileName,
+        fileType: fileData.fileType,
+        fileExtension: fileData.fileExtension,
+        referenceType: createFileDto.referenceType as any,
+        category: createFileDto.category as any,
+        relativePath: fileData.filePath,
+        fullPath: fileData.blobUrl || fileData.filePath,
+        createdById: loggedInUser?.id,
+        fileSize: validatedFile.buffer.length,
+        mimeType: validatedFile.mimetype,
+        isPublic: createFileDto.isPublic || false,
+        metadata: createFileDto.metadata,
+      } as File;
+
+      return await this.fileDataAgent.createFile(newFileData);
+    });
+
+    // Wait for all uploads (with allSettled for partial success tolerance)
+    const results = await Promise.allSettled(uploadPromises);
+    const successfulFiles = results
+      .filter(
+        (r): r is PromiseFulfilledResult<File> => r.status === 'fulfilled',
+      )
+      .map((r) => r.value);
+
+    if (successfulFiles.length === 0) {
+      return BukkaResponse.errorResponse('All file uploads failed.');
+    }
+
+    return BukkaResponse.createResponse('Files', successfulFiles);
   }
 
   async uploadFilesFromUrls(
@@ -137,7 +208,7 @@ export class FileRepository {
         const response = await axios.get(url, { responseType: 'arraybuffer' });
 
         const buffer = Buffer.from(response.data);
-        const stream = Readable.from(buffer);
+        // const stream = Readable.from(buffer);
         const originalFileName = url.split('/').pop() ?? 'unknown';
         const relativePath = `uploads/${FileHelper.generateUniqueFileName()}-${originalFileName}`;
 
@@ -148,7 +219,7 @@ export class FileRepository {
             dto.fileType ??
             response.headers['content-type'] ??
             'application/octet-stream',
-          stream,
+          buffer,
         });
 
         return {

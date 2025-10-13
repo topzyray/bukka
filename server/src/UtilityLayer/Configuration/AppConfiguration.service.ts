@@ -147,6 +147,13 @@ export class AppConfigurationService {
       ?.trim() as string;
   }
 
+  get cloudinaryUploadTimeoutMs(): number {
+    return Number.parseInt(
+      this.configService.get<string>('FILE_UPLOAD_TIMEOUT')?.trim() as string,
+      10,
+    );
+  }
+
   // get queueProvider(): string {
   //   return this.configService.get<string>('QUEUE_PROVIDER')?.trim() as string;
   // }
