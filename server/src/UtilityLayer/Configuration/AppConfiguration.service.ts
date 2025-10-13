@@ -24,6 +24,14 @@ export class AppConfigurationService {
       ?.trim() as string;
   }
 
+  get encryptionKey(): string {
+    return this.configService.get<string>('ENCRYPTION_KEY')?.trim() as string;
+  }
+
+  get encryptionIv(): string {
+    return this.configService.get<string>('ENCRYPTION_IV')?.trim() as string;
+  }
+
   get tokenSecret(): string {
     return this.configService.get<string>('TOKEN_SECRET')?.trim() as string;
   }
@@ -32,6 +40,27 @@ export class AppConfigurationService {
     return this.configService
       .get<string>('TOKEN_EXPIRY_IN_SECONDS')
       ?.trim() as string;
+  }
+
+  get maxSessionCount(): number {
+    return Number.parseInt(
+      this.configService.get<string>('MAX_SESSION_COUNT')?.trim() as string,
+      10,
+    );
+  }
+
+  get accessTokenMaxAge(): number {
+    return Number.parseInt(
+      this.configService.get<string>('ACCESS_TOKEN_MAX_AGE')?.trim() as string,
+      10,
+    );
+  }
+
+  get refreshTokenMaxAge(): number {
+    return Number.parseInt(
+      this.configService.get<string>('ACCESS_TOKEN_MAX_AGE')?.trim() as string,
+      10,
+    );
   }
 
   get sslKeyPath(): string {

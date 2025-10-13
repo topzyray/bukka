@@ -29,7 +29,7 @@ export class UserRepository {
       throw new ConflictException('User already exists!');
     }
     data.confirmationCode = Generator.GenerateDigits(6).toString();
-    data.confirmationCodeExpires = Generator.calculateExpirationTime(30);
+    data.confirmationCodeExpires = Generator.CalculateExpirationTime(30);
     const user = data as User;
     const result = await this._userDataAgent.createUserAsync(user);
     return BukkaResponse.customResponse(

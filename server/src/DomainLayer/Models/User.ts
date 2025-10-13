@@ -15,8 +15,6 @@ export class User {
   emailConfirmed?: boolean;
   confirmationCode?: string | null;
   confirmationCodeExpires?: Date | null;
-  refreshToken?: string | null;
-  refreshTokenExpires?: Date | null;
   passwordResetToken?: string | null;
   passwordResetExpires?: Date | null;
   passwordChangedAt?: Date;
@@ -25,6 +23,7 @@ export class User {
   deletedAt?: Date;
   isUpdated?: boolean;
   userNotifications?: any;
+  authSessions?: any;
   favorites: any;
   createdAt?: Date;
   updatedAt?: Date;

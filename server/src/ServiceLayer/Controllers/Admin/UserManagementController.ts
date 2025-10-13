@@ -54,11 +54,9 @@ export class UserManagementController {
     const response = await this.userRepository.createUserAsync(request);
     if (response.status) {
       await this.notif.sendMail(response.responseData);
-      response.responseData = TypeSafeMapper.map(
-        response.responseData,
-        UserResponse,
-        UserDto,
-      );
+      response.responseData = TypeSafeMapper.mapObject(response.responseData, {
+        exclude: ['password'],
+      });
     }
     return BukkaResponse.GetStatusResponse(response, res);
   }
@@ -80,7 +78,7 @@ export class UserManagementController {
     @Body() updateUserDto: AdminUpdateUserDto,
     @Res() res: Response,
   ) {
-    const user = TypeSafeMapper.map(updateUserDto, AdminUpdateUserDto, UserDto);
+    const user = TypeSafeMapper.mapObject(updateUserDto);
     const response = await this.userRepository.adminUpdateUserAsync(user);
 
     return BukkaResponse.GetStatusResponse(response, res);
@@ -97,7 +95,7 @@ export class UserManagementController {
     const mappedData = {
       ...response,
       data: response.data.map((data) =>
-        TypeSafeMapper.map(data, UserDto, UserResponse),
+        TypeSafeMapper.mapArray(data, { exclude: ['password'] }),
       ),
     };
 
@@ -115,11 +113,9 @@ export class UserManagementController {
   })
   async getUserById(@Param('userId') userId: number, @Res() res: Response) {
     const response = await this.userRepository.findUserById(Number(userId));
-    const mappedData = TypeSafeMapper.map(
-      response as User,
-      UserResponse,
-      UserDto,
-    );
+    const mappedData = TypeSafeMapper.mapObject(response as User, {
+      exclude: ['password'],
+    });
     const data = BukkaResponse.GetSingleDataResponse('user', mappedData);
 
     return BukkaResponse.GetStatusResponse(data, res);

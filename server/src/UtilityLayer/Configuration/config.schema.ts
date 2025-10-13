@@ -25,9 +25,36 @@ export const configSchema = z.object({
     .string({ error: 'TOKEN_SECRET is required' })
     .min(32, 'TOKEN_SECRET must be at least 32 characters long'),
 
+  ACCESS_TOKEN_MAX_AGE: z
+    .string({ error: 'ACCESS_TOKEN_MAX_AGE is required' })
+    .min(4, 'ACCESS_TOKEN_MAX_AGE must be at least resonable amount of time'),
+
+  REFRESH_TOKEN_MAX_AGE: z
+    .string({ error: 'REFRESH_TOKEN_MAX_AGE is required' })
+    .min(6, 'REFRESH_TOKEN_MAX_AGE must be at least resonable amount of time'),
+
+  ENCRYPTION_KEY: z
+    .string({ error: 'ENCRYPTION_KEY is required' })
+    .regex(/^[a-fA-F0-9]+$/, 'ENCRYPTION_KEY must be a valid hex string')
+    .length(64, 'ENCRYPTION_KEY must be 64 hex characters (32 bytes)'),
+
+  ENCRYPTION_IV: z
+    .string({ error: 'ENCRYPTION_IV is required' })
+    .regex(/^[a-fA-F0-9]+$/, 'ENCRYPTION_IV must be a valid hex string')
+    .length(32, 'ENCRYPTION_IV must be 32 hex characters (16 bytes)'),
+
+  ENCRYPTION_ALGORITHM: z
+    .string()
+    .default('aes-256-cbc')
+    .refine((val) => val === 'aes-256-cbc', 'Only aes-256-cbc is supported'),
+
   TOKEN_EXPIRY_IN_SECONDS: z
     .string({ error: 'TOKEN_EXPIRY_IN_SECONDS is required' })
     .min(1, 'Specify how long tokens should last (in seconds)'),
+
+  MAX_SESSION_COUNT: z
+    .string({ error: 'MAX_SESSION_COUNT is required' })
+    .min(1, 'Specify the maximum session a user can have'),
 
   PORT: z.string().optional(),
 

@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         {},
         { withCredentials: true }
       );
-
+      StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.DEVICE_ID);
       try {
         StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
         window.dispatchEvent(new Event("sessionHandledReset"));

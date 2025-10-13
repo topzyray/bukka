@@ -8,18 +8,22 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { Response } from 'express';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import {
   ProfileUpdateDto,
   UpdateUserDto,
-  UserDto,
   UserFilterDto,
 } from 'src/DomainLayer/Dtos/UserDto';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
-import { UserResponse } from 'src/DomainLayer/Models/UserResponse';
 import { UserRepository } from 'src/BussinessLayer/UserRepository';
 import { TypeSafeMapper } from 'src/MiddlewareLayer/Mappings/TypeSafeMapper';
 import { User } from 'src/DomainLayer/Models/User';
@@ -27,6 +31,7 @@ import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/users`)
 @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+@ApiSecurity('device-id')
 @UseGuards(JwtAuthGuard)
 @ApiTags('User')
 export class UserController {
@@ -39,12 +44,16 @@ export class UserController {
     @Res() res?: Response,
   ) {
     const response = await this._userRepository.findByFilters(request);
-    const mappedData = {
-      ...response,
-      data: response.data.map((data) =>
-        TypeSafeMapper.map(data, UserResponse, UserDto),
-      ),
-    };
+    // const mappedData = {
+    //   ...response,
+    //   data: response.data.map((data) =>
+    //     TypeSafeMapper.map(data, UserResponse, UserDto),
+    //   ),
+    // };
+    const mappedData = TypeSafeMapper.mapArray(response.data, {
+      exclude: ['password'],
+    });
+
     const data = BukkaResponse.GetPagedDataResponse('Profiles', mappedData);
     return BukkaResponse.GetStatusResponse(
       data,
@@ -56,7 +65,9 @@ export class UserController {
   @ApiOperation({ summary: 'Get logged in user data' })
   async getUserData(@Res() res: Response) {
     const user = await this._userRepository.getLoggedInUserData();
-    const mappedData = TypeSafeMapper.map(user as User, UserResponse, UserDto);
+    const mappedData = TypeSafeMapper.mapObject(user as User, {
+      exclude: ['password'],
+    });
     const data = BukkaResponse.GetSingleDataResponse('User', mappedData);
     return BukkaResponse.GetStatusResponse(data, res);
   }
@@ -85,11 +96,9 @@ export class UserController {
   async updateUser(@Body() updateUserDto: UpdateUserDto, @Res() res: Response) {
     const response =
       await this._userRepository.updateUserDataAsync(updateUserDto);
-    response.responseData = TypeSafeMapper.map(
-      response.responseData,
-      UserDto,
-      UserResponse,
-    );
+    response.responseData = TypeSafeMapper.mapObject(response?.responseData, {
+      exclude: ['password'],
+    });
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
@@ -102,11 +111,9 @@ export class UserController {
   ) {
     const response =
       await this._userRepository.updateUserProfileAsync(profileUpdateDto);
-    response.responseData = TypeSafeMapper.map(
-      response.responseData,
-      UserDto,
-      UserResponse,
-    );
+    response.responseData = TypeSafeMapper.mapObject(response?.responseData, {
+      exclude: ['password'],
+    });
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
@@ -114,11 +121,9 @@ export class UserController {
   @ApiOperation({ summary: 'Complete logged in user onboarding' })
   async completeProfileOnboarding(@Res() res: Response) {
     const response = await this._userRepository.completeProfileOnboarding();
-    response.responseData = TypeSafeMapper.map(
-      response.responseData,
-      UserDto,
-      UserResponse,
-    );
+    response.responseData = TypeSafeMapper.mapObject(response?.responseData, {
+      exclude: ['password'],
+    });
     return BukkaResponse.GetStatusResponse(response, res);
   }
 

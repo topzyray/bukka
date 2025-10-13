@@ -17,6 +17,7 @@ import { UserRoleEnum } from '../Enums/UserRoleEnum';
 import { UserNotification } from '../Models/UserNotification';
 import { UserTypeEnum } from '../Enums/UserTypeEnum';
 import { Favorite } from '../Models/Favorite';
+import { UserSession } from '../Models/UserSession';
 
 export class UserDto {
   id: number;
@@ -37,14 +38,13 @@ export class UserDto {
   location: Location;
   userStatus: string;
   emailConfirmed: boolean;
-  refreshToken: string;
-  refreshTokenExpires: Date;
   lastLoginAt: Date;
   isDeleted: boolean;
   isUpdated: boolean;
   deletedAt: Date;
   favorites: Favorite[];
   userNotifications: UserNotification[];
+  authSessions: UserSession[];
   createdAt: Date;
   updatedAt: Date;
   counts: {
@@ -99,10 +99,6 @@ export class CreateUserDto {
   @IsDateString()
   @IsOptional()
   confirmationCodeExpires?: Date;
-
-  @IsString()
-  @IsOptional()
-  refreshToken?: string;
 
   @IsString()
   @IsOptional()

@@ -6,9 +6,10 @@ import {
   UserNotificationApiService,
   NotificationSettingApiService,
 } from "@/server/services";
-import { extractErrorMessage } from "@/utils";
+import { extractErrorMessage, StorageUtilsHelper } from "@/utils";
 import { useCustomMutation } from "@/server/mutations/base";
 import { useQueryClient } from "@tanstack/react-query";
+import { STORE_KEYS } from "@/configs";
 
 export const useSignIn = () => {
   const queryClient = useQueryClient();
@@ -18,7 +19,18 @@ export const useSignIn = () => {
     AuthApiService.signIn,
     {
       onSuccessCallback: async (data) => {
-        const { user } = data?.responseData;
+        const { user, deviceId } = data?.responseData;
+
+        if (deviceId) {
+          try {
+            StorageUtilsHelper.saveToLocalStorage([
+              STORE_KEYS.DEVICE_ID,
+              deviceId,
+            ]);
+          } catch (e) {
+            console.error("Failed to persist device ID", e);
+          }
+        }
 
         queryClient.setQueryData(["currentUser"], user);
 

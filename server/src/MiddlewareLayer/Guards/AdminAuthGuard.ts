@@ -10,14 +10,16 @@ import { UserTypeEnum } from '../../DomainLayer/Enums/UserTypeEnum';
 import { JwtAuthGuard } from './JwtAuthGuard';
 import { Reflector } from '@nestjs/core';
 import { TokenRepository } from 'src/BussinessLayer/TokenRepository';
+import { UserSessionRepository } from 'src/BussinessLayer/UserSessionRepository';
 
 @Injectable()
 export class AdminAuthGuard extends JwtAuthGuard implements CanActivate {
   constructor(
     protected readonly reflector: Reflector,
     private readonly tokenRepository: TokenRepository,
+    private readonly userSessionRepository: UserSessionRepository,
   ) {
-    super(tokenRepository);
+    super(tokenRepository, userSessionRepository);
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

@@ -64,10 +64,6 @@ export class CreateAdminUserDto {
 
   @IsString()
   @IsOptional()
-  refreshToken?: string;
-
-  @IsString()
-  @IsOptional()
   passwordResetToken: string;
 
   @IsDateString()

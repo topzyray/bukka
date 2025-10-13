@@ -26,6 +26,19 @@ class HttpClient {
       withCredentials: true,
     });
 
+    this.client.interceptors.request.use(
+      (config) => {
+        const deviceId = StorageUtilsHelper.getItemFromLocalStorage(
+          STORE_KEYS.DEVICE_ID
+        );
+        if (deviceId) {
+          config.headers["x-device-id"] = deviceId;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
     this.client.interceptors.response.use(
       (response) => response,
       async (error: AxiosError) => this.handleErrorResponse(error)
@@ -69,11 +82,30 @@ class HttpClient {
       originalRequest._retry = true;
 
       try {
-        await axios.post(
+        const deviceId = StorageUtilsHelper.getItemFromLocalStorage(
+          STORE_KEYS.DEVICE_ID
+        ) as string;
+
+        const response = await axios.post(
           `${envConfig.NEXT_PUBLIC_API_BASE_URL}${authRoutes.refreshToken}`,
           {},
-          { withCredentials: true }
+          {
+            withCredentials: true,
+            headers: deviceId ? { "x-device-id": deviceId } : {},
+          }
         );
+        const newDeviceId = response?.data?.responseData?.deviceId;
+
+        if (newDeviceId) {
+          try {
+            StorageUtilsHelper.saveToLocalStorage([
+              STORE_KEYS.DEVICE_ID,
+              newDeviceId,
+            ]);
+          } catch (e) {
+            console.error("Failed to persist device ID", e);
+          }
+        }
 
         try {
           StorageUtilsHelper.saveToLocalStorage([
@@ -95,6 +127,7 @@ class HttpClient {
             {},
             { withCredentials: true }
           );
+          StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.DEVICE_ID);
         } catch {}
 
         if (this.queryClient) {

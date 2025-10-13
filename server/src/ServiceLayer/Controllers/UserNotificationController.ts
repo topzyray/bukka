@@ -18,6 +18,7 @@ import {
   ApiOperation,
   ApiTags,
   ApiParam,
+  ApiSecurity,
 } from '@nestjs/swagger';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
@@ -31,6 +32,7 @@ import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/users/notifications`)
 @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+@ApiSecurity('device-id')
 @UseGuards(JwtAuthGuard)
 @ApiTags('User Notification')
 export class UserNotificationController {

@@ -53,13 +53,15 @@ import { UserPersonalizationRepository } from './BussinessLayer/UserPersonalizat
 import { UserPersonalizationDataAgent } from './DataLayer/DataAgents/UserPersonalizationDataAgent';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { UserSessionDataAgent } from './DataLayer/DataAgents/UserSessionDataAgent';
+import { UserSessionRepository } from './BussinessLayer/UserSessionRepository';
 
 @Module({
   imports: [
     ThrottlerModule.forRoot([
       {
-        ttl: 60, // 1 minute window
-        limit: 5, // allow max 5 requests per minute per IP
+        ttl: 60,
+        limit: 5,
       },
     ]),
 
@@ -120,6 +122,7 @@ import { APP_GUARD } from '@nestjs/core';
     UserRepository,
     FileRepository,
     UserPersonalizationRepository,
+    UserSessionRepository,
 
     WaitlistDataAgent,
     NotificationSettingsDataAgent,
@@ -127,6 +130,7 @@ import { APP_GUARD } from '@nestjs/core';
     UserDataAgent,
     FileDataAgent,
     UserPersonalizationDataAgent,
+    UserSessionDataAgent,
 
     AuthNotificationHelper,
     FileReferenceHelper,

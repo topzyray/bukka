@@ -59,6 +59,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
       },
       extras: {
         include: {
+          authSessions: true,
           _count: {
             select: {
               favorites: true,

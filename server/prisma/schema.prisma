@@ -81,43 +81,38 @@ model Waitlist {
 }
 
 model User {
-  id                      Int                 @id @default(autoincrement())
-  email                   String              @unique
+  id                      Int                @id @default(autoincrement())
+  email                   String             @unique
   password                String
-  role                    UserRole            @default(USER)
+  role                    UserRole           @default(USER)
   firstName               String
   lastName                String
-  username                String?             @unique
+  username                String?            @unique
   gender                  Gender?
   phoneNumber             String?
   bio                     String?
   phoneCountryCode        String?
   phoneNumberConfirmed    Boolean?
-  userStatus              UserStatus          @default(ACTIVE)
-  emailConfirmed          Boolean             @default(false)
+  userStatus              UserStatus         @default(ACTIVE)
+  emailConfirmed          Boolean            @default(false)
   confirmationCode        String?
   confirmationCodeExpires DateTime?
-  onboardingProgress      Int?                @default(0)
-  refreshToken            String?
-  refreshTokenExpires     DateTime?
+  onboardingProgress      Int?               @default(0)
   passwordResetToken      String?
   passwordResetExpires    DateTime?
   passwordChangedAt       DateTime?
   lastLoginAt             DateTime?
-  isDeleted               Boolean             @default(false)
-  isUpdated               Boolean             @default(false)
+  isDeleted               Boolean            @default(false)
+  isUpdated               Boolean            @default(false)
   deletedAt               DateTime?
   locationId              Int?
   avatar                  Json?
   userNotifications       UserNotification[]
   favorites               Favorite[]
-  createdAt               DateTime            @default(now())
-  updatedAt               DateTime            @updatedAt
-  location                Location?           @relation(fields: [locationId], references: [id])
-
-  // Enable this if you want to implement more security hardening, session lifetime control and some compliance
-  // refreshTokenRotationCount Int?
-  // maxRotationCount          Int?
+  authSessions            UserSession[]
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  location                Location?          @relation(fields: [locationId], references: [id])
 
   @@index([email])
   @@index([username])
@@ -194,11 +189,11 @@ model UserNotification {
 }
 
 model NotificationSettings {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  settings   Json?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  settings  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
 }
@@ -218,23 +213,18 @@ model UserPersonalization {
   @@index([userId])
 }
 
+model UserSession {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  deviceId     String
+  refreshToken String
+  userAgent    String
+  ipAddress    String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-// TODO: Implement this for multiple device support in the future
-// model RefreshToken {
-//   id          Int       @id @default(autoincrement())
-//   token       String    @unique
-//   userId      Int
-//   deviceId    String?   // e.g. browser fingerprint or device name
-//   expiresAt   DateTime
-//   isRevoked   Boolean   @default(false)
-//   createdAt   DateTime  @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-// lastUsedAt
-
-// ipAddress
-
-// userAgent
-
-// refreshTokenRotationCount: number
-// maxRotationCount: number // e.g., 100
-// }
+  @@unique([userId, deviceId])
+}

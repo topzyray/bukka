@@ -3,6 +3,7 @@ import { GenderEnum } from '../Enums/GenderEnum';
 import { UserStatusEnum } from '../Enums/UserStatusEnum';
 import { UserNotification } from './UserNotification';
 import { Favorite } from '@prisma/client';
+import { UserSession } from './UserSession';
 
 export class UserResponse {
   id: number;
@@ -30,6 +31,7 @@ export class UserResponse {
   deletedAt: Date;
   favorites: Favorite[];
   userNotifications: UserNotification[];
+  authSessions: UserSession[];
   createdAt: Date;
   updatedAt: Date;
   counts: {

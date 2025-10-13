@@ -27,12 +27,12 @@ export class TokenRepository {
   }
 
   async generateRefreshTokenAsync(): Promise<string> {
-    const refreshToken = Generator.generateRandomString();
+    const refreshToken = Generator.GenerateRandomString();
     return refreshToken;
   }
 
   async generatePasswordResetTokenAsync(): Promise<string> {
-    return await Generator.GenerateDigits(6).toString();
+    return Generator.GenerateDigits(6).toString();
   }
 
   async generateEmailConfirmationTokenAsync(email: string): Promise<string> {

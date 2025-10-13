@@ -7,19 +7,18 @@ import {
   ForgotPasswordDto,
   SigninDto,
   LoginResponseDto,
-  RefreshTokenDto,
   ResendConfirmEmailDto,
   ResetPasswordDto,
   RefreshTokenResponseDto,
+  SigninMetaDataDto,
 } from 'src/DomainLayer/Dtos/AuthDto';
 import { User } from 'src/DomainLayer/Models/User';
-import { CreateUserDto, UserDto } from 'src/DomainLayer/Dtos/UserDto';
+import { CreateUserDto } from 'src/DomainLayer/Dtos/UserDto';
 import { ValidationHelper } from 'src/InfrastructureLayer/Helpers/ValidationHelper';
 import { UserStatusEnum } from 'src/DomainLayer/Enums/UserStatusEnum';
 import { TokenRepository } from './TokenRepository';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { TokenClaims } from 'src/DomainLayer/Models/TokenClaims';
-import { UserResponse } from 'src/DomainLayer/Models/UserResponse';
 import { TypeSafeMapper } from 'src/MiddlewareLayer/Mappings/TypeSafeMapper';
 import { UserWithCounts } from 'src/DomainLayer/Models/UserWithCounts';
 import { AuthNotificationService } from 'src/InfrastructureLayer/Services/notification/auth/AuthNotificationService';
@@ -30,11 +29,13 @@ import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
 import { AppUrlTypeEnum } from 'src/DomainLayer/Enums/AppUrlTypeEnum';
 import { TextHelper } from 'src/InfrastructureLayer/Helpers/TextHelper';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
+import { UserSessionRepository } from './UserSessionRepository';
 
 @Injectable()
 export class AuthRepository {
   constructor(
     private readonly _userRepository: UserRepository,
+    private readonly _userSessionRepository: UserSessionRepository,
     private readonly _tokenRepository: TokenRepository,
     private readonly _notif: AuthNotificationService,
     private readonly _notifSetting: NotificationSettingsDataAgent,
@@ -42,7 +43,7 @@ export class AuthRepository {
   ) {}
 
   async signUp(userDto: CreateUserDto): Promise<BukkaResponse<User>> {
-    const hashedPassword = await Generator.hash(userDto.password, 10);
+    const hashedPassword = await Generator.Hash(userDto.password, 10);
     userDto.password = hashedPassword;
     const data = await this._userRepository.createUserAsync(userDto);
 
@@ -68,77 +69,92 @@ export class AuthRepository {
         AuthQueueMessageTypeEnum.SIGNUP,
       );
     }
-    const mappedData = TypeSafeMapper.map(
-      data?.responseData,
-      UserResponse,
-      UserDto,
-    );
+    const mappedData = TypeSafeMapper.mapObject(data?.responseData, {
+      exclude: ['password'],
+    });
     return { ...data, responseData: mappedData };
   }
 
-  async signIn(loginDto: SigninDto): Promise<BukkaResponse<LoginResponseDto>> {
-    const response = (await this._userRepository.findUserByEmail(
+  async signIn(
+    loginDto: SigninDto,
+    metaData: SigninMetaDataDto,
+  ): Promise<BukkaResponse<LoginResponseDto<User>>> {
+    const user = (await this._userRepository.findUserByEmail(
       loginDto.email,
     )) as UserWithCounts;
-    if (!response) {
-      return BukkaResponse.loginResponse(
-        'user',
-        response,
-        false,
-        'Invalid Credentials!',
-      );
-    }
-    const validUser = await this.validateUserAsync(response, loginDto.password);
-    if (!validUser) {
-      return BukkaResponse.loginResponse(
-        'user',
-        response,
-        false,
-        'Invalid credentials!',
+
+    if (!user || !(await this.validateUserAsync(user, loginDto.password))) {
+      return BukkaResponse.errorResponse(
+        'Invalid credentials',
+        HttpStatus.UNAUTHORIZED,
       );
     }
 
-    if (!response?.emailConfirmed) {
+    if (!user?.emailConfirmed) {
       return BukkaResponse.loginResponse(
         'user',
-        response,
+        user,
         false,
         'Email verification required!',
       );
     }
 
-    if (response?.userStatus === UserStatusEnum.LOCKED) {
+    if (user?.userStatus === UserStatusEnum.LOCKED) {
       return BukkaResponse.loginResponse(
         'user',
-        response,
+        user,
         false,
         'Your account has been locked. Please contact support.',
       );
     }
 
-    const claims = TypeSafeMapper.map(response, TokenClaims, UserDto);
+    const claims = TypeSafeMapper.mapObject(user, {
+      include: ['id', 'email', 'firstName', 'lastName', 'role'],
+    }) as TokenClaims;
 
     const accessToken =
       await this._tokenRepository.generateAccessTokenAsync(claims);
     const refreshToken =
       await this._tokenRepository.generateRefreshTokenAsync();
-    response.refreshToken = refreshToken;
-    response.lastLoginAt = new Date();
 
-    const loginResponse = new LoginResponseDto();
+    const deviceId = Generator.RandomUUID();
+    const encryptedToken = await Generator.Encrypt(refreshToken);
 
-    await this._userRepository.updateOtherUserAsync(response?.id as number, {
-      id: response?.id,
-      refreshToken: response?.refreshToken,
-      refreshTokenExpires: Generator.calculateExpirationTime(20160), // 14 days
-      lastLoginAt: response?.lastLoginAt,
+    const existingSessions =
+      await this._userSessionRepository.findUserSessionBy(user?.id);
+
+    if (existingSessions.length >= this._configService.maxSessionCount) {
+      const sorted = existingSessions.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      );
+      const toDelete = sorted.slice(
+        0,
+        existingSessions.length - (this._configService.maxSessionCount - 1),
+      );
+      await Promise.all(
+        toDelete.map((s) =>
+          this._userSessionRepository.deleteSessionById(s.id),
+        ),
+      );
+    }
+
+    await this._userSessionRepository.createUserSession({
+      userId: user.id,
+      deviceId: deviceId,
+      refreshToken: encryptedToken,
+      userAgent: metaData.userAgent,
+      ipAddress: metaData.ip,
+      expiresAt: Generator.CalculateExpirationTime(20160), // 14 days
     });
 
-    loginResponse.user = TypeSafeMapper.map(response, UserResponse, UserDto);
-
+    const loginResponse = new LoginResponseDto();
+    loginResponse.user = TypeSafeMapper.mapObject(user, {
+      exclude: ['password'],
+    });
     loginResponse.accessToken = accessToken;
-    loginResponse.refreshToken = response.refreshToken;
-    loginResponse.counts = response?.counts;
+    loginResponse.refreshToken = refreshToken;
+    loginResponse.deviceId = deviceId;
 
     return BukkaResponse.loginResponse('User', loginResponse, true);
   }
@@ -146,22 +162,29 @@ export class AuthRepository {
   async signOut(
     refreshToken: string,
   ): Promise<BukkaResponse<RefreshTokenResponseDto>> {
-    const response = await this._userRepository.findUserByToken(
-      refreshToken,
-      TokenTypeEnum.REFRESH_TOKEN,
-    );
+    const encryptedToken = await Generator.Encrypt(refreshToken);
+    const session =
+      await this._userSessionRepository.findByRefreshToken(encryptedToken);
 
-    if (!response) {
+    if (!session) {
       return BukkaResponse.errorResponse(
-        'Invalid Refresh Token, Please Re-Login',
+        'Invalid or expired refresh token',
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    await this._userRepository.updateOtherUserAsync(response.id as number, {
-      refreshToken: null,
-      refreshTokenExpires: null,
-    });
+    if (new Date(session.expiresAt) < new Date()) {
+      await this._userSessionRepository.deleteSessionById(session.id);
+      return BukkaResponse.errorResponse(
+        'Invalid or expired refresh token',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    await this._userSessionRepository.deleteSessionByUserIdAndDeviceId(
+      session?.userId,
+      session?.deviceId,
+    );
 
     return BukkaResponse.customResponse(
       'User signed out successfully',
@@ -174,79 +197,40 @@ export class AuthRepository {
   async refreshToken(
     refreshToken: string,
   ): Promise<BukkaResponse<RefreshTokenResponseDto>> {
-    // TODO: Implement the below in the future for logging purpose to detect a token replay attack
-    //     if (!response) {
-    //   // Potential token replay attack
-    //   await this._userRepository.flagSuspiciousActivity(userId);
-    //   return BukkaResponse.errorResponse('Invalid Refresh Token', HttpStatus.UNAUTHORIZED);
-    // }
+    const encryptedToken = await Generator.Encrypt(refreshToken);
 
-    const response = await this._userRepository.findUserByToken(
-      refreshToken,
-      TokenTypeEnum.REFRESH_TOKEN,
-    );
+    const session =
+      await this._userSessionRepository.findByRefreshToken(encryptedToken);
+    console.log('CURRENT SESSION TO REFRESH: ', session);
 
-    if (!response) {
+    if (!session || new Date(session.expiresAt) < new Date()) {
       return BukkaResponse.errorResponse(
-        'Invalid Refresh Token, Please Re-Login',
+        'Invalid or expired refresh token',
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    if (response.refreshToken !== refreshToken) {
-      return BukkaResponse.errorResponse(
-        'Invalid Refresh Token, Please Re-Login',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-
-    if (
-      !response.refreshTokenExpires ||
-      Date.now() > Number(response.refreshTokenExpires)
-    ) {
-      return BukkaResponse.errorResponse(
-        'Refresh token expired. Please Re-Login.',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-
-    // Enable and implement this if you want to implement more security hardening, session lifetime control and some compliance
-    // if (user.refreshTokenRotationCount >= user.maxRotationCount) {
-    //   return BukkaResponse.errorResponse(
-    //     'Session expired. Please login again.',
-    //     HttpStatus.UNAUTHORIZED,
-    //   );
-    // }
-
-    // user.refreshTokenRotationCount += 1;
-    // await this._userRepository.updateOtherUserAsync(user.id, {
-    //   refreshToken: newRefreshToken,
-    //   refreshTokenExpires: newExpiry,
-    //   refreshTokenRotationCount: user.refreshTokenRotationCount,
-    // });
-
+    const user = await this._userRepository.findUserById(session.userId);
     const claims = {
-      id: response.id as number,
-      email: response.email,
-      firstName: response.firstName,
-      lastName: response.lastName,
-      role: response.role,
+      id: user?.id as number,
+      email: user?.email as string,
+      firstName: user?.firstName as string,
+      lastName: user?.lastName as string,
+      role: user?.role as string,
     };
-
     const accessToken =
       await this._tokenRepository.generateAccessTokenAsync(claims);
-
-    response.refreshToken =
+    const newRefreshToken =
       await this._tokenRepository.generateRefreshTokenAsync();
 
-    await this._userRepository.updateOtherUserAsync(response.id as number, {
-      refreshToken: response.refreshToken,
-      refreshTokenExpires: Generator.calculateExpirationTime(20160), // 14 days
-    });
+    session.refreshToken = await Generator.Encrypt(newRefreshToken);
+    session.expiresAt = Generator.CalculateExpirationTime(20160);
+    await this._userSessionRepository.updateUserSession(session.id, session);
 
     return BukkaResponse.GetSingleDataResponse('Token', {
       accessToken,
-      refreshToken: response.refreshToken,
+      refreshToken: newRefreshToken,
+      deviceId: session.deviceId,
     });
   }
 
@@ -300,11 +284,9 @@ export class AuthRepository {
       AuthQueueMessageTypeEnum.FORGOT_PASSWORD,
     );
 
-    const mappedData = TypeSafeMapper.map(
-      result?.responseData,
-      UserResponse,
-      UserDto,
-    );
+    const mappedData = TypeSafeMapper.mapObject(result?.responseData, {
+      exclude: ['password'],
+    });
 
     return BukkaResponse.customResponse(
       `We've sent a password reset link to ${result.responseData.email}. Check your Inbox or Spam for further actions.`,
@@ -404,7 +386,7 @@ export class AuthRepository {
     }
 
     response.confirmationCode = Generator.GenerateDigits(6).toString();
-    response.confirmationCodeExpires = Generator.calculateExpirationTime(30);
+    response.confirmationCodeExpires = Generator.CalculateExpirationTime(30);
 
     const data = await this._userRepository.updateOtherUserAsync(
       response.id as number,
@@ -524,7 +506,7 @@ export class AuthRepository {
     user: User,
     newPassword: string,
   ): Promise<BukkaResponse<User>> {
-    const hashedPassword = await Generator.hash(newPassword, 10);
+    const hashedPassword = await Generator.Hash(newPassword, 10);
     user.password = hashedPassword;
     const result = await this._userRepository.updateOtherUserAsync(
       user.id as number,
@@ -543,11 +525,9 @@ export class AuthRepository {
       );
     }
 
-    const mappedData = TypeSafeMapper.map(
-      result?.responseData,
-      UserResponse,
-      UserDto,
-    );
+    const mappedData = TypeSafeMapper.mapObject(result?.responseData, {
+      exclude: ['password'],
+    });
 
     return BukkaResponse.customResponse(
       'Password reset successful. You can now signin with your new password!',

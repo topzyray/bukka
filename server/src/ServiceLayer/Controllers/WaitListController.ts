@@ -14,6 +14,7 @@ import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
@@ -43,6 +44,7 @@ export class WaitListController {
   }
 
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
   @UseGuards(AdminAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Get all paginated waitlist' })
@@ -63,6 +65,7 @@ export class WaitListController {
   }
 
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
   @UseGuards(AdminAuthGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Get a waitlist by ID' })
@@ -78,6 +81,7 @@ export class WaitListController {
   }
 
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
   @UseGuards(AdminAuthGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a waitlist by ID' })

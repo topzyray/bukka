@@ -6,21 +6,17 @@ import {
   Param,
   Body,
   Res,
-  Query,
   Put,
   UseGuards,
 } from '@nestjs/common';
-import {
-  NotificationSettingsFilterDto,
-  UpdateNotificationSettingsDto,
-} from 'src/DomainLayer/Dtos/NotificationSettingsDto';
+import { UpdateNotificationSettingsDto } from 'src/DomainLayer/Dtos/NotificationSettingsDto';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import {
   ApiTags,
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
-  ApiParam,
+  ApiSecurity,
 } from '@nestjs/swagger';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { NotificationSettingsRepository } from 'src/BussinessLayer/NotificationSettingsRepository';
@@ -29,6 +25,7 @@ import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/users/notification-settings`)
 @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+@ApiSecurity('device-id')
 @UseGuards(JwtAuthGuard)
 @ApiTags('Notification Settings')
 export class NotificationSettingsController {

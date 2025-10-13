@@ -58,7 +58,14 @@ async function bootstrap() {
     origin: [`${AppUrlTypeEnum.LOCAL}:3000`, AppUrlTypeEnum.PROD],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'Set-Cookie'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Cookie',
+      'Set-Cookie',
+      'x-device-id',
+      'X-Device-Id',
+    ],
   });
   app.use(helmet());
 
@@ -82,6 +89,12 @@ async function bootstrap() {
       },
       TokenTypeEnum.ACCESS_TOKEN,
     )
+    .addSecurity('device-id', {
+      type: 'apiKey',
+      in: 'header',
+      name: 'x-device-id',
+      description: 'Unique device identifier for this session',
+    })
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

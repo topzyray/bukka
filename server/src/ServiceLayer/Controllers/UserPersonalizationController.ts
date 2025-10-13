@@ -21,10 +21,9 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
-  ApiParam,
+  ApiSecurity,
 } from '@nestjs/swagger';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
-import { NotificationSettingsRepository } from 'src/BussinessLayer/NotificationSettingsRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { UserPersonalizationRepository } from 'src/BussinessLayer/UserPersonalizationRepository';
@@ -35,6 +34,7 @@ import {
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/users/personalization`)
 @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+@ApiSecurity('device-id')
 @UseGuards(JwtAuthGuard)
 @ApiTags('User Personalization')
 export class UserPersonalizationController {

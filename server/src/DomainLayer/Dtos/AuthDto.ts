@@ -12,7 +12,20 @@ export class SigninDto {
 
   @ApiProperty({ example: 'Ad123456@', required: true })
   @IsNotEmpty()
+  @IsString()
   password: string;
+}
+
+export class SigninMetaDataDto {
+  @ApiProperty({ example: 'example@bukka.com', required: true })
+  @IsNotEmpty()
+  @IsString()
+  ip: string;
+
+  @ApiProperty({ example: 'Chrome', required: true })
+  @IsNotEmpty()
+  @IsString()
+  userAgent: string;
 }
 
 export class ConfirmEmailDto {
@@ -85,16 +98,15 @@ export class RefreshTokenDto {
   refreshToken: string;
 }
 
-export class LoginResponseDto {
-  user: UserResponse;
-  counts: {
-    favorites: number;
-  };
+export class LoginResponseDto<T> {
+  user: T;
   accessToken: string;
   refreshToken: string;
+  deviceId: string;
 }
 
 export class RefreshTokenResponseDto {
   accessToken: string;
   refreshToken: string;
+  deviceId: string;
 }

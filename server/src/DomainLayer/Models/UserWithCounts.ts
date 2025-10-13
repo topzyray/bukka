@@ -1,7 +1,5 @@
-import { User } from './User';
-
 export interface UserWithCounts {
-  id?: number;
+  id: number;
   email: string;
   password: string;
   role: string;
@@ -16,7 +14,6 @@ export interface UserWithCounts {
   emailConfirmed?: boolean;
   confirmationCode?: string;
   confirmationCodeExpires?: Date;
-  refreshToken?: string;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
   passwordChangedAt?: Date;
@@ -26,6 +23,7 @@ export interface UserWithCounts {
   isUpdated?: boolean;
   userNotifications?: any;
   favorites: any;
+  authSessions: any;
   createdAt?: Date;
   updatedAt?: Date;
   counts: {

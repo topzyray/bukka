@@ -8,7 +8,13 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { Public } from 'src/DomainLayer/Decorators/PublicDecorator';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
@@ -19,6 +25,7 @@ import {
   SigninDto,
   ResendConfirmEmailDto,
   ResetPasswordDto,
+  SigninMetaDataDto,
 } from 'src/DomainLayer/Dtos/AuthDto';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
@@ -28,9 +35,7 @@ import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
 import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
 import { Throttle } from '@nestjs/throttler';
-
-const ACCESS_TOKEN_MAX_AGE = 30 * 60 * 1000; // 30 minutes
-const REFRESH_TOKEN_MAX_AGE = 14 * 24 * 60 * 60 * 1000; // 14 days
+import { RequestInfoHelper } from 'src/InfrastructureLayer/Helpers/RequestInfoHelper';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/auth`)
 @ApiTags('Auth')
@@ -38,11 +43,15 @@ export class AuthController {
   private readonly isProd: boolean;
   private readonly cookieOptions: any;
   private readonly clearCookieOptions: any;
+  private readonly ACCESS_TOKEN_MAX_AGE: number;
+  private readonly REFRESH_TOKEN_MAX_AGE: number;
 
   constructor(
     private readonly _authRepository: AuthRepository,
     private readonly _configService: AppConfigurationService,
   ) {
+    this.ACCESS_TOKEN_MAX_AGE = this._configService.accessTokenMaxAge;
+    this.REFRESH_TOKEN_MAX_AGE = this._configService.refreshTokenMaxAge;
     this.isProd = this._configService.nodeEnv === EnvironmentTypeEnum.PROD;
     this.cookieOptions = {
       httpOnly: true,
@@ -52,11 +61,7 @@ export class AuthController {
       // domain: this.isProd ? '.yourdomain.com' : undefined, // Add this later if the domain of both client and server are the same
     };
     this.clearCookieOptions = {
-      httpOnly: true,
-      secure: this.isProd,
-      sameSite: this.isProd ? 'none' : 'lax',
-      path: '/',
-      // domain: this.isProd ? AppUrlTypeEnum.PROD : undefined,
+      ...this.cookieOptions,
     };
   }
 
@@ -74,19 +79,62 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 60 } })
   @ApiOperation({ summary: 'Sign to account' })
   @ApiBody({ type: SigninDto })
-  async signIn(@Body() request: SigninDto, @Res() res: Response) {
-    const response = await this._authRepository.signIn(request);
+  async signIn(
+    @Body() request: SigninDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const metaData: SigninMetaDataDto = {
+      ip: RequestInfoHelper.getClientIp(req),
+      userAgent: RequestInfoHelper.getUserAgent(req),
+    };
+    const response = await this._authRepository.signIn(request, metaData);
+
+    res.cookie(TokenTypeEnum.ACCESS_TOKEN, response.responseData?.accessToken, {
+      ...this.cookieOptions,
+      maxAge: this.ACCESS_TOKEN_MAX_AGE,
+    });
+    res.cookie(
+      TokenTypeEnum.REFRESH_TOKEN,
+      response.responseData?.refreshToken,
+      {
+        ...this.cookieOptions,
+        maxAge: this.REFRESH_TOKEN_MAX_AGE,
+      },
+    );
+
+    const newResponse = {
+      user: response.responseData?.user,
+      deviceId: response.responseData?.deviceId,
+    };
+
+    response.responseData = response?.status ? newResponse : null;
+
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Public()
+  @Post('refresh-token')
+  @ApiOperation({ summary: 'Refreshes user token' })
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      throw new BadRequestException('Refresh token not found.');
+    }
+    const response = await this._authRepository.refreshToken(refreshToken);
     res.cookie(
       TokenTypeEnum.ACCESS_TOKEN,
       response?.responseData?.accessToken,
-      { ...this.cookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE },
+      { ...this.cookieOptions, maxAge: this.ACCESS_TOKEN_MAX_AGE },
     );
     res.cookie(
       TokenTypeEnum.REFRESH_TOKEN,
       response?.responseData?.refreshToken,
-      { ...this.cookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE },
+      { ...this.cookieOptions, maxAge: this.REFRESH_TOKEN_MAX_AGE },
     );
-    response.responseData = response?.responseData?.user;
+    response.responseData = {
+      deviceId: response?.responseData?.deviceId,
+    };
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
@@ -137,29 +185,6 @@ export class AuthController {
   }
 
   @Public()
-  @Post('refresh-token')
-  @ApiOperation({ summary: 'Refreshes user token' })
-  async refreshToken(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.cookies?.refreshToken;
-    if (!refreshToken) {
-      throw new BadRequestException('Refresh token not found.');
-    }
-    const response = await this._authRepository.refreshToken(refreshToken);
-    res.cookie(
-      TokenTypeEnum.ACCESS_TOKEN,
-      response?.responseData?.accessToken,
-      { ...this.cookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE },
-    );
-    res.cookie(
-      TokenTypeEnum.REFRESH_TOKEN,
-      response?.responseData?.refreshToken,
-      { ...this.cookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE },
-    );
-    response.responseData = null;
-    return BukkaResponse.GetStatusResponse(response, res);
-  }
-
-  @Public()
   @Post('forgot-password')
   @ApiOperation({ summary: 'Forgot password api' })
   @ApiBody({ type: ForgotPasswordDto })
@@ -178,6 +203,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
   @UseGuards(JwtAuthGuard)
   @Post('change-password')
   @ApiOperation({ summary: 'Change user password' })

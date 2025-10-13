@@ -19,6 +19,7 @@ import {
   ApiConsumes,
   ApiBody,
   ApiBearerAuth,
+  ApiSecurity,
 } from '@nestjs/swagger';
 import {
   CreateFileDto,
@@ -37,6 +38,7 @@ import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/files`)
 @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+@ApiSecurity('device-id')
 @UseGuards(JwtAuthGuard)
 @ApiTags('File')
 export class FileController {
