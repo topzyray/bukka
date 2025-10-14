@@ -58,7 +58,7 @@ export class AppConfigurationService {
 
   get refreshTokenMaxAge(): number {
     return Number.parseInt(
-      this.configService.get<string>('ACCESS_TOKEN_MAX_AGE')?.trim() as string,
+      this.configService.get<string>('REFRESH_TOKEN_MAX_AGE')?.trim() as string,
       10,
     );
   }

@@ -93,6 +93,7 @@ export class AuthController {
     res.cookie(TokenTypeEnum.ACCESS_TOKEN, response.responseData?.accessToken, {
       ...this.cookieOptions,
       maxAge: this.ACCESS_TOKEN_MAX_AGE,
+      expires: new Date(Date.now() + this.ACCESS_TOKEN_MAX_AGE),
     });
     res.cookie(
       TokenTypeEnum.REFRESH_TOKEN,
@@ -100,6 +101,7 @@ export class AuthController {
       {
         ...this.cookieOptions,
         maxAge: this.REFRESH_TOKEN_MAX_AGE,
+        expires: new Date(Date.now() + this.REFRESH_TOKEN_MAX_AGE),
       },
     );
 
@@ -125,12 +127,20 @@ export class AuthController {
     res.cookie(
       TokenTypeEnum.ACCESS_TOKEN,
       response?.responseData?.accessToken,
-      { ...this.cookieOptions, maxAge: this.ACCESS_TOKEN_MAX_AGE },
+      {
+        ...this.cookieOptions,
+        maxAge: this.ACCESS_TOKEN_MAX_AGE,
+        expires: new Date(Date.now() + this.ACCESS_TOKEN_MAX_AGE),
+      },
     );
     res.cookie(
       TokenTypeEnum.REFRESH_TOKEN,
       response?.responseData?.refreshToken,
-      { ...this.cookieOptions, maxAge: this.REFRESH_TOKEN_MAX_AGE },
+      {
+        ...this.cookieOptions,
+        maxAge: this.REFRESH_TOKEN_MAX_AGE,
+        expires: new Date(Date.now() + this.REFRESH_TOKEN_MAX_AGE),
+      },
     );
     response.responseData = {
       deviceId: response?.responseData?.deviceId,

@@ -2,7 +2,7 @@ import imageCompression from "browser-image-compression";
 import { toast } from "sonner";
 
 export class FileHelper {
-  static readonly MAX_FILE_SIZE = 200 * 1024; // 200 KB
+  static readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
   static readonly MAX_DIMENSION = 512; // max width/height
   static async compressImage(
     file: File,
