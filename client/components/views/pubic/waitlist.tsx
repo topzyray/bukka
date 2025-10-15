@@ -108,7 +108,7 @@ export default function BukkaWaitList() {
         <motion.div
           whileHover={{ rotate: 360 }}
           transition={{ duration: 0.6 }}
-          className="w-24 flex items-center justify-center mx-auto hover:cursor-pointer"
+          className="w-24 flex items-center justify-center mx-auto hover:cursor-pointer dark:bg-white/80 dark:p-2 dark:rounded dark:backdrop-blur-2xl"
         >
           <Image
             src="/images/bukka.png"

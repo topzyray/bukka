@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Confetti from "react-confetti";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Loader2, Zap, Utensils, Heart, CheckCircle } from "lucide-react";
 import { useAuth } from "@/providers";
 import { cn } from "@/lib/utils";
@@ -11,9 +11,8 @@ import { useCompleteProfileOnboarding } from "@/server/mutations/user/use-comple
 
 export default function OnboardingCompleteScreen() {
   const { user } = useAuth();
-  const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
-  const [seconds, setSeconds] = useState(5);
+  const [seconds, setSeconds] = useState(10);
 
   const { mutate, isPending, isError, isSuccess, error } =
     useCompleteProfileOnboarding({
@@ -34,7 +33,7 @@ export default function OnboardingCompleteScreen() {
   useEffect(() => {
     if (!isCompleted) return;
 
-    setSeconds(5);
+    setSeconds(10);
 
     const interval = setInterval(() => {
       setSeconds((prev) => {
@@ -45,10 +44,10 @@ export default function OnboardingCompleteScreen() {
         }
         return prev - 1;
       });
-    }, 1000);
+    }, 10000);
 
     return () => clearInterval(interval);
-  }, [isCompleted]);
+  }, [isCompleted, user?.role]);
 
   const renderButtonContent = () => {
     if (isPending) {

@@ -20,7 +20,7 @@ export interface UserWithCounts {
   lastLoginAt?: Date;
   isDeleted?: boolean;
   deletedAt?: Date;
-  isUpdated?: boolean;
+  isOnboarded?: boolean;
   userNotifications?: any;
   favorites: any;
   authSessions: any;

@@ -40,7 +40,7 @@ export class UserDto {
   emailConfirmed: boolean;
   lastLoginAt: Date;
   isDeleted: boolean;
-  isUpdated: boolean;
+  isOnboarded: boolean;
   deletedAt: Date;
   favorites: Favorite[];
   userNotifications: UserNotification[];

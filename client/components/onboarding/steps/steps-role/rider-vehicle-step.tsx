@@ -9,6 +9,7 @@ import { InputComponent } from "@/components/forms/base/input-component";
 import { Button } from "@/components/ui/button";
 import { uploadFile } from "@/utils/upload-utils";
 import { toast } from "sonner";
+import { Form } from "@/components/ui/form";
 
 export default function RiderVehicleStep({ onNext, onBack, finalize }: any) {
   const { state, actions } = useOnboarding();
@@ -40,48 +41,50 @@ export default function RiderVehicleStep({ onNext, onBack, finalize }: any) {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
-      <InputComponent
-        formControl={form.control}
-        formName="vehicleMake"
-        formInputType="text"
-        formPlaceholder="Vehicle Make"
-      />
-      <InputComponent
-        formControl={form.control}
-        formName="vehicleModel"
-        formInputType="text"
-        formPlaceholder="Vehicle Model"
-      />
-      <InputComponent
-        formControl={form.control}
-        formName="plateNumber"
-        formInputType="text"
-        formPlaceholder="Plate Number"
-      />
-
-      {/* For file input you can reuse ImageUploader or create a simple File input */}
-      <div>
-        <label className="block text-sm font-medium">
-          Driver License (optional)
-        </label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) =>
-            form.setValue("licenseImageFile", e.target.files?.[0] ?? null)
-          }
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
+        <InputComponent
+          formControl={form.control}
+          formName="vehicleMake"
+          formInputType="text"
+          formPlaceholder="Vehicle Make"
         />
-      </div>
+        <InputComponent
+          formControl={form.control}
+          formName="vehicleModel"
+          formInputType="text"
+          formPlaceholder="Vehicle Model"
+        />
+        <InputComponent
+          formControl={form.control}
+          formName="plateNumber"
+          formInputType="text"
+          formPlaceholder="Plate Number"
+        />
 
-      <div className="flex gap-2">
-        <Button variant="ghost" onClick={onBack}>
-          Back
-        </Button>
-        <Button type="submit" disabled={loading}>
-          {loading ? "Saving..." : finalize ? "Finish" : "Continue"}
-        </Button>
-      </div>
-    </form>
+        {/* For file input you can reuse ImageUploader or create a simple File input */}
+        <div>
+          <label className="block text-sm font-medium">
+            Driver License (optional)
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) =>
+              form.setValue("licenseImageFile", e.target.files?.[0] ?? null)
+            }
+          />
+        </div>
+
+        <div className="flex gap-2">
+          <Button variant="ghost" onClick={onBack}>
+            Back
+          </Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Saving..." : finalize ? "Finish" : "Continue"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

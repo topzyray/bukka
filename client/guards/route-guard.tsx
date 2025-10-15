@@ -60,7 +60,7 @@ export function RouteGuard({
       }
 
       // If user has not completed onboarding, they must be on their onboarding path
-      if (user.isUpdated === false) {
+      if (user.isOnboarded === false) {
         const onboardingPath = `/onboarding/${user.role.toLowerCase()}`;
         if (!pathname.startsWith(onboardingPath)) {
           router.replace(onboardingPath);
@@ -69,7 +69,7 @@ export function RouteGuard({
       }
 
       // If user has completed onboarding, they must NOT be on any /onboarding/* page
-      if (user.isUpdated === true && pathname.startsWith("/onboarding")) {
+      if (user.isOnboarded === true && pathname.startsWith("/onboarding")) {
         const target = RouteHelper.getDashboardPath(user);
         router.replace(target);
         return;

@@ -13,13 +13,16 @@ import {
 import { RestaurantCard } from "@/components/views/restaurant/RestaurantCard";
 import { Badge } from "@/components/ui/badge";
 import { BukkaButton } from "@/components/ui/button-variants";
+import { useAuth } from "@/providers";
+import { TextHelper } from "@/helpers";
 
 export function UserOverview() {
-  // Mock user data
+  const { user } = useAuth();
+
   const userStats = [
     {
       title: "Favorite Restaurants",
-      value: "12",
+      value: (user?.favorites && user?.favorites.length) ?? 0,
       icon: Heart,
       color: "text-red-500",
     },
@@ -37,7 +40,7 @@ export function UserOverview() {
     },
     {
       title: "Member Since",
-      value: "Jan 2024",
+      value: TextHelper.getFormattedDate(user?.createdAt as string),
       icon: Calendar,
       color: "text-green-500",
     },
@@ -98,7 +101,7 @@ export function UserOverview() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">
-                Welcome back, John! 👋
+                Welcome back, {user?.firstName}! 👋
               </h1>
               <p className="text-muted-foreground mt-1">
                 Here&apos;s what&apos;s been happening with your food journey

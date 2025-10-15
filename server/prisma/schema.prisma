@@ -45,6 +45,19 @@ enum FileReferenceType {
   GENERAL
 }
 
+enum BusinessType {
+  RESTAURANT
+  BAR
+  LOUNGE
+  CATERING
+  BAKERY
+  FOOD_VENDOR
+  STREET_EATRY
+  GROCERY
+  DELIVERY_SERVICE
+  OTHER
+}
+
 model File {
   id            Int               @id @default(autoincrement())
   referenceId   Int?
@@ -103,16 +116,18 @@ model User {
   passwordChangedAt       DateTime?
   lastLoginAt             DateTime?
   isDeleted               Boolean            @default(false)
-  isUpdated               Boolean            @default(false)
+  isOnboarded             Boolean            @default(false)
   deletedAt               DateTime?
   locationId              Int?
   avatar                  Json?
   userNotifications       UserNotification[]
   favorites               Favorite[]
   authSessions            UserSession[]
+  reviews                 Review[]
+  business                Business[]
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
-  location                Location?          @relation(fields: [locationId], references: [id])
+  location                Location?          @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   @@index([email])
   @@index([username])
@@ -120,56 +135,106 @@ model User {
 }
 
 model Business {
-  id           Int        @id @default(autoincrement())
-  placeId      String     @unique
-  ownerId      String
-  name         String
-  address      String
-  latitude     Float
-  longitude    Float
-  rating       Float?
-  phoneNumber  String?
-  website      String?
-  favorites    Favorite[]
-  openingHours Json?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  location     Location?  @relation(fields: [locationId], references: [id])
-  locationId   Int?
+  id              Int              @id @default(autoincrement())
+  ownerId         Int
+  name            String
+  description     String?
+  type            BusinessType     @default(RESTAURANT)
+  categoryId      Int?
+  logoFileId      Int?              // reference to File (logo)
+  coverFileId     Int?              // reference to File (cover/banner)
+  phoneNumber     String?
+  email           String?
+  website         String?
+  registrationNo  String?
+  verified        Boolean          @default(false)
+  rating          Float?           @default(0)
+  totalReviews    Int?             @default(0)
+  openingHours    Json?
+  socialLinks     Json?
+  locationId      Int?
+  location        Location?        @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  category        BusinessCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  owner           User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  reviews         Review[]
+  favorites       Favorite[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
+  @@index([ownerId])
+  @@index([categoryId])
   @@index([locationId])
+  @@index([type])
 }
+
+model BusinessCategory {
+  id            Int          @id @default(autoincrement())
+  name          String        @unique
+  slug          String        @unique
+  description   String?
+  iconUrl       String?
+  type          BusinessType
+  businesses    Business[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([slug])
+}
+
+model Review {
+  id            Int        @id @default(autoincrement())
+  userId        Int
+  businessId    Int
+  rating        Int
+  comment       String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business      Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([userId])
+}
+
 
 model Location {
-  id        Int        @id @default(autoincrement())
-  placeId   String     @unique //google map placeId
-  latitude  Float
-  longitude Float
-  address   String?
-  city      String?
-  state     String?
-  country   String?
-  zipCode   String?
-  cityId    String?
-  stateId   String?
-  countryId String?
-  business  Business[]
-  user      User[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id          Int         @id @default(autoincrement())
+  placeId     String?     @unique
+  latitude    Float
+  longitude   Float
+  address     String?
+  city        String?
+  state       String?
+  country     String?
+  zipCode     String?
+  landmark    String?
+  plusCode    String?
+  cityId      String?
+  stateId     String?
+  countryId   String?
+  businesses  Business[]
+  users       User[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@index([placeId, id])
+  @@index([latitude, longitude])
+  @@index([city, state])
 }
+
 
 model Favorite {
   id         Int      @id @default(autoincrement())
   userId     Int
   businessId Int
-  createdAt  DateTime @default(now())
-  user       User     @relation(fields: [userId], references: [id])
-  business   Business @relation(fields: [businessId], references: [id])
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
   @@unique([userId, businessId])
+  @@index([userId])
+  @@index([businessId])
 }
 
 model UserNotification {
@@ -227,4 +292,17 @@ model UserSession {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, deviceId])
+}
+
+model Support {
+  id        Int      @id @default(autoincrement())
+  ticketId  String   @unique
+  name      String
+  email     String
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ticketId])
 }

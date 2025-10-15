@@ -23,7 +23,7 @@ export class RouteHelper {
     const role = user?.role;
     if (!role) return "/signin";
 
-    if (!user.isUpdated) return `/onboarding/${role}`;
+    if (!user.isOnboarded) return `/onboarding/${role?.toLowerCase()}`;
 
     switch (role) {
       case UserRoleEnum.ADMIN:

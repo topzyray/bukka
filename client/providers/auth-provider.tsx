@@ -17,7 +17,7 @@ import axios from "axios";
 import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
 import { authRoutes } from "@/constants/routes";
 import { StorageUtilsHelper } from "@/utils";
-import { usePathname } from "next/navigation";
+import { UserFile } from "@/server/interfaces/UserFile";
 
 interface IAuthContextType {
   user: User | null;
@@ -25,7 +25,7 @@ interface IAuthContextType {
   isError: boolean;
   logout: () => void;
   isLoading: boolean;
-  userFiles: any;
+  userFiles: UserFile[];
   isLoadingUserFiles: boolean;
   isUserFilesError: boolean;
 }
@@ -35,11 +35,12 @@ const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
   const { data: user, isLoading, isError } = useCurrentUser();
-  const {
+  let {
     data: userFiles,
     isLoading: isLoadingUserFiles,
     isError: isUserFilesError,
   } = useUserFiles({ userId: user?.id });
+  userFiles = userFiles?.data;
 
   const logout = useCallback(async () => {
     try {

@@ -25,9 +25,22 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { FileCategoryEnum } from "@/server/enums";
+import { UserFile } from "@/server/interfaces/UserFile";
+import { CircularLoader } from "@/components/loaders/circular-loader";
 
 export function Profile() {
-  const { user, logout } = useAuth();
+  const { user, logout, userFiles, isLoadingUserFiles } = useAuth();
+  const profileAvatar: UserFile | null | undefined =
+    !isLoadingUserFiles && userFiles && userFiles.length
+      ? userFiles.find(
+          (file) => file.category === FileCategoryEnum.USER_PROFILE_IMAGE
+        )
+      : null;
+
+  console.log("Profile avaar: ", profileAvatar);
+
   const router = useRouter();
 
   const handleAction = (message: string) => {
@@ -45,10 +58,21 @@ export function Profile() {
           {/* Profile Header */}
           <Card className="shadow-card">
             <CardHeader className="text-center">
-              <Avatar className="w-24 h-24 mx-auto mb-4">
-                <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                  {user?.email?.[0].toUpperCase()}
-                </AvatarFallback>
+              <Avatar className="w-24 h-24 mx-auto mb-4 border border-primary">
+                {isLoadingUserFiles ? (
+                  <CircularLoader />
+                ) : userFiles ? (
+                  <Image
+                    src={profileAvatar?.fullPath as string}
+                    alt={user?.firstName + "profile"}
+                    width={96}
+                    height={96}
+                  />
+                ) : (
+                  <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
+                    {user?.email?.[0].toUpperCase()}
+                  </AvatarFallback>
+                )}
               </Avatar>
               <CardTitle className="text-2xl">
                 {`${user?.firstName} ${user?.lastName}`}
@@ -58,15 +82,19 @@ export function Profile() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-primary">24</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {user?.favorites ?? 0}
+                  </div>
                   <div className="text-sm text-muted-foreground">Favorites</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-primary">156</div>
+                  <div className="text-2xl font-bold text-primary">0</div>
                   <div className="text-sm text-muted-foreground">Reviews</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-primary">8</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {userFiles?.length}
+                  </div>
                   <div className="text-sm text-muted-foreground">Photos</div>
                 </div>
               </div>
@@ -115,6 +143,14 @@ export function Profile() {
                 <BukkaButton
                   variant="ghost"
                   className="w-full justify-start"
+                  onClick={() => handleAction("Profile editing coming soon")}
+                >
+                  <User className="w-4 h-4 mr-3" />
+                  Active Sessions
+                </BukkaButton>
+                <BukkaButton
+                  variant="ghost"
+                  className="w-full justify-start"
                   onClick={() =>
                     handleAction("Location preferences coming soon")
                   }
@@ -145,7 +181,7 @@ export function Profile() {
 
                 <BukkaButton
                   variant="ghost"
-                  className="w-full justify-start text-destructive"
+                  className="w-full justify-start text-destructive dark:text-white"
                   onClick={logout}
                 >
                   <LogOut className="w-4 h-4 mr-3" />

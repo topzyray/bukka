@@ -7,6 +7,7 @@ import { investorDetailsSchema } from "@/server/schemas/onboarding";
 import { useOnboarding } from "@/providers/onboarding-provider";
 import { InputComponent } from "@/components/forms/base/input-component";
 import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
 
 export default function InvestorDetailsStep({ onNext, onBack, finalize }: any) {
   const { state, actions } = useOnboarding();
@@ -23,37 +24,39 @@ export default function InvestorDetailsStep({ onNext, onBack, finalize }: any) {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
-      <InputComponent
-        formControl={form.control}
-        formName="investmentExperienceYears"
-        formInputType="number"
-        formPlaceholder="Years of experience"
-      />
-      <InputComponent
-        formControl={form.control}
-        formName="primaryInvestmentType"
-        formInputType="text"
-        formPlaceholder="Primary investment type"
-      />
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="acc"
-          onChange={(e) =>
-            form.setValue("accreditedInvestor", e.target.checked)
-          }
-          defaultChecked={form.getValues("accreditedInvestor")}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
+        <InputComponent
+          formControl={form.control}
+          formName="investmentExperienceYears"
+          formInputType="number"
+          formPlaceholder="Years of experience"
         />
-        <label htmlFor="acc">Accredited investor</label>
-      </div>
+        <InputComponent
+          formControl={form.control}
+          formName="primaryInvestmentType"
+          formInputType="text"
+          formPlaceholder="Primary investment type"
+        />
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="acc"
+            onChange={(e) =>
+              form.setValue("accreditedInvestor", e.target.checked)
+            }
+            defaultChecked={form.getValues("accreditedInvestor")}
+          />
+          <label htmlFor="acc">Accredited investor</label>
+        </div>
 
-      <div className="flex gap-2">
-        <Button variant="ghost" onClick={onBack}>
-          Back
-        </Button>
-        <Button type="submit">Finish</Button>
-      </div>
-    </form>
+        <div className="flex gap-2">
+          <Button variant="ghost" onClick={onBack}>
+            Back
+          </Button>
+          <Button type="submit">Finish</Button>
+        </div>
+      </form>
+    </Form>
   );
 }

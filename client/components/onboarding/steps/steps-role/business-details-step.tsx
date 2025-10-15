@@ -7,9 +7,10 @@ import { businessDetailsSchema } from "@/server/schemas/onboarding";
 import { useOnboarding } from "@/providers/onboarding-provider";
 import { InputComponent } from "@/components/forms/base/input-component";
 import { Button } from "@/components/ui/button";
-import { ImageUploader } from "@/components/onboarding/image-uploader";
+import { ImageUploader } from "@/components/atoms/image-uploader";
 import { uploadFile } from "@/utils/upload-utils";
 import { toast } from "sonner";
+import { Form } from "@/components/ui/form";
 
 export default function BusinessDetailsStep({ onNext, onBack, finalize }: any) {
   const { state, actions } = useOnboarding();
@@ -44,44 +45,48 @@ export default function BusinessDetailsStep({ onNext, onBack, finalize }: any) {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
-      <InputComponent
-        formControl={form.control}
-        formName="businessName"
-        formInputType="text"
-        formPlaceholder="Business name"
-      />
-      <InputComponent
-        formControl={form.control}
-        formName="businessType"
-        formInputType="text"
-        formPlaceholder="Type (e.g., Restaurant)"
-      />
-      <InputComponent
-        formControl={form.control}
-        formName="businessAddress"
-        formInputType="text"
-        formPlaceholder="Address"
-      />
-
-      <div>
-        <label className="block text-sm font-medium">Business Images</label>
-        <ImageUploader
-          isMultiple
-          onChange={(files) =>
-            setLocalImages(Array.isArray(files) ? files : files ? [files] : [])
-          }
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
+        <InputComponent
+          formControl={form.control}
+          formName="businessName"
+          formInputType="text"
+          formPlaceholder="Business name"
         />
-      </div>
+        <InputComponent
+          formControl={form.control}
+          formName="businessType"
+          formInputType="text"
+          formPlaceholder="Type (e.g., Restaurant)"
+        />
+        <InputComponent
+          formControl={form.control}
+          formName="businessAddress"
+          formInputType="text"
+          formPlaceholder="Address"
+        />
 
-      <div className="flex gap-2">
-        <Button variant="ghost" onClick={onBack}>
-          Back
-        </Button>
-        <Button type="submit" disabled={loading}>
-          {loading ? "Saving..." : finalize ? "Finish" : "Continue"}
-        </Button>
-      </div>
-    </form>
+        <div>
+          <label className="block text-sm font-medium">Business Images</label>
+          <ImageUploader
+            isMultiple
+            onChange={(files) =>
+              setLocalImages(
+                Array.isArray(files) ? files : files ? [files] : []
+              )
+            }
+          />
+        </div>
+
+        <div className="flex gap-2">
+          <Button variant="ghost" onClick={onBack}>
+            Back
+          </Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Saving..." : finalize ? "Finish" : "Continue"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

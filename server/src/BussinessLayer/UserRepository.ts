@@ -193,7 +193,7 @@ export class UserRepository {
   async completeProfileOnboarding(): Promise<BukkaResponse<User | null>> {
     const loggedInUser = await UserHelper.getLoggedInUser();
     const data = {
-      isUpdated: true,
+      isOnboarded: true,
     } as Partial<User>;
     const updatedUser = await this._userDataAgent.updateUser(
       loggedInUser?.id,

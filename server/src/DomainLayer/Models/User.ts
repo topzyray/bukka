@@ -21,7 +21,7 @@ export class User {
   lastLoginAt?: Date;
   isDeleted?: boolean;
   deletedAt?: Date;
-  isUpdated?: boolean;
+  isOnboarded?: boolean;
   userNotifications?: any;
   authSessions?: any;
   favorites: any;

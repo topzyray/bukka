@@ -27,7 +27,7 @@ export class UserResponse {
   refreshTokenExpires: Date;
   lastLoginAt: Date;
   isDeleted: boolean;
-  isUpdated: boolean;
+  isOnboarded: boolean;
   deletedAt: Date;
   favorites: Favorite[];
   userNotifications: UserNotification[];

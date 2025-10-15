@@ -46,7 +46,7 @@ export function Header({ className }: HeaderProps) {
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
-              className="w-18 h-14 flex items-center justify-center mx-auto hover:cursor-pointer"
+              className="w-18 h-14 flex items-center justify-center mx-auto hover:cursor-pointer dark:bg-white/80 dark:p-1 dark:rounded dark:backdrop-blur-2xl"
               // onClick={() => router.push("/")}
             >
               <Image
@@ -97,8 +97,14 @@ export function Header({ className }: HeaderProps) {
                 Profile
               </Link>
             </BukkaButton> */}
-            <BukkaButton variant="hero" size="sm" asChild>
-              <Link href={route}>Sign In</Link>
+            <BukkaButton
+              variant="hero"
+              size="sm"
+              asChild
+              onClick={() => router.push(route)}
+            >
+              {/* <Link href={route}>Sign In</Link> */}
+              Sign In
             </BukkaButton>
             <ThemeToggle />
           </nav>
@@ -179,8 +185,15 @@ export function Header({ className }: HeaderProps) {
               </Link>
             </BukkaButton> */}
             <section className="pt-2">
-              <BukkaButton variant="hero" size="sm" className="w-full" asChild>
-                <Link href={route}>Sign In</Link>
+              <BukkaButton
+                variant="hero"
+                size="sm"
+                className="w-full"
+                asChild
+                onClick={() => router.push(route)}
+              >
+                {/* <Link href={route}>Sign In</Link> */}
+                Sign In
               </BukkaButton>
             </section>
           </section>

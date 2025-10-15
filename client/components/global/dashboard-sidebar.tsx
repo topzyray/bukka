@@ -26,42 +26,64 @@ import { Separator } from "../ui/separator";
 import { TDashboardNavigation } from "@/types";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/providers";
 
 interface DashBoardSidebarInterface {
   navItems: TDashboardNavigation;
 }
 
 export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { isMobile, toggleSidebar } = useSidebar();
+  const { user } = useAuth();
   const pathname = usePathname();
+
+  const normalize = (url: string) => url.replace(/\/+$/, "");
 
   const toggleSideBarOnMobile = () => {
     if (isMobile) toggleSidebar();
   };
 
+  useEffect(() => {
+    const activeMenu = navItems.find(
+      (item) =>
+        item.hasSubmenu &&
+        item.submenu?.some((subItem) =>
+          normalize(pathname).startsWith(normalize(subItem.url ?? ""))
+        )
+    );
+    if (activeMenu) {
+      setOpenMenu(activeMenu.title);
+    }
+  }, [pathname, navItems]);
+
   return (
-    <Sidebar side="left" variant="sidebar" collapsible="offcanvas">
+    <Sidebar side="left" variant="floating" collapsible="offcanvas">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-4">
-            <motion.div
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.6 }}
-              className="w-18 h-14 flex items-center justify-center mx-auto hover:cursor-pointer"
-            >
-              <Image
-                src="/images/bukka.png"
-                alt="Logo"
-                width={180}
-                height={38}
-                priority
-                className="w-full h-full"
-              />
-            </motion.div>
+            <Link href={`/dashboard/${user?.role}/overview`}>
+              <motion.div
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.6 }}
+                className="w-18 h-14 flex items-center justify-center mx-auto hover:cursor-pointer dark:bg-white/80 dark:p-1 dark:rounded dark:backdrop-blur-2xl"
+              >
+                <Image
+                  src="/images/bukka.png"
+                  alt="Logo"
+                  width={180}
+                  height={38}
+                  priority
+                  className="w-full h-full"
+                />
+              </motion.div>
+            </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarSeparator />
+      <SidebarSeparator className="max-w-[14rem] w-full" />
       <SidebarContent>
         <SidebarGroupLabel>Navigations</SidebarGroupLabel>
 
@@ -74,11 +96,31 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
             (Icons[item.icon as keyof typeof Icons] as React.FC<
               React.SVGProps<SVGSVGElement>
             >) || DefaultIcon;
+
+          const submenuIsCurrentlyActive =
+            !!item.hasSubmenu &&
+            item.submenu?.some((subItem) =>
+              normalize(pathname).startsWith(normalize(subItem.url ?? ""))
+            );
+
           return item.hasSubmenu && item.isSidebarNav ? (
-            <Collapsible key={item.title} className="group/collapsible">
-              <SidebarGroup className="">
-                <SidebarGroupLabel asChild className="text-text pl-0 text-sm">
-                  <CollapsibleTrigger className="py-4 hover:cursor-pointer">
+            <Collapsible
+              key={item.title}
+              className="group/collapsible"
+              open={openMenu === item.title}
+              onOpenChange={(isOpen) => setOpenMenu(isOpen ? item.title : null)}
+            >
+              <SidebarGroup className="px-0 py-0">
+                <SidebarGroupLabel
+                  asChild
+                  // className="text-text pl-0 text-sm"
+                  className={cn(
+                    "text-text hover:bg-sidebar-accent hover:text-sidebar-accent-foreground pl-2 text-sm",
+                    submenuIsCurrentlyActive &&
+                      "bg-sidebar-accent text-sidebar-accent-foreground"
+                  )}
+                >
+                  <CollapsibleTrigger className="py-5 hover:cursor-pointer">
                     <span className="flex items-center gap-x-2">
                       {Icon && <Icon className="w-4" />}
                       {item.title}
@@ -87,19 +129,20 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
                   </CollapsibleTrigger>
                 </SidebarGroupLabel>
 
-                <CollapsibleContent className="mt-2">
+                <CollapsibleContent className="mt-2 pl-2">
                   <SidebarGroupContent>
                     <SidebarMenu>
                       {item.submenu != undefined &&
                         item.submenu.map((submenuItem) => {
-                          // const DefaultIcon = Icons.HelpCircle as React.FC<
-                          //   React.SVGProps<SVGSVGElement>
-                          // >;
+                          const DefaultIcon = Icons.ArrowRight as React.FC<
+                            React.SVGProps<SVGSVGElement>
+                          >;
 
-                          // const Icon =
-                          //   (Icons[item.icon as keyof typeof Icons] as React.FC<
-                          //     React.SVGProps<SVGSVGElement>
-                          //   >) || DefaultIcon;
+                          const Icon =
+                            DefaultIcon ||
+                            (Icons[item.icon as keyof typeof Icons] as React.FC<
+                              React.SVGProps<SVGSVGElement>
+                            >);
 
                           return (
                             <SidebarMenuItem
@@ -108,11 +151,13 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
                             >
                               <SidebarMenuButton
                                 asChild
-                                isActive={submenuItem.url.startsWith(pathname)}
-                                size="lg"
+                                isActive={normalize(pathname).startsWith(
+                                  normalize(submenuItem.url ?? "")
+                                )}
+                                size="default"
                               >
                                 <Link href={submenuItem.url}>
-                                  {/* {Icon && <Icon className="w-4" />} */}
+                                  {Icon && <Icon className="w-4" />}
                                   <span>{submenuItem.title}</span>
                                 </Link>
                               </SidebarMenuButton>
@@ -131,8 +176,10 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
                   <SidebarMenuItem onClick={toggleSideBarOnMobile}>
                     <SidebarMenuButton
                       asChild
-                      isActive={item.url?.startsWith(pathname)}
-                      size="lg"
+                      isActive={normalize(pathname).startsWith(
+                        normalize(item.url ?? "")
+                      )}
+                      size="default"
                     >
                       <Link href={item.url ? item.url : "#"}>
                         {Icon && <Icon />}
@@ -148,7 +195,14 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
       </SidebarContent>
       <Separator />
       <SidebarFooter>
-        <SidebarMenu></SidebarMenu>
+        <SidebarMenu>
+          <Link href="/">
+            <SidebarMenuItem className="flex items-center gap-2 overflow-hidden py-2 text-sm text-ellipsis capitalize hover:bg-accent hover:text-black rounded-lg">
+              <Icons.Home />
+              Homepage
+            </SidebarMenuItem>
+          </Link>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

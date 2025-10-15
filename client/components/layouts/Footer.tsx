@@ -33,7 +33,7 @@ export function Footer() {
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
-              className="w-24 flex items-center hover:cursor-pointer"
+              className="w-24 flex items-center hover:cursor-pointer dark:bg-white/80 dark:p-1 dark:rounded dark:backdrop-blur-2xl"
             >
               <Image
                 src="/images/bukka.png"

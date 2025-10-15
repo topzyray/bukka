@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { ImageUploader } from "@/components/onboarding/image-uploader";
+import { ImageUploader } from "@/components/atoms/image-uploader";
 import { useAuth } from "@/providers/auth-provider";
 import { toast } from "sonner";
 import { FileCategoryEnum, FileReferenceTypeEnum } from "@/server/enums";

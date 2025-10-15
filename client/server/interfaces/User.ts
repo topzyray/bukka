@@ -16,19 +16,19 @@ export interface User {
   userStatus: string;
   emailConfirmed: boolean;
   confirmationCode: string | null;
-  confirmationCodeExpires: Date | null;
+  confirmationCodeExpires: string | null;
   refreshToken: string;
   passwordResetToken: string | null;
-  passwordResetExpires: Date | null;
-  passwordChangedAt: Date;
-  lastLoginAt: Date;
+  passwordResetExpires: string | null;
+  passwordChangedAt: string;
+  lastLoginAt: string;
   isDeleted: boolean;
-  deletedAt: Date;
-  isUpdated: boolean;
+  deletedAt: string;
+  isOnboarded: boolean;
   userNotifications: any;
   favorites: any;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   avatar: {
     url: string;
   };

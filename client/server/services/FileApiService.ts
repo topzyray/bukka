@@ -25,7 +25,7 @@ export class FileApiService {
       `${fileRoutes.getLoggedInUserFiles}`,
       { params: queryParms }
     );
-    return response.data;
+    return response.data?.responseData;
   }
 
   static async getFileById(fileId: number) {

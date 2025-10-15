@@ -10,7 +10,7 @@ export function CustomTrigger() {
   return (
     <TooltipComponent
       trigger={
-        <p onClick={toggleSidebar}>
+        <p onClick={toggleSidebar} className="hover:cursor-pointer">
           {open ? <PanelLeft /> : <PanelRight />}
           <span className="sr-only">Toggle Sidebar</span>
         </p>
