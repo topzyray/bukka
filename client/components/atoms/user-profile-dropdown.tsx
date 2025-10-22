@@ -34,17 +34,24 @@ export function UserProfileDropdown({ userData }: IUserProfileDropdown) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <SidebarMenuButton variant="default" size="default" className="py-4">
-          {userData && userData !== null && userData.avatar ? (
+        <SidebarMenuButton
+          variant="default"
+          size="default"
+          // className="py-4 hover:bg-accent"
+        >
+          {userData && userData !== null && userData?.avatar ? (
             <Image
               src={userData?.avatar?.url as string}
-              alt={userData.firstName}
+              alt={userData?.firstName}
               width={30}
               height={30}
               className="h-6 w-6 rounded-full"
             />
           ) : (
-            <CircleUserRound size={35} className="text-primary" />
+            <CircleUserRound
+              size={35}
+              // className="text-primary dark:text-white"
+            />
           )}
           <span className="hidden sm:block">
             {TextHelper.capitalize(userData?.firstName as string)}
@@ -54,16 +61,16 @@ export function UserProfileDropdown({ userData }: IUserProfileDropdown) {
       </DropdownMenuTrigger>
       <DropdownMenuContent side="top" className="w-full min-w-sm space-y-2 p-4">
         <DropdownMenuItem className="text-sm">
-          {userData && userData !== null && userData.avatar ? (
+          {userData && userData !== null && userData?.avatar ? (
             <Image
               src={userData?.avatar?.url}
-              alt={userData.firstName}
+              alt={userData?.firstName}
               width={35}
               height={35}
               className="h-6 w-6 rounded-full"
             />
           ) : (
-            <CircleUserRound size={35} className="text-primary" />
+            <CircleUserRound size={35} />
           )}{" "}
           {userData &&
             userData !== null &&
@@ -74,11 +81,11 @@ export function UserProfileDropdown({ userData }: IUserProfileDropdown) {
         <TooltipComponent
           trigger={
             <DropdownMenuItem className="overflow-hidden py-2 text-sm text-ellipsis">
-              <LucideMail /> {userData && userData !== null && userData.email}
+              <LucideMail /> {userData && userData !== null && userData?.email}
             </DropdownMenuItem>
           }
           message={
-            <span>{userData && userData !== null && userData.email}</span>
+            <span>{userData && userData !== null && userData?.email}</span>
           }
         />
         <DropdownMenuItem
@@ -98,10 +105,7 @@ export function UserProfileDropdown({ userData }: IUserProfileDropdown) {
         <DropdownMenuItem className="py-2 text-sm">
           <HelpCircle /> Help & Support
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={logout}
-          className="py-2 text-sm text-red-600"
-        >
+        <DropdownMenuItem onClick={logout} className="py-2 text-sm">
           <LogOutIcon /> Logout
         </DropdownMenuItem>
       </DropdownMenuContent>

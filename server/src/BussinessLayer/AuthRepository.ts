@@ -30,6 +30,7 @@ import { AppUrlTypeEnum } from 'src/DomainLayer/Enums/AppUrlTypeEnum';
 import { TextHelper } from 'src/InfrastructureLayer/Helpers/TextHelper';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { UserSessionRepository } from './UserSessionRepository';
+import { UserSession } from 'src/DomainLayer/Models/UserSession';
 
 @Injectable()
 export class AuthRepository {
@@ -84,14 +85,14 @@ export class AuthRepository {
     )) as UserWithCounts;
 
     if (!user || !(await this.validateUserAsync(user, loginDto.password))) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'Invalid credentials',
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     if (!user?.emailConfirmed) {
-      return BukkaResponse.loginResponse(
+      return BukkaResponse.LoginResponse(
         'user',
         user,
         false,
@@ -100,7 +101,7 @@ export class AuthRepository {
     }
 
     if (user?.userStatus === UserStatusEnum.LOCKED) {
-      return BukkaResponse.loginResponse(
+      return BukkaResponse.LoginResponse(
         'user',
         user,
         false,
@@ -125,7 +126,7 @@ export class AuthRepository {
 
     if (existingSessions.length >= this._configService.maxSessionCount) {
       const sorted = existingSessions.sort(
-        (a, b) =>
+        (a: UserSession, b: UserSession) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       );
       const toDelete = sorted.slice(
@@ -148,15 +149,15 @@ export class AuthRepository {
       expiresAt: Generator.CalculateExpirationTime(20160), // 14 days
     });
 
-    const loginResponse = new LoginResponseDto();
-    loginResponse.user = TypeSafeMapper.mapObject(user, {
+    const LoginResponse = new LoginResponseDto();
+    LoginResponse.user = TypeSafeMapper.mapObject(user, {
       exclude: ['password'],
     });
-    loginResponse.accessToken = accessToken;
-    loginResponse.refreshToken = refreshToken;
-    loginResponse.deviceId = deviceId;
+    LoginResponse.accessToken = accessToken;
+    LoginResponse.refreshToken = refreshToken;
+    LoginResponse.deviceId = deviceId;
 
-    return BukkaResponse.loginResponse('User', loginResponse, true);
+    return BukkaResponse.LoginResponse('User', LoginResponse, true);
   }
 
   async signOut(
@@ -167,7 +168,7 @@ export class AuthRepository {
       await this._userSessionRepository.findByRefreshToken(encryptedToken);
 
     if (!session) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'Invalid or expired refresh token',
         HttpStatus.UNAUTHORIZED,
       );
@@ -175,7 +176,7 @@ export class AuthRepository {
 
     if (new Date(session.expiresAt) < new Date()) {
       await this._userSessionRepository.deleteSessionById(session.id);
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'Invalid or expired refresh token',
         HttpStatus.UNAUTHORIZED,
       );
@@ -186,7 +187,7 @@ export class AuthRepository {
       session?.deviceId,
     );
 
-    return BukkaResponse.customResponse(
+    return BukkaResponse.CustomResponse(
       'User signed out successfully',
       HttpStatus.OK,
       true,
@@ -201,10 +202,9 @@ export class AuthRepository {
 
     const session =
       await this._userSessionRepository.findByRefreshToken(encryptedToken);
-    console.log('CURRENT SESSION TO REFRESH: ', session);
 
     if (!session || new Date(session.expiresAt) < new Date()) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'Invalid or expired refresh token',
         HttpStatus.UNAUTHORIZED,
       );
@@ -246,7 +246,7 @@ export class AuthRepository {
     }
 
     if (!response?.emailConfirmed) {
-      return BukkaResponse.loginResponse(
+      return BukkaResponse.LoginResponse(
         'user',
         response,
         false,
@@ -266,7 +266,7 @@ export class AuthRepository {
     );
 
     if (!result) {
-      return BukkaResponse.customResponse(
+      return BukkaResponse.CustomResponse(
         'Unable to process your request!',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
@@ -288,7 +288,7 @@ export class AuthRepository {
       exclude: ['password'],
     });
 
-    return BukkaResponse.customResponse(
+    return BukkaResponse.CustomResponse(
       `We've sent a password reset link to ${result.responseData.email}. Check your Inbox or Spam for further actions.`,
       HttpStatus.OK,
       true,
@@ -303,14 +303,14 @@ export class AuthRepository {
     );
 
     if (!response) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'Token not found. Please request a new one!',
         HttpStatus.NOT_FOUND,
       );
     }
 
     if (response.passwordResetToken !== data.token) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'Token not found. Please request a new one!',
         HttpStatus.NOT_FOUND,
       );
@@ -320,7 +320,7 @@ export class AuthRepository {
       !response.passwordResetExpires ||
       Date.now() > Number(response.passwordResetExpires)
     ) {
-      return BukkaResponse.customResponse(
+      return BukkaResponse.CustomResponse(
         'This token has expired. Please request a new one.',
         HttpStatus.BAD_REQUEST,
       );
@@ -337,7 +337,7 @@ export class AuthRepository {
     );
 
     if (!response) {
-      return BukkaResponse.loginResponse(
+      return BukkaResponse.LoginResponse(
         'User',
         response,
         false,
@@ -351,7 +351,7 @@ export class AuthRepository {
     );
 
     if (!validUser) {
-      return BukkaResponse.loginResponse(
+      return BukkaResponse.LoginResponse(
         'User',
         response,
         false,
@@ -370,14 +370,14 @@ export class AuthRepository {
     );
 
     if (!response) {
-      return BukkaResponse.customResponse(
+      return BukkaResponse.CustomResponse(
         'User does not exist',
         HttpStatus.BAD_REQUEST,
       );
     }
 
     if (response.emailConfirmed) {
-      return BukkaResponse.customResponse(
+      return BukkaResponse.CustomResponse(
         'Your email has already been verified. You can now log in.',
         HttpStatus.BAD_REQUEST,
         true,
@@ -409,7 +409,7 @@ export class AuthRepository {
       );
     }
 
-    return BukkaResponse.customResponse(
+    return BukkaResponse.CustomResponse(
       `Confirmation Email Sent Successfully to ${confirmEmailDto.email}. Check your Inbox or Spam for further actions.`,
       HttpStatus.OK,
       true,
@@ -426,14 +426,14 @@ export class AuthRepository {
     );
 
     if (!user) {
-      return BukkaResponse.customResponse(
+      return BukkaResponse.CustomResponse(
         'Token does not exist. Please request new one!',
         HttpStatus.BAD_REQUEST,
       );
     }
 
     if (user.emailConfirmed) {
-      return BukkaResponse.customResponse(
+      return BukkaResponse.CustomResponse(
         'Email verification successfull. Please signin.',
         HttpStatus.BAD_REQUEST,
         true,
@@ -445,14 +445,14 @@ export class AuthRepository {
       !user.confirmationCodeExpires ||
       Date.now() > Number(user.confirmationCodeExpires)
     ) {
-      return BukkaResponse.customResponse(
+      return BukkaResponse.CustomResponse(
         'This token has expired. Please request a new one.',
         HttpStatus.BAD_REQUEST,
       );
     }
 
     if (confirmationDto.token !== user.confirmationCode) {
-      return BukkaResponse.customResponse(
+      return BukkaResponse.CustomResponse(
         'Invalid confirmation code',
         HttpStatus.BAD_REQUEST,
       );
@@ -474,7 +474,7 @@ export class AuthRepository {
     );
 
     if (!result?.status) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'Verification failed! Please try again.',
         HttpStatus.NOT_IMPLEMENTED,
       );
@@ -494,7 +494,7 @@ export class AuthRepository {
       AuthQueueMessageTypeEnum.SIGNUP,
     );
 
-    return BukkaResponse.customResponse(
+    return BukkaResponse.CustomResponse(
       'Email verification successful! Please signin.',
       HttpStatus.OK,
       true,
@@ -519,7 +519,7 @@ export class AuthRepository {
     );
 
     if (!result.status) {
-      return BukkaResponse.customResponse(
+      return BukkaResponse.CustomResponse(
         'Unable to change password',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
@@ -529,7 +529,7 @@ export class AuthRepository {
       exclude: ['password'],
     });
 
-    return BukkaResponse.customResponse(
+    return BukkaResponse.CustomResponse(
       'Password reset successful. You can now signin with your new password!',
       HttpStatus.OK,
       true,

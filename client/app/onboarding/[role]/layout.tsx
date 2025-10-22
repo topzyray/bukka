@@ -10,6 +10,7 @@ import { LogOut } from "lucide-react";
 import { BackgroundIcons } from "@/components/ui/background-icons";
 import { OnboardingGuard } from "@/guards/onboarding-guard";
 import { UserRole } from "@/server/interfaces/Auth";
+import { ThemeToggle } from "@/components/atoms/mode-toggle";
 
 interface IOnboardingLayout {
   children: ReactNode;
@@ -19,12 +20,13 @@ export default function RoleBasedOnboardingLayout({
   children,
 }: IOnboardingLayout) {
   const { logout, user } = useAuth();
-  const role = user?.role ? (user.role.toLowerCase() as UserRole) : undefined;
+  const role = user?.role ? (user?.role.toLowerCase() as UserRole) : undefined;
   return (
     <OnboardingGuard roles={role ? [role] : []}>
-      <section className="relative min-h-screen flex flex-col md:flex-row items-center justify-center bg-gradient-primary p-4 sm:p-6 overflow-hidden">
+      <section className="relative min-h-screen flex flex-col md:flex-row items-center justify-center bg-gradient-primary/80 p-4 sm:p-6 overflow-hidden">
         {/* Logout Button */}
-        <div className="absolute top-3 right-3 z-50">
+        <div className="absolute top-3 right-3 z-50 flex items-center gap-2">
+          <ThemeToggle />
           <Button
             variant="outline"
             size="sm"

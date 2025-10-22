@@ -1,8 +1,12 @@
+import { Business } from './Business';
+import { User } from './User';
+
 export class Favorite {
-  id?: number;
+  id: number;
   userId: number;
-  restaurantId: number;
-  createdAt?: Date;
-  user?: any;
-  restaurant?: any;
+  businessId: number;
+  user: User;
+  business: Business;
+  createdAt: Date;
+  updatedAt: Date;
 }

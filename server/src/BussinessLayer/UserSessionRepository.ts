@@ -61,7 +61,7 @@ export class UserSessionRepository {
         deviceId,
       );
 
-    return BukkaResponse.deleteResponse(
+    return BukkaResponse.DeleteResponse(
       'Session',
       true,
       undefined,
@@ -83,7 +83,7 @@ export class UserSessionRepository {
       sessionId,
       updateData,
     );
-    return BukkaResponse.updateResponse('User session', updatedSession);
+    return BukkaResponse.UpdateResponse('User session', updatedSession);
   }
 
   async deleteSessionById(id: number): Promise<void> {
@@ -111,7 +111,7 @@ export class UserSessionRepository {
       userSession.id,
     );
 
-    return BukkaResponse.deleteResponse(
+    return BukkaResponse.DeleteResponse(
       'Session',
       true,
       undefined,
@@ -131,7 +131,7 @@ export class UserSessionRepository {
     //   return BukkaResponse.GetSingleDataResponse("Session", null)
     // }
 
-    return BukkaResponse.deleteResponse(
+    return BukkaResponse.DeleteResponse(
       'Session',
       true,
       undefined,

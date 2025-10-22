@@ -32,7 +32,7 @@ export class UserRepository {
     data.confirmationCodeExpires = Generator.CalculateExpirationTime(30);
     const user = data as User;
     const result = await this._userDataAgent.createUserAsync(user);
-    return BukkaResponse.customResponse(
+    return BukkaResponse.CustomResponse(
       `We've sent a verification token to ${result.email}. Check your Inbox or Spam for further actions.`,
       HttpStatus.CREATED,
       true,
@@ -74,7 +74,7 @@ export class UserRepository {
       throw new NotFoundException('User not found!');
     }
     const updatedUser = await this._userDataAgent.updateUser(userId, data);
-    return BukkaResponse.updateResponse('User', updatedUser);
+    return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
   async updateUserDataAsync(data: Partial<User>): Promise<BukkaResponse<User>> {
@@ -122,7 +122,7 @@ export class UserRepository {
       loggedInUser?.id,
       data,
     );
-    return BukkaResponse.updateResponse('User', updatedUser);
+    return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
   async updateUserProfileAsync(
@@ -187,7 +187,7 @@ export class UserRepository {
       loggedInUser?.id,
       userProfileDto,
     );
-    return BukkaResponse.updateResponse('User', updatedUser);
+    return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
   async completeProfileOnboarding(): Promise<BukkaResponse<User | null>> {
@@ -199,7 +199,7 @@ export class UserRepository {
       loggedInUser?.id,
       data,
     );
-    return BukkaResponse.updateResponse('User', updatedUser);
+    return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
   async adminUpdateUserAsync(
@@ -214,7 +214,7 @@ export class UserRepository {
       id as number,
       updateData,
     );
-    return BukkaResponse.updateResponse('User', updatedUser);
+    return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
   async deleteUser(userId: number): Promise<BukkaResponse<void>> {
@@ -223,7 +223,7 @@ export class UserRepository {
       throw new NotFoundException('User not found!');
     }
     await this._userDataAgent.deleteUser(user?.id as number);
-    return BukkaResponse.deleteResponse('User', true);
+    return BukkaResponse.DeleteResponse('User', true);
   }
 
   async findByFilters(filterDto: UserFilterDto): Promise<PagedData<any[]>> {
@@ -246,14 +246,20 @@ export class UserRepository {
     );
   }
 
-  async adminFindByFilters(
-    filterDto: AdminUserFilterDto,
-  ): Promise<PagedData<any[]>> {
+  async adminFindByFilters(filterDto: AdminUserFilterDto) {
     const { userId, ...otherFilters } = filterDto;
     const mergedFilters = { id: userId, ...otherFilters };
     const query = FilterQueryHelper.buildQuery({
       dto: mergedFilters,
-      rules: [{ field: 'userStatus' }, { field: 'phoneNumber' }],
+      rules: [
+        { field: 'id' },
+        { field: 'role' },
+        { field: 'gender' },
+        { field: 'isDeleted' },
+        { field: 'userStatus' },
+        { field: 'isOnboarded' },
+        { field: 'emailConfirmed' },
+      ],
       searchConfig: {
         fields: ['username', 'email', 'firstName', 'lastName'],
         mode: 'insensitive',

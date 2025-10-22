@@ -226,13 +226,13 @@ export class FileController {
       id,
       deleteFileDto.relativePath,
     );
-    return res.status(response.responseCode).json(response);
+    return BukkaResponse.GetStatusResponse(response, res);
   }
 
   @Delete('user')
   @ApiOperation({ summary: 'Delete all files for a user' })
   async deleteUserFiles(@Res() res: Response) {
     const response = await this.fileRepository.deleteUserFiles();
-    return res.status(response.responseCode).json(response);
+    return BukkaResponse.GetStatusResponse(response, res);
   }
 }

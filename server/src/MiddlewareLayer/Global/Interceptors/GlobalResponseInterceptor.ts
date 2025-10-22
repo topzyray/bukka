@@ -37,11 +37,11 @@ export class GlobalResponseInterceptor<T> implements NestInterceptor<T, any> {
           'pageSize' in data;
 
         if (handler.toLowerCase().startsWith('create')) {
-          response = BukkaResponse.createResponse(entityName, data);
+          response = BukkaResponse.CreateResponse(entityName, data);
         } else if (handler.toLowerCase().startsWith('update')) {
-          response = BukkaResponse.updateResponse(entityName, data);
+          response = BukkaResponse.UpdateResponse(entityName, data);
         } else if (handler.toLowerCase().startsWith('delete')) {
-          response = BukkaResponse.deleteResponse(
+          response = BukkaResponse.DeleteResponse(
             entityName,
             !!data,
             undefined,

@@ -61,7 +61,7 @@ export class WaitListController {
   @ApiOperation({ summary: 'Get total waitlist count' })
   async getTotalWaitlistCount(@Res() res: Response) {
     const response = await this._waitlistRepository.getTotalWaitlistCount();
-    return res.status(response.responseCode).json(response);
+    return BukkaResponse.GetStatusResponse(response, res);
   }
 
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
@@ -91,7 +91,7 @@ export class WaitListController {
     example: 12,
   })
   async deleteUserAccount(@Param('id') id: number, @Res() res: Response) {
-    const result = await this._waitlistRepository.deleteWaitlist(id);
-    return res.status(result.responseCode).json(result);
+    const response = await this._waitlistRepository.deleteWaitlist(id);
+    return BukkaResponse.GetStatusResponse(response, res);
   }
 }

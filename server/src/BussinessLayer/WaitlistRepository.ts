@@ -38,7 +38,7 @@ export class WaitlistRepository {
       //     getStartedLink: 'https://buuka.vercel.app',
       //   },
       // });
-      return BukkaResponse.customResponse(
+      return BukkaResponse.CustomResponse(
         'You’re already on the list! We’ll notify you when Bukka goes live!',
         HttpStatus.CREATED,
         true,
@@ -64,7 +64,7 @@ export class WaitlistRepository {
       },
     });
 
-    return BukkaResponse.customResponse(
+    return BukkaResponse.CustomResponse(
       'You’re on the list! We’ll notify you when Bukka goes live! Check your Inbox or Spam for further actions.',
       HttpStatus.CREATED,
       true,
@@ -87,7 +87,7 @@ export class WaitlistRepository {
     }
 
     await this._waitlistDataAgent.deleteWaitlist(waitlistId);
-    return BukkaResponse.deleteResponse('Waitlist', true);
+    return BukkaResponse.DeleteResponse('Waitlist', true);
   }
 
   async findByFilters(filterDto: WaitlistFilterDto): Promise<PagedData<any[]>> {
@@ -110,7 +110,7 @@ export class WaitlistRepository {
 
   async getTotalWaitlistCount(): Promise<BukkaResponse<number>> {
     const waitlistCount = await this._waitlistDataAgent.getWaitlistCount();
-    return BukkaResponse.customResponse(
+    return BukkaResponse.CustomResponse(
       'Total Waitlist count',
       HttpStatus.OK,
       true,

@@ -6,3 +6,4 @@ export * from "./waitlistRoutes";
 export * from "./userNotificationRoutes";
 export * from "./notificationSettingRoutes";
 export * from "./userPersonalizationRoutes";
+export * from "./businessRoutes";

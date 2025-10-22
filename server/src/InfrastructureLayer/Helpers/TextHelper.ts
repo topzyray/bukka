@@ -146,4 +146,20 @@ export class TextHelper {
   static computeMemberId(firstMember: string, secondMember: string) {
     return [firstMember, secondMember].sort().join('_');
   }
+
+  static generateTicketId(): string {
+    return `BUKKA-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  }
+
+  static slugify(input = ''): string {
+    return input
+      .toString()
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036F]/g, '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  }
 }

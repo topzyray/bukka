@@ -1,5 +1,8 @@
+import { Business } from './Business';
+import { User } from './User';
+
 export class Location {
-  id?: number;
+  id: number;
   placeId: string;
   latitude: number;
   longitude: number;
@@ -8,11 +11,13 @@ export class Location {
   state?: string;
   country?: string;
   zipCode?: string;
+  landmark?: string;
+  plusCode?: string;
   cityId?: string;
   stateId?: string;
   countryId?: string;
-  business?: any;
-  user?: any;
-  createdAt?: Date;
-  updatedAt?: Date;
+  businesses?: Business[];
+  users?: User[];
+  createdAt: Date;
+  updatedAt: Date;
 }

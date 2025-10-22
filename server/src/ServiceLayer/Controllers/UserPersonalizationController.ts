@@ -6,15 +6,10 @@ import {
   Param,
   Body,
   Res,
-  Query,
   Put,
   UseGuards,
   Post,
 } from '@nestjs/common';
-import {
-  NotificationSettingsFilterDto,
-  UpdateNotificationSettingsDto,
-} from 'src/DomainLayer/Dtos/NotificationSettingsDto';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import {
   ApiTags,

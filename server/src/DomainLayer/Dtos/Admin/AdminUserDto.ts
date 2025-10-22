@@ -10,10 +10,12 @@ import {
   IsOptional,
   IsDateString,
   IsNumber,
+  IsBoolean,
 } from 'class-validator';
 import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
 import { Transform } from 'class-transformer';
 import { PaginationDto } from '../Base/PaginationDto';
+import { GenderEnum } from 'src/DomainLayer/Enums/GenderEnum';
 
 export class CreateAdminUserDto {
   @ApiProperty({ example: 'example@bukka.com' })
@@ -94,28 +96,20 @@ export class AdminUpdateUserDto {
 }
 
 export class AdminUserFilterDto extends PaginationDto {
-  @ApiProperty({ example: 12, required: false })
+  @ApiProperty({ example: 1, required: false })
   @IsOptional()
   @IsNumber()
   @Transform(({ value }) => Number.parseInt(value, 10))
   userId?: number;
 
   @ApiProperty({
-    example: 'Search by email, first name or last name',
+    example: UserRoleEnum.USER,
+    enum: UserRoleEnum,
     required: false,
   })
   @IsOptional()
   @IsString()
-  search?: string;
-
-  @ApiProperty({
-    example: UserTypeEnum.USER,
-    enum: UserTypeEnum,
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  userType?: UserTypeEnum;
+  role?: UserRoleEnum;
 
   @ApiProperty({
     example: UserStatusEnum.ACTIVE,
@@ -125,4 +119,54 @@ export class AdminUserFilterDto extends PaginationDto {
   @IsOptional()
   @IsString()
   userStatus?: UserStatusEnum;
+
+  @ApiProperty({
+    example: GenderEnum.MALE,
+    enum: GenderEnum,
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  gender?: GenderEnum;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+    return Boolean(value);
+  })
+  isDeleted?: boolean;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+    return Boolean(value);
+  })
+  isOnboarded?: boolean;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+    return Boolean(value);
+  })
+  emailConfirmed?: boolean;
+
+  @ApiProperty({
+    example: 'Search by username, email, first name or last name',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
 }

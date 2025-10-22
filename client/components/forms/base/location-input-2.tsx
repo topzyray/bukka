@@ -25,7 +25,7 @@ interface ILocationInputProps {
   icon?: React.ElementType;
 }
 
-export default function LocationInput({
+export default function LocationInput2({
   formControl,
   formName,
   formLabel,

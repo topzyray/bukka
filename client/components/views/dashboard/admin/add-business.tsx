@@ -38,7 +38,7 @@ export const AddBusiness = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      {/* <Header /> */}
 
       <main className="container mx-auto px-4 py-8 max-w-3xl">
         <motion.div
@@ -173,7 +173,7 @@ export const AddBusiness = () => {
         </motion.div>
       </main>
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

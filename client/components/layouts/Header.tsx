@@ -72,7 +72,7 @@ export function Header({ className }: HeaderProps) {
                 placeholder="Search restaurants, cuisines..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full  border-white/20 focus:border-primary/50"
+                className="pl-10 pr-4 py-2 w-full  border-white/20 dark:bg-transparent focus:border-primary/50 dark:text-primary dark:placeholder:text-primary"
               />
             </section>
           </form>
@@ -83,6 +83,12 @@ export function Header({ className }: HeaderProps) {
               <Link href="/search" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Explore
+              </Link>
+            </BukkaButton>
+            <BukkaButton variant="ghost" size="sm" asChild>
+              <Link href="/map" className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                Explore Map
               </Link>
             </BukkaButton>
             {/* <BukkaButton variant="ghost" size="sm" asChild>

@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384pt" height="384pt" viewBox="0 0 384 384" version="1.1" class="iconadda">
+<g id="animate_0" transform="rotate(0,192,192) translate(0,0) scale(1,1)">
+<g id="animate_1" style="transform-origin: 192px 137.625px;" class=""><path style="stroke-width: 30; stroke-linecap: round; stroke-linejoin: round; stroke-opacity: 1; stroke-miterlimit: 10;" d="M 0.00108923 0.000981653 C 0.00108923 -59.921072 -48.577181 -108.499343 -108.499235 -108.499343 C -168.421289 -108.499343 -216.999559 -59.921072 -216.999559 0.000981653 C -216.999559 59.923036 -168.421289 108.501306 -108.499235 108.501306 C -48.577181 108.501306 0.00108923 59.923036 0.00108923 0.000981653 Z M 0.00108923 0.000981653 " transform="matrix(0.749998,0,0,-0.749998,273.374183,137.625736)" id="animate_2" stroke="#462009" data-original="#000000" fill="none" stroke-width="30" class=""></path>
+</g><g id="animate_3" style="transform-origin: 192px 180.75px;" class=""><path style="stroke-width: 30; stroke-linecap: round; stroke-linejoin: round; stroke-opacity: 1; stroke-miterlimit: 10;" d="M 0.000765002 0.00150759 C -97.20265 0.00150759 -175.999761 -78.795603 -175.999761 -175.999018 C -175.999761 -214.269966 -163.775766 -249.68153 -143.036121 -278.561825 L -12.176355 -460.739453 C -9.452388 -464.525922 -5.020083 -466.999888 0.000765002 -466.999888 C 5.021613 -466.999888 9.44871 -464.525922 12.172676 -460.739453 L 143.032442 -278.561825 C 163.777296 -249.68153 176.001291 -214.269966 176.001291 -175.999018 C 176.001291 -78.795603 97.20418 0.00150759 0.000765002 0.00150759 Z M 0.000765002 0.00150759 " transform="matrix(0.749998,0,0,-0.749998,191.999426,5.626131)" id="animate_4" stroke="#462009" data-original="#000000" fill="none" stroke-width="30" class=""></path>
+</g><g id="animate_5" style="transform-origin: 192px 346.326px;" class=""><path style="stroke-width: 30; stroke-linecap: round; stroke-linejoin: round; stroke-opacity: 1; stroke-miterlimit: 10;" d="M -0.0000927578 -0.000832846 C -18.942858 -8.105024 -30.609559 -19.146723 -30.609559 -31.323843 C -30.609559 -56.178084 17.968711 -76.323978 77.890765 -76.323978 C 137.812819 -76.323978 186.391089 -56.178084 186.391089 -31.323843 C 186.391089 -13.537332 161.516015 1.832506 125.406532 9.139819 " transform="matrix(0.749998,0,0,-0.749998,133.582101,321.132188)" id="animate_6" stroke="#462009" data-original="#000000" fill="none" stroke-width="30" class=""></path>
+</g></g>
+<style>
+            svg #animate_3 {
+                animation: 1s 1 forwards cubic-bezier(.36, -0.01, .5, 1.38) zoomOut, 1.5s infinite linear ;
+                animation-delay: 0s, 1s;
+            }
+        
+            svg #animate_5 {
+                animation: 1s 1 forwards cubic-bezier(.36, -0.01, .5, 1.38) , 1.5s infinite linear ;
+                animation-delay: 0s, 1s;
+            }
+        
+            @keyframes shake {
+                10%, 90% { transform: translate3d(-1px, 0, 0); }
+                20%, 80% { transform: translate3d(2px, 0, 0); }
+                30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+                40%, 60% { transform: translate3d(4px, 0, 0); }
+            }
+        
+            @keyframes floating {
+                0% { opacity: 1; transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+                100% { opacity: 1; transform: translateY(0px); }
+            }
+        
+            @keyframes wind {
+                0% { transform: rotate(0deg); }
+                25% { transform: rotate(1deg); }
+                75% { transform: rotate(-1deg); }
+            }
+        
+            @keyframes spin {
+                from { transform: rotate(0); }
+                to { transform: rotate(360deg); }
+            }
+        
+            @keyframes heartbeat {
+                0% { transform: scale(1); }
+                10% { transform: scale(1.1); }
+                30% { transform: scale(1); }
+                40% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                60% { transform: scale(1); }
+                100% { transform: scale(1); }
+            }
+        
+            @keyframes fadeIn {
+                0% { opacity: 0; }
+                100% { opacity: 1; }
+            }
+        
+            @keyframes lightSpeedLeft {
+                from { transform: translate3d(-50%, 0, 0) skewX(20deg); opacity: 0; }
+                60% { transform: skewX(-10deg); opacity: 1; }
+                80% { transform: skewX(2deg); }
+                to { opacity: 1; transform: translate3d(0, 0, 0); }
+            }
+        
+            @keyframes lightSpeedRight {
+                from { transform: translate3d(50%, 0, 0) skewX(-20deg); opacity: 0; }
+                60% { transform: skewX(10deg); opacity: 1; }
+                80% { transform: skewX(-2deg); }
+                to { opacity: 1; transform: translate3d(0, 0, 0); }
+            }
+        
+            @keyframes zoomOut {
+                0% { opacity: 0; transform: scale(1.5); }
+                100% { opacity: 1; transform: scale(1); }
+            }
+        
+            @keyframes zoomIn {
+                0% { opacity: 0; transform: scale(0.5); }
+                100% { opacity: 1; transform: scale(1); }
+            }
+        
+            @keyframes slideUp {
+                0% { opacity: 0; transform: translateY(30px); }
+                100% { opacity: 1;transform: translateY(0);}    
+            }
+        
+            @keyframes slideDown {
+                0% { opacity: 0; transform: translateY(-30px); }
+                100% { opacity: 1; transform: translateY(0); }
+            }
+        
+            @keyframes slideLeft {
+                0% { opacity: 0; transform: translateX(-30px); }
+                100% { opacity: 1; transform: translateX(0); }
+            }
+        
+            @keyframes slideRight {
+                0% { opacity: 0; transform: translateX(30px); }
+                100% { opacity: 1; transform: translateX(0); }
+            }
+        </style></svg>

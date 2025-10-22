@@ -1,70 +1,98 @@
+// CORE
+import { APP_GUARD } from '@nestjs/core';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
 import { Logger, Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+
+// MODULES
 import { DatabaseModule } from './UtilityLayer/Configuration/Database.module';
 import { AppConfigurationModule } from './UtilityLayer/Configuration/AppConfiguration.module';
-import { RestaurantSearchService } from './InfrastructureLayer/Services/RestaurantSearchService';
-import { AppConfigurationService } from './UtilityLayer/Configuration/AppConfiguration.service';
-import { DbAdapterEnum } from './DomainLayer/Enums/DbAdapterEnum';
-import { HttpServiceWrapper } from './InfrastructureLayer/Services/HttpServiceWrapper';
-import { AuthController } from './ServiceLayer/Controllers/AuthController';
+
+// CONTROLLERS
+import { AppController } from './app.controller';
 import { UserController } from './ServiceLayer/Controllers/UserController';
+import { AuthController } from './ServiceLayer/Controllers/AuthController';
+import { FileController } from './ServiceLayer/Controllers/FileController';
+import { ReviewController } from './ServiceLayer/Controllers/ReviewController';
+import { HealthController } from './ServiceLayer/Controllers/HealthController';
+import { SupportController } from './ServiceLayer/Controllers/SupportController';
+import { BusinessController } from './ServiceLayer/Controllers/BusinessController';
+import { LocationController } from './ServiceLayer/Controllers/LocationController';
+import { WaitListController } from './ServiceLayer/Controllers/WaitListController';
 import { UserNotificationController } from './ServiceLayer/Controllers/UserNotificationController';
+import { BusinessCategoryController } from './ServiceLayer/Controllers/BusinessCategoryController';
+import { UserPersonalizationController } from './ServiceLayer/Controllers/UserPersonalizationController';
 import { NotificationSettingsController } from './ServiceLayer/Controllers/NotificationSettingsController';
-import { HandlebarsEngine } from './InfrastructureLayer/Services/email/template-engine/HandleBarsEngine';
-import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/template-engine/ManualEngine';
-import { AuthNotificationHelper } from './InfrastructureLayer/Helpers/AuthNotificationHelper';
-import { NotificationSettingsDataAgent } from './DataLayer/DataAgents/NotificationSettingsDataAgent';
-import { UserNotificationDataAgent } from './DataLayer/DataAgents/UserNotificationDataAgent';
-import { NotificationSettingsRepository } from './BussinessLayer/NotificationSettingsRepository';
-import { UserNotificationRepository } from './BussinessLayer/UserNotificationRepository';
+import { UserManagementController } from './ServiceLayer/Controllers/Admin/UserManagementController';
+
+// REPOSITORIES
+import { UserRepository } from './BussinessLayer/UserRepository';
 import { AuthRepository } from './BussinessLayer/AuthRepository';
+import { TokenRepository } from './BussinessLayer/TokenRepository';
+import { ReviewRepository } from './BussinessLayer/ReviewRepository';
+import { SupportRepository } from './BussinessLayer/SupportRepository';
+import { WaitlistRepository } from './BussinessLayer/WaitlistRepository';
+import { BusinessRepository } from './BussinessLayer/BusinessRepository';
+import { LocationRepository } from './BussinessLayer/LocationRepository';
+import { UserSessionRepository } from './BussinessLayer/UserSessionRepository';
+import { BusinessCategoryRepository } from './BussinessLayer/BusinessCategoryRepository';
+import { UserNotificationRepository } from './BussinessLayer/UserNotificationRepository';
+import { UserPersonalizationRepository } from './BussinessLayer/UserPersonalizationRepository';
+import { NotificationSettingsRepository } from './BussinessLayer/NotificationSettingsRepository';
+
+// DATA AGENTS
+import { FileDataAgent } from './DataLayer/DataAgents/FileDataAgent';
 import { UserDataAgent } from './DataLayer/DataAgents/UserDataAgent';
-import { EmailTemplateFactory } from './InfrastructureLayer/Services/email/EmailTemplateFactory';
-import { EmailFactory } from './InfrastructureLayer/Services/email/EmailFactory';
+import { ReviewDataAgent } from './DataLayer/DataAgents/ReviewDataAgent';
+import { SupportDataAgent } from './DataLayer/DataAgents/SupportDataAgent';
+import { LocationDataAgent } from './DataLayer/DataAgents/LocationDataAgent';
+import { WaitlistDataAgent } from './DataLayer/DataAgents/WaitlistDataAgent';
+import { BusinessDataAgent } from './DataLayer/DataAgents/BusinessDataAgent';
+import { UserSessionDataAgent } from './DataLayer/DataAgents/UserSessionDataAgent';
+import { BusinessCategoryDataAgent } from './DataLayer/DataAgents/BusinessCategoryDataAgent';
+import { UserNotificationDataAgent } from './DataLayer/DataAgents/UserNotificationDataAgent';
+import { UserPersonalizationDataAgent } from './DataLayer/DataAgents/UserPersonalizationDataAgent';
+import { NotificationSettingsDataAgent } from './DataLayer/DataAgents/NotificationSettingsDataAgent';
+
+// SERVICES
+import { JwtService } from '@nestjs/jwt';
+import { AppService } from './app.service';
+import { EmailService } from './InfrastructureLayer/Services/email/EmailService';
+import { KeepAliveService } from './InfrastructureLayer/Services/KeepAliveService';
+import { HttpServiceWrapper } from './InfrastructureLayer/Services/HttpServiceWrapper';
+import { FileUploadService } from './InfrastructureLayer/Services/upload/FileUploadService';
+import { AppConfigurationService } from './UtilityLayer/Configuration/AppConfiguration.service';
+import { RestaurantSearchService } from './InfrastructureLayer/Services/RestaurantSearchService';
 import { NotificationService } from './InfrastructureLayer/Services/notification/NotificationService';
 import { AuthNotificationService } from './InfrastructureLayer/Services/notification/auth/AuthNotificationService';
-import { EmailService } from './InfrastructureLayer/Services/email/EmailService';
-import { ConfigModule } from '@nestjs/config';
-import { HttpModule } from '@nestjs/axios';
-import { NodemailerProvider } from './InfrastructureLayer/Services/email/providers/NodemailerProvider';
-import { TokenRepository } from './BussinessLayer/TokenRepository';
-import { UserRepository } from './BussinessLayer/UserRepository';
-import { JwtService } from '@nestjs/jwt';
-import { HealthController } from './ServiceLayer/Controllers/HealthController';
-import { WaitListController } from './ServiceLayer/Controllers/WaitListController';
-import { WaitlistRepository } from './BussinessLayer/WaitlistRepository';
-import { WaitlistDataAgent } from './DataLayer/DataAgents/WaitlistDataAgent';
-import { MailjetProvider } from './InfrastructureLayer/Services/email/providers/MailjetProvider';
-import { MailgunProvider } from './InfrastructureLayer/Services/email/providers/MailgunProvider';
-import { FileDataAgent } from './DataLayer/DataAgents/FileDataAgent';
+
+// FACTORIES
 import { FileRepository } from './BussinessLayer/FileRepository';
-import { FileController } from './ServiceLayer/Controllers/FileController';
-import { FileReferenceHelper } from './InfrastructureLayer/Helpers/FileReferenceHelper';
-import { FileUploadService } from './InfrastructureLayer/Services/upload/FileUploadService';
 import { FileFactory } from './InfrastructureLayer/Services/upload/FileFactory';
+import { EmailFactory } from './InfrastructureLayer/Services/email/EmailFactory';
+import { EmailTemplateFactory } from './InfrastructureLayer/Services/email/EmailTemplateFactory';
+
+// PROVIDERS
+import { MailgunProvider } from './InfrastructureLayer/Services/email/providers/MailgunProvider';
+import { MailjetProvider } from './InfrastructureLayer/Services/email/providers/MailjetProvider';
 import { LocalDiskProvider } from './InfrastructureLayer/Services/upload/providers/LocalDiskProvider';
+import { NodemailerProvider } from './InfrastructureLayer/Services/email/providers/NodemailerProvider';
 import { CloudinaryProvider } from './InfrastructureLayer/Services/upload/providers/CloudinaryProvider';
-import { ScheduleModule } from '@nestjs/schedule';
-import { KeepAliveService } from './InfrastructureLayer/Services/KeepAliveService';
-import { UserPersonalizationController } from './ServiceLayer/Controllers/UserPersonalizationController';
-import { UserPersonalizationRepository } from './BussinessLayer/UserPersonalizationRepository';
-import { UserPersonalizationDataAgent } from './DataLayer/DataAgents/UserPersonalizationDataAgent';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
-import { UserSessionDataAgent } from './DataLayer/DataAgents/UserSessionDataAgent';
-import { UserSessionRepository } from './BussinessLayer/UserSessionRepository';
+
+// HELPERS
+import { FileReferenceHelper } from './InfrastructureLayer/Helpers/FileReferenceHelper';
+import { AuthNotificationHelper } from './InfrastructureLayer/Helpers/AuthNotificationHelper';
+
+// OTHERS
+import { DbAdapterEnum } from './DomainLayer/Enums/DbAdapterEnum';
+import { HandlebarsEngine } from './InfrastructureLayer/Services/email/template-engine/HandleBarsEngine';
+import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/template-engine/ManualEngine';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60,
-        limit: 5,
-      },
-    ]),
-
     // ThrottlerModule.forRootAsync({
     //   imports: [ConfigModule],
     //   inject: [ConfigService],
@@ -79,19 +107,26 @@ import { UserSessionRepository } from './BussinessLayer/UserSessionRepository';
     ConfigModule,
     TerminusModule,
     AppConfigurationModule,
-    DatabaseModule.forRoot({ adapter: DbAdapterEnum.PRISMA }),
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot([{ ttl: 60, limit: 5 }]),
+    DatabaseModule.forRoot({ adapter: DbAdapterEnum.PRISMA }),
   ],
   controllers: [
     AppController,
     HealthController,
-    AuthController,
+    SupportController,
     WaitListController,
+    AuthController,
     FileController,
     UserController,
     UserNotificationController,
     NotificationSettingsController,
     UserPersonalizationController,
+    BusinessCategoryController,
+    BusinessController,
+    LocationController,
+    ReviewController,
+    UserManagementController,
   ],
   providers: [
     {
@@ -99,52 +134,60 @@ import { UserSessionRepository } from './BussinessLayer/UserSessionRepository';
       useClass: ThrottlerGuard,
     },
 
-    AppService,
-    AppConfigurationService,
-    RestaurantSearchService,
     JwtService,
+    AppService,
     EmailService,
-    FileUploadService,
     KeepAliveService,
-
-    AuthNotificationService,
+    FileUploadService,
     NotificationService,
+    AppConfigurationService,
+    AuthNotificationService,
+    RestaurantSearchService,
 
-    EmailFactory,
-    EmailTemplateFactory,
     FileFactory,
-
-    WaitlistRepository,
-    AuthRepository,
-    NotificationSettingsRepository,
-    UserNotificationRepository,
-    TokenRepository,
+    EmailFactory,
     UserRepository,
+    AuthRepository,
     FileRepository,
-    UserPersonalizationRepository,
+    TokenRepository,
+    ReviewRepository,
+    SupportRepository,
+    WaitlistRepository,
+    BusinessRepository,
+    LocationRepository,
+    EmailTemplateFactory,
     UserSessionRepository,
+    UserNotificationRepository,
+    BusinessCategoryRepository,
+    NotificationSettingsRepository,
+    UserPersonalizationRepository,
 
-    WaitlistDataAgent,
-    NotificationSettingsDataAgent,
-    UserNotificationDataAgent,
     UserDataAgent,
     FileDataAgent,
-    UserPersonalizationDataAgent,
+    ReviewDataAgent,
+    SupportDataAgent,
+    WaitlistDataAgent,
+    LocationDataAgent,
+    BusinessDataAgent,
     UserSessionDataAgent,
+    BusinessCategoryDataAgent,
+    UserNotificationDataAgent,
+    UserPersonalizationDataAgent,
+    NotificationSettingsDataAgent,
 
-    AuthNotificationHelper,
     FileReferenceHelper,
+    AuthNotificationHelper,
 
-    NodemailerProvider,
     MailjetProvider,
     MailgunProvider,
     LocalDiskProvider,
+    NodemailerProvider,
     CloudinaryProvider,
 
-    HttpServiceWrapper,
-    HandlebarsEngine,
-    ManualTemplateEngine,
     Logger,
+    HandlebarsEngine,
+    HttpServiceWrapper,
+    ManualTemplateEngine,
   ],
 })
 export class AppModule {}

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384pt" height="384pt" viewBox="0 0 384 384" version="1.1" class="iconadda">
+<g id="animate_0" transform="rotate(0,192,192) translate(0,0) scale(1.0,1.0)">
+<g id="animate_1" style="transform-origin: 192px 192.001px;" class="selected animated"><path style="stroke: none; fill-rule: nonzero; fill-opacity: 1;" d="M 192 0 C 115.316406 0 52.929688 62.386719 52.929688 139.070312 C 52.929688 234.234375 177.382812 373.945312 182.683594 379.847656 C 187.660156 385.390625 196.351562 385.382812 201.316406 379.847656 C 206.613281 373.945312 331.070312 234.238281 331.070312 139.070312 C 331.070312 62.386719 268.683594 0 192 0 Z M 192 209.039062 C 153.417969 209.039062 122.03125 177.652344 122.03125 139.070312 C 122.03125 100.488281 153.417969 69.101562 192 69.101562 C 230.582031 69.101562 261.96875 100.488281 261.96875 139.070312 C 261.96875 177.652344 230.582031 209.039062 192 209.039062 Z M 192 209.039062 " id="animate_2" data-original="#000001" fill="#462009" class=""></path>
+</g></g>
+<style>
+            svg #animate_1 {
+                animation: 1s 1 forwards cubic-bezier(.36, -0.01, .5, 1.38) slideDown, 1.5s infinite linear ;
+                animation-delay: 0s, 1s;
+            }
+        
+            @keyframes slideUp {
+                0% { opacity: 0; transform: translateY(30px); }
+                100% { opacity: 1;transform: translateY(0);}    
+            }
+        
+            @keyframes slideDown {
+                0% { opacity: 0; transform: translateY(-30px); }
+                100% { opacity: 1; transform: translateY(0); }
+            }
+        
+            @keyframes zoomIn {
+                0% { opacity: 0; transform: scale(0.5); }
+                100% { opacity: 1; transform: scale(1); }
+            }
+        
+            @keyframes zoomOut {
+                0% { opacity: 0; transform: scale(1.5); }
+                100% { opacity: 1; transform: scale(1); }
+            }
+        
+            @keyframes slideLeft {
+                0% { opacity: 0; transform: translateX(-30px); }
+                100% { opacity: 1; transform: translateX(0); }
+            }
+        
+            @keyframes lightSpeedRight {
+                from { transform: translate3d(50%, 0, 0) skewX(-20deg); opacity: 0; }
+                60% { transform: skewX(10deg); opacity: 1; }
+                80% { transform: skewX(-2deg); }
+                to { opacity: 1; transform: translate3d(0, 0, 0); }
+            }
+        
+            @keyframes lightSpeedLeft {
+                from { transform: translate3d(-50%, 0, 0) skewX(20deg); opacity: 0; }
+                60% { transform: skewX(-10deg); opacity: 1; }
+                80% { transform: skewX(2deg); }
+                to { opacity: 1; transform: translate3d(0, 0, 0); }
+            }
+        
+            @keyframes fadeIn {
+                0% { opacity: 0; }
+                100% { opacity: 1; }
+            }
+        </style></svg>

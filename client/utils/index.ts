@@ -6,3 +6,4 @@ export * from "./route-access-utils";
 export * from "./extract-error-utils";
 export * from "./dashboard-confg-utils";
 export * from "./token-encryption-utils";
+export * from "./slug-utils";

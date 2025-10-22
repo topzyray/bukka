@@ -185,16 +185,8 @@ export class UserDataAgent implements IReferenceEntityAgent {
     const pageData = new PagedData<User[]>();
     pageData.page = pageNumber;
     pageData.pageSize = pageSize;
-
-    const mergedFilter = FilterQueryHelper.mergeFilterWithCondition(filter, {
-      AND: [
-        { field: 'isDeleted', op: 'eq', value: false },
-        { field: 'id', op: 'ne', value: filter.field === 'id' },
-      ],
-    });
-
     const spec: QuerySpec = {
-      filter: mergedFilter,
+      filter,
       sort: [{ field: 'createdAt', direction: 'desc' }],
       pagination: { page: pageNumber, pageSize },
       extras: {
@@ -207,51 +199,38 @@ export class UserDataAgent implements IReferenceEntityAgent {
         },
       },
     };
-
-    const total = await this.model.count({ filter: mergedFilter });
+    const total = await this.model.count({ filter });
     pageData.total = total;
     pageData.pageCount = Math.ceil(total / pageSize);
-
-    const data = await this.model.find(spec);
-    pageData.data = data;
+    pageData.data = await this.model.find(spec);
     return pageData;
   }
 
   async getAdminOverview() {
     const totalUsers = await this.model.count({});
-
     const newSignups = await this.model.count({
       filter: {
-        filter: {
-          field: 'createdAt',
-          op: 'gte',
-          value: new Date(new Date().setDate(new Date().getDate() - 7)), // Last 7 days
-        },
+        field: 'createdAt',
+        op: 'gte',
+        value: new Date(new Date().setDate(new Date().getDate() - 7)), // Last 7 days
       },
     });
-
     const activeAccounts = await this.model.count({
       filter: {
-        filter: {
-          field: 'userStatus',
-          op: 'eq',
-          value: UserStatusEnum.ACTIVE,
-        },
+        field: 'userStatus',
+        op: 'eq',
+        value: UserStatusEnum.ACTIVE,
       },
     });
-
     const deletedAccounts = await this.model.count({
       filter: {
-        filter: {
-          field: 'userStatus',
-          op: 'eq',
-          value: UserStatusEnum.DELETED,
-        },
+        field: 'userStatus',
+        op: 'eq',
+        value: UserStatusEnum.DELETED,
       },
     });
-
     return {
-      numberOfUsers: totalUsers,
+      totalUsers: totalUsers,
       newSignups: newSignups,
       activeAccounts: activeAccounts,
       deletedAccounts: deletedAccounts,

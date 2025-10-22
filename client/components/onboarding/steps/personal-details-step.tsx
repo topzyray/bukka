@@ -67,23 +67,30 @@ export function PersonalDetailsStep({
 
   const form = useForm({
     resolver: zodResolver(personalDetailsSchema),
-    defaultValues: {},
     mode: "all",
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      username: "",
+      email: "",
+      gender: "",
+      phoneNumber: "",
+      bio: "",
+    },
   });
 
   useEffect(() => {
-    if (user) {
-      form.reset({
-        firstName: TextHelper.capitalizeWords(user?.firstName),
-        lastName: TextHelper.capitalizeWords(user?.lastName),
-        email: user?.email,
-        username: TextHelper.capitalizeWords(user?.username),
-        gender: TextHelper.capitalizeWords(user?.gender),
-        phoneNumber: user?.phoneNumber ?? "",
-        bio: TextHelper.capitalizeWords(user?.bio) ?? "",
-      });
-    }
-  }, [user, form]);
+    if (!user) return;
+    form.reset({
+      firstName: TextHelper.capitalizeWords(user?.firstName),
+      lastName: TextHelper.capitalizeWords(user?.lastName),
+      email: user?.email,
+      username: TextHelper.capitalizeWords(user?.username),
+      gender: user?.gender ?? "",
+      phoneNumber: user?.phoneNumber ?? "",
+      bio: TextHelper.capitalizeWords(user?.bio ?? ""),
+    });
+  }, [form, user]);
 
   const { data: savedProgress, isLoading: isFetchingProgress } =
     useOnboardingProgress(user?.id as number);
@@ -178,6 +185,7 @@ export function PersonalDetailsStep({
               formName="phoneNumber"
               autoDetect
               disabled={isUpdatingUserData}
+              withKey={user !== null}
             />
 
             <TextAreaComponent

@@ -35,6 +35,11 @@ import {
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { BukkaButton } from "@/components/ui/button-variants";
+import {
+  PageWrapper,
+  PageWrapperContent,
+  PageWrapperContentWithFramer,
+} from "@/components/ui/page-wrapper";
 
 // Mock data for charts
 const userGrowthData = [
@@ -95,16 +100,9 @@ export function AdminOverview() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* <Header /> */}
-
-      <main className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-6"
-        >
+    <PageWrapper>
+      <PageWrapperContent className="container mx-auto px-4 py-8">
+        <PageWrapperContentWithFramer>
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
@@ -283,7 +281,7 @@ export function AdminOverview() {
                   time: "1 hour ago",
                 },
                 {
-                  action: "System maintenance completed",
+                  action: "System PageWrapperContenttenance completed",
                   user: "System",
                   time: "2 hours ago",
                 },
@@ -305,10 +303,8 @@ export function AdminOverview() {
               ))}
             </CardContent>
           </Card>
-        </motion.div>
-      </main>
-
-      {/* <Footer /> */}
-    </div>
+        </PageWrapperContentWithFramer>
+      </PageWrapperContent>
+    </PageWrapper>
   );
 }

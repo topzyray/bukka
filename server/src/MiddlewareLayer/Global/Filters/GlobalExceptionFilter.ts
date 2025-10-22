@@ -54,6 +54,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       errorDetails: details,
     });
 
-    response.status(status).json(BukkaResponse.errorResponse(message, status));
+    response.status(status).json(BukkaResponse.ErrorResponse(message, status));
   }
 }

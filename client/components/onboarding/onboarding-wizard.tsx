@@ -42,7 +42,19 @@ type StepDescriptor = {
 
 /** Map roles -> step descriptors */
 const roleStepMap: Record<UserRole, StepDescriptor[]> = {
-  ADMIN: [],
+  ADMIN: [
+    { id: "image", title: "Profile Photo", Component: ImageUploadStep },
+    {
+      id: "personal",
+      title: "Bio-Data",
+      Component: PersonalDetailsStep,
+    },
+    {
+      id: "completion",
+      title: "Final Step",
+      Component: OnboardingCompleteScreen,
+    },
+  ],
   USER: [
     { id: "image", title: "Profile Photo", Component: ImageUploadStep },
     {

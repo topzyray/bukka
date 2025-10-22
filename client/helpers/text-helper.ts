@@ -232,19 +232,6 @@ export class TextHelper {
     return url.replace(/.+\/\/|www.|\..+/g, "");
   }
 
-  static setFilePath(
-    basePath: string,
-    filePath: string,
-    userId: string,
-    fileName: string
-  ) {
-    return (
-      basePath.replace("{0}", userId) +
-      Date.now() +
-      filePath.replace("{1}", fileName)
-    );
-  }
-
   static formatTrackerDescriptionText(
     name: string | undefined,
     tracker: string[] | undefined,

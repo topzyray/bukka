@@ -13,7 +13,7 @@ export class BukkaResponse<K> {
     res.status(response.responseCode).send(response);
   }
 
-  static finishCallbackResponse(
+  static FinishCallbackResponse(
     response: BukkaResponse<any>,
     res: Response,
     callback: () => any,
@@ -22,7 +22,7 @@ export class BukkaResponse<K> {
     BukkaResponse.GetStatusResponse(response, res);
   }
 
-  static closeCallbackResponse(
+  static CloseCallbackResponse(
     response: BukkaResponse<any>,
     res: Response,
     callback: () => any,
@@ -31,7 +31,7 @@ export class BukkaResponse<K> {
     BukkaResponse.GetStatusResponse(response, res);
   }
 
-  static createResponse<T>(entityName: string, data?: T, message?: string) {
+  static CreateResponse<T>(entityName: string, data?: T, message?: string) {
     return {
       status: !!data,
       responseCode: data ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST,
@@ -44,7 +44,7 @@ export class BukkaResponse<K> {
     };
   }
 
-  static createMultipleResponse<T>(
+  static CreateMultipleResponse<T>(
     entityName: string,
     data: T[] = [],
     count: number = 0,
@@ -63,7 +63,7 @@ export class BukkaResponse<K> {
     };
   }
 
-  static verifyResponse<T>(entityName: string, data?: T, message?: string) {
+  static VerifyResponse<T>(entityName: string, data?: T, message?: string) {
     return {
       status: !!data,
       responseCode: data ? HttpStatus.OK : HttpStatus.BAD_REQUEST,
@@ -85,11 +85,12 @@ export class BukkaResponse<K> {
     };
   }
 
-  static conflictResponse(entityName: string, message?: string) {
+  static ConflictResponse(entityName: string, message?: string) {
     return {
       status: false,
       responseCode: HttpStatus.CONFLICT,
       responseMessage: message || `User with ${entityName} already exists.`,
+      responseData: null,
     };
   }
 
@@ -146,7 +147,7 @@ export class BukkaResponse<K> {
     };
   }
 
-  static updateResponse<T>(entityName: string, data?: T, message?: string) {
+  static UpdateResponse<T>(entityName: string, data?: T, message?: string) {
     return {
       status: !!data,
       responseCode: data ? HttpStatus.OK : HttpStatus.BAD_REQUEST,
@@ -159,7 +160,7 @@ export class BukkaResponse<K> {
     };
   }
 
-  static deleteResponse(
+  static DeleteResponse(
     entityName: string,
     isDeleted: boolean,
     message?: string,
@@ -177,7 +178,7 @@ export class BukkaResponse<K> {
     };
   }
 
-  static errorResponse(message: string, code?: HttpStatus) {
+  static ErrorResponse(message: string, code?: HttpStatus) {
     return {
       status: false,
       responseCode: code ?? HttpStatus.INTERNAL_SERVER_ERROR,
@@ -186,7 +187,7 @@ export class BukkaResponse<K> {
     };
   }
 
-  static badRequestResponse(message: string, code?: HttpStatus) {
+  static BadRequestResponse(message: string, code?: HttpStatus) {
     return {
       status: false,
       responseCode: code ?? HttpStatus.BAD_REQUEST,
@@ -195,7 +196,7 @@ export class BukkaResponse<K> {
     };
   }
 
-  static loginResponse<T>(
+  static LoginResponse<T>(
     entity: string,
     data?: T,
     success?: boolean,
@@ -213,7 +214,7 @@ export class BukkaResponse<K> {
     };
   }
 
-  static customResponse(
+  static CustomResponse(
     message?: string,
     status?: number,
     success?: boolean,

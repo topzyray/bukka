@@ -13,7 +13,7 @@ export function RoleBasedDashboardLayoutClient({
   children: React.ReactNode;
 }) {
   const { user } = useAuth();
-  const role = user?.role ? (user.role.toLowerCase() as UserRole) : undefined;
+  const role = user?.role ? (user?.role.toLowerCase() as UserRole) : undefined;
   return (
     <RouteGuard isProtected={true} roles={role ? [role] : []}>
       <DashboardLayout defaultOpen={defaultOpen}>{children}</DashboardLayout>

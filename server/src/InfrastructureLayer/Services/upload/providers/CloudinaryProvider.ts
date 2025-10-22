@@ -1,6 +1,5 @@
 import fetch from 'node-fetch';
 import cloudinary from 'cloudinary';
-import { nanoid } from 'nanoid';
 import { Readable } from 'stream';
 import { FileDocDto } from 'src/DomainLayer/Dtos/Base/FileDocDto';
 import {
@@ -9,14 +8,13 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { FileHelper } from 'src/InfrastructureLayer/Helpers/FileHelper';
 import { IFileUploadProvider } from 'src/DataLayer/Abstracts/Interfaces/IFileUploadProvider';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
 import { RetryHelper } from 'src/InfrastructureLayer/Helpers/RetryHelper';
 
 @Injectable()
 export class CloudinaryProvider implements IFileUploadProvider {
-  private readonly logger = new Logger();
+  private readonly logger = new Logger(CloudinaryProvider.name);
 
   constructor(private readonly configService: AppConfigurationService) {
     cloudinary.v2.config({

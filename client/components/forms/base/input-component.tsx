@@ -94,7 +94,7 @@ export function InputComponent({
             )}
 
             {/* Input with icons */}
-            <section className="relative">
+            <section className="relative flex items-center">
               {Icon && (
                 <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               )}

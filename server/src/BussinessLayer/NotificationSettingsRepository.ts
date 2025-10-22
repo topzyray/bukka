@@ -25,7 +25,7 @@ export class NotificationSettingsRepository {
       await this._notificationSettingsDataAgent.createNotificationSetting(
         dto as INotificationSettings,
       );
-    return BukkaResponse.createResponse('Notification setting', settings);
+    return BukkaResponse.CreateResponse('Notification setting', settings);
   }
 
   async findNotificationById(
@@ -82,7 +82,7 @@ export class NotificationSettingsRepository {
 
     const updatedNotificationSettings =
       await this._notificationSettingsDataAgent.updateNotificationSetting(dto);
-    return BukkaResponse.updateResponse(
+    return BukkaResponse.UpdateResponse(
       'Settings',
       updatedNotificationSettings,
     );
@@ -101,7 +101,7 @@ export class NotificationSettingsRepository {
     const deletedSetting =
       this._notificationSettingsDataAgent.deleteUserNotificationSetting(id);
 
-    return BukkaResponse.deleteResponse(
+    return BukkaResponse.DeleteResponse(
       'Notification settings',
       true,
       undefined,

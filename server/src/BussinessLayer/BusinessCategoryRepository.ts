@@ -1,0 +1,69 @@
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { BusinessCategoryDataAgent } from 'src/DataLayer/DataAgents/BusinessCategoryDataAgent';
+import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
+import {
+  CreateBusinessCategoryDto,
+  UpdateBusinessCategoryDto,
+  FilterBusinessCategoryDto,
+} from 'src/DomainLayer/Dtos/BusinessCategoryDto';
+import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
+import slugify from 'slugify';
+import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
+
+@Injectable()
+export class BusinessCategoryRepository {
+  constructor(private readonly dataAgent: BusinessCategoryDataAgent) {}
+
+  async createCategory(dto: CreateBusinessCategoryDto) {
+    const loggedInAdmin = await UserHelper.getLoggedInUser();
+    const slug = slugify(dto.name, { lower: true, strict: true });
+    const existing = await this.dataAgent.findBySlug(slug);
+    if (existing)
+      throw new BadRequestException('Category slug already exists.');
+    const newCategory = {
+      ...dto,
+      slug,
+      createdBy: loggedInAdmin.id,
+    };
+    const created = await this.dataAgent.createCategory(newCategory);
+    return BukkaResponse.CreateResponse('BusinessCategory', created);
+  }
+
+  async getById(id: number) {
+    const cat = await this.dataAgent.findById(id);
+    if (!cat) throw new NotFoundException('Category not found');
+    return BukkaResponse.GetSingleDataResponse('BusinessCategory', cat);
+  }
+
+  async list(filterDto: FilterBusinessCategoryDto) {
+    const query = FilterQueryHelper.buildQuery({
+      dto: filterDto,
+      rules: [{ field: 'createdBy' }, { field: 'type' }],
+      searchConfig: {
+        fields: ['name', 'description', 'slug'],
+        mode: 'insensitive',
+      },
+    });
+    const { pageSize, pageNumber } =
+      FilterQueryHelper.extractPagination(filterDto);
+    return await this.dataAgent.findAll(query, pageSize, pageNumber);
+  }
+
+  async update(id: number, dto: UpdateBusinessCategoryDto) {
+    const existing = await this.dataAgent.findById(id);
+    if (!existing) throw new NotFoundException('Category not found');
+    const updated = await this.dataAgent.updateCategory(id, dto as any);
+    return BukkaResponse.UpdateResponse('BusinessCategory', updated);
+  }
+
+  async delete(id: number) {
+    const existing = await this.dataAgent.findById(id);
+    if (!existing) throw new NotFoundException('Category not found');
+    await this.dataAgent.deleteCategory(id);
+    return BukkaResponse.DeleteResponse('BusinessCategory', true);
+  }
+}

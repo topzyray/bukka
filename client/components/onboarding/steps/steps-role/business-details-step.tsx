@@ -1,92 +1,51 @@
 "use client";
 
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { businessDetailsSchema } from "@/server/schemas/onboarding";
-import { useOnboarding } from "@/providers/onboarding-provider";
-import { InputComponent } from "@/components/forms/base/input-component";
-import { Button } from "@/components/ui/button";
-import { ImageUploader } from "@/components/atoms/image-uploader";
-import { uploadFile } from "@/utils/upload-utils";
-import { toast } from "sonner";
-import { Form } from "@/components/ui/form";
+import React from "react";
+import { CreateEditBusinessForm } from "@/components/forms/business/component/create-edit-business-form";
+import { useOnboardingProgress } from "@/server/queries/use-onboarding-progress-query";
+import { useUpdateUserData } from "@/server/mutations/user/use-update-user-data";
+import { useAuth } from "@/providers";
+import { useQueryClient } from "@tanstack/react-query";
+import { CircularLoader } from "@/components/loaders/circular-loader";
 
-export default function BusinessDetailsStep({ onNext, onBack, finalize }: any) {
-  const { state, actions } = useOnboarding();
-  const form = useForm({
-    resolver: zodResolver(businessDetailsSchema),
-    defaultValues: state.roleSpecific ?? undefined,
-    mode: "all",
-  });
-  const [localImages, setLocalImages] = useState<File[]>(
-    state.roleSpecific?.businessImages ?? []
-  );
-  const [loading, setLoading] = useState(false);
+export default function BusinessDetailsStep({
+  onNext,
+  onBack,
+}: {
+  onNext: () => void;
+  onBack?: () => void;
+  stepIndex?: number;
+}) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const submit = async (data: any) => {
-    setLoading(true);
-    try {
-      // if business images exist, upload each
-      if (localImages.length) {
-        const uploaded = await Promise.all(
-          localImages.map((f) => uploadFile(f, "BUSINESS_IMAGE"))
-        );
-        data.businessImageUrls = uploaded.map((r) => r?.url ?? r);
-      }
-      actions.setRoleSpecific({ ...data, businessImages: undefined });
-      if (finalize) await finalize();
-      else onNext();
-    } catch (err: any) {
-      toast.error(err.message ?? "Failed to save business details");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: savedProgress, isLoading: isFetchingProgress } =
+    useOnboardingProgress(user?.id as number);
+
+  const { mutateAsync: updateUserData, isPending: isUpdatingUserData } =
+    useUpdateUserData({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+        onNext();
+      },
+    });
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
-        <InputComponent
-          formControl={form.control}
-          formName="businessName"
-          formInputType="text"
-          formPlaceholder="Business name"
+    <>
+      {isFetchingProgress ? (
+        <CircularLoader />
+      ) : (
+        <CreateEditBusinessForm
+          isEdit={false}
+          initial={undefined}
+          onSuccess={() => {
+            updateUserData({ onboardingProgress: savedProgress + 1 });
+          }}
+          containerClassName="px-1"
+          onBack={onBack}
+          busy={isUpdatingUserData}
         />
-        <InputComponent
-          formControl={form.control}
-          formName="businessType"
-          formInputType="text"
-          formPlaceholder="Type (e.g., Restaurant)"
-        />
-        <InputComponent
-          formControl={form.control}
-          formName="businessAddress"
-          formInputType="text"
-          formPlaceholder="Address"
-        />
-
-        <div>
-          <label className="block text-sm font-medium">Business Images</label>
-          <ImageUploader
-            isMultiple
-            onChange={(files) =>
-              setLocalImages(
-                Array.isArray(files) ? files : files ? [files] : []
-              )
-            }
-          />
-        </div>
-
-        <div className="flex gap-2">
-          <Button variant="ghost" onClick={onBack}>
-            Back
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? "Saving..." : finalize ? "Finish" : "Continue"}
-          </Button>
-        </div>
-      </form>
-    </Form>
+      )}
+    </>
   );
 }

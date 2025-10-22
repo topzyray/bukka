@@ -27,7 +27,7 @@ export class UserPersonalizationRepository {
         loggedInUser.id,
       );
     if (existingData) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'Personalization already exist for user!',
         HttpStatus.CONFLICT,
       );
@@ -41,7 +41,7 @@ export class UserPersonalizationRepository {
         data as Partial<UserPersonalization>,
       );
 
-    return BukkaResponse.createResponse('User personalization', result);
+    return BukkaResponse.CreateResponse('User personalization', result);
   }
 
   async findPersonalizationById(
@@ -126,7 +126,7 @@ export class UserPersonalizationRepository {
       await this._userPersonalizationDataAgent.updateUserPersonalization(
         updateData,
       );
-    return BukkaResponse.updateResponse(
+    return BukkaResponse.UpdateResponse(
       'User personalization',
       updatedUserPersonalization,
     );
@@ -148,7 +148,7 @@ export class UserPersonalizationRepository {
     const deletedPersonalization =
       this._userPersonalizationDataAgent.deleteUserPersonalization(id);
 
-    return BukkaResponse.deleteResponse(
+    return BukkaResponse.DeleteResponse(
       'Personalization',
       true,
       undefined,

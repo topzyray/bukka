@@ -24,7 +24,7 @@ export class UserNotificationRepository {
     const result = await this._userNotificationDataAgent.createUserNotification(
       newUserNotification as unknown as UserNotification,
     );
-    return BukkaResponse.createResponse('User notification', result);
+    return BukkaResponse.CreateResponse('User notification', result);
   }
 
   async createMultipleUsersNotification(
@@ -34,7 +34,7 @@ export class UserNotificationRepository {
       await this._userNotificationDataAgent.createMultipleUserNotifications(
         userNotifications as unknown as UserNotification[],
       );
-    return BukkaResponse.createMultipleResponse(
+    return BukkaResponse.CreateMultipleResponse(
       'user notifications',
       [],
       // result.count,
@@ -46,7 +46,7 @@ export class UserNotificationRepository {
   ): Promise<BukkaResponse<UserNotification>> {
     const notification = await this.findNotificationById(notificationId);
     if (!notification) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'Notification not found',
         HttpStatus.NOT_FOUND,
       );
@@ -56,7 +56,7 @@ export class UserNotificationRepository {
         notification.id as number,
         { isRead: true },
       );
-    return BukkaResponse.updateResponse(
+    return BukkaResponse.UpdateResponse(
       'User notification',
       updatedUserNotification,
     );
@@ -68,7 +68,7 @@ export class UserNotificationRepository {
       await this._userNotificationDataAgent.viewAllUserNotification(
         loggedInUser?.id as number,
       );
-    return BukkaResponse.updateResponse(
+    return BukkaResponse.UpdateResponse(
       'User notification',
       updatedUserNotifications,
     );
@@ -121,14 +121,14 @@ export class UserNotificationRepository {
     const loggedInUser = await UserHelper.getLoggedInUser();
     const notification = await this.findNotificationById(notificationId);
     if (!notification) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'Notification not found',
         HttpStatus.NOT_FOUND,
       );
     }
 
     if (loggedInUser?.id !== notification?.userId) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'You do not have access to this resource!',
         HttpStatus.FORBIDDEN,
       );
@@ -139,7 +139,7 @@ export class UserNotificationRepository {
         notification.id as number,
       );
 
-    return BukkaResponse.deleteResponse(
+    return BukkaResponse.DeleteResponse(
       'User notification',
       true,
       undefined,
@@ -154,12 +154,12 @@ export class UserNotificationRepository {
         loggedInUser?.id,
       );
     if (deletedUserNotifications === null) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'No user notification found!',
         HttpStatus.NOT_FOUND,
       );
     }
-    return BukkaResponse.deleteResponse(
+    return BukkaResponse.DeleteResponse(
       'User notification',
       true,
       undefined,

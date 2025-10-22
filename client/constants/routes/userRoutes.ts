@@ -4,6 +4,7 @@ import { RouteHelper } from "../../helpers";
 const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 
 type IUserApi =
+  | "adminGetUsers"
   | "getUsers"
   | "getUserById"
   | "getLoggedInUser"
@@ -13,6 +14,7 @@ type IUserApi =
   | "completeOnboarding";
 
 const rawAuthRoutes: Record<IUserApi, string> = {
+  adminGetUsers: "/admin/users",
   getUsers: "/users",
   getUserById: "/users",
   getLoggedInUser: "/users/me/profile",

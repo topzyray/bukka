@@ -55,6 +55,11 @@ export const ImageUploader = ({
     const updated = previews.filter((_, i) => i !== index);
     setPreviews(updated);
     setIsValidFile(false);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
     if (isMultiple) {
       onChange(updated.map((item) => item.file));
     } else {

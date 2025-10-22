@@ -1,0 +1,70 @@
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { FavoriteDataAgent } from 'src/DataLayer/DataAgents/FavoriteDataAgent';
+import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
+import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
+import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
+import {
+  CreateFavoriteDto,
+  FavoriteFilterDto,
+} from 'src/DomainLayer/Dtos/Favorite';
+
+@Injectable()
+export class FavoriteRepository {
+  constructor(private readonly favoriteDataAgent: FavoriteDataAgent) {}
+
+  async addFavorite(dto: CreateFavoriteDto) {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const existing = await this.favoriteDataAgent.findByUserAndBusiness(
+      loggedInUser.id,
+      dto.businessId,
+    );
+    if (existing) throw new BadRequestException('Business already favorited');
+
+    const created = await this.favoriteDataAgent.createFavorite({
+      userId: loggedInUser.id,
+      businessId: dto.businessId,
+    } as any);
+
+    return BukkaResponse.CreateResponse('Favorite', created);
+  }
+
+  async removeFavoriteByBusiness(businessId: number) {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const existing = await this.favoriteDataAgent.findByUserAndBusiness(
+      loggedInUser.id,
+      businessId,
+    );
+    if (!existing) return BukkaResponse.DeleteResponse('Favorite', true); // idempotent
+
+    await this.favoriteDataAgent.deleteFavorite(existing.id as number);
+    return BukkaResponse.DeleteResponse('Favorite', true);
+  }
+
+  async toggleFavorite(dto: CreateFavoriteDto) {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const existing = await this.favoriteDataAgent.findByUserAndBusiness(
+      loggedInUser.id,
+      dto.businessId,
+    );
+    if (existing) {
+      await this.favoriteDataAgent.deleteFavorite(existing.id as number);
+      return BukkaResponse.DeleteResponse('Favorite', true);
+    }
+    const created = await this.favoriteDataAgent.createFavorite({
+      userId: loggedInUser.id,
+      businessId: dto.businessId,
+    } as any);
+    return BukkaResponse.CreateResponse('Favorite', created);
+  }
+
+  async listFavorites(filterDto: FavoriteFilterDto) {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const { pageSize, pageNumber } =
+      FilterQueryHelper.extractPagination(filterDto);
+    return await this.favoriteDataAgent.listByUser(
+      loggedInUser.id,
+      pageSize,
+      pageNumber,
+    );
+  }
+}

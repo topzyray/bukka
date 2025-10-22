@@ -3,12 +3,10 @@ import { UpdateUserDto } from "../dtos";
 import { userRoutes } from "@/constants/routes";
 
 export class UserApiService {
-  static async getUsers(queryParms: Record<string, any> = {}) {
+  static async adminGetUsers(params: Record<string, any> = {}) {
     const response = await HttpClient.getClient().get(
-      `${userRoutes.getUsers}`,
-      {
-        params: queryParms,
-      }
+      `${userRoutes.adminGetUsers}`,
+      { params }
     );
     return response.data;
   }

@@ -69,6 +69,8 @@ export function SelectComponent({
         //   }
         // };
 
+        console.log("Gender field value:", field.value);
+
         return (
           <FormItem className="space-y-0.5">
             {/* Label */}
@@ -84,12 +86,13 @@ export function SelectComponent({
               </FormLabel>
             )}
 
-            <div className="relative">
+            <div className="relative  flex items-center">
               {Icon && (
                 <Icon className="z-10 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               )}
 
               <Select
+                key={field.value ?? "empty"}
                 onValueChange={(value: string) => {
                   if (multiSelect) {
                     const current: string[] = Array.isArray(field.value)
@@ -107,7 +110,7 @@ export function SelectComponent({
                 value={
                   multiSelect && Array.isArray(field.value)
                     ? undefined
-                    : field.value
+                    : field.value ?? ""
                 }
                 disabled={disabled}
               >

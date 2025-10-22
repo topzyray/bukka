@@ -14,7 +14,7 @@ export class FileUploadService {
   ): Promise<BukkaResponse<any>> {
     const provider = this.providerFactory.getProvider();
     const uploadResponse = await provider.uploadFile(filePath, file);
-    return BukkaResponse.createResponse('File', uploadResponse);
+    return BukkaResponse.CreateResponse('File', uploadResponse);
   }
 
   async uploadAsStream(streamData: FileStreamDto): Promise<FileDocDto> {
@@ -47,7 +47,7 @@ export class FileUploadService {
     console.log('FILE PATH TO DELETE: ', filePath);
     const provider = this.providerFactory.getProvider();
     await provider.deleteFile(filePath);
-    return BukkaResponse.deleteResponse('File', true);
+    return BukkaResponse.DeleteResponse('File', true);
   }
 
   async deleteMultipleFiles(filePaths: string[]): Promise<void> {

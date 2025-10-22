@@ -105,7 +105,7 @@ export function TagInputComponent<T extends FieldValues>({
               </FormLabel>
             )}
 
-            <section className="relative">
+            <section className="relative flex items-center">
               <FormControl>
                 <div
                   className={cn(

@@ -22,6 +22,7 @@ interface IPhoneNumberInputProps {
   autoDetect?: boolean;
   inputClassName?: string;
   icon?: React.ElementType;
+  withKey?: boolean;
 }
 
 export function PhoneNumberInput({
@@ -32,6 +33,7 @@ export function PhoneNumberInput({
   autoDetect = false,
   inputClassName,
   icon: Icon,
+  withKey = false,
 }: IPhoneNumberInputProps) {
   const { formState } = formControl;
 
@@ -91,12 +93,13 @@ export function PhoneNumberInput({
                 {formLabel}
               </FormLabel>
             )}
-            <section className="relative">
+            <section className="relative  flex items-center">
               {Icon && (
                 <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               )}
               <FormControl>
                 <PhoneInput
+                  key={(withKey && field.value) || ""}
                   country={defaultCountry}
                   enableSearch
                   value={field.value || ""}

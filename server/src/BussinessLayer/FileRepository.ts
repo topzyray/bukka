@@ -5,7 +5,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import axios from 'axios';
-import { Readable } from 'stream';
 import { FileDataAgent } from 'src/DataLayer/DataAgents/FileDataAgent';
 import {
   CreateFileDto,
@@ -76,7 +75,7 @@ export class FileRepository {
     );
 
     if (!fileResponse?.responseData) {
-      return BukkaResponse.errorResponse('Error uploading file.');
+      return BukkaResponse.ErrorResponse('Error uploading file.');
     }
 
     const fileData = fileResponse.responseData;
@@ -103,10 +102,10 @@ export class FileRepository {
     const newFile = await this.fileDataAgent.createFile(newFileData);
 
     if (!newFile) {
-      return BukkaResponse.errorResponse('Error saving file to database.');
+      return BukkaResponse.ErrorResponse('Error saving file to database.');
     }
 
-    return BukkaResponse.createResponse('File', newFile);
+    return BukkaResponse.CreateResponse('File', newFile);
   }
 
   async uploadMultipleFiles(
@@ -177,10 +176,10 @@ export class FileRepository {
       .map((r) => r.value);
 
     if (successfulFiles.length === 0) {
-      return BukkaResponse.errorResponse('All file uploads failed.');
+      return BukkaResponse.ErrorResponse('All file uploads failed.');
     }
 
-    return BukkaResponse.createResponse('Files', successfulFiles);
+    return BukkaResponse.CreateResponse('Files', successfulFiles);
   }
 
   async uploadFilesFromUrls(
@@ -252,7 +251,7 @@ export class FileRepository {
       uploadedFiles.map((fileData) => this.fileDataAgent.createFile(fileData)),
     );
 
-    return BukkaResponse.createResponse('Files', savedFiles);
+    return BukkaResponse.CreateResponse('Files', savedFiles);
   }
 
   async getFileById(fileId: number): Promise<File | null> {
@@ -340,7 +339,7 @@ export class FileRepository {
     const existingFile = await this.fileDataAgent.getFileById(fileId);
 
     if (!existingFile) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         `File with ID ${fileId} not found in the database.`,
         HttpStatus.NOT_FOUND,
       );
@@ -349,7 +348,7 @@ export class FileRepository {
     await this.fileUploadService.deleteFile(filePath);
     await this.fileDataAgent.deleteFile(fileId);
 
-    return BukkaResponse.deleteResponse('File', true);
+    return BukkaResponse.DeleteResponse('File', true);
   }
 
   private async handleExistingFileDeletion(
@@ -376,12 +375,12 @@ export class FileRepository {
     const loggedInUser = await UserHelper.getLoggedInUser();
     const files = await this.fileDataAgent.deleteUserFiles(loggedInUser?.id);
     if (files.count === 0) {
-      return BukkaResponse.errorResponse(
+      return BukkaResponse.ErrorResponse(
         'No files found for this user',
         HttpStatus.NOT_FOUND,
       );
     }
-    return BukkaResponse.deleteResponse('Files', true);
+    return BukkaResponse.DeleteResponse('Files', true);
   }
 
   async getFilesByReferenceTypeAndId(

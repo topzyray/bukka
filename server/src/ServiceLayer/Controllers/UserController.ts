@@ -44,14 +44,14 @@ export class UserController {
     @Res() res?: Response,
   ) {
     const response = await this._userRepository.findByFilters(request);
-    // const mappedData = {
-    //   ...response,
-    //   data: response.data.map((data) =>
-    //     TypeSafeMapper.map(data, UserResponse, UserDto),
-    //   ),
-    // };
     const mappedData = TypeSafeMapper.mapArray(response.data, {
-      exclude: ['password'],
+      exclude: [
+        'password',
+        'confirmationCode',
+        'confirmationCodeExpires',
+        'passwordResetToken',
+        'passwordResetExpires',
+      ],
     });
 
     const data = BukkaResponse.GetPagedDataResponse('Profiles', mappedData);
@@ -66,7 +66,13 @@ export class UserController {
   async getUserData(@Res() res: Response) {
     const user = await this._userRepository.getLoggedInUserData();
     const mappedData = TypeSafeMapper.mapObject(user as User, {
-      exclude: ['password'],
+      exclude: [
+        'password',
+        'confirmationCode',
+        'confirmationCodeExpires',
+        'passwordResetToken',
+        'passwordResetExpires',
+      ],
     });
     const data = BukkaResponse.GetSingleDataResponse('User', mappedData);
     return BukkaResponse.GetStatusResponse(data, res);
@@ -97,7 +103,13 @@ export class UserController {
     const response =
       await this._userRepository.updateUserDataAsync(updateUserDto);
     response.responseData = TypeSafeMapper.mapObject(response?.responseData, {
-      exclude: ['password'],
+      exclude: [
+        'password',
+        'confirmationCode',
+        'confirmationCodeExpires',
+        'passwordResetToken',
+        'passwordResetExpires',
+      ],
     });
     return BukkaResponse.GetStatusResponse(response, res);
   }
@@ -112,7 +124,13 @@ export class UserController {
     const response =
       await this._userRepository.updateUserProfileAsync(profileUpdateDto);
     response.responseData = TypeSafeMapper.mapObject(response?.responseData, {
-      exclude: ['password'],
+      exclude: [
+        'password',
+        'confirmationCode',
+        'confirmationCodeExpires',
+        'passwordResetToken',
+        'passwordResetExpires',
+      ],
     });
     return BukkaResponse.GetStatusResponse(response, res);
   }
@@ -122,7 +140,13 @@ export class UserController {
   async completeProfileOnboarding(@Res() res: Response) {
     const response = await this._userRepository.completeProfileOnboarding();
     response.responseData = TypeSafeMapper.mapObject(response?.responseData, {
-      exclude: ['password'],
+      exclude: [
+        'password',
+        'confirmationCode',
+        'confirmationCodeExpires',
+        'passwordResetToken',
+        'passwordResetExpires',
+      ],
     });
     return BukkaResponse.GetStatusResponse(response, res);
   }

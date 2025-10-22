@@ -44,7 +44,7 @@ export default function OnboardingCompleteScreen() {
         }
         return prev - 1;
       });
-    }, 10000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [isCompleted, user?.role]);

@@ -15,7 +15,11 @@ import { PaymentMethodEnum } from '../Enums/PaymentMethodEnum';
 import { DietaryRestrictionEnum } from '../Enums/DietRestrictionEnum';
 
 export class UserPersonalizationDto {
-  @ApiProperty({ example: ['African - Nigerian'], required: true })
+  @ApiProperty({
+    example: ['African - Nigerian'],
+    isArray: true,
+    required: true,
+  })
   @IsNotEmpty()
   @IsArray()
   @IsString({ each: true })

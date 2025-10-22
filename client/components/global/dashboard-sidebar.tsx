@@ -64,7 +64,7 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-4">
-            <Link href={`/dashboard/${user?.role}/overview`}>
+            <Link href={`/dashboard/${user?.role.toLowerCase()}/overview`}>
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.6 }}
@@ -83,7 +83,7 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarSeparator className="max-w-[14rem] w-full" />
+      <SidebarSeparator className="max-w-[11rem] w-full" />
       <SidebarContent>
         <SidebarGroupLabel>Navigations</SidebarGroupLabel>
 

@@ -105,7 +105,7 @@ export class UserNotificationController {
       'User Notification',
       response,
     );
-    return res.status(data.responseCode).json(data);
+    return BukkaResponse.GetStatusResponse(data, res);
   }
 
   @Put(':notificationId/read')
