@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import markerIcon2x from "/icons/custom/marker.svg";
-import markerIcon from "/icons/custom/marker2.svg";
-import markerShadow from "/icons/custom/marker.svg";
+import markerIcon2x from "../../../public/icons/custom/marker.svg";
+import markerIcon from "../../../public/icons/custom/marker2.svg";
+import markerShadow from "../../../public/icons/custom/marker.svg";
 
 // // Fix marker icon issues in many setups
 delete (L.Icon.Default.prototype as any)._getIconUrl;
