@@ -173,7 +173,7 @@ export function DataTable<TData>({
   //   setFilterState(next);
   //   onFilterChange?.(next);
   // };
-  const updateFilter = (key: string, value: string | undefined) => {
+  const updateFilter = (key: string, value: string) => {
     const next = { ...filterState, [key]: value ?? "" };
     setFilterState(next);
     onFilterChange?.(next);
