@@ -55,6 +55,8 @@
   --animate-slide-down: slide-down 0.4s ease-out;
   --animate-float: float 3s ease-in-out infinite;
   --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+  --animate-spin-slow: spin-slow 4s linear infinite;
+  --animate-pulse-ring: pulse-ring 2s ease-in-out infinite;
 }
 
 :root {
@@ -251,6 +253,28 @@
   }
   50% {
     box-shadow: 0 0 40px oklch(from var(--primary) l c h / 0.6);
+  }
+}
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
   }
 }
 

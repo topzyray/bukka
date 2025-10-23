@@ -8,6 +8,7 @@ import {
   Popup,
   useMapEvents,
   Tooltip,
+  useMap,
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -23,6 +24,9 @@ import { SearchPlacesWithAutocomplete } from "../search-places-with-autocomplete
 import { envConfig } from "@/configs";
 import { useGlobalState } from "@/providers";
 import { IconHelper } from "@/helpers/icon-helper";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const ICONS: Record<BusinessTypeEnum, L.Icon> = {
   [BusinessTypeEnum.RESTAURANT]: IconHelper.createColoredIcon(
@@ -305,6 +309,14 @@ export function LocationIQMap({
             <Tooltip>{b?.name}</Tooltip>
           </Marker>
         ))}
+
+        <RecenterButton
+          onLocate={(coords) => {
+            setMarker(coords);
+            setCoordinates(coords);
+            onSelect(coords.lat, coords.lng);
+          }}
+        />
       </MapContainer>
 
       <div
@@ -314,6 +326,40 @@ export function LocationIQMap({
         className="absolute top-2.5 left-12 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-[14rem] sm:max-w-[18rem] w-full"
       >
         <SearchPlacesWithAutocomplete />
+        {/* <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={async () => {
+            if (!navigator.geolocation) {
+              toast.error("Geolocation not supported");
+              return;
+            }
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                const coords = {
+                  lat: pos.coords.latitude,
+                  lng: pos.coords.longitude,
+                };
+                setMarker(coords);
+                setCoordinates(coords);
+                if (
+                  !lastEmitted.current ||
+                  LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
+                ) {
+                  lastEmitted.current = coords;
+                  onSelect(coords.lat, coords.lng);
+                }
+              },
+              () => {
+                setMarker(DEFAULT_CENTER);
+              },
+              { enableHighAccuracy: true, timeout: 10000 }
+            );
+          }}
+        >
+          Me
+        </Button> */}
       </div>
       {showLegend && (
         <div
@@ -353,6 +399,102 @@ export function LocationIQMap({
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+export function RecenterButton({
+  onLocate,
+}: {
+  onLocate: (coords: { lat: number; lng: number }) => void;
+}) {
+  const map = useMap();
+  const { setCoordinates } = useGlobalState();
+  const [locating, setLocating] = useState(false);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+
+  const handleLocate = () => {
+    // ✅ If we already have a user location, just re-center (don’t fetch again)
+    if (userLocation) {
+      map.flyTo([userLocation.lat, userLocation.lng], 16, { animate: true });
+      toast.info("Centered on your location");
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      toast.error("Geolocation not supported");
+      return;
+    }
+
+    setLocating(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        };
+
+        setUserLocation(coords);
+        setCoordinates(coords);
+        map.flyTo([coords.lat, coords.lng], 16, { animate: true });
+        onLocate(coords);
+
+        toast.success("Located your position");
+        setLocating(false);
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+        toast.error("Unable to get your location");
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  return (
+    <div className="absolute top-2.5 right-2.5 z-[499]">
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={handleLocate}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setUserLocation(null);
+          toast("Next click will fetch your live location again");
+        }}
+        className="relative hover:text-blue-600 dark:hover:text-blue-400 transition-colors rounded-full"
+        title="Go to my location"
+      >
+        <span className="absolute inset-0 rounded-full bg-blue-500/20 animate-pulse-ring" />
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 32 32"
+          fill="currentColor"
+          className={cn(
+            "w-10 h-10 text-primary drop-shadow-sm",
+            "animate-spin-slow text-blue-500"
+          )}
+        >
+          <circle
+            cx="16"
+            cy="16"
+            r="14"
+            stroke="currentColor"
+            strokeWidth="2"
+            fill="none"
+          />
+          <path
+            d="M10.5 21.5a1 1 0 0 0 1.1.23l7-2.8a1 1 0 0 0 .55-.55l2.8-7a1 1 0 0 0-1.33-1.33l-7 2.8a1 1 0 0 0-.55.55l-2.8 7a1 1 0 0 0 .23 1.1Z"
+            fill="currentColor"
+          />
+        </svg>
+      </Button>
     </div>
   );
 }

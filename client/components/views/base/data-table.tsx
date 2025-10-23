@@ -255,23 +255,15 @@ export function DataTable<TData>({
       {/* Toolbar */}
       <div className="flex flex-wrap flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          {/* <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search..."
+          <div className="h-9">
+            <SearchBox
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="pl-9"
+              placeholder="Search..."
+              onSearch={(q) => console.log("Searching: ", q)}
+              delay={400}
             />
-          </div> */}
-
-          <SearchBox
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search..."
-            onSearch={(q) => console.log("Searching: ", q)}
-            delay={400}
-          />
+          </div>
           <Button
             variant="outline"
             onClick={() =>

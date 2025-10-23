@@ -13,6 +13,7 @@ import { MapProviderEnum } from "@/server/enums/MapProviderEnum";
 import { toast } from "sonner";
 import { extractErrorMessage } from "@/utils";
 import { CircularLoader } from "../loaders/circular-loader";
+import { useGlobalState } from "@/providers";
 
 type Props = {
   control?: any;
@@ -40,6 +41,7 @@ Props) {
   const [mapOpen, setMapOpen] = useState(false);
   const [loadingReverse, setLoadingReverse] = useState(false);
   const lastCoordsRef = useRef<string | null>(null);
+  const { setCoordinates } = useGlobalState();
 
   return (
     <FormField
@@ -162,7 +164,10 @@ Props) {
                         console.log("COORDS: ", pos);
 
                         const { latitude, longitude } = pos.coords;
-
+                        setCoordinates({
+                          lng: longitude,
+                          lat: latitude,
+                        });
                         // non-blocking: call handleCoordsSelected but do not await it
                         void handleCoordsSelected(latitude, longitude);
                       },
