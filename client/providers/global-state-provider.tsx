@@ -9,6 +9,8 @@ import ServiceWorkderRegistrar from "./service-worker";
 interface IGlobalContext {
   signupAs: UserRoleEnum | null;
   setSignUpAs: React.Dispatch<React.SetStateAction<UserRoleEnum | null>>;
+  coordinates: any | null;
+  setCoordinates: React.Dispatch<React.SetStateAction<any | null>>;
 }
 
 export const GlobalContext = createContext({} as IGlobalContext);
@@ -19,6 +21,7 @@ export const GlobalStateProvider = ({
   children: React.ReactNode;
 }>) => {
   const [signupAs, setSignUpAs] = useState<UserRoleEnum | null>(null);
+  const [coordinates, setCoordinates] = useState<any | null>(null);
 
   const { theme } = useTheme();
   if (theme) {
@@ -28,6 +31,8 @@ export const GlobalStateProvider = ({
   const value = {
     signupAs,
     setSignUpAs,
+    coordinates,
+    setCoordinates,
   };
 
   return (

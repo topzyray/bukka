@@ -131,7 +131,7 @@ export function LocationSearchBox({
 // type LocationIQPlace = {
 //   display_name: string;
 //   lat: string;
-//   lon: string;
+//   lng: string;
 // };
 
 // export function LocationSearchBox({
@@ -185,7 +185,7 @@ export function LocationSearchBox({
 
 //   const handleSelect = (place: LocationIQPlace) => {
 //     const lat = parseFloat(place.lat);
-//     const lng = parseFloat(place.lon);
+//     const lng = parseFloat(place.lng);
 //     setQuery(place.display_name);
 //     setShowResults(false);
 //     onSelect({ lat, lng }, place.display_name);

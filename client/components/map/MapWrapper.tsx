@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { Input } from '@/components/ui/input';
-import { Search, MapPin } from 'lucide-react';
+import React, { useEffect, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { Input } from "@/components/ui/input";
+import { Search, MapPin } from "lucide-react";
 
 // For now using a demo token - user should replace with their own
-const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+const MAPBOX_ACCESS_TOKEN =
+  "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
 
 interface MapWrapperProps {
   center?: [number, number];
@@ -25,30 +26,30 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
   zoom = 12,
   markers = [],
   onLocationSelect,
-  className = "w-full h-full"
+  className = "w-full h-full",
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     if (!mapContainer.current) return;
 
     mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
-    
+
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
+      style: "mapbox://styles/mapbox/streets-v12",
       center: center,
-      zoom: zoom
+      zoom: zoom,
     });
 
     // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
     // Add click handler for location selection
     if (onLocationSelect) {
-      map.current.on('click', (e) => {
+      map.current.on("click", (e) => {
         onLocationSelect([e.lngLat.lng, e.lngLat.lat]);
       });
     }
@@ -63,11 +64,11 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
     if (!map.current) return;
 
     // Remove existing markers
-    const existingMarkers = document.querySelectorAll('.mapboxgl-marker');
-    existingMarkers.forEach(marker => marker.remove());
+    const existingMarkers = document.querySelectorAll(".mapboxgl-marker");
+    existingMarkers.forEach((marker) => marker.remove());
 
     // Add new markers
-    markers.forEach(marker => {
+    markers.forEach((marker) => {
       if (map.current) {
         const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
           `<div>
@@ -87,7 +88,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Implement geocoding search
-    console.log('Searching for:', searchValue);
+    console.log("Searching for:", searchValue);
   };
 
   return (
@@ -108,7 +109,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
 
       {/* Map container */}
       <div ref={mapContainer} className="w-full h-full rounded-lg" />
-      
+
       {/* Location notice */}
       <div className="absolute bottom-4 left-4 bg-background/95 backdrop-blur-sm rounded-lg p-3 text-sm">
         <div className="flex items-center gap-2 text-muted-foreground">

@@ -1,0 +1,13 @@
+<!-- public/icons/flat/bakery.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Bakery">
+  <!-- loaf body -->
+  <path d="M8 36c0 9 7 16 16 16h16c9 0 16-7 16-16 0-8-7-14-16-14H24C15 22 8 28 8 36z" fill="#462009"/>
+  <!-- top puff -->
+  <path d="M18 24c1-5 7-8 14-8s13 3 14 8c0 0-3-6-14-6s-14 6-14 6z" fill="#462009"/>
+  <!-- scoring lines (lighter by using white fill inside paths) -->
+  <g fill="#FFFFFF" fill-opacity="0.14">
+    <rect x="22" y="36" width="2" height="12" rx="1"/>
+    <rect x="30" y="36" width="2" height="12" rx="1"/>
+    <rect x="38" y="36" width="2" height="12" rx="1"/>
+  </g>
+</svg>

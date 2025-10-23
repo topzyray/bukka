@@ -51,7 +51,7 @@ const userGrowthData = [
   { month: "Jun", users: 5400 },
 ];
 
-const restaurantStatusData = [
+const businessStatusData = [
   { name: "Active", value: 234, color: "hsl(var(--primary))" },
   { name: "Pending", value: 45, color: "hsl(var(--accent))" },
   { name: "Suspended", value: 12, color: "hsl(var(--destructive))" },
@@ -77,7 +77,7 @@ export function AdminOverview() {
       positive: true,
     },
     {
-      title: "Active Restaurants",
+      title: "Active Businesses",
       value: "234",
       change: "+5.2%",
       icon: Store,
@@ -186,22 +186,20 @@ export function AdminOverview() {
               </CardContent>
             </Card>
 
-            {/* Restaurant Status */}
+            {/* Business Status */}
             <Card className="shadow-card">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Store className="w-5 h-5" />
-                  Restaurant Status
+                  Business Status
                 </CardTitle>
-                <CardDescription>
-                  Current restaurant distribution
-                </CardDescription>
+                <CardDescription>Current business distribution</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
-                      data={restaurantStatusData}
+                      data={businessStatusData}
                       cx="50%"
                       cy="50%"
                       innerRadius={60}
@@ -209,7 +207,7 @@ export function AdminOverview() {
                       paddingAngle={5}
                       dataKey="value"
                     >
-                      {restaurantStatusData.map((entry, index) => (
+                      {businessStatusData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
@@ -217,7 +215,7 @@ export function AdminOverview() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="flex justify-center gap-4 mt-4">
-                  {restaurantStatusData.map((entry) => (
+                  {businessStatusData.map((entry) => (
                     <div key={entry.name} className="flex items-center gap-2">
                       <div
                         className="w-3 h-3 rounded-full"

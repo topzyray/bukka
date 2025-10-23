@@ -109,8 +109,7 @@ export function Header({ className }: HeaderProps) {
               asChild
               onClick={() => router.push(route)}
             >
-              {/* <Link href={route}>Sign In</Link> */}
-              Sign In
+              {user?.role ? "Dashboard" : "Sign In"}
             </BukkaButton>
             <ThemeToggle />
           </nav>
@@ -168,6 +167,12 @@ export function Header({ className }: HeaderProps) {
                 Explore
               </Link>
             </BukkaButton>
+            <BukkaButton variant="ghost" size="sm" asChild>
+              <Link href="/map" className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                Explore Map
+              </Link>
+            </BukkaButton>
             {/* <BukkaButton
               variant="ghost"
               size="sm"
@@ -198,8 +203,7 @@ export function Header({ className }: HeaderProps) {
                 asChild
                 onClick={() => router.push(route)}
               >
-                {/* <Link href={route}>Sign In</Link> */}
-                Sign In
+                {user?.role ? "Dashboard" : "Sign In"}
               </BukkaButton>
             </section>
           </section>

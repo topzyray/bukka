@@ -4,8 +4,10 @@ import { BukkaButton } from "@/components/ui/button-variants";
 import { motion } from "framer-motion";
 import { Home, MapPin, Search } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function NotFound() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
       <motion.div
@@ -32,11 +34,15 @@ export default function NotFound() {
         </p>
 
         <div className="space-y-3">
-          <BukkaButton variant="hero" size="lg" asChild className="w-full">
-            <Link href="/" className="flex items-center justify-center gap-2">
-              <Home className="w-5 h-5" />
-              Back to Home
-            </Link>
+          <BukkaButton
+            variant="hero"
+            size="lg"
+            asChild
+            className="w-full flex items-center justify-center gap-2"
+            onClick={() => router.back()}
+          >
+            <Home className="w-5 h-5" />
+            Go Back
           </BukkaButton>
 
           <BukkaButton variant="outline" size="lg" asChild className="w-full">
