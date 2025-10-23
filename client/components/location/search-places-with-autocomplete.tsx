@@ -253,7 +253,7 @@ export function SearchPlacesWithAutocomplete() {
       ref={containerRef}
       className="relative w-full flex flex-col gap-0.5 bg-white dark:bg-background"
     >
-      <div className="bg-background rounded-lg h-[3rem]">
+      <div className="bg-background rounded-lg h-[2.5rem] sm:h-[3rem]">
         <SearchBox
           {...form.register("search")}
           placeholder="Search location…"

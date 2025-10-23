@@ -177,14 +177,14 @@ export default function BusinessList() {
                     key: "categoryId",
                     label: "Category",
                     options: [
-                      { label: "All", value: "all" },
+                      { label: "All", value: undefined },
                     ] /* fetch and populate dynamically */,
                   },
                   {
                     key: "isVerified",
                     label: "Verified",
                     options: [
-                      { label: "All", value: "all" },
+                      { label: "All", value: undefined },
                       { label: "Yes", value: "true" },
                       { label: "No", value: "false" },
                     ],

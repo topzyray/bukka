@@ -4,7 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, MapPin, Menu, X } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  Menu,
+  X,
+  LayoutDashboard,
+  FormInputIcon,
+} from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -156,18 +163,13 @@ export function Header({ className }: HeaderProps) {
           className="md:hidden overflow-hidden"
         >
           <section className="py-4 space-y-2">
-            <BukkaButton
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start"
-              asChild
-            >
+            <BukkaButton variant="ghost" size="sm" className="w-full" asChild>
               <Link href="/search" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Explore
               </Link>
             </BukkaButton>
-            <BukkaButton variant="ghost" size="sm" asChild>
+            <BukkaButton variant="ghost" size="sm" asChild className="w-full ">
               <Link href="/map" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Explore Map
@@ -203,7 +205,10 @@ export function Header({ className }: HeaderProps) {
                 asChild
                 onClick={() => router.push(route)}
               >
-                {user?.role ? "Dashboard" : "Sign In"}
+                <span className="flex gap-2">
+                  {user ? <LayoutDashboard /> : <FormInputIcon />}
+                  {user?.role ? "Dashboard" : "Sign In"}
+                </span>
               </BukkaButton>
             </section>
           </section>

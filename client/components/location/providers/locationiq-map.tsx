@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   MapContainer,
   TileLayer,
   Marker,
   Popup,
-  useMap,
   useMapEvents,
   Tooltip,
 } from "react-leaflet";
@@ -61,27 +60,7 @@ const ICONS: Record<BusinessTypeEnum, L.Icon> = {
   ),
 };
 
-const DEFAULT_CENTER = LAGOS; // Lagos fallback
-
-// once-only icon (avoid re-creating every render)
-// const DEFAULT_ICON = L.icon({
-//   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-//   iconRetinaUrl:
-//     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-//   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-//   iconSize: [25, 41],
-//   iconAnchor: [12, 41],
-//   className: "",
-// });
-
-// const LOCAL_DEFAULT_ICON = L.icon({
-//   iconUrl: "/icons/marker2.svg",
-//   iconRetinaUrl: "/icons/marker2.svg",
-//   shadowUrl: "/icons/marker-shadow.png",
-//   iconSize: [45, 61],
-//   iconAnchor: [12, 41],
-//   className: "",
-// });
+const DEFAULT_CENTER = LAGOS;
 
 const USER_ICON = IconHelper.createColoredIcon(
   "/icons/custom/you.svg",
@@ -89,31 +68,29 @@ const USER_ICON = IconHelper.createColoredIcon(
   [45, 61]
 );
 
-// L.Marker.prototype.options.icon = LOCAL_DEFAULT_ICON;
+// function RecenterOnProp({ lat, lng }: { lat: number; lng: number }) {
+//   const map = useMap();
+//   const last = useRef<{ lat: number; lng: number } | null>(null);
 
-function RecenterOnProp({ lat, lng }: { lat: number; lng: number }) {
-  const map = useMap();
-  const last = useRef<{ lat: number; lng: number } | null>(null);
+//   useEffect(() => {
+//     if (!lat && !lng) return;
+//     const newCenter = { lat, lng };
+//     if (
+//       !last.current ||
+//       LocationCoordsHelper.coordsDiffer(last.current, newCenter)
+//     ) {
+//       // only call setView if center truly changed (prevents continuous recenters)
+//       try {
+//         map.setView([lat, lng], map.getZoom(), { animate: true });
+//         last.current = newCenter;
+//       } catch {
+//         // ignore
+//       }
+//     }
+//   }, [lat, lng, map]);
 
-  useEffect(() => {
-    if (!lat && !lng) return;
-    const newCenter = { lat, lng };
-    if (
-      !last.current ||
-      LocationCoordsHelper.coordsDiffer(last.current, newCenter)
-    ) {
-      // only call setView if center truly changed (prevents continuous recenters)
-      try {
-        map.setView([lat, lng], map.getZoom(), { animate: true });
-        last.current = newCenter;
-      } catch {
-        // ignore
-      }
-    }
-  }, [lat, lng, map]);
-
-  return null;
-}
+//   return null;
+// }
 
 function MapClickHandler({
   onClick,
@@ -136,6 +113,7 @@ interface ILocationIQMap {
   onSelect: (lat: number, lng: number) => void;
   height?: string | number;
   disabled?: boolean;
+  showLegend?: boolean;
   businesses?: Business[];
 }
 
@@ -144,9 +122,10 @@ export function LocationIQMap({
   onSelect,
   height = 360,
   disabled = false,
+  showLegend = false,
   businesses = [],
 }: ILocationIQMap) {
-  const { coordinates } = useGlobalState();
+  const { coordinates, setCoordinates } = useGlobalState();
   const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(
     initial ?? null
   );
@@ -195,9 +174,16 @@ export function LocationIQMap({
   }, [coordinates, initial, onSelect]);
 
   useEffect(() => {
-    if (!initial) return;
+    if (!initial || initial.lat == null || initial.lng == null) return;
+
     if (!marker || LocationCoordsHelper.coordsDiffer(marker, initial)) {
-      setMarker(initial);
+      setMarker((prev) => {
+        if (prev && !LocationCoordsHelper.coordsDiffer(prev, initial))
+          return prev;
+        return initial;
+      });
+
+      // only emit if lastEmitted differs from initial
       if (
         !lastEmitted.current ||
         LocationCoordsHelper.coordsDiffer(lastEmitted.current, initial)
@@ -206,7 +192,9 @@ export function LocationIQMap({
         onSelect(initial.lat, initial.lng);
       }
     }
-  }, [initial, marker, onSelect]);
+    // watch only the primitive lat/lng (and onSelect)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial?.lat, initial?.lng, onSelect]);
 
   const handleDragEnd = (e: L.LeafletEvent) => {
     if (disabled) return;
@@ -225,18 +213,22 @@ export function LocationIQMap({
     } catch {}
   };
 
-  const handleMapClick = (lat: number, lng: number) => {
-    if (disabled) return;
-    const coords = { lat, lng };
-    setMarker(coords);
-    if (
-      !lastEmitted.current ||
-      LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
-    ) {
-      lastEmitted.current = coords;
-      onSelect(lat, lng);
-    }
-  };
+  const handleMapClick = useCallback(
+    (lat: number, lng: number) => {
+      if (disabled) return;
+      const coords = { lat, lng };
+      setMarker(coords);
+      setCoordinates(coords);
+      if (
+        !lastEmitted.current ||
+        LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
+      ) {
+        lastEmitted.current = coords;
+        onSelect(lat, lng);
+      }
+    },
+    [disabled, onSelect, setCoordinates]
+  );
 
   if (!marker) {
     return (
@@ -249,7 +241,7 @@ export function LocationIQMap({
     );
   }
 
-  const tileUrl = envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN
+  const tileUrl = !envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN
     ? `https://{s}-tiles.locationiq.com/v3/${
         theme === "light" ? "streets" : "dark"
       }/r/{z}/{x}/{y}.png?key=${envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN}`
@@ -271,7 +263,7 @@ export function LocationIQMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
         />
         <MapClickHandler onClick={handleMapClick} disabled={disabled} />
-        <RecenterOnProp lat={marker.lat} lng={marker.lng} />
+        {/* <RecenterOnProp lat={marker.lat} lng={marker.lng} /> */}
         <Marker
           position={[marker.lat, marker.lng]}
           draggable={!disabled}
@@ -319,47 +311,48 @@ export function LocationIQMap({
         style={{
           zIndex: 499,
         }}
-        className="absolute top-2.5 left-12 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-[18rem] w-full"
+        className="absolute top-2.5 left-12 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-[14rem] sm:max-w-[18rem] w-full"
       >
         <SearchPlacesWithAutocomplete />
       </div>
-
-      <div
-        style={{
-          zIndex: 499,
-        }}
-        className="absolute bottom-5 right-2 bg-background backdrop-blur-md p-2 rounded shadow-md text-xs space-y-2 max-h-max overflow-auto"
-      >
-        {Object.entries(ICONS).map(([key]) => {
-          let icon: string = `/icons/pin/${key.toLowerCase()}.svg`;
-          switch (key) {
-            case BusinessTypeEnum.OTHER:
-              icon = "/icons/pin/default.svg";
-            case BusinessTypeEnum.CATERING:
-              icon = "/icons/pin/fast_food.svg";
-            case BusinessTypeEnum.LOUNGE:
-              icon = "/icons/pin/default.svg";
-            case BusinessTypeEnum.FOOD_VENDOR:
-              icon = "/icons/pin/fast_food.svg";
-            case BusinessTypeEnum.STREET_EATRY:
-              icon = "/icons/pin/fast_food.svg";
-            default:
-              break;
-          }
-          return (
-            <div key={key} className="flex items-center gap-1">
-              <Image
-                src={icon}
-                alt={key}
-                width={16}
-                height={16}
-                className="w-6 h-6"
-              />
-              <span>{key.replace(/_/g, " ")}</span>
-            </div>
-          );
-        })}
-      </div>
+      {showLegend && (
+        <div
+          style={{
+            zIndex: 499,
+          }}
+          className="absolute bottom-4.5 right-0.5 bg-background backdrop-blur-md p-2 rounded shadow-md text-xs space-y-2 max-h-60 sm:max-h-max overflow-auto"
+        >
+          {Object.entries(ICONS).map(([key]) => {
+            let icon: string = `/icons/pin/${key.toLowerCase()}.svg`;
+            switch (key) {
+              case BusinessTypeEnum.OTHER:
+                icon = "/icons/pin/default.svg";
+              case BusinessTypeEnum.CATERING:
+                icon = "/icons/pin/fast_food.svg";
+              case BusinessTypeEnum.LOUNGE:
+                icon = "/icons/pin/default.svg";
+              case BusinessTypeEnum.FOOD_VENDOR:
+                icon = "/icons/pin/fast_food.svg";
+              case BusinessTypeEnum.STREET_EATRY:
+                icon = "/icons/pin/fast_food.svg";
+              default:
+                break;
+            }
+            return (
+              <div key={key} className="flex items-center gap-1">
+                <Image
+                  src={icon}
+                  alt={key}
+                  width={16}
+                  height={16}
+                  className="w-5 h-5"
+                />
+                <span>{key.replace(/_/g, " ")}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

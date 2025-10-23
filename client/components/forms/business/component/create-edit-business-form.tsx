@@ -1,7 +1,7 @@
 "use client";
 
 import { z } from "zod";
-import { useAuth } from "@/providers";
+import { useAuth, useGlobalState } from "@/providers";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
@@ -135,6 +135,7 @@ export function CreateEditBusinessForm({
 }: ICreateBusinessForm) {
   const [ownerInfo, setOwnerInfo] = useState<User | null>(null);
   const { user } = useAuth();
+  const { coordinates } = useGlobalState();
   const { data: catData } = useBusinessCategories(true);
   const { data: allUserData } = useUsers({
     enabled: user?.role === UserRoleEnum.ADMIN,
@@ -148,6 +149,16 @@ export function CreateEditBusinessForm({
     mode: "onSubmit",
     // defaultValues: defaultBusinessValues,
   });
+
+  useEffect(() => {
+    if (coordinates) {
+      form.setValue("location", {
+        longitude: coordinates?.lng,
+        latitude: coordinates?.lat,
+        address: coordinates?.address,
+      });
+    }
+  }, [coordinates, form]);
 
   const createMutation = useCreateBusiness({
     onSuccess,

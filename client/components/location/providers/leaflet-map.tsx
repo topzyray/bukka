@@ -4,18 +4,17 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import markerIcon2x from "../../../public/icons/custom/marker.svg";
-import markerIcon from "../../../public/icons/custom/marker2.svg";
-import markerShadow from "../../../public/icons/custom/marker.svg";
+
+const markerIcon = "/icons/custom/marker.svg";
+const markerIcon2x = "/icons/custom/marker2.svg";
+const markerShadow = "/icons/custom/marker.svg";
 
 // // Fix marker icon issues in many setups
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    typeof window !== "undefined" ? markerIcon2x.src ?? markerIcon2x : "",
-  iconUrl: typeof window !== "undefined" ? markerIcon.src ?? markerIcon : "",
-  shadowUrl:
-    typeof window !== "undefined" ? markerShadow.src ?? markerShadow : "",
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
 });
 
 export function LeafletMap({
@@ -31,33 +30,6 @@ export function LeafletMap({
 }) {
   const [center, setCenter] = useState<LatLng | null>(initial ?? null);
   const [marker, setMarker] = useState<LatLng | null>(initial ?? null);
-
-  // useEffect(() => {
-  //   if (!initial) {
-  //     // try user location
-  //     if (typeof navigator !== "undefined" && navigator.geolocation) {
-  //       const id = navigator.geolocation.getCurrentPosition(
-  //         (pos) => {
-  //           const p = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-  //           setCenter(p);
-  //           setMarker(p);
-  //         },
-  //         () => {
-  //           setCenter(LAGOS);
-  //         },
-  //         { enableHighAccuracy: true, timeout: 5000 }
-  //       );
-  //       return () => {
-  //         // no cleanup for getCurrentPosition
-  //       };
-  //     } else {
-  //       setCenter(LAGOS);
-  //     }
-  //   } else {
-  //     setCenter(initial);
-  //     setMarker(initial);
-  //   }
-  // }, [initial]);
 
   useEffect(() => {
     if (initial) {

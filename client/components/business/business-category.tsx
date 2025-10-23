@@ -191,7 +191,7 @@ export default function BusinessCategoryList() {
                         value: "DELIVERY_SERVICE",
                       },
                       { label: "OTHER", value: "OTHER" },
-                    ] /* fetch and populate dynamically */,
+                    ],
                   },
                 ]}
                 isLoading={isLoading || isFetchingNextPage}

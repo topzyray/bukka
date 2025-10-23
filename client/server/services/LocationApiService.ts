@@ -3,7 +3,7 @@ import { locationRoutes } from "@/constants/routes/locationRoutes";
 import axios from "axios";
 
 const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL = 60 * 60 * 1000; // 60 minutes
 
 export class LocationApiService {
   static async getLocations(params: Record<string, any> = {}) {
@@ -59,13 +59,6 @@ export class LocationApiService {
       const data = response?.data;
       cache.set(cleanQuery.toLowerCase(), { data, timestamp: now });
       return data;
-
-      // Normalize only needed fields
-      // return response.data.map((item: any) => ({
-      //   display_name: item.display_name,
-      //   lat: item.lat,
-      //   lng: item.lng,
-      // }));
     } catch (error: any) {
       if (axios.isCancel(error)) {
         throw new Error("LocationIQ request canceled");
@@ -74,7 +67,6 @@ export class LocationApiService {
       } else {
         throw new Error(error.message || error);
       }
-      // return [];
     }
   }
 

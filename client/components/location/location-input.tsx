@@ -10,6 +10,9 @@ import { Card } from "../ui/card";
 import { ScrollArea } from "../ui/scroll-area";
 import { MapSelector } from "./map-selector";
 import { MapProviderEnum } from "@/server/enums/MapProviderEnum";
+import { toast } from "sonner";
+import { extractErrorMessage } from "@/utils";
+import { CircularLoader } from "../loaders/circular-loader";
 
 type Props = {
   control?: any;
@@ -149,22 +152,24 @@ Props) {
                   variant="outline"
                   onClick={async () => {
                     if (!navigator.geolocation) {
-                      console.error("Geolocation not supported");
+                      toast.error("Geolocation not supported");
                       return;
                     }
 
                     // Request current position — update immediately and then trigger reverse geocode non-blocking.
                     navigator.geolocation.getCurrentPosition(
                       (pos) => {
+                        console.log("COORDS: ", pos);
+
                         const { latitude, longitude } = pos.coords;
 
                         // non-blocking: call handleCoordsSelected but do not await it
                         void handleCoordsSelected(latitude, longitude);
                       },
                       (err) => {
-                        console.error("Geolocation error:", err);
+                        toast.error(extractErrorMessage(err));
                       },
-                      { enableHighAccuracy: true, timeout: 10000 }
+                      { enableHighAccuracy: true }
                     );
                   }}
                 >
@@ -193,18 +198,20 @@ Props) {
                 <ScrollArea className="max-h-40">
                   <div>
                     {loadingReverse ? (
-                      <p className="text-sm text-muted-foreground">
-                        Fetching address...
-                      </p>
+                      <CircularLoader text="Fetching address..." />
                     ) : selected ? (
                       <>
+                        {selected?.address && (
+                          <div className="font-medium text-sm">
+                            {selected?.address}
+                          </div>
+                        )}
                         <div className="font-medium text-sm">
-                          {selected.address ??
-                            `${selected.latitude}, ${selected.longitude}`}
+                          {`${selected?.latitude}, ${selected?.longitude}`}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          Lat: {selected.latitude?.toFixed?.(6)} | Lng:{" "}
-                          {selected.longitude?.toFixed?.(6)}
+                          Lat: {selected?.latitude?.toFixed?.(6)} | Lng:{" "}
+                          {selected?.longitude?.toFixed?.(6)}
                         </div>
                         {selected.city && (
                           <div className="text-xs">{selected.city}</div>

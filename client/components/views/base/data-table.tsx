@@ -18,7 +18,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -43,6 +42,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { SearchBox } from "@/components/atoms/search-box";
 
 /**
  * Generic, reusable DataTable
@@ -255,7 +255,7 @@ export function DataTable<TData>({
       {/* Toolbar */}
       <div className="flex flex-wrap flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <div className="relative w-full sm:w-72">
+          {/* <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search..."
@@ -263,7 +263,15 @@ export function DataTable<TData>({
               onChange={(e) => handleSearch(e.target.value)}
               className="pl-9"
             />
-          </div>
+          </div> */}
+
+          <SearchBox
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="Search..."
+            onSearch={(q) => console.log("Searching: ", q)}
+            delay={400}
+          />
           <Button
             variant="outline"
             onClick={() =>
@@ -299,10 +307,10 @@ export function DataTable<TData>({
               </SelectTrigger>
               <SelectContent>
                 {f.options
-                  .filter((opt) => opt.value) // remove empty string
+                  .filter((opt) => opt?.value) // remove empty string
                   .map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                    <SelectItem key={opt?.value} value={opt?.value ?? ""}>
+                      {opt?.label}
                     </SelectItem>
                   ))}
               </SelectContent>

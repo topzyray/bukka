@@ -11,6 +11,7 @@ type Props = {
   initial?: { lat: number; lng: number } | null;
   onSelect: (lat: number, lng: number) => void;
   provider: MapProviderEnum;
+  showLegend?: boolean;
   height?: string | number;
 };
 
@@ -18,6 +19,7 @@ export function MapSelector({
   initial = null,
   onSelect,
   provider,
+  showLegend,
   height,
 }: Props) {
   const PAGE_SIZE = 10;
@@ -81,6 +83,7 @@ export function MapSelector({
           onSelect={onSelect}
           height={height}
           businesses={currentPageData}
+          showLegend={showLegend}
         />
       );
     }

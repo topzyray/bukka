@@ -12,6 +12,7 @@ const Map = () => {
       <MapSelector
         onSelect={() => console.log("")}
         height={"93%"}
+        showLegend={true}
         provider={MapProviderEnum.LOCATIONIQ}
       />
     </div>
