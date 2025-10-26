@@ -20,12 +20,12 @@ export interface Restaurant {
   phone?: string;
   website?: string;
   opening_hours?: {
-    open_now: boolean;
+    openNow: boolean;
     periods: Array<{
       open: { day: number; time: string };
       close: { day: number; time: string };
     }>;
-    weekday_text: string[];
+    weekdayText: string[];
   };
   reviews?: Array<{
     user: string;

@@ -196,15 +196,15 @@ export function RestaurantCard({
           </BukkaButton>
 
           {/* Status Badge */}
-          {restaurant.opening_hours?.open_now !== undefined && (
+          {restaurant.opening_hours?.openNow !== undefined && (
             <Badge
               variant={
-                restaurant.opening_hours.open_now ? "default" : "secondary"
+                restaurant.opening_hours.openNow ? "default" : "secondary"
               }
               className="absolute bottom-3 left-3"
             >
               <Clock className="w-3 h-3 mr-1" />
-              {restaurant.opening_hours.open_now ? "Open" : "Closed"}
+              {restaurant.opening_hours.openNow ? "Open" : "Closed"}
             </Badge>
           )}
         </div>

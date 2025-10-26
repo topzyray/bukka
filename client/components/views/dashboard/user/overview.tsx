@@ -60,9 +60,9 @@ export function UserOverview() {
       isSaved: true,
       distanceMeters: 800,
       opening_hours: {
-        open_now: true,
+        openNow: true,
         periods: [],
-        weekday_text: [],
+        weekdayText: [],
       },
     },
   ];

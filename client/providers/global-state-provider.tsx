@@ -6,11 +6,20 @@ import { UserRoleEnum } from "@/server/enums";
 import Cookies from "js-cookie";
 import ServiceWorkderRegistrar from "./service-worker";
 
+type TCoordinates = {
+  lng: number;
+  lat: number;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+};
+
 interface IGlobalContext {
   signupAs: UserRoleEnum | null;
   setSignUpAs: React.Dispatch<React.SetStateAction<UserRoleEnum | null>>;
-  coordinates: any | null;
-  setCoordinates: React.Dispatch<React.SetStateAction<any | null>>;
+  coordinates: TCoordinates | null;
+  setCoordinates: React.Dispatch<React.SetStateAction<TCoordinates | null>>;
 }
 
 export const GlobalContext = createContext({} as IGlobalContext);

@@ -35,7 +35,7 @@ const featuredRestaurants = [
     photos: [],
     isSaved: false,
     distanceMeters: 500,
-    opening_hours: { open_now: true } as any,
+    opening_hours: { openNow: true } as any,
   },
   {
     id: "2",
@@ -49,7 +49,7 @@ const featuredRestaurants = [
     photos: [],
     isSaved: true,
     distanceMeters: 1200,
-    opening_hours: { open_now: false } as any,
+    opening_hours: { openNow: false } as any,
   },
 ];
 
@@ -184,7 +184,7 @@ export default function Home() {
                     variant="glass"
                     size="sm"
                     onClick={() =>
-                      (window.location.href = "/search?filter=open_now")
+                      (window.location.href = "/search?filter=openNow")
                     }
                   >
                     <Clock className="w-4 h-4 mr-2" />

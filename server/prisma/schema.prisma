@@ -141,10 +141,12 @@ model Business {
   description    String?
   type           BusinessType      @default(RESTAURANT)
   categoryId     Int
+  slug           String
   phoneNumber    String?
   email          String?
   website        String?
   registrationNo String?
+  cuisines       Json[]
   isVerified     Boolean           @default(false)
   isActive       Boolean           @default(false)
   rating         Float?            @default(0)

@@ -11,21 +11,31 @@ export type BusinessType =
   | "OTHER";
 
 export interface CreateBusinessDto {
+  ownerId: number;
   name: string;
+  type: BusinessType;
+  categoryId: number;
+  slug: string;
+  latitude: number;
+  longitude: number;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  cuisines?: string[] | [];
+  placeId?: string;
+  cityId?: string;
+  stateId?: string;
+  countryId?: string;
+  zipCode?: string;
+  landmark?: string;
   description?: string;
-  type?: BusinessType;
-  categoryId?: number | null;
   phoneNumber?: string;
   email?: string;
   website?: string;
   registrationNo?: string;
-  locationId?: number | null;
   openingHours?: any;
   socialLinks?: any;
-  isVerified?: boolean;
-  isActive?: boolean;
-  iconUrl?: string | null;
-  coverUrl?: string | null;
 }
 
 export interface UpdateBusinessDto {

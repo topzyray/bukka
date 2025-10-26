@@ -10,6 +10,7 @@ import {
   IsLongitude,
   IsLatitude,
   IsDecimal,
+  IsArray,
 } from 'class-validator';
 import { PaginationDto } from './Base/PaginationDto';
 import { Transform } from 'class-transformer';
@@ -47,6 +48,24 @@ export class CreateBusinessDto extends CreateLocationDto {
   @IsNumber()
   @Transform(({ value }) => Number.parseInt(value, 10))
   categoryId: number;
+
+  @ApiProperty({
+    example: 'restaurant',
+    required: true,
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  slug: string;
+
+  @ApiProperty({
+    example: 'restaurant',
+    required: true,
+    default: [],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  cuisines: string[] = [];
 
   @ApiProperty({
     example: 'We provide the best service.',

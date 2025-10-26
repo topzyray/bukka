@@ -277,4 +277,19 @@ export class TextHelper {
       return `${Math.floor(diffInSeconds / 3600)} hours ago`;
     return past.toLocaleDateString();
   }
+
+  static isOPenNow(periods: any[]) {
+    if (!periods?.length) return false;
+
+    const now = new Date();
+    const currentDay = now.getDay();
+    const currentTime = now.toTimeString().slice(0, 5); // "HH:mm"
+
+    const todayPeriod = periods.find((p: any) => p.day === currentDay);
+    if (!todayPeriod) return false;
+
+    return (
+      currentTime >= todayPeriod.openTime && currentTime < todayPeriod.closeTime
+    );
+  }
 }

@@ -16,6 +16,7 @@ import { useCreateUserPersonalization } from "@/server/mutations/userPersonaliza
 import { toast } from "sonner";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { useUpdateUserData } from "@/server/mutations/user/use-update-user-data";
+import { cuisineSuggestions } from "@/constants/menu-info";
 
 export const userPersonalizedSchema = z.object({
   preferredCuisines: z
@@ -224,102 +225,3 @@ export function UserPersonalizedDetailsStep({
     </>
   );
 }
-
-const CUISINE_OPTIONS: Record<string, string[]> = {
-  African: [
-    "Nigerian",
-    "Ghanaian",
-    "Ethiopian",
-    "Moroccan",
-    "South African",
-    "Kenyan",
-    "Egyptian",
-    "Tunisian",
-    "Senegalese",
-    "Somali",
-  ],
-  American: [
-    "Southern (Soul Food)",
-    "Cajun & Creole",
-    "Tex-Mex",
-    "Hawaiian",
-    "Californian Fusion",
-    "Barbecue (BBQ)",
-    "New England",
-    "Midwestern Comfort",
-    "Pacific Northwest",
-  ],
-  Asian: [
-    "Chinese",
-    "Japanese",
-    "Thai",
-    "Korean",
-    "Vietnamese",
-    "Indian",
-    "Pakistani",
-    "Indonesian",
-    "Filipino",
-    "Malaysian",
-    "Sri Lankan",
-    "Nepalese",
-  ],
-  European: [
-    "Italian",
-    "French",
-    "Spanish",
-    "Greek",
-    "British",
-    "German",
-    "Portuguese",
-    "Turkish",
-    "Russian",
-    "Scandinavian",
-  ],
-  MiddleEastern: [
-    "Lebanese",
-    "Persian (Iranian)",
-    "Israeli",
-    "Syrian",
-    "Turkish",
-    "Iraqi",
-    "Emirati",
-    "Saudi Arabian",
-  ],
-  LatinAmerican: [
-    "Mexican",
-    "Brazilian",
-    "Argentinian",
-    "Peruvian",
-    "Colombian",
-    "Cuban",
-    "Puerto Rican",
-    "Venezuelan",
-    "Chilean",
-  ],
-  Caribbean: [
-    "Jamaican",
-    "Trinidadian",
-    "Haitian",
-    "Barbadian",
-    "Cuban",
-    "Dominican",
-    "Bahamas",
-  ],
-  Oceanian: ["Australian", "New Zealand", "Polynesian", "Fijian", "Samoan"],
-  FusionModern: [
-    "Afro-Fusion",
-    "Asian-Fusion",
-    "Tex-Mex Fusion",
-    "Plant-Based",
-    "Vegan Fusion",
-    "Street Food",
-    "Contemporary Global",
-  ],
-};
-
-const cuisineSuggestions = Object.entries(CUISINE_OPTIONS).flatMap(
-  ([region, cuisines]) =>
-    cuisines.map(
-      (cuisine) => `${region.replace(/([A-Z])/g, " $1").trim()} - ${cuisine}`
-    )
-);

@@ -30,6 +30,53 @@ import { LocationInput } from "@/components/location/location-input";
 import { useBusinessCategories } from "@/server/queries/use-businesses-category-query";
 import { cn } from "@/lib/utils";
 import { CreateBusinessDto } from "@/server/dtos";
+import { BusinessCategory } from "@/server/interfaces/BusinessCategory";
+import { OpeningHoursField } from "../../custom/openin-hours-field";
+import { TagInputComponent } from "../../base/tag-input-component";
+import { cuisineSuggestions } from "@/constants/menu-info";
+
+const weekdayNames = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+const timeRegex = /^([0-1]\d|2[0-3]):([0-5]\d)$/; // HH:mm format
+
+export const openingHoursSchema = z
+  .object({
+    periods: z
+      .array(
+        z
+          .object({
+            day: z.number().min(0).max(6).optional(),
+            openTime: z
+              .string()
+              .regex(timeRegex, "Time must be in HH:mm format")
+              .optional(),
+            closeTime: z
+              .string()
+              .regex(timeRegex, "Time must be in HH:mm format")
+              .optional(),
+          })
+          // Optional refinement only if both times are provided
+          .refine(
+            (p) => !p.openTime || !p.closeTime || p.openTime < p.closeTime,
+            "Closing time must be after opening time"
+          )
+      )
+      .optional()
+      .default([]),
+
+    weekdayText: z.array(z.string()).optional().default([]),
+  })
+  .optional()
+  .nullable()
+  .default(null);
 
 const locationSchema = z.object({
   latitude: z.coerce
@@ -40,11 +87,11 @@ const locationSchema = z.object({
     .number({ error: "Longitude is required" })
     .min(-180, { message: "Longitude must be ≥ -180" })
     .max(180, { message: "Longitude must be ≤ 180" }),
+  address: z.string().min(1, { error: "Required" }),
+  city: z.string().min(1, { error: "Required" }),
+  state: z.string().min(1, { error: "Required" }),
+  country: z.string().min(1, { error: "Required" }),
   placeId: z.string().or(z.literal("")).optional().nullable(),
-  address: z.string().or(z.literal("")).optional().nullable(),
-  city: z.string().or(z.literal("")).optional().nullable(),
-  state: z.string().or(z.literal("")).optional().nullable(),
-  country: z.string().or(z.literal("")).optional().nullable(),
   cityId: z.string().or(z.literal("")).optional().nullable(),
   stateId: z.string().or(z.literal("")).optional().nullable(),
   countryId: z.string().or(z.literal("")).optional().nullable(),
@@ -60,9 +107,6 @@ export const createBusinessSchema = z.object({
   name: z
     .string({ error: "Business name is required" })
     .min(2, { message: "Business name must be at least 2 characters long" }),
-  type: z
-    .string({ error: "Business type is required" })
-    .min(2, { message: "Business type must be valid" }),
   categoryId: z.coerce
     .number({ error: "Category is required" })
     .int({ message: "Category ID must be a number" }),
@@ -85,20 +129,8 @@ export const createBusinessSchema = z.object({
     .or(z.literal(""))
     .optional()
     .nullable(),
-  openingHours: z
-    .record(z.string(), z.string())
-    .or(z.literal(""))
-    .optional()
-    .nullable()
-    .refine(
-      (obj) => {
-        if (!obj) return true;
-        return Object.entries(obj).every(
-          ([, v]) => typeof v === "string" && /\d{2}:\d{2}-\d{2}:\d{2}/.test(v)
-        );
-      },
-      { message: "Opening hours must be in HH:mm-HH:mm format" }
-    ),
+  openingHours: openingHoursSchema.optional(),
+  cuisines: z.array(z.string()).optional().default([]),
   socialLinks: z
     .object({
       instagram: z.url().or(z.literal("")).optional(),
@@ -155,7 +187,10 @@ export function CreateEditBusinessForm({
       form.setValue("location", {
         longitude: coordinates?.lng,
         latitude: coordinates?.lat,
-        address: coordinates?.address,
+        address: coordinates?.address as string,
+        city: coordinates?.city as string,
+        state: coordinates?.state as string,
+        country: coordinates?.country as string,
       });
     }
   }, [coordinates, form]);
@@ -170,43 +205,6 @@ export function CreateEditBusinessForm({
   });
 
   busy = createMutation.isPending || updateMutation.isPending || busy;
-
-  // useEffect(() => {
-  //   if (initial) {
-  //     form.reset({
-  //       ...defaultBusinessValues,
-  //       ...initial,
-  //       location: {
-  //         ...defaultBusinessValues.location,
-  //         ...initial.location,
-  //       },
-  //       socialLinks: {
-  //         ...defaultBusinessValues.socialLinks,
-  //         ...(initial as any).socialLinks,
-  //       },
-  //     });
-  //   }
-  // }, [initial, form]);
-
-  const onSubmit = (data: CreateBusinessFormValues) => {
-    const { location, ...otherData } = data;
-    let payload: any;
-    if (isEdit && initial?.id) {
-      payload = {
-        ...otherData,
-        longitude: location?.longitude.toFixed(6),
-        latitude: location?.latitude.toFixed(6),
-      } as Partial<CreateBusinessDto>;
-      updateMutation.mutate({ id: initial.id, payload });
-    } else {
-      payload = {
-        ...otherData,
-        longitude: location?.longitude.toFixed(6),
-        latitude: location?.latitude.toFixed(6),
-      } as CreateBusinessDto;
-      createMutation.mutate(payload);
-    }
-  };
 
   const ownerId = form.watch("ownerId");
 
@@ -224,6 +222,61 @@ export function CreateEditBusinessForm({
     }
   }, [allUserData?.responseData?.data, form, ownerId, user]);
 
+  const onSubmit = (data: CreateBusinessFormValues) => {
+    const weekdayText =
+      data.openingHours?.periods.map((p) => {
+        const day = weekdayNames[p.day as number];
+        return `${day}: ${p.openTime} - ${p.closeTime}`;
+      }) ?? [];
+
+    const { location, ...otherData } = data;
+    const category: BusinessCategory =
+      catData?.responseData?.data.length &&
+      catData?.responseData?.data.find(
+        (cat: BusinessCategory) => cat?.id === data?.categoryId
+      );
+
+    let payload: any;
+    if (isEdit && initial?.id) {
+      payload = {
+        ...otherData,
+        longitude: Number(location?.longitude.toFixed(6)),
+        latitude: Number(location?.latitude.toFixed(6)),
+        type: category?.type,
+        slug: category?.slug,
+        address: location?.address,
+        city: location?.city,
+        state: location?.state,
+        country: location?.country,
+        openingHours: {
+          ...data.openingHours,
+          weekdayText,
+        },
+      } as Partial<CreateBusinessDto>;
+      updateMutation.mutate({ id: initial.id, payload });
+    } else {
+      payload = {
+        ...otherData,
+        longitude: Number(location?.longitude.toFixed(6)),
+        latitude: Number(location?.latitude.toFixed(6)),
+        type: category?.type,
+        slug: category?.slug,
+        address: location?.address,
+        city: location?.city,
+        state: location?.state,
+        country: location?.country,
+        openingHours: {
+          ...data.openingHours,
+          weekdayText,
+        },
+      } as CreateBusinessDto;
+
+      console.log("Payload: ", payload);
+
+      // createMutation.mutate(payload);
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="">
@@ -234,7 +287,7 @@ export function CreateEditBusinessForm({
             {/* LOCATION */}
             <div className="space-y-2">
               <h3 className="text-base font-semibold">
-                Business Location Info
+                Business Location Info (all required)
               </h3>
               <LocationInput
                 provider={MapProviderEnum.LOCATIONIQ}
@@ -245,11 +298,48 @@ export function CreateEditBusinessForm({
               />
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <InputComponent
+                formControl={form.control}
+                formName="location.address"
+                formInputType="text"
+                formLabel="Address"
+                formPlaceholder="e.g. 10th Avenue"
+                disabled={busy}
+              />
+              <InputComponent
+                formControl={form.control}
+                formName="location.city"
+                formInputType="text"
+                formLabel="City"
+                formPlaceholder="e.g. Abuja"
+                disabled={busy}
+              />
+              <InputComponent
+                formControl={form.control}
+                formName="location.state"
+                formInputType="text"
+                formLabel="State"
+                formPlaceholder="e.g. FCT"
+                disabled={busy}
+              />
+              <InputComponent
+                formControl={form.control}
+                formName="location.country"
+                formInputType="text"
+                formLabel="Country"
+                formPlaceholder="e.g. Nigeria"
+                disabled={busy}
+              />
+            </div>
+
             <Separator />
 
             {/* BUSINESS BASICS */}
             <div className="space-y-2">
-              <h3 className="text-base font-semibold">Vendor Details</h3>
+              <h3 className="text-base font-semibold">
+                Vendor Details (all required)
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {user?.role === UserRoleEnum.ADMIN ? (
                   <SelectField
@@ -303,25 +393,15 @@ export function CreateEditBusinessForm({
                   formControl={form.control}
                   formName="name"
                   formInputType="text"
-                  formLabel="Business Name"
+                  formLabel="Business Name (required)"
                   formPlaceholder="e.g. Mama Nkechi Bukka"
                   disabled={busy}
                 />
 
                 <SelectField
                   control={form.control}
-                  formName="type"
-                  formLabel="Business Type"
-                  formData={catData?.responseData?.data ?? []}
-                  valueKey="type"
-                  labelKey="type"
-                  disabled={busy}
-                />
-
-                <SelectField
-                  control={form.control}
                   formName="categoryId"
-                  formLabel="Category"
+                  formLabel="Category (required)"
                   formData={catData?.responseData?.data ?? []}
                   placeholder="Select category"
                   disabled={busy}
@@ -331,7 +411,7 @@ export function CreateEditBusinessForm({
                   formControl={form.control}
                   formName="registrationNo"
                   formInputType="text"
-                  formLabel="Registration No"
+                  formLabel="Registration No (optional)"
                   formPlaceholder="RC-172823434"
                   disabled={busy}
                 />
@@ -339,7 +419,7 @@ export function CreateEditBusinessForm({
                 <PhoneNumberInput
                   formControl={form}
                   formName="phoneNumber"
-                  formLabel="Phone Number"
+                  formLabel="Phone Number (optional)"
                   disabled={busy}
                 />
 
@@ -347,7 +427,7 @@ export function CreateEditBusinessForm({
                   formControl={form.control}
                   formName="email"
                   formInputType="email"
-                  formLabel="Business Email"
+                  formLabel="Business Email (optional)"
                   formPlaceholder="hello@mamaput.com"
                   disabled={busy}
                 />
@@ -356,7 +436,7 @@ export function CreateEditBusinessForm({
                   formControl={form.control}
                   formName="website"
                   formInputType="text"
-                  formLabel="Website"
+                  formLabel="Website (optional)"
                   formPlaceholder="https://mamaput.com"
                   disabled={busy}
                 />
@@ -367,36 +447,43 @@ export function CreateEditBusinessForm({
             <TextAreaComponent
               formControl={form.control}
               formName="description"
-              formLabel="Business Description"
+              formLabel="Business Description (optional)"
               formPlaceholder="Short description about your business"
               inputClassName="min-h-[120px]"
               disabled={busy}
             />
 
-            {/* VISUALS */}
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <InputComponent
-                    formControl={form.control}
-                    formName="iconUrl"
-                    formInputType="text"
-                    formLabel="Business Icon URL"
-                    formPlaceholder="https://example.com/icon.png"
-                  />
+            <Separator />
 
-                  <InputComponent
-                    formControl={form.control}
-                    formName="coverUrl"
-                    formInputType="text"
-                    formLabel="Cover Image URL"
-                    formPlaceholder="https://example.com/cover.jpg"
-                  />
-                </div> */}
+            <div className="space-y-2 w-full">
+              <h3 className="text-base font-semibold">
+                Available Menu (optional)
+              </h3>
+              <TagInputComponent
+                formControl={form.control}
+                formName="cuisines"
+                formLabel="Add Your Cuisines"
+                formPlaceholder="Type or select cuisines..."
+                enableSuggestions
+                suggestions={cuisineSuggestions}
+                disabled={busy}
+                inputClassName="w-full"
+              />
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <OpeningHoursField formName="openingHours" formContext={form} />
+            </div>
 
             <Separator />
 
             {/* SOCIAL LINKS */}
             <div className="space-y-2">
-              <h3 className="text-base font-semibold">Business Social Links</h3>
+              <h3 className="text-base font-semibold">
+                Business Social Links (optional)
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <InputComponent
                   formControl={form.control}

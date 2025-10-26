@@ -76,33 +76,33 @@ export class CreateLocationDto {
   @Transform(({ value }) => Number.parseFloat(value))
   longitude: number;
 
+  @ApiProperty({
+    example: 'Laughter`s Youghurt, Immowa Buiding',
+    required: true,
+  })
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @ApiProperty({ example: 'Abuja', required: true })
+  @IsString()
+  @IsNotEmpty()
+  city: string;
+
+  @ApiProperty({ example: 'FCT', required: true })
+  @IsString()
+  @IsNotEmpty()
+  state: string;
+
+  @ApiProperty({ example: 'Nigeria', required: true })
+  @IsString()
+  @IsNotEmpty()
+  country: string;
+
   @ApiProperty({ example: 'ChIJN1t_tJezz4AR4GeTYWZsKWw', required: false })
   @IsOptional()
   @IsString()
   placeId?: string;
-
-  @ApiProperty({
-    example: 'Laughter`s Youghurt, Immowa Buiding',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  address?: string;
-
-  @ApiProperty({ example: 'Abuja', required: false })
-  @IsString()
-  @IsOptional()
-  city?: string;
-
-  @ApiProperty({ example: 'FCT', required: false })
-  @IsString()
-  @IsOptional()
-  state?: string;
-
-  @ApiProperty({ example: 'Nigeria', required: false })
-  @IsString()
-  @IsOptional()
-  country?: string;
 
   @ApiProperty({ example: '2643743', required: false })
   @IsString()

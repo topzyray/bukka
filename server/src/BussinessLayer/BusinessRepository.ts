@@ -38,7 +38,16 @@ export class BusinessRepository {
   async createBusiness(
     dto: CreateBusinessDto,
   ): Promise<BukkaResponse<Business>> {
-    const { longitude, latitude, ...otherDto } = dto;
+    const {
+      longitude,
+      latitude,
+      address,
+      city,
+      state,
+      country,
+      zipCode,
+      ...otherDto
+    } = dto;
 
     let location = await this.locationDataAgent.findNearbyLocation(
       longitude,
@@ -58,13 +67,13 @@ export class BusinessRepository {
         longitude,
         latitude,
         // TODO: ADD THE FOLLOWING WHEN YOU IMPLEMENT GEOCODING
-        //  address,
+        address,
+        city,
+        state,
+        country,
         // placeId,
-        // city,
-        // state,
-        // country,
-        // zipCode,
       };
+
       location = await this.locationDataAgent.createLocation(newLocationData);
     }
 

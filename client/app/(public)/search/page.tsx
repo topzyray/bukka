@@ -26,7 +26,7 @@ const mockRestaurants = [
     photos: [],
     isSaved: false,
     distanceMeters: 500,
-    opening_hours: { open_now: true } as any,
+    opening_hours: { openNow: true } as any,
   },
   {
     id: "2",
@@ -40,7 +40,7 @@ const mockRestaurants = [
     photos: [],
     isSaved: true,
     distanceMeters: 1200,
-    opening_hours: { open_now: false } as any,
+    opening_hours: { openNow: false } as any,
   },
   // Add more mock restaurants...
 ];

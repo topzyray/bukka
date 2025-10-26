@@ -3,7 +3,7 @@ import { RedisService } from '../../redis/RedisService';
 import { Logger } from '@nestjs/common';
 
 export class ReadThroughStrategy implements ICacheStrategy {
-  private readonly logger = new Logger();
+  private readonly logger = new Logger(ReadThroughStrategy.name);
   private readonly redisService: RedisService;
 
   constructor(redisService: RedisService) {
@@ -24,7 +24,7 @@ export class ReadThroughStrategy implements ICacheStrategy {
     }
 
     if (dataLoader) {
-      console.info(`Cache miss for key: ${key}`);
+      this.logger.log(`Cache miss for key: ${key}`);
       const freshData = await dataLoader();
       await this.set(key, freshData, ttl);
       return freshData;

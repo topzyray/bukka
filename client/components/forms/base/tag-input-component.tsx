@@ -109,6 +109,7 @@ export function TagInputComponent<T extends FieldValues>({
               <FormControl>
                 <div
                   className={cn(
+                    "w-full",
                     Icon && "pl-8",
                     "focus-within:ring-primary/50 flex flex-wrap items-center gap-1 rounded-md border px-3 focus-within:ring-1 cursor-text",
                     "pr-8",
