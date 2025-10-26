@@ -18,17 +18,31 @@ export class RedisService {
   private readonly logger = new Logger(RedisService.name);
 
   constructor() {
-    let baseOptions: any = {
-      url: this.url,
+    // let baseOptions: any = {
+    //   url: this.url,
+    //   password: this.config.redisPassword,
+    // };
+    // if (this.config.env.toLowerCase() === EnvironmentTypeEnum.PROD) {
+    //   baseOptions.socket = {
+    //     reconnectStrategy: (retries: number) => Math.min(retries * 50, 1000),
+    //     timeout: 30000,
+    //     tls: true,
+    //   };
+    // }
+    // this.client = createClient(baseOptions);
+
+    const isTls = this.config.redisUrl?.startsWith('rediss://');
+
+    const baseOptions: any = {
+      url: this.config.redisUrl,
       password: this.config.redisPassword,
-    };
-    if (this.config.env === EnvironmentTypeEnum.PROD) {
-      baseOptions.socket = {
+      socket: {
         reconnectStrategy: (retries: number) => Math.min(retries * 50, 1000),
         timeout: 30000,
-        tls: true,
-      };
-    }
+        ...(isTls ? { tls: true } : {}),
+      },
+    };
+
     this.client = createClient(baseOptions);
 
     this.client.on('error', (error) =>
