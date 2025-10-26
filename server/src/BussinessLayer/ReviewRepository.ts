@@ -14,6 +14,11 @@ import {
 } from 'src/DomainLayer/Dtos/ReviewDto';
 import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
+import {
+  handleCache,
+  invalidateCache,
+} from 'src/InfrastructureLayer/Services/cache/CacheUtils';
+import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 
 @Injectable()
 export class ReviewRepository {
@@ -57,6 +62,9 @@ export class ReviewRepository {
       reviewCount: newCount,
     } as any);
 
+    await invalidateCache('reviews', { businessId: dto.businessId });
+    await invalidateCache('business', { id: dto.businessId });
+
     return BukkaResponse.CreateResponse('Review', review);
   }
 
@@ -67,12 +75,19 @@ export class ReviewRepository {
   }
 
   async listReviewsByBusiness(businessId: number, filterDto: ReviewFilterDto) {
-    const { pageSize, pageNumber } =
-      FilterQueryHelper.extractPagination(filterDto);
-    return await this.reviewDataAgent.findByBusinessId(
-      businessId,
-      pageSize,
-      pageNumber,
+    return handleCache(
+      'reviews',
+      { businessId, ...filterDto },
+      () => {
+        const { pageSize, pageNumber } =
+          FilterQueryHelper.extractPagination(filterDto);
+        return this.reviewDataAgent.findByBusinessId(
+          businessId,
+          pageSize,
+          pageNumber,
+        );
+      },
+      CacheTTLPolicy.REVIEW,
     );
   }
 

@@ -10,18 +10,19 @@ import {
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { PagedData } from 'src/DomainLayer/Models/PagedData';
 import { Location } from 'src/DomainLayer/Models/Location';
+import {
+  handleCache,
+  invalidateCache,
+} from 'src/InfrastructureLayer/Services/cache/CacheUtils';
+import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 
 @Injectable()
 export class LocationRepository {
   constructor(private readonly locationDataAgent: LocationDataAgent) {}
 
-  /**
-   * Create a new location (can be from Google PlaceId or manual lat/lng)
-   */
   async createLocation(
     dto: CreateLocationDto,
   ): Promise<BukkaResponse<Location>> {
-    // Basic validation (placeId or lat/lng)
     if (
       !dto.placeId &&
       (dto.latitude === undefined || dto.longitude === undefined)
@@ -31,7 +32,6 @@ export class LocationRepository {
       );
     }
 
-    // If placeId is provided, attempt to prevent duplicates by placeId
     if (dto.placeId) {
       const existing = await this.locationDataAgent.findLocationByPlaceId(
         dto.placeId,
@@ -42,12 +42,10 @@ export class LocationRepository {
     }
 
     const created = await this.locationDataAgent.createLocation(dto as any);
+    await invalidateCache('locations:search', {});
     return BukkaResponse.CreateResponse('Location', created);
   }
 
-  /**
-   * Find a single location by id
-   */
   async findLocationById(id: number): Promise<BukkaResponse<Location | null>> {
     const location = await this.locationDataAgent.findLocationById(id);
     if (!location) {
@@ -56,59 +54,66 @@ export class LocationRepository {
     return BukkaResponse.GetSingleDataResponse('Location', location);
   }
 
-  /**
-   * Find locations by filters (supports pagination)
-   */
   async findLocations(
     filterDto: FilterLocationDto,
   ): Promise<PagedData<Location[]>> {
-    const query = FilterQueryHelper.buildQuery({
-      dto: filterDto,
-      rules: [
-        { field: 'placeId' },
-        { field: 'city' },
-        { field: 'state' },
-        { field: 'country' },
-      ],
-      searchConfig: {
-        fields: ['address', 'city', 'state', 'country'],
-        mode: 'insensitive',
+    return handleCache(
+      'locations:list',
+      filterDto as Record<string, any>,
+      async () => {
+        const query = FilterQueryHelper.buildQuery({
+          dto: filterDto,
+          rules: [
+            { field: 'placeId' },
+            { field: 'city' },
+            { field: 'state' },
+            { field: 'country' },
+          ],
+          searchConfig: {
+            fields: ['address', 'city', 'state', 'country'],
+            mode: 'insensitive',
+          },
+        });
+        const { pageSize, pageNumber } =
+          FilterQueryHelper.extractPagination(filterDto);
+        return this.locationDataAgent.getLocationsByFilter(
+          query,
+          pageSize,
+          pageNumber,
+        );
       },
-    });
-
-    const { pageSize, pageNumber } =
-      FilterQueryHelper.extractPagination(filterDto);
-    return await this.locationDataAgent.getLocationsByFilter(
-      query,
-      pageSize,
-      pageNumber,
+      CacheTTLPolicy.LOCATION,
     );
   }
 
   async searchLocations(
     searchFilters: SearchLocationDto,
   ): Promise<PagedData<Location[]>> {
-    const query = FilterQueryHelper.buildQuery({
-      dto: searchFilters,
-      rules: [{ field: 'search' }],
-      searchConfig: {
-        fields: ['address', 'city', 'state', 'country'],
-        mode: 'insensitive',
-      },
-    });
+    return handleCache(
+      'locations:search',
+      searchFilters as Record<any, any>,
+      () => {
+        const query = FilterQueryHelper.buildQuery({
+          dto: searchFilters,
+          rules: [{ field: 'search' }],
+          searchConfig: {
+            fields: ['address', 'city', 'state', 'country'],
+            mode: 'insensitive',
+          },
+        });
 
-    const { pageNumber, pageSize } =
-      FilterQueryHelper.extractPagination(searchFilters);
-    return await this.locationDataAgent.getLocationsByFilter(
-      query,
-      pageSize,
-      pageNumber,
+        const { pageNumber, pageSize } =
+          FilterQueryHelper.extractPagination(searchFilters);
+        return this.locationDataAgent.getLocationsByFilter(
+          query,
+          pageSize,
+          pageNumber,
+        );
+      },
+      CacheTTLPolicy.LOCATION,
     );
   }
 
-  /**
-   * Update a location by id
-   */
   async updateLocation(
     id: number,
     dto: UpdateLocationDto,
@@ -118,24 +123,22 @@ export class LocationRepository {
       return BukkaResponse.ErrorResponse('Location not found', 404);
     }
     const updated = await this.locationDataAgent.updateLocation(id, dto as any);
+    await invalidateCache('location', { id });
+    await invalidateCache('locations:search', {});
     return BukkaResponse.UpdateResponse('Location', updated);
   }
 
-  /**
-   * Delete a location
-   */
   async deleteLocation(id: number): Promise<BukkaResponse<void>> {
     const existing = await this.locationDataAgent.findLocationById(id);
     if (!existing) {
       return BukkaResponse.ErrorResponse('Location not found', 404);
     }
     await this.locationDataAgent.deleteLocation(id);
+    await invalidateCache('location', { id });
+    await invalidateCache('locations:search', {});
     return BukkaResponse.DeleteResponse('Location', true);
   }
 
-  /**
-   * Find a location by placeId helper (passes through)
-   */
   async findLocationByPlaceId(placeId: string): Promise<Location | null> {
     return await this.locationDataAgent.findLocationByPlaceId(placeId);
   }

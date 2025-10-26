@@ -19,6 +19,11 @@ import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
 import { LocationDataAgent } from 'src/DataLayer/DataAgents/LocationDataAgent';
 import { FileRepository } from './FileRepository';
 import { LocationCoordsHelper } from 'src/InfrastructureLayer/Helpers/LocationCoordsHelper';
+import {
+  handleCache,
+  invalidateCache,
+} from 'src/InfrastructureLayer/Services/cache/CacheUtils';
+import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 
 const TOLERANCE = 1e-5;
 
@@ -41,8 +46,6 @@ export class BusinessRepository {
       TOLERANCE,
     );
 
-    console.log('EXISITING LOCATION: ', location);
-
     if (
       !location ||
       LocationCoordsHelper.coordsDiffer(
@@ -63,7 +66,6 @@ export class BusinessRepository {
         // zipCode,
       };
       location = await this.locationDataAgent.createLocation(newLocationData);
-      console.log('NEW LOCATION: ', location);
     }
 
     const loggedInUser = await UserHelper.getLoggedInUser();
@@ -75,7 +77,7 @@ export class BusinessRepository {
     const existingBusiness = await this.businessDataAgent.findByLocation(
       location?.id as number,
     );
-    console.log('EXISITING BUSINESS: ', existingBusiness);
+
     if (existingBusiness) {
       return BukkaResponse.CustomResponse(
         'Business already exists.',
@@ -91,15 +93,23 @@ export class BusinessRepository {
       ownerId,
       isActive: true,
     });
-    console.log('NEW BUSINESS: ', business);
+
+    await invalidateCache('businesses', {});
 
     return BukkaResponse.CreateResponse('Business', business);
   }
 
   async getBusinessById(id: number): Promise<BukkaResponse<Business>> {
-    const business = await this.businessDataAgent.findById(id);
-    if (!business) throw new NotFoundException('Business not found');
-    return BukkaResponse.GetSingleDataResponse('Business', business);
+    return handleCache(
+      'business',
+      { id },
+      async () => {
+        const business = await this.businessDataAgent.findById(id);
+        if (!business) throw new NotFoundException('Business not found');
+        return BukkaResponse.GetSingleDataResponse('Business', business);
+      },
+      CacheTTLPolicy.BUSINESS_DETAIL,
+    );
   }
 
   async getBusinessesByOwner(): Promise<BukkaResponse<Business>> {
@@ -113,9 +123,16 @@ export class BusinessRepository {
   async getBusinesses(
     filterDto: FilterBusinessDto,
   ): Promise<PagedData<Business[]>> {
-    const { pageSize, pageNumber } =
-      FilterQueryHelper.extractPagination(filterDto);
-    return this.businessDataAgent.findAll(pageSize, pageNumber);
+    return handleCache(
+      'businesses',
+      filterDto as Record<string, any>,
+      () => {
+        const { pageSize, pageNumber } =
+          FilterQueryHelper.extractPagination(filterDto);
+        return this.businessDataAgent.findAll(pageSize, pageNumber);
+      },
+      CacheTTLPolicy.BUSINESS_LIST,
+    );
   }
 
   async updateBusiness(
@@ -130,6 +147,8 @@ export class BusinessRepository {
       throw new ForbiddenException('Unauthorized update');
 
     const updated = await this.businessDataAgent.updateBusiness(id, dto);
+    await invalidateCache('business', { id });
+    await invalidateCache('businesses', {});
     return BukkaResponse.UpdateResponse('Business', updated);
   }
 
@@ -142,6 +161,8 @@ export class BusinessRepository {
       throw new ForbiddenException('Unauthorized delete');
 
     await this.businessDataAgent.deleteBusiness(id);
+    await invalidateCache('business', { id });
+    await invalidateCache('businesses', {});
     return BukkaResponse.DeleteResponse('Business', true);
   }
 

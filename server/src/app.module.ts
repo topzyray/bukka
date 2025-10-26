@@ -60,6 +60,7 @@ import { NotificationSettingsDataAgent } from './DataLayer/DataAgents/Notificati
 // SERVICES
 import { JwtService } from '@nestjs/jwt';
 import { AppService } from './app.service';
+import { RedisService } from './InfrastructureLayer/Services/redis/RedisService';
 import { EmailService } from './InfrastructureLayer/Services/email/EmailService';
 import { KeepAliveService } from './InfrastructureLayer/Services/KeepAliveService';
 import { HttpServiceWrapper } from './InfrastructureLayer/Services/HttpServiceWrapper';
@@ -190,4 +191,8 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     ManualTemplateEngine,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  async onApplicationBootstrap() {
+    RedisService.getInstance().connect();
+  }
+}

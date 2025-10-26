@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   CreateNotificationSettingsDto,
   NotificationSettingsFilterDto,
@@ -11,6 +11,11 @@ import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHe
 import { NotificationSettings } from 'src/DomainLayer/Models/NotificationSetting';
 import { INotificationSettings } from 'src/DataLayer/Abstracts/Interfaces/INotificationSettings';
 import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
+import {
+  handleCache,
+  invalidateCache,
+} from 'src/InfrastructureLayer/Services/cache/CacheUtils';
+import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 
 @Injectable()
 export class NotificationSettingsRepository {
@@ -40,12 +45,18 @@ export class NotificationSettingsRepository {
     BukkaResponse<NotificationSettings>
   > {
     const loggedInUser = await UserHelper.getLoggedInUser();
-    const data =
-      await this._notificationSettingsDataAgent.getNotificationSettingByUserId(
-        loggedInUser?.id,
-      );
-
-    return BukkaResponse.GetSingleDataResponse('User settings', data);
+    return handleCache(
+      'user:settings',
+      { id: loggedInUser.id },
+      async () => {
+        const data =
+          await this._notificationSettingsDataAgent.getNotificationSettingByUserId(
+            loggedInUser?.id,
+          );
+        return BukkaResponse.GetSingleDataResponse('User settings', data);
+      },
+      CacheTTLPolicy.NOTIFICATION_SETTING,
+    );
   }
 
   async findNotificationSettingByFilters(
@@ -82,6 +93,7 @@ export class NotificationSettingsRepository {
 
     const updatedNotificationSettings =
       await this._notificationSettingsDataAgent.updateNotificationSetting(dto);
+    await invalidateCache('user:settings', { id: dto.id });
     return BukkaResponse.UpdateResponse(
       'Settings',
       updatedNotificationSettings,
@@ -101,6 +113,7 @@ export class NotificationSettingsRepository {
     const deletedSetting =
       this._notificationSettingsDataAgent.deleteUserNotificationSetting(id);
 
+    await invalidateCache('user:settings', { id });
     return BukkaResponse.DeleteResponse(
       'Notification settings',
       true,

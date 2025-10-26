@@ -18,6 +18,10 @@ export class AppConfigurationService {
     return this.configService.get<string>('DATABASE_URL')?.trim() as string;
   }
 
+  get redisUri(): string {
+    return this.configService.get<string>('REDIS_URL')?.trim() as string;
+  }
+
   get googleMapApiKey(): string {
     return this.configService
       .get<string>('GOOGLE_MAPS_API_KEY')

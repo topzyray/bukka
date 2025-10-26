@@ -19,6 +19,11 @@ import { User } from 'src/DomainLayer/Models/User';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
+import {
+  handleCache,
+  invalidateCache,
+} from 'src/InfrastructureLayer/Services/cache/CacheUtils';
+import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 @Injectable()
 export class UserRepository {
   constructor(private readonly _userDataAgent: UserDataAgent) {}
@@ -45,8 +50,13 @@ export class UserRepository {
   }
 
   async getLoggedInUserData() {
-    const loggedInUser = await UserHelper.getLoggedInUser();
-    return this._userDataAgent.getUserById(loggedInUser?.id);
+    const user = await UserHelper.getLoggedInUser();
+    return handleCache(
+      'user:profile',
+      { id: user.id },
+      () => this._userDataAgent.getUserById(user.id),
+      CacheTTLPolicy.PROFILE,
+    );
   }
 
   async findUserByToken(token: string, type: TokenTypeEnum) {
@@ -122,6 +132,7 @@ export class UserRepository {
       loggedInUser?.id,
       data,
     );
+    await invalidateCache('user:profile', { id: loggedInUser.id });
     return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
@@ -187,6 +198,7 @@ export class UserRepository {
       loggedInUser?.id,
       userProfileDto,
     );
+    await invalidateCache('user:profile', { id: loggedInUser.id });
     return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
@@ -199,6 +211,7 @@ export class UserRepository {
       loggedInUser?.id,
       data,
     );
+    await invalidateCache('user:profile', { id: loggedInUser.id });
     return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
@@ -223,6 +236,9 @@ export class UserRepository {
       throw new NotFoundException('User not found!');
     }
     await this._userDataAgent.deleteUser(user?.id as number);
+    await invalidateCache('users:list', {});
+    await invalidateCache('users:admin', {});
+    await invalidateCache('user:profile', { id: userId });
     return BukkaResponse.DeleteResponse('User', true);
   }
 
@@ -239,10 +255,11 @@ export class UserRepository {
     });
     const { pageSize, pageNumber } =
       FilterQueryHelper.extractPagination(mergedFilters);
-    return await this._userDataAgent.getUsersByFilter(
-      query,
-      pageSize,
-      pageNumber,
+    return handleCache(
+      'users:list',
+      mergedFilters,
+      () => this._userDataAgent.getUsersByFilter(query, pageSize, pageNumber),
+      CacheTTLPolicy.USER_LIST,
     );
   }
 
@@ -267,10 +284,12 @@ export class UserRepository {
     });
     const { pageSize, pageNumber } =
       FilterQueryHelper.extractPagination(mergedFilters);
-    return await this._userDataAgent.adminGetUsersByFilter(
-      query,
-      pageSize,
-      pageNumber,
+    return handleCache(
+      'users:admin',
+      mergedFilters,
+      () =>
+        this._userDataAgent.adminGetUsersByFilter(query, pageSize, pageNumber),
+      CacheTTLPolicy.USER_LIST,
     );
   }
 

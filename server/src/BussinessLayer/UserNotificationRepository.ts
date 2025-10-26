@@ -1,14 +1,18 @@
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { UserDataAgent } from 'src/DataLayer/DataAgents/UserDataAgent';
 import { UserNotificationDataAgent } from 'src/DataLayer/DataAgents/UserNotificationDataAgent';
 import {
   CreateNotificationDto,
   UserNotificationFilterDto,
 } from 'src/DomainLayer/Dtos/UserNotificationDto';
+import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { UserNotification } from 'src/DomainLayer/Models/UserNotification';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
+import {
+  handleCache,
+  invalidateCache,
+} from 'src/InfrastructureLayer/Services/cache/CacheUtils';
 
 @Injectable()
 export class UserNotificationRepository {
@@ -96,24 +100,31 @@ export class UserNotificationRepository {
   async findNotificationsByFilters(filterDto: UserNotificationFilterDto) {
     const loggedInUser = await UserHelper.getLoggedInUser();
     const mergedFilters = { ...filterDto, userId: loggedInUser?.id };
-    const query = FilterQueryHelper.buildQuery({
-      dto: mergedFilters,
-      rules: [
-        { field: 'userId' },
-        { field: 'isRead' },
-        { field: 'notificationCategory' },
-      ],
-      searchConfig: {
-        fields: ['title', 'message'],
-        mode: 'insensitive',
+    return handleCache(
+      'notifications',
+      mergedFilters,
+      () => {
+        const query = FilterQueryHelper.buildQuery({
+          dto: mergedFilters,
+          rules: [
+            { field: 'userId' },
+            { field: 'isRead' },
+            { field: 'notificationCategory' },
+          ],
+          searchConfig: {
+            fields: ['title', 'message'],
+            mode: 'insensitive',
+          },
+        });
+        const { pageSize, pageNumber } =
+          FilterQueryHelper.extractPagination(mergedFilters);
+        return this._userNotificationDataAgent.getUserNotificationsByFilter(
+          query,
+          pageSize,
+          pageNumber,
+        );
       },
-    });
-    const { pageSize, pageNumber } =
-      FilterQueryHelper.extractPagination(mergedFilters);
-    return this._userNotificationDataAgent.getUserNotificationsByFilter(
-      query,
-      pageSize,
-      pageNumber,
+      CacheTTLPolicy.NOTIFICATION,
     );
   }
 
@@ -139,6 +150,9 @@ export class UserNotificationRepository {
         notification.id as number,
       );
 
+    await invalidateCache('notifications', {});
+    await invalidateCache('notifications:count', {});
+
     return BukkaResponse.DeleteResponse(
       'User notification',
       true,
@@ -159,6 +173,7 @@ export class UserNotificationRepository {
         HttpStatus.NOT_FOUND,
       );
     }
+
     return BukkaResponse.DeleteResponse(
       'User notification',
       true,
