@@ -3,16 +3,16 @@
 import { LocationModel } from "@/server/interfaces/Location";
 import { LocationApiService } from "@/server/services/LocationApiService";
 import { useRef, useState } from "react";
-import { FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { FormField, FormItem, FormLabel, FormMessage } from "../../ui/form";
 import { cn } from "@/lib/utils";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
-import { ScrollArea } from "../ui/scroll-area";
+import { Button } from "../../ui/button";
+import { Card } from "../../ui/card";
+import { ScrollArea } from "../../ui/scroll-area";
 import { MapSelector } from "./map-selector";
 import { MapProviderEnum } from "@/server/enums/MapProviderEnum";
 import { toast } from "sonner";
 import { extractErrorMessage } from "@/utils";
-import { CircularLoader } from "../loaders/circular-loader";
+import { CircularLoader } from "../../loaders/circular-loader";
 import { useGlobalState } from "@/providers";
 
 type Props = {
@@ -211,9 +211,11 @@ Props) {
                             {selected?.address}
                           </div>
                         )}
-                        <div className="font-medium text-sm">
-                          {`${selected?.latitude}, ${selected?.longitude}`}
-                        </div>
+                        {selected?.latitude && selected?.longitude && (
+                          <div className="font-medium text-sm">
+                            {`${selected?.latitude}, ${selected?.longitude}`}
+                          </div>
+                        )}
                         <div className="text-xs text-muted-foreground">
                           Lat: {selected?.latitude?.toFixed?.(6)} | Lng:{" "}
                           {selected?.longitude?.toFixed?.(6)}

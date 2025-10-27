@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/providers/auth-provider";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { BackgroundIcons } from "@/components/ui/background-icons";
 import { OnboardingGuard } from "@/guards/onboarding-guard";
 import { UserRole } from "@/server/interfaces/Auth";
 import { ThemeToggle } from "@/components/atoms/mode-toggle";
+import { CircularLoader } from "@/components/loaders/circular-loader";
 
 interface IOnboardingLayout {
   children: ReactNode;
@@ -20,6 +21,22 @@ export default function RoleBasedOnboardingLayout({
   children,
 }: IOnboardingLayout) {
   const { logout, user } = useAuth();
+
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  // During hydration, render a placeholder loader to match SSR output
+  if (!hydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <CircularLoader text="Preparing dashboard..." />
+      </div>
+    );
+  }
+
   const role = user?.role ? (user?.role.toLowerCase() as UserRole) : undefined;
   return (
     <OnboardingGuard roles={role ? [role] : []}>
@@ -40,14 +57,14 @@ export default function RoleBasedOnboardingLayout({
 
         {/* Main Card */}
         <motion.section
-          className="w-full max-w-5xl h-[75vh] bg-card text-card-foreground rounded-2xl shadow-elegant overflow-hidden flex flex-col md:flex-row"
+          className="w-full max-w-[66rem] h-[75vh] bg-card text-card-foreground rounded-2xl shadow-elegant overflow-hidden flex flex-col md:flex-row"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           {/* Left Section: Form / Content */}
           <section className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 overflow-y-auto px-2 sm:px-8 py-8">
+            <div className="flex-1 overflow-y-auto px-2 sm:px-5 py-8">
               {/* Mobile Logo */}
               <div className="md:hidden flex justify-center mb-6">
                 <Link href="/" className="hover:scale-105 transition-transform">
@@ -74,7 +91,7 @@ export default function RoleBasedOnboardingLayout({
                 better.
               </p>
 
-              <div className="flex justify-center">
+              <div className="flex justify-center w-full">
                 <div className="w-full">{children}</div>
               </div>
             </div>
@@ -82,7 +99,7 @@ export default function RoleBasedOnboardingLayout({
 
           {/* Right Section: Illustration */}
           <motion.section
-            className="hidden md:flex w-[45%] flex-col justify-center items-center bg-muted/30 p-8 border-l border-border relative"
+            className="hidden md:flex w-[40%] flex-col justify-center items-center bg-muted/30 p-8 border-l border-border relative"
             animate={{ y: [0, -10, 0] }}
             transition={{ repeat: Infinity, duration: 4 }}
           >

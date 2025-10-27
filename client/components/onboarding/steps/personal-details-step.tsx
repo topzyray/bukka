@@ -185,7 +185,7 @@ export function PersonalDetailsStep({
               formName="phoneNumber"
               autoDetect
               disabled={isUpdatingUserData}
-              withKey={user !== null}
+              withKey={user?.phoneNumber !== null}
             />
 
             <TextAreaComponent

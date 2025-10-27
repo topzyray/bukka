@@ -27,10 +27,7 @@ export class UserPersonalizationRepository {
         loggedInUser.id,
       );
     if (existingData) {
-      return BukkaResponse.ErrorResponse(
-        'Personalization already exist for user!',
-        HttpStatus.CONFLICT,
-      );
+      return BukkaResponse.CreateResponse('User personalization', existingData);
     }
     const data = {
       ...dto,

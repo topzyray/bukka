@@ -1,4 +1,4 @@
-import BusinessCategoryList from "@/components/business/business-category";
+import BusinessCategoryList from "@/components/views/business/business-category";
 
 export default function BusinessCategories() {
   return (

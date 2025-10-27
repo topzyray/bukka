@@ -1,18 +1,19 @@
 "use client";
 
-import React from "react";
-import { useCustomInfiniteQuery } from "@/server/queries/base";
-import { BusinessApiService } from "@/server/services/BusinessApiService";
+import React, { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Business } from "@/server/interfaces/Business";
-import { CreateUpdateBusinessModal } from "../forms/business/create-update-business-modal";
-import { DataTable } from "../views/base/data-table";
-import { businessColumns } from "../atoms/columns/business-columns";
+import { BusinessCategory } from "@/server/interfaces/BusinessCategory";
+import { DataTable } from "../../views/base/data-table";
+import { businessCategoryColumns } from "../../atoms/columns/business-category-columns";
 import {
   PageWrapper,
   PageWrapperContent,
   PageWrapperContentWithFramer,
-} from "../ui/page-wrapper";
+} from "../../ui/page-wrapper";
+import { CreateUpdateBusinessCategoryModal } from "../../forms/business/create-update-business-category-form";
+import { useAuth } from "@/providers";
+import { User } from "@/server/interfaces/User";
+import { useInfiniteBusinessCategories } from "@/server/queries/use-businesses-category-query";
 
 /**
  * This component:
@@ -22,39 +23,36 @@ import {
  * - uses the normal DataTable props (data is the current-page rows)
  */
 
-export default function BusinessList() {
+export default function BusinessCategoryList() {
   const PAGE_SIZE = 10;
   const [page, setPage] = React.useState<number>(1);
   const [search, setSearch] = React.useState<string>("");
   const [filters, setFilters] = React.useState<Record<string, any>>({});
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const {
     data: infiniteData,
     fetchNextPage,
+    hasNextPage,
+    isFetching,
     isFetchingNextPage,
     isLoading,
     refetch,
-  } = useCustomInfiniteQuery<Business>(
-    ["businesses", search, filters],
-    ({ pageNumber, ...rest }) =>
-      BusinessApiService.getBusinesses({
-        page: pageNumber,
-        limit: PAGE_SIZE,
-        search: search,
-        ...filters,
-      }),
-    {
-      params: { searchParams: search, limit: PAGE_SIZE },
-      initialPageParam: 1,
-      enabled: true,
-    }
-  );
+  } = useInfiniteBusinessCategories({
+    user: user as User,
+    limit: PAGE_SIZE,
+    searchQuery: search,
+    type: filters.type,
+  });
 
   // Helper: find page object (NormalizedPagedData) for a page number
-  const findPage = (pn: number) => {
-    return infiniteData?.pages?.find((p) => p.pageNumber === pn);
-  };
+  const findPage = useCallback(
+    (pn: number) => {
+      return infiniteData?.pages?.find((p) => p.pageNumber === pn);
+    },
+    [infiniteData?.pages]
+  );
 
   // When user clicks to go to a page:
   const goToPage = async (pn: number) => {
@@ -102,25 +100,25 @@ export default function BusinessList() {
     // Here we set filters and refetch
     setFilters((f) => ({ ...f, sortBy, sortOrder }));
     // clear existing pages and refetch from page 1
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: ["business-categories"] });
     setPage(1);
   };
 
   const onSearchChange = (term: string) => {
     setSearch(term);
     // clear cache and refetch
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: ["business-categories"] });
     setPage(1);
   };
 
   const onFilterChange = (f: Record<string, any>) => {
     setFilters(f);
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: ["business-categories"] });
     setPage(1);
   };
 
   // edit/delete callbacks
-  const handleEdit = (row: Business) => {
+  const handleEdit = (row: BusinessCategory) => {
     // open modal with row (you wire BusinessFormModal)
     // ...
   };
@@ -133,7 +131,7 @@ export default function BusinessList() {
 
   // build columns
   const columns = React.useMemo(
-    () => businessColumns(handleEdit, handleDelete),
+    () => businessCategoryColumns(handleEdit, handleDelete),
     []
   );
 
@@ -144,17 +142,19 @@ export default function BusinessList() {
           <div className="space-y-6">
             <header className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold">Businesses</h1>
+                <h1 className="text-2xl font-bold">Business Categories</h1>
                 <p className="text-sm text-muted-foreground">
-                  Manage vendor businesses
+                  Manage business categories
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <CreateUpdateBusinessModal
+                <CreateUpdateBusinessCategoryModal
                   mode="create"
                   onSuccess={() => {
-                    queryClient.removeQueries({ queryKey: ["businesses"] });
+                    queryClient.removeQueries({
+                      queryKey: ["business-categories"],
+                    });
                     setPage(1);
                   }}
                 />
@@ -174,26 +174,30 @@ export default function BusinessList() {
                 onFilterChange={onFilterChange}
                 filters={[
                   {
-                    key: "categoryId",
-                    label: "Category",
+                    key: "type",
+                    label: "Type",
                     options: [
-                      { label: "All", value: undefined },
-                    ] /* fetch and populate dynamically */,
-                  },
-                  {
-                    key: "isVerified",
-                    label: "Verified",
-                    options: [
-                      { label: "All", value: undefined },
-                      { label: "Yes", value: "true" },
-                      { label: "No", value: "false" },
+                      { label: "ALL", value: undefined },
+                      { label: "RESTAURANT", value: "RESTAURANT" },
+                      { label: "BAR", value: "BAR" },
+                      { label: "LOUNGE", value: "LOUNGE" },
+                      { label: "CATERING", value: "CATERING" },
+                      { label: "BAKERY", value: "BAKERY" },
+                      { label: "FOOD VENDOR", value: "FOOD_VENDOR" },
+                      { label: "STREET EATRY", value: "STREET_EATRY" },
+                      { label: "GROCERY", value: "GROCERY" },
+                      {
+                        label: "DELIVERY SERVICE",
+                        value: "DELIVERY_SERVICE",
+                      },
+                      { label: "OTHER", value: "OTHER" },
                     ],
                   },
                 ]}
                 isLoading={isLoading || isFetchingNextPage}
                 selectable
                 enableDateFilter
-                idAccessor={(r) => (r as Business).id}
+                idAccessor={(r) => (r as BusinessCategory).id}
               />
             </div>
           </div>

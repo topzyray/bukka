@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import Cookies from "js-cookie";
 import {
   createContext,
@@ -8,16 +9,14 @@ import {
   useCallback,
   ReactNode,
 } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useCurrentUser } from "@/server/queries/use-current-user";
-import { User } from "@/server/interfaces/User";
-import { CircularLoader } from "@/components/loaders/circular-loader";
-import { useUserFiles } from "@/server/queries";
-import axios from "axios";
-import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
-import { authRoutes } from "@/constants/routes";
 import { StorageUtilsHelper } from "@/utils";
+import { authRoutes } from "@/constants/routes";
+import { useUserFiles } from "@/server/queries";
+import { User } from "@/server/interfaces/User";
+import { useQueryClient } from "@tanstack/react-query";
 import { UserFile } from "@/server/interfaces/UserFile";
+import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
+import { useCurrentUser } from "@/server/queries/use-current-user";
 
 interface IAuthContextType {
   user: User | null;
@@ -66,7 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       queryClient.clear();
       Cookies.remove("sidebarState");
-    } catch (e) {}
+    } catch {}
     window.location.href = "/signin";
   }, [queryClient]);
 
@@ -92,16 +91,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     ]
   );
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <CircularLoader
-          text="Validating..."
-          textClassName="animate-pulse-glow rounded-lg px-4"
-        />
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex min-h-screen items-center justify-center">
+  //       <CircularLoader
+  //         text="Validating your session..."
+  //         textClassName="animate-pulse-glow rounded-lg px-4 mt-4"
+  //       />
+  //     </div>
+  //   );
+  // }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

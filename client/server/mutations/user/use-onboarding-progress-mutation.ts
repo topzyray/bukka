@@ -3,7 +3,13 @@ import { useCustomMutation } from "@/server/mutations/base";
 import { UserApiService } from "@/server/services/UserApiService";
 import { useQueryClient } from "@tanstack/react-query";
 
-export const useSaveOnboardingProgress = ({ user }: { user: User }) => {
+export const useSaveOnboardingProgress = ({
+  user,
+  toastStatusMessage,
+}: {
+  user: User;
+  toastStatusMessage?: boolean;
+}) => {
   const queryClient = useQueryClient();
   return useCustomMutation(UserApiService.updateUser, {
     onSuccessCallback: () => {
@@ -12,6 +18,7 @@ export const useSaveOnboardingProgress = ({ user }: { user: User }) => {
       });
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
     },
+    toastStatusMessage,
     onErrorCallback: () => {},
   });
 };

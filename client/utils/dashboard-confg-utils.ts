@@ -5,6 +5,7 @@ import {
   INVESTOR,
   RIDER,
   USER,
+  VENDOR,
 } from "@/constants/dashboard-navigations";
 
 export function getDashboardConfig(role: UserRoleEnum) {
@@ -18,6 +19,11 @@ export function getDashboardConfig(role: UserRoleEnum) {
       return {
         title: DashboardTitleEnum.USER,
         navItems: USER,
+      };
+    case UserRoleEnum.VENDOR:
+      return {
+        title: DashboardTitleEnum.VENDOR,
+        navItems: VENDOR,
       };
     case UserRoleEnum.RIDER:
       return {

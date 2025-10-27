@@ -1,16 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
-import { BukkaButton } from "@/components/ui/button-variants";
-import { ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { RouteGuard } from "@/guards/route-guard";
-import { BackgroundIcons } from "@/components/ui/background-icons";
 import { useRouter } from "next/navigation";
+import { RouteGuard } from "@/guards/route-guard";
 import { ThemeToggle } from "@/components/atoms/mode-toggle";
+import { BackgroundIcons } from "@/components/ui/background-icons";
 
 interface IAuthLayout {
   children: ReactNode;
@@ -20,20 +17,8 @@ export default function AuthLayout({ children }: IAuthLayout) {
   const router = useRouter();
   return (
     <RouteGuard isProtected={false}>
-      <section className="relative min-h-screen hero-gradient bg-card flex flex-col">
+      <section className="relative min-h-screen flex flex-col">
         <header className="p-4 flex justify-between items-center">
-          {/* <BukkaButton
-            variant="link"
-            size="sm"
-            asChild
-            className="absolute cursor-pointer text-white"
-          >
-            <Link href="/" className="flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Link>
-          </BukkaButton> */}
-
           <section className="absolute top-2 right-0 bg-white dark:bg-primary rounded-full">
             <ThemeToggle />
           </section>

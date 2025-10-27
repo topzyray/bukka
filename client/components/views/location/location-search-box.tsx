@@ -1,8 +1,8 @@
 import { LocationModel } from "@/server/interfaces/Location";
 import { LocationApiService } from "@/server/services/LocationApiService";
 import { useCallback, useRef, useState } from "react";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Input } from "../../ui/input";
+import { Button } from "../../ui/button";
 
 export function LocationSearchBox({
   provider,

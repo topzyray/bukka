@@ -103,6 +103,7 @@ export function UserPersonalizedDetailsStep({
         queryClient.invalidateQueries({ queryKey: ["currentUser"] });
         onNext();
       },
+      toastStatusMessage: false,
     });
 
   const {

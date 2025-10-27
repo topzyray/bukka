@@ -6,6 +6,7 @@ import { RouteHelper } from "@/helpers";
 import { UserRole } from "@/server/interfaces/Auth";
 import { useAuth } from "@/providers/auth-provider";
 import { User } from "@/server/interfaces/User";
+import { CircularLoader } from "@/components/loaders/circular-loader";
 
 interface RouteGuardProps {
   children: ReactNode;
@@ -106,8 +107,16 @@ export function RouteGuard({
     router,
   ]);
 
+  // if (isLoading) {
+  //   return null;
+  // }
   if (isLoading) {
-    return null;
+    // Instead of returning null, render a minimal loader so we don't show a blank page
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <CircularLoader text="Loading your session..." />
+      </div>
+    );
   }
 
   return <>{children}</>;

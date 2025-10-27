@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   CreateNotificationSettingsDto,
   NotificationSettingsFilterDto,
@@ -47,7 +47,7 @@ export class NotificationSettingsRepository {
     const loggedInUser = await UserHelper.getLoggedInUser();
     return handleCache(
       'user:settings',
-      { id: loggedInUser.id },
+      { id: loggedInUser?.id },
       async () => {
         const data =
           await this._notificationSettingsDataAgent.getNotificationSettingByUserId(
