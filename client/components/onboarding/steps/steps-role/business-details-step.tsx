@@ -28,6 +28,7 @@ export default function BusinessDetailsStep({
         queryClient.invalidateQueries({ queryKey: ["currentUser"] });
         onNext();
       },
+      toastStatusMessage: false,
     });
 
   return (

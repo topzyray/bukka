@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Urbanist } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { envConfig } from "@/configs";
-import { BackgroundIcons } from "@/components/ui/background-icons";
 import {
   AuthProvider,
   GlobalStateProvider,
@@ -15,11 +14,13 @@ import { SessionExpirationModal } from "@/events/session-event-listener";
 const urbanist = Urbanist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Bukka",
-  description: "AI-Powered Restaurant Finder",
+  title: "Explore Nearby Food Businesses | Bukka",
+  description:
+    "Discover and explore restaurants, bars, lounges, bakeries, and catering services near you with Bukka. Search by location, category, or ratings.",
   openGraph: {
-    title: "Bukka",
-    description: "AI-Powered Restaurant Finder",
+    title: "Explore Nearby Food Businesses | Bukka",
+    description:
+      "Find top-rated restaurants and hidden gems near you with Bukka.",
     url: envConfig.NEXT_PUBLIC_DOMAIN_URL,
     siteName: "Bukka",
     images: [
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
         url: `${envConfig.NEXT_PUBLIC_DOMAIN_URL}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: "Bukka",
+        alt: "Bukka Explore Page",
       },
     ],
     locale: "en_NG",
@@ -35,6 +36,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    title: "Explore Nearby Food Businesses | Bukka",
+    description:
+      "Find top-rated restaurants and hidden gems near you with Bukka.",
+    images: ["/images/og-explore.jpg"],
     site: "@bukka",
   },
 };
@@ -64,7 +69,7 @@ export default function RootLayout({
             </AuthProvider>
           </ThemeProvider>
         </ReactQueryProvider>
-        <BackgroundIcons />
+        {/* <BackgroundIcons /> */}
       </body>
     </html>
   );

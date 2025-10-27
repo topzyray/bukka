@@ -27,6 +27,7 @@ import { IconHelper } from "@/helpers/icon-helper";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const ICONS: Record<BusinessTypeEnum, L.Icon> = {
   [BusinessTypeEnum.RESTAURANT]: IconHelper.createColoredIcon(
@@ -114,20 +115,22 @@ function MapClickHandler({
 
 interface ILocationIQMap {
   initial?: { lat: number; lng: number } | null;
-  onSelect: (lat: number, lng: number) => void;
   height?: string | number;
   disabled?: boolean;
   showLegend?: boolean;
   businesses?: Business[];
+  onSelect: (lat: number, lng: number) => void;
+  onMarkerClick?: (businessId: number) => void;
 }
 
 export function LocationIQMap({
   initial = null,
-  onSelect,
   height = 360,
   disabled = false,
   showLegend = false,
   businesses = [],
+  onSelect,
+  onMarkerClick,
 }: ILocationIQMap) {
   const { coordinates, setCoordinates } = useGlobalState();
   const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(
@@ -136,8 +139,8 @@ export function LocationIQMap({
   const { theme } = useTheme();
   const geoAttempted = useRef(false);
   const lastEmitted = useRef<{ lat: number; lng: number } | null>(null);
+  const router = useRouter();
 
-  // Initialize: if initial provided, use it. Otherwise attempt geolocation once, else fallback to default.
   useEffect(() => {
     if (coordinates) {
       setMarker(coordinates);
@@ -158,7 +161,6 @@ export function LocationIQMap({
             lng: pos.coords.longitude,
           };
           setMarker(coords);
-          // emit to parent so parent can reverse-geocode if required
           if (
             !lastEmitted.current ||
             LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
@@ -187,7 +189,6 @@ export function LocationIQMap({
         return initial;
       });
 
-      // only emit if lastEmitted differs from initial
       if (
         !lastEmitted.current ||
         LocationCoordsHelper.coordsDiffer(lastEmitted.current, initial)
@@ -196,7 +197,6 @@ export function LocationIQMap({
         onSelect(initial.lat, initial.lng);
       }
     }
-    // watch only the primitive lat/lng (and onSelect)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial?.lat, initial?.lng, onSelect]);
 
@@ -285,30 +285,106 @@ export function LocationIQMap({
           </Popup>
         </Marker>
 
-        {businesses.map((b) => (
-          <Marker
-            key={b.id}
-            position={[b?.location?.latitude, b?.location?.longitude]}
-            icon={ICONS[b?.type as BusinessTypeEnum] || ICONS.OTHER}
-          >
-            <Popup>
-              <div className="flex flex-col">
-                <h2 className="text-primary text-xl font-bold">{b?.name}</h2>
-                {b?.category && <p>{b?.category?.name}</p>}
-                {b?.location?.address && (
-                  <p className="text-xs text-muted-foreground">
-                    {b?.location?.address}
-                  </p>
-                )}
-                <div className="flex gap-2">
-                  <Badge className="cursor-pointer">View Details</Badge>
-                  <Badge className="cursor-pointer">Add to Favourite</Badge>
+        {businesses.map((b) => {
+          const lat = b?.location?.latitude;
+          const lng = b?.location?.longitude;
+          if (lat == null || lng == null) return null;
+
+          const markerIcon = ICONS[b?.type as BusinessTypeEnum] || ICONS.OTHER;
+
+          return (
+            // <Marker
+            //   key={b.id}
+            //   position={[b?.location?.latitude, b?.location?.longitude]}
+            //   icon={ICONS[b?.type as BusinessTypeEnum] || ICONS.OTHER}
+            // >
+            //   <Popup>
+            //     <div className="flex flex-col">
+            //       <h2 className="text-primary text-xl font-bold">{b?.name}</h2>
+            //       {b?.category && <p>{b?.category?.name}</p>}
+            //       {b?.location?.address && (
+            //         <p className="text-xs text-muted-foreground">
+            //           {b?.location?.address}
+            //         </p>
+            //       )}
+            //       <div className="flex gap-2">
+            //         <Badge className="cursor-pointer">View Details</Badge>
+            //         <Badge className="cursor-pointer">Add to Favourite</Badge>
+            //       </div>
+            //     </div>
+            //   </Popup>
+            //   <Tooltip>{b?.name}</Tooltip>
+            // </Marker>
+            <Marker
+              key={b.id}
+              position={[lat, lng]}
+              icon={markerIcon}
+              eventHandlers={{
+                // when a marker is clicked, call parent handler
+                click: () => {
+                  if (onMarkerClick) {
+                    try {
+                      onMarkerClick(b.id);
+                    } catch (e) {
+                      // safe no-op
+                    }
+                  }
+                },
+              }}
+            >
+              {/* Popup includes a View Details button that navigates to business detail */}
+              <Popup>
+                <div className="flex flex-col gap-2">
+                  <div className="font-semibold text-base">{b?.name}</div>
+                  {b?.category && (
+                    <div className="text-xs text-muted-foreground">
+                      {b.category.name}
+                    </div>
+                  )}
+                  {b?.location?.address && (
+                    <div className="text-xs text-muted-foreground">
+                      {b.location.address}
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        // Prefer next/navigation router
+                        try {
+                          router.push(`/businesses/${b.id}`);
+                        } catch {
+                          // fallback to window
+                          window.location.href = `/businesses/${b.id}`;
+                        }
+                      }}
+                    >
+                      View Details
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        // Toggle favorite inline if desired (optional)
+                        // You can call a global handler or simply open the details page
+                        try {
+                          router.push(`/businesses/${b.id}`);
+                        } catch {
+                          window.location.href = `/businesses/${b.id}`;
+                        }
+                      }}
+                    >
+                      Add to Favourite
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </Popup>
-            <Tooltip>{b?.name}</Tooltip>
-          </Marker>
-        ))}
+              </Popup>
+              <Tooltip>{b?.name}</Tooltip>
+            </Marker>
+          );
+        })}
 
         <RecenterButton
           onLocate={(coords) => {

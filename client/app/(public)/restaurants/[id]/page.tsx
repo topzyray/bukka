@@ -85,6 +85,8 @@ const RestaurantDetail = () => {
               src={restaurant.photos[0]}
               alt={restaurant.name}
               className="w-full h-full object-cover"
+              width={250}
+              height={250}
             />
             <div className="absolute inset-0 bg-black/20" />
             <div className="absolute bottom-4 left-4 right-4">
@@ -179,6 +181,8 @@ const RestaurantDetail = () => {
                           src={photo}
                           alt={`${restaurant.name} photo ${index + 1}`}
                           className="w-full h-full object-cover hover-scale cursor-pointer"
+                          width={100}
+                          height={100}
                         />
                       </div>
                     ))}

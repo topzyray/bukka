@@ -55,6 +55,7 @@ export function ImageUploadStep({
       onSuccess: () => {
         form.reset();
       },
+      toastStatusMessage: false,
     });
 
   const { data: savedProgress, isLoading: isFetchingProgress } =

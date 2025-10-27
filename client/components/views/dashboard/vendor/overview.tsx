@@ -23,6 +23,11 @@ import {
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { BukkaButton } from "@/components/ui/button-variants";
+import {
+  PageWrapper,
+  PageWrapperContent,
+  PageWrapperContentWithFramer,
+} from "@/components/ui/page-wrapper";
 
 // Mock data for restaurant metrics
 const weeklyVisitors = [
@@ -44,7 +49,7 @@ const monthlyRevenue = [
   { month: "Jun", revenue: 32000 },
 ];
 
-export function BusinessOverview() {
+export function VendorOverview() {
   const stats = [
     {
       title: "Monthly Visitors",
@@ -98,25 +103,18 @@ export function BusinessOverview() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* <Header /> */}
-
-      <main className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-6"
-        >
+    <PageWrapper>
+      <PageWrapperContent className="container mx-auto px-4 py-8">
+        <PageWrapperContentWithFramer>
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                 <Store className="w-8 h-8 text-primary" />
-                Mama Cass Dashboard
+                Vendor&apos;s Dashboard
               </h1>
               <p className="text-muted-foreground mt-1">
-                Manage your restaurant presence on Bukka
+                Manage your business presence on Bukka
               </p>
             </div>
             <div className="flex gap-2">
@@ -298,10 +296,8 @@ export function BusinessOverview() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
-      </main>
-
-      {/* <Footer /> */}
-    </div>
+        </PageWrapperContentWithFramer>
+      </PageWrapperContent>
+    </PageWrapper>
   );
 }

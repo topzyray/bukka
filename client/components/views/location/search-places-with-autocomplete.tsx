@@ -162,7 +162,7 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Loader } from "lucide-react";
-import { SearchBox } from "../atoms/search-box";
+import { SearchBox } from "../../atoms/search-box";
 import { useAutoComplete } from "@/server/queries";
 import { debounce, extractErrorMessage } from "@/utils";
 import { cn } from "@/lib/utils";

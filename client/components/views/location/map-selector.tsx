@@ -9,18 +9,20 @@ import React, { useCallback } from "react";
 
 type Props = {
   initial?: { lat: number; lng: number } | null;
-  onSelect: (lat: number, lng: number) => void;
   provider: MapProviderEnum;
   showLegend?: boolean;
   height?: string | number;
+  businesses?: Business[];
+  onSelect: (lat: number, lng: number) => void;
 };
 
 export function MapSelector({
   initial = null,
-  onSelect,
   provider,
   showLegend,
   height,
+  businesses,
+  onSelect,
 }: Props) {
   const PAGE_SIZE = 10;
 
@@ -82,7 +84,7 @@ export function MapSelector({
           initial={initial}
           onSelect={onSelect}
           height={height}
-          businesses={currentPageData}
+          businesses={currentPageData || businesses}
           showLegend={showLegend}
         />
       );

@@ -2,7 +2,7 @@ name: CI/CD – Next.js + Vercel for Bukka Client
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
     paths:
       - "client/**"
       - ".github/workflows/bukka-client.yml"

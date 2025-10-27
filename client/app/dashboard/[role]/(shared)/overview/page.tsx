@@ -1,7 +1,7 @@
 "use client";
 
 import { AdminOverview } from "@/components/views/dashboard/admin/overview";
-import { BusinessOverview } from "@/components/views/dashboard/business/overview";
+import { VendorOverview } from "@/components/views/dashboard/vendor/overview";
 import { DefaultOverview } from "@/components/views/dashboard/other/overview-default";
 import { UserOverview } from "@/components/views/dashboard/user/overview";
 import { UserRoleEnum } from "@/server/enums";
@@ -14,7 +14,7 @@ export default function OverviewPage() {
     case UserRoleEnum.ADMIN:
       return <AdminOverview />;
     case UserRoleEnum.VENDOR:
-      return <BusinessOverview />;
+      return <VendorOverview />;
     case UserRoleEnum.USER:
       return <UserOverview />;
     default:

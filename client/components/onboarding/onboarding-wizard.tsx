@@ -145,6 +145,7 @@ function OnboardingFlow({ role }: { role: UserRole }) {
 
   const saveProgressMutation = useSaveOnboardingProgress({
     user: user as User,
+    toastStatusMessage: false,
   });
 
   const [currentStep, setCurrentStep] = useState<number>(savedProgress);

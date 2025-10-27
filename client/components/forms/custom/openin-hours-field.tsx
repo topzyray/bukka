@@ -77,9 +77,13 @@ export function OpeningHoursField({
           return (
             <div
               key={field.id}
+              // className={cn(
+              //   "relative flex flex-col gap-3 border rounded-lg bg-muted/30 p-4 transition hover:bg-muted/50",
+              //   "sm:grid sm:grid-cols-2 md:grid-cols-4 md:gap-4"
+              // )}
               className={cn(
-                "relative flex flex-col gap-3 border rounded-lg bg-muted/30 p-4 transition hover:bg-muted/50",
-                "sm:grid sm:grid-cols-2 md:grid-cols-4 md:gap-4"
+                "w-full relative flex flex-col gap-3 border rounded-lg bg-muted/30 p-4 transition hover:bg-muted/50",
+                "w-full sm:grid sm:grid-cols-2 lg:grid-cols-4 md:gap-4"
               )}
             >
               {/* === Day select === */}
@@ -87,7 +91,7 @@ export function OpeningHoursField({
                 control={control}
                 name={`${formName}.periods.${index}.day`}
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="w-full">
                     <FormLabel className="text-xs uppercase tracking-wide text-muted-foreground">
                       Day
                     </FormLabel>
@@ -121,12 +125,16 @@ export function OpeningHoursField({
                 control={control}
                 name={`${formName}.periods.${index}.openTime`}
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="w-full">
                     <FormLabel className="text-xs uppercase tracking-wide text-muted-foreground">
                       Open Time
                     </FormLabel>
                     <FormControl>
-                      <Input type="time" className="text-sm" {...field} />
+                      <Input
+                        type="time"
+                        className="text-sm w-full"
+                        {...field}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -137,30 +145,34 @@ export function OpeningHoursField({
                 control={control}
                 name={`${formName}.periods.${index}.closeTime`}
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="w-full">
                     <FormLabel className="text-xs uppercase tracking-wide text-muted-foreground">
                       Close Time
                     </FormLabel>
                     <FormControl>
-                      <Input type="time" className="text-sm" {...field} />
+                      <Input
+                        type="time"
+                        className="text-sm w-full"
+                        {...field}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
               />
 
               {/* === Remove button === */}
-              <div className="flex sm:justify-end">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  className="mt-1 sm:mt-auto w-full sm:w-auto"
-                  onClick={() => remove(index)}
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  Remove
-                </Button>
-              </div>
+              {/* <div className="flex "> */}
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                className="mt-1 sm:mt-auto w-full sm:w-auto max-w-max"
+                onClick={() => remove(index)}
+              >
+                <X className="h-4 w-4 mr-1" />
+                <span className="hidden lg:inline">Remove</span>
+              </Button>
+              {/* </div> */}
             </div>
           );
         })}

@@ -26,7 +26,7 @@ import { MapProviderEnum } from "@/server/enums/MapProviderEnum";
 import { useUsers } from "@/server/queries/admin/use-users-query";
 import { TextAreaComponent } from "../../base/text-area-component";
 import { PhoneNumberInput } from "../../base/phone-number-component";
-import { LocationInput } from "@/components/location/location-input";
+import { LocationInput } from "@/components/views/location/location-input";
 import { useBusinessCategories } from "@/server/queries/use-businesses-category-query";
 import { cn } from "@/lib/utils";
 import { CreateBusinessDto } from "@/server/dtos";
@@ -179,7 +179,6 @@ export function CreateEditBusinessForm({
   const form = useForm({
     resolver: zodResolver(createBusinessSchema),
     mode: "onSubmit",
-    // defaultValues: defaultBusinessValues,
   });
 
   useEffect(() => {
@@ -270,10 +269,7 @@ export function CreateEditBusinessForm({
           weekdayText,
         },
       } as CreateBusinessDto;
-
-      console.log("Payload: ", payload);
-
-      // createMutation.mutate(payload);
+      createMutation.mutate(payload);
     }
   };
 

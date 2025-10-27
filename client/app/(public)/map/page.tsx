@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { MapSelector } from "@/components/location/map-selector";
 import { MapProviderEnum } from "@/server/enums/MapProviderEnum";
 import { Header } from "@/components/layouts/Header";
+import { MapSelector } from "@/components/views/location/map-selector";
 
 const Map = () => {
   return (
