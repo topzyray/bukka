@@ -9,7 +9,7 @@ type IUserPersonalizationApi =
   | "updateLoggedUserPersonalization"
   | "deleteLoggedUserPersonalization";
 
-const rawNotificationSettingRoutes: Record<IUserPersonalizationApi, string> = {
+const rawUserPersonalizationRoutes: Record<IUserPersonalizationApi, string> = {
   createUserPersonalization: "/users/personalization",
   getLoggedUserPersonalization: "/users/personalization",
   updateLoggedUserPersonalization: "/users/personalization",
@@ -19,4 +19,4 @@ const rawNotificationSettingRoutes: Record<IUserPersonalizationApi, string> = {
 export const userPersonalizationRoutes: Record<
   IUserPersonalizationApi,
   string
-> = RouteHelper.createRoutes(BACKEND_SVC_PATH, rawNotificationSettingRoutes);
+> = RouteHelper.createRoutes(BACKEND_SVC_PATH, rawUserPersonalizationRoutes);

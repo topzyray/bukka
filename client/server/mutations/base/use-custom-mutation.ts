@@ -1,21 +1,25 @@
 import { TextHelper } from "@/helpers/text-helper";
 import { extractErrorMessage } from "@/utils";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-interface UseCustomMutationOptions {
+interface UseCustomMutationOptions<TData, TError, TVariables, TContext>
+  extends UseMutationOptions<TData, TError, TVariables, TContext> {
   onSuccessMessage?: string;
   onErrorMessage?: string;
-  onSuccessCallback?: (data: any) => void;
-  onErrorCallback?: (error: any) => void;
+  onSuccessCallback?: (data: TData) => void;
+  onErrorCallback?: (error: TError) => void;
   toastStatusMessage?: boolean;
-  retry?: number;
-  retryDelay?: number;
 }
 
-export const useCustomMutation = <T, P>(
-  mutationFn: (params: P) => Promise<T>,
-  options: UseCustomMutationOptions = {}
+export const useCustomMutation = <
+  TData = unknown,
+  TError = unknown,
+  TVariables = void,
+  TContext = unknown
+>(
+  mutationFn: (params: TVariables) => Promise<TData>,
+  options: UseCustomMutationOptions<TData, TError, TVariables, TContext> = {}
 ) => {
   const {
     onSuccessMessage,
@@ -23,46 +27,38 @@ export const useCustomMutation = <T, P>(
     onSuccessCallback,
     onErrorCallback,
     toastStatusMessage = true,
-    retry,
-    retryDelay,
+    onSuccess,
+    onError,
+    ...restOptions
   } = options;
 
-  const mutation = useMutation<T, Error, P>({
+  const mutation = useMutation<TData, TError, TVariables, TContext>({
     mutationFn,
-    onSuccess: (data: any) => {
+    onSuccess: (data, variables, context, mutation) => {
       if (toastStatusMessage) {
-        if (onSuccessMessage) {
-          toast.success(onSuccessMessage);
-        } else {
-          toast.success(
-            TextHelper.capitalize(data?.responseMessage) ||
-              "Operation successful"
-          );
-        }
+        toast.success(
+          onSuccessMessage ??
+            TextHelper.capitalize((data as any)?.responseMessage) ??
+            "Operation successful"
+        );
       }
 
-      if (onSuccessCallback) {
-        onSuccessCallback(data);
-      }
+      onSuccessCallback?.(data);
+      onSuccess?.(data, variables, context, mutation);
     },
-    onError: (error) => {
+    onError: (error, variables, context, mutation) => {
       if (toastStatusMessage) {
-        if (onErrorMessage) {
-          toast.error(onErrorMessage);
-        } else {
-          toast.error(
-            TextHelper.capitalize(extractErrorMessage(error)) ||
-              "Something went wrong"
-          );
-        }
+        toast.error(
+          onErrorMessage ??
+            TextHelper.capitalize(extractErrorMessage(error as any)) ??
+            "Something went wrong"
+        );
       }
 
-      if (onErrorCallback) {
-        onErrorCallback(error);
-      }
+      onErrorCallback?.(error);
+      onError?.(error, variables, context, mutation);
     },
-    retry,
-    retryDelay,
+    ...restOptions,
   });
 
   return mutation;

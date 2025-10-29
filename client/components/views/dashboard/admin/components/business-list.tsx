@@ -1,18 +1,17 @@
 "use client";
 
-import React from "react";
-import { useCustomInfiniteQuery } from "@/server/queries/base";
-import { BusinessApiService } from "@/server/services/BusinessApiService";
+import React, { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Business } from "@/server/interfaces/Business";
-import { CreateUpdateBusinessModal } from "../../forms/business/create-update-business-modal";
-import { DataTable } from "../../views/base/data-table";
-import { businessColumns } from "../../atoms/columns/business-columns";
+import { CreateUpdateBusinessModal } from "../../../../forms/business/create-update-business-modal";
+import { DataTable } from "../../../base/data-table";
+import { businessColumns } from "../../../../atoms/columns/business-columns";
 import {
   PageWrapper,
   PageWrapperContent,
   PageWrapperContentWithFramer,
-} from "../../ui/page-wrapper";
+} from "../../../../ui/page-wrapper";
+import { useBusinesses } from "@/server/queries/use-businesses-query";
 
 /**
  * This component:
@@ -35,32 +34,26 @@ export default function BusinessList() {
     isFetchingNextPage,
     isLoading,
     refetch,
-  } = useCustomInfiniteQuery<Business>(
-    ["businesses", search, filters],
-    ({ pageNumber, ...rest }) =>
-      BusinessApiService.getBusinesses({
-        page: pageNumber,
-        limit: PAGE_SIZE,
-        search: search,
-        ...filters,
-      }),
-    {
-      params: { searchParams: search, limit: PAGE_SIZE },
-      initialPageParam: 1,
-      enabled: true,
-    }
-  );
+  } = useBusinesses({
+    search,
+    filters,
+    pageSize: PAGE_SIZE,
+    enabled: true,
+  });
 
   // Helper: find page object (NormalizedPagedData) for a page number
-  const findPage = (pn: number) => {
-    return infiniteData?.pages?.find((p) => p.pageNumber === pn);
-  };
+  const findPage = useCallback(
+    (pn: number) => {
+      return infiniteData?.pages?.find((p) => p.pageNumber === pn)?.data ?? [];
+    },
+    [infiniteData?.pages]
+  );
 
   // When user clicks to go to a page:
   const goToPage = async (pn: number) => {
     if (pn <= 0) return;
     // if page already loaded, simply set local state
-    if (findPage(pn)) {
+    if (findPage(pn).length > 0) {
       setPage(pn);
       return;
     }
@@ -76,17 +69,14 @@ export default function BusinessList() {
     }
     // finally set page (if found fallback to last available)
     setPage(
-      findPage(pn)
+      findPage(pn).length
         ? pn
         : infiniteData?.pages?.[infiniteData.pages.length - 1]?.pageNumber ?? 1
     );
   };
 
   // Flattened data for the page (or empty)
-  const currentPageData = React.useMemo(() => {
-    const pageObj = findPage(page) ?? infiniteData?.pages?.[0];
-    return pageObj?.data ?? [];
-  }, [findPage, infiniteData?.pages, page]);
+  const currentPageData = React.useMemo(() => findPage(page), [page, findPage]);
 
   // total records (from first page meta if available)
   const total = infiniteData?.pages?.[0]?.totalRecords ?? 0;

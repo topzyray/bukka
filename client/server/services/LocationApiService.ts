@@ -1,6 +1,7 @@
 import { envConfig, HttpClient } from "@/configs";
 import { locationRoutes } from "@/constants/routes/locationRoutes";
 import axios from "axios";
+import { UpdateLocationDto } from "../dtos";
 
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 60 * 60 * 1000; // 60 minutes
@@ -14,18 +15,29 @@ export class LocationApiService {
     return response.data;
   }
 
+  static async updateLocation(payload: UpdateLocationDto) {
+    const response = await HttpClient.getClient().put(
+      `${locationRoutes.updateLocation}`,
+      payload
+    );
+    return response.data;
+  }
+
   static async searchPlaces(params: Record<string, any> = {}) {
     const response = await HttpClient.getClient().get(
-      `${locationRoutes.searchPlaces}`,
+      `${locationRoutes.searchLocation}`,
       { params }
     );
     return response.data?.responseData;
   }
 
-  static async reverseGeocode(params: Record<string, any> = {}) {
+  static async reverseGeocode(payload: {
+    longitude: number;
+    latitude: number;
+  }) {
     const response = await HttpClient.getClient().get(
       `${locationRoutes.reverseGeocode}`,
-      { params }
+      { params: payload }
     );
     return response.data;
   }

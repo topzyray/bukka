@@ -73,7 +73,6 @@ export class UserPersonalizationRepository {
         { field: 'paymentPreference' },
         { field: 'preferredDeliveryTime' },
         { field: 'allergies' },
-        { field: 'search' },
       ],
       searchConfig: {
         fields: [
@@ -83,6 +82,8 @@ export class UserPersonalizationRepository {
           'paymentPreference',
           'preferredDeliveryTime',
           'allergies',
+
+          //  { field: 'cuisines', dtoKey: 'cuisines', defaultOp: 'has' },
         ],
         mode: 'insensitive',
       },

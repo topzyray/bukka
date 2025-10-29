@@ -23,7 +23,7 @@ import {
   handleCache,
   invalidateCache,
 } from 'src/InfrastructureLayer/Services/cache/CacheUtils';
-import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
+import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 @Injectable()
 export class UserRepository {
   constructor(private readonly _userDataAgent: UserDataAgent) {}
@@ -55,7 +55,7 @@ export class UserRepository {
       'user:profile',
       { id: user.id },
       () => this._userDataAgent.getUserById(user.id),
-      CacheTTLPolicy.PROFILE,
+      CacheTTLPolicyEnum.PROFILE,
     );
   }
 
@@ -133,6 +133,8 @@ export class UserRepository {
       data,
     );
     await invalidateCache('user:profile', { id: loggedInUser.id });
+    await invalidateCache('users:list', {});
+
     return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
@@ -259,7 +261,7 @@ export class UserRepository {
       'users:list',
       mergedFilters,
       () => this._userDataAgent.getUsersByFilter(query, pageSize, pageNumber),
-      CacheTTLPolicy.USER_LIST,
+      CacheTTLPolicyEnum.USER_LIST,
     );
   }
 
@@ -289,7 +291,7 @@ export class UserRepository {
       mergedFilters,
       () =>
         this._userDataAgent.adminGetUsersByFilter(query, pageSize, pageNumber),
-      CacheTTLPolicy.USER_LIST,
+      CacheTTLPolicyEnum.USER_LIST,
     );
   }
 

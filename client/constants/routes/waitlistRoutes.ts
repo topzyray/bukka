@@ -5,15 +5,17 @@ const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 
 type IWaitlistApi =
   | "joinWaitlist"
-  | "getWaitlist"
+  | "getWaitlists"
+  | "getWaitlistById"
   | "getWaitlistCount"
   | "deleteWaitlist";
 
 const rawAuthRoutes: Record<IWaitlistApi, string> = {
-  joinWaitlist: "/waitlist/join",
-  getWaitlist: "/waitlist",
-  getWaitlistCount: "/waitlist/count",
-  deleteWaitlist: "/waitlist",
+  joinWaitlist: "/waitlists/join",
+  getWaitlists: "/waitlists",
+  getWaitlistById: "/waitlists",
+  getWaitlistCount: "/waitlists/count",
+  deleteWaitlist: "/waitlists",
 };
 
 export const waitlistRoutes: Record<IWaitlistApi, string> =

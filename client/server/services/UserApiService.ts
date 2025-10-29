@@ -3,21 +3,6 @@ import { UpdateUserDto } from "../dtos";
 import { userRoutes } from "@/constants/routes";
 
 export class UserApiService {
-  static async adminGetUsers(params: Record<string, any> = {}) {
-    const response = await HttpClient.getClient().get(
-      `${userRoutes.adminGetUsers}`,
-      { params }
-    );
-    return response.data;
-  }
-
-  static async adminGetUserById(userId: number) {
-    const response = await HttpClient.getClient().get(
-      `${userRoutes.getUserById}/${userId}`
-    );
-    return response.data;
-  }
-
   static async getLoggedInUser() {
     const response = await HttpClient.getClient().get(
       `${userRoutes.getLoggedInUser}`
@@ -49,13 +34,6 @@ export class UserApiService {
     const response = await HttpClient.getClient().put(
       `${userRoutes.updateUserProfile}`,
       payload
-    );
-    return response.data;
-  }
-
-  static async deleteUser(userId: number) {
-    const response = await HttpClient.getClient().delete(
-      `${userRoutes.deleteUser}/${userId}`
     );
     return response.data;
   }

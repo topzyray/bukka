@@ -4,16 +4,18 @@ import { RouteHelper } from "@/helpers";
 const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 
 type IBusinessApi =
+  | "createBusiness"
   | "getBusinesses"
   | "getBusinessById"
-  | "createBusiness"
+  | "getLoggedInVendorBusinesses"
   | "updateBusiness"
   | "deleteBusiness";
 
 const rawBusinessRoutes: Record<IBusinessApi, string> = {
+  createBusiness: "/businesses",
   getBusinesses: "/businesses",
   getBusinessById: "/businesses",
-  createBusiness: "/businesses",
+  getLoggedInVendorBusinesses: "/businesses/my-businesses",
   updateBusiness: "/businesses",
   deleteBusiness: "/businesses",
 };

@@ -65,6 +65,12 @@ export class CreateBusinessDto extends CreateLocationDto {
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) {
+      return value.map((v) => (typeof v === 'string' ? v.toLowerCase() : v));
+    }
+    return value;
+  })
   cuisines: string[] = [];
 
   @ApiProperty({
@@ -129,57 +135,13 @@ export class FilterBusinessDto extends PaginationDto {
   @IsString()
   search?: string;
 
-  @ApiProperty({ example: '1234567890', required: false })
-  @IsOptional()
-  @IsString()
-  placeId?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  categoryId?: number;
-
-  @ApiProperty({ example: true, required: false })
-  @IsOptional()
-  @IsBoolean()
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      return value.toLowerCase() === 'true';
-    }
-    return Boolean(value);
+  @ApiProperty({
+    example: BusinessTypeEnum.RESTAURANT,
+    required: true,
   })
-  isVerified?: boolean;
-
-  @ApiProperty({ example: true, required: false })
-  @IsOptional()
-  @IsBoolean()
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      return value.toLowerCase() === 'true';
-    }
-    return Boolean(value);
-  })
-  isActive?: boolean;
-
-  @ApiProperty({ example: 37.7749, required: false })
-  @IsOptional()
-  @IsLongitude()
-  latitude?: number;
-
-  @ApiProperty({ example: -12.4194, required: false })
-  @IsOptional()
-  @IsLatitude()
-  longitude?: number;
-
-  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  city?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  state?: string;
+  type: BusinessTypeEnum;
 }
 
 export class BusinessWithinDistanceDto extends PaginationDto {

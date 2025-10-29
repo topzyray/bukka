@@ -18,7 +18,7 @@ import {
   handleCache,
   invalidateCache,
 } from 'src/InfrastructureLayer/Services/cache/CacheUtils';
-import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
+import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 
 @Injectable()
 export class ReviewRepository {
@@ -87,7 +87,7 @@ export class ReviewRepository {
           pageNumber,
         );
       },
-      CacheTTLPolicy.REVIEW,
+      CacheTTLPolicyEnum.REVIEW,
     );
   }
 

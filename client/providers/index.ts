@@ -5,3 +5,4 @@ export * from "./onboarding-provider";
 export * from "./query-client-provider";
 export * from "./service-worker";
 export * from "./theme-provider";
+export * from "./user-location-provider";

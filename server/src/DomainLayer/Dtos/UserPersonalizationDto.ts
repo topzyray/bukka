@@ -7,7 +7,7 @@ import {
   IsEnum,
   IsNumber,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { PaginationDto } from './Base/PaginationDto';
 import { MealPreferenceEnum } from '../Enums/MealPreferenceEnum';
 import { DeliveryTimeEnum } from '../Enums/DeliveryTimeEnum';
@@ -23,6 +23,12 @@ export class UserPersonalizationDto {
   @IsNotEmpty()
   @IsArray()
   @IsString({ each: true })
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) {
+      return value.map((v) => (typeof v === 'string' ? v.toLowerCase() : v));
+    }
+    return value;
+  })
   preferredCuisines: string[];
 
   @ApiProperty({
@@ -84,6 +90,12 @@ export class UpdateUserPersonalizationDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) {
+      return value.map((v) => (typeof v === 'string' ? v.toLowerCase() : v));
+    }
+    return value;
+  })
   preferredCuisines?: string[];
 
   @ApiProperty({
@@ -137,6 +149,12 @@ export class UserPersonalizationFilterDto extends PaginationDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) {
+      return value.map((v) => (typeof v === 'string' ? v.toLowerCase() : v));
+    }
+    return value;
+  })
   preferredCuisines?: string[];
 
   @ApiProperty({

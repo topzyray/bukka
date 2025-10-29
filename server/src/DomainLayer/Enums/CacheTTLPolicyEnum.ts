@@ -1,4 +1,4 @@
-export enum CacheTTLPolicy {
+export enum CacheTTLPolicyEnum {
   BUSINESS_DETAIL = 1800,
   BUSINESS_LIST = 900,
   CATEGORY = 86400,
@@ -10,4 +10,5 @@ export enum CacheTTLPolicy {
   NOTIFICATION = 60,
   FILE = 3600,
   ANALYTICS = 300,
+  USER_FAVORITE = 300,
 }

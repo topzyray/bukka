@@ -138,7 +138,7 @@ export function Favorites() {
                 Start exploring restaurants and save your favorites here
               </p>
               <BukkaButton asChild>
-                <a href="/search">Discover Restaurants</a>
+                <a href="/businesses">Discover Restaurants</a>
               </BukkaButton>
             </motion.div>
           )}

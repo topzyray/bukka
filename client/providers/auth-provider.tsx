@@ -14,7 +14,7 @@ import { authRoutes } from "@/constants/routes";
 import { useUserFiles } from "@/server/queries";
 import { User } from "@/server/interfaces/User";
 import { useQueryClient } from "@tanstack/react-query";
-import { UserFile } from "@/server/interfaces/UserFile";
+import { File } from "@/server/interfaces/File";
 import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
 import { useCurrentUser } from "@/server/queries/use-current-user";
 
@@ -24,7 +24,7 @@ interface IAuthContextType {
   isError: boolean;
   logout: () => void;
   isLoading: boolean;
-  userFiles: UserFile[];
+  userFiles: File[];
   isLoadingUserFiles: boolean;
   isUserFilesError: boolean;
 }

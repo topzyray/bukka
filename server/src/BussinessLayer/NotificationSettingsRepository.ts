@@ -15,7 +15,7 @@ import {
   handleCache,
   invalidateCache,
 } from 'src/InfrastructureLayer/Services/cache/CacheUtils';
-import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
+import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 
 @Injectable()
 export class NotificationSettingsRepository {
@@ -55,7 +55,7 @@ export class NotificationSettingsRepository {
           );
         return BukkaResponse.GetSingleDataResponse('User settings', data);
       },
-      CacheTTLPolicy.NOTIFICATION_SETTING,
+      CacheTTLPolicyEnum.NOTIFICATION_SETTING,
     );
   }
 

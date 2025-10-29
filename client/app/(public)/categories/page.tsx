@@ -59,7 +59,7 @@ const Categories = () => {
                   className="shadow-card hover-lift cursor-pointer"
                   onClick={() =>
                     router.push(
-                      `/search?category=${category.name.toLowerCase()}`
+                      `/businesses?category=${category.name.toLowerCase()}`
                     )
                   }
                 >

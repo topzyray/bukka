@@ -47,7 +47,7 @@ export default function NotFound() {
 
           <BukkaButton variant="outline" size="lg" asChild className="w-full">
             <Link
-              href="/search"
+              href="/businesses"
               className="flex items-center justify-center gap-2"
             >
               <Search className="w-5 h-5" />

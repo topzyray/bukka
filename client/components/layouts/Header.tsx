@@ -11,6 +11,8 @@ import {
   X,
   LayoutDashboard,
   FormInputIcon,
+  FormInput,
+  BriefcaseBusiness,
 } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
@@ -35,7 +37,9 @@ export function Header({ className }: HeaderProps) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchValue.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchValue.trim())}`);
+      router.push(
+        `/businesses?search=${encodeURIComponent(searchValue.trim())}`
+      );
     }
   };
 
@@ -44,7 +48,8 @@ export function Header({ className }: HeaderProps) {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className={cn("sticky top-0 z-50 backdrop-blur", className)}
+      className={cn("sticky top-0 backdrop-blur", className)}
+      style={{ zIndex: 1000 }}
     >
       <section className="container mx-auto px-4">
         <section className="flex items-center justify-between h-16">
@@ -87,7 +92,13 @@ export function Header({ className }: HeaderProps) {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-2">
             <BukkaButton variant="ghost" size="sm" asChild>
-              <Link href="/search" className="flex items-center gap-2">
+              <Link href="/businesses" className="flex items-center gap-2">
+                <BriefcaseBusiness className="w-4 h-4" />
+                Businesses
+              </Link>
+            </BukkaButton>
+            <BukkaButton variant="ghost" size="sm" asChild>
+              <Link href="/explore" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Explore
               </Link>
@@ -95,7 +106,7 @@ export function Header({ className }: HeaderProps) {
             <BukkaButton variant="ghost" size="sm" asChild>
               <Link href="/map" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
-                Explore Map
+                Map View
               </Link>
             </BukkaButton>
             {/* <BukkaButton variant="ghost" size="sm" asChild>
@@ -116,6 +127,7 @@ export function Header({ className }: HeaderProps) {
               asChild
               onClick={() => router.push(route)}
             >
+              <FormInput />
               {user?.role ? "Dashboard" : "Sign In"}
             </BukkaButton>
             <ThemeToggle />
@@ -164,7 +176,13 @@ export function Header({ className }: HeaderProps) {
         >
           <section className="py-4 space-y-2">
             <BukkaButton variant="ghost" size="sm" className="w-full" asChild>
-              <Link href="/search" className="flex items-center gap-2">
+              <Link href="/businesses" className="flex items-center gap-2">
+                <BriefcaseBusiness className="w-4 h-4" />
+                Businesses
+              </Link>
+            </BukkaButton>
+            <BukkaButton variant="ghost" size="sm" className="w-full" asChild>
+              <Link href="/explore" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Explore
               </Link>
@@ -172,7 +190,7 @@ export function Header({ className }: HeaderProps) {
             <BukkaButton variant="ghost" size="sm" asChild className="w-full ">
               <Link href="/map" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
-                Explore Map
+                Map View
               </Link>
             </BukkaButton>
             {/* <BukkaButton

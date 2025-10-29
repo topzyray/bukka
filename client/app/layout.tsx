@@ -8,6 +8,7 @@ import {
   GlobalStateProvider,
   ReactQueryProvider,
   ThemeProvider,
+  UserLocationProvider,
 } from "@/providers";
 import { SessionExpirationModal } from "@/events/session-event-listener";
 
@@ -61,12 +62,14 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <SessionExpirationModal />
-            <AuthProvider>
-              <GlobalStateProvider>
-                {children}
-                <Toaster richColors position="top-right" />
-              </GlobalStateProvider>
-            </AuthProvider>
+            <UserLocationProvider>
+              <AuthProvider>
+                <GlobalStateProvider>
+                  {children}
+                  <Toaster richColors position="top-right" />
+                </GlobalStateProvider>
+              </AuthProvider>
+            </UserLocationProvider>
           </ThemeProvider>
         </ReactQueryProvider>
         {/* <BackgroundIcons /> */}

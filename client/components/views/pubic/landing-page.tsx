@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -10,66 +10,51 @@ import {
   Clock,
   TrendingUp,
 } from "lucide-react";
-
 import { BukkaButton } from "@/components/ui/button-variants";
-import { Input } from "@/components/ui/input";
-import { RestaurantCard } from "@/components/views/restaurant/RestaurantCard";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/layouts/Header";
 import { Footer } from "@/components/layouts/Footer";
 import { TypeAnimation } from "react-type-animation";
-
-// Mock data for featured restaurants
-const featuredRestaurants = [
-  {
-    id: "1",
-    placeId: "place1",
-    name: "Mama's Kitchen",
-    address: "123 Food Street, Downtown",
-    location: { lat: 40.7128, lng: -74.006 },
-    rating: 4.8,
-    priceLevel: 2,
-    types: ["restaurant", "nigerian", "african"],
-    photos: [],
-    isSaved: false,
-    distanceMeters: 500,
-    opening_hours: { openNow: true } as any,
-  },
-  {
-    id: "2",
-    placeId: "place2",
-    name: "Spice Garden",
-    address: "456 Flavor Ave, Midtown",
-    location: { lat: 40.758, lng: -73.9855 },
-    rating: 4.6,
-    priceLevel: 3,
-    types: ["restaurant", "indian", "vegetarian"],
-    photos: [],
-    isSaved: true,
-    distanceMeters: 1200,
-    opening_hours: { openNow: false } as any,
-  },
-];
+import { Business } from "@/server/interfaces/Business";
+import { useBusinesses } from "@/server/queries/use-businesses-query";
+import { BusinessCard } from "../business/business-card";
+import { TextHelper } from "@/helpers";
+import { BusinessTypeEnum } from "@/server/enums/BusinessTypeEnum";
+import { useRouter } from "next/navigation";
+import { SearchBox } from "@/components/atoms/search-box";
 
 const categories = [
-  { name: "Nigerian", icon: "🍛", count: "120+" },
-  { name: "Italian", icon: "🍝", count: "85+" },
-  { name: "Asian", icon: "🍜", count: "95+" },
-  { name: "Fast Food", icon: "🍔", count: "200+" },
-  { name: "Desserts", icon: "🍰", count: "60+" },
-  { name: "Coffee", icon: "☕", count: "75+" },
+  { name: BusinessTypeEnum.RESTAURANT, icon: "🍛", count: "120+" },
+  { name: BusinessTypeEnum.FAST_FOOD, icon: "🍔", count: "200+" },
+  { name: BusinessTypeEnum.FOOD_VENDOR, icon: "🛒", count: "80+" },
+  { name: BusinessTypeEnum.BAR, icon: "🍷", count: "50+" },
+  { name: BusinessTypeEnum.BAKERY, icon: "🍰", count: "60+" },
+  { name: BusinessTypeEnum.LOUNGE, icon: "🛋️", count: "40+" },
+  { name: BusinessTypeEnum.STREET_EATRY, icon: "🌭", count: "70+" },
+  { name: BusinessTypeEnum.CATERING, icon: "🍽️", count: "30+" },
+  { name: BusinessTypeEnum.GROCERY, icon: "🥦", count: "90+" },
+  { name: BusinessTypeEnum.DELIVERY_SERVICE, icon: "🚚", count: "25+" },
+  { name: BusinessTypeEnum.OTHER, icon: "❓", count: "10+" },
 ];
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = React.useState("");
+  const router = useRouter();
+
+  const { data } = useBusinesses({});
+
+  const featuredBusinesses: Business[] = useMemo(
+    () => data?.pages.flatMap((p) => p.data) ?? [],
+    [data]
+  );
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      {/* Hero Section */}
       <section className="relative h-screen">
         <Header />
-        {/* Background Image */}
+
         <div className="flex justify-center items-center h-[80vh]">
           <div className="absolute inset-0 opacity-40">
             <Image
@@ -80,6 +65,7 @@ export default function Home() {
               className="w-full h-full object-cover"
             />
           </div>
+
           <div className="relative z-10">
             <div className="container mx-auto px-4 py-20">
               <motion.div
@@ -94,26 +80,42 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.8 }}
                 >
-                  Discover Amazing
+                  <span>Discover Amazing</span>
                   <br />
                   <span>
                     <TypeAnimation
                       sequence={[
-                        "Restaurants",
-                        1000,
-                        "Super Bukka",
-                        1000,
-                        "Hot Sharwama Spot",
-                        1000,
-                        "Special Eatries",
-                        1000,
-                        "Delicious Mama Put",
-                        1000,
+                        TextHelper.normalizeText(BusinessTypeEnum.RESTAURANT),
+                        1500,
+                        TextHelper.normalizeText(BusinessTypeEnum.FAST_FOOD),
+                        1500,
+                        TextHelper.normalizeText(BusinessTypeEnum.FOOD_VENDOR),
+                        1500,
+                        TextHelper.normalizeText(BusinessTypeEnum.BAR),
+                        1500,
+                        TextHelper.normalizeText(BusinessTypeEnum.LOUNGE),
+                        1500,
+                        TextHelper.normalizeText(BusinessTypeEnum.BAKERY),
+                        1500,
+                        TextHelper.normalizeText(BusinessTypeEnum.STREET_EATRY),
+                        1500,
+                        TextHelper.normalizeText(BusinessTypeEnum.GROCERY),
+                        1500,
+                        TextHelper.normalizeText(BusinessTypeEnum.CATERING),
+                        1500,
+                        TextHelper.normalizeText(
+                          BusinessTypeEnum.DELIVERY_SERVICE
+                        ),
+                        1500,
+                        TextHelper.normalizeText(BusinessTypeEnum.OTHER) +
+                          " " +
+                          "Services",
+                        1500,
                       ]}
-                      wrapper="h1"
-                      className="text-accent"
+                      wrapper="span"
                       repeat={Infinity}
-                    />
+                      className="capitalize"
+                    />{" "}
                   </span>{" "}
                   Near You
                 </motion.h1>
@@ -125,7 +127,7 @@ export default function Home() {
                   transition={{ delay: 0.4, duration: 0.8 }}
                 >
                   Find the perfect dining experience with Bukka&apos;s curated
-                  restaurant discovery
+                  buiness discovery
                 </motion.p>
 
                 {/* Search Bar */}
@@ -135,19 +137,25 @@ export default function Home() {
                   transition={{ delay: 0.6, duration: 0.8 }}
                   className="max-w-2xl mx-auto"
                 >
-                  <div className="flex flex-col md:flex-row gap-4 glass rounded-2xl p-2">
+                  <div className="flex flex-col md:flex-row gap-2 md:gap-2 glass rounded-2xl p-2">
                     <div className="relative flex-1">
-                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                      <Input
-                        type="text"
-                        placeholder="Search restaurants, cuisines, or dishes..."
+                      <SearchBox
+                        placeholder="Search businesses, cuisines, or services..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-12 pr-4 py-6 text-lg border-0 bg-transparent focus:ring-0"
+                        className="shadow-card h-11 md:h-full border-none"
                       />
                     </div>
-                    <BukkaButton variant="hero" size="xl" className="md:px-8">
-                      <Search className="w-5 h-5 mr-2" />
+
+                    <BukkaButton
+                      variant="hero"
+                      size="lg"
+                      className="md:px-8"
+                      onClick={() =>
+                        router.push(`/businesses?search=${searchQuery}`)
+                      }
+                    >
+                      <Search className="w-5 mr-2" />
                       Search
                     </BukkaButton>
                   </div>
@@ -164,7 +172,7 @@ export default function Home() {
                     variant="glass"
                     size="sm"
                     onClick={() =>
-                      (window.location.href = "/search?filter=near_me")
+                      (window.location.href = "/businesses?filter=near_me")
                     }
                   >
                     <MapPin className="w-4 h-4 mr-2" />
@@ -174,7 +182,7 @@ export default function Home() {
                     variant="glass"
                     size="sm"
                     onClick={() =>
-                      (window.location.href = "/search?sort=rating")
+                      (window.location.href = "/businesses?sort=rating")
                     }
                   >
                     <Star className="w-4 h-4 mr-2" />
@@ -184,7 +192,7 @@ export default function Home() {
                     variant="glass"
                     size="sm"
                     onClick={() =>
-                      (window.location.href = "/search?filter=openNow")
+                      (window.location.href = "/businesses?filter=openNow")
                     }
                   >
                     <Clock className="w-4 h-4 mr-2" />
@@ -246,11 +254,16 @@ export default function Home() {
                 transition={{ delay: index * 0.1, duration: 0.6 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() =>
+                  router.push(`/businesses?type=${category.name.toLowerCase()}`)
+                }
               >
                 <Card className="cursor-pointer hover:shadow-card transition-smooth text-center p-6">
                   <CardContent className="p-0">
                     <div className="text-4xl mb-3">{category.icon}</div>
-                    <h3 className="font-semibold mb-1">{category.name}</h3>
+                    <h3 className="font-semibold mb-1 uppercase">
+                      {TextHelper.normalizeText(category.name)}
+                    </h3>
                     <p className="text-sm text-muted-foreground">
                       {category.count}
                     </p>
@@ -281,7 +294,7 @@ export default function Home() {
               </p>
             </div>
             <BukkaButton variant="outline" asChild>
-              <Link href="/search">
+              <Link href="/businesses">
                 View All
                 <TrendingUp className="w-4 h-4 ml-2" />
               </Link>
@@ -289,15 +302,15 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredRestaurants.map((restaurant, index) => (
+            {featuredBusinesses.map((buiness, index) => (
               <motion.div
-                key={restaurant.id}
+                key={buiness.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.2, duration: 0.6 }}
               >
-                <RestaurantCard restaurant={restaurant} />
+                <BusinessCard business={buiness} />
               </motion.div>
             ))}
           </div>
@@ -330,22 +343,22 @@ export default function Home() {
                 Ready to Find Your Next Favorite Meal?
               </h2>
               <p className="text-xl mb-8 opacity-90">
-                Join thousands of food lovers discovering amazing restaurants
-                every day
+                Join thousands of food lovers discovering amazing spots every
+                day
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <BukkaButton variant="float" size="lg" asChild>
-                  <Link href="/signup">
+                <Link href="/signup">
+                  <BukkaButton variant="float" size="lg" asChild>
                     Get Started Free
                     <Utensils className="w-5 h-5 ml-2" />
-                  </Link>
-                </BukkaButton>
-                <BukkaButton variant="glass" size="lg" asChild>
-                  <Link href="/search">
+                  </BukkaButton>
+                </Link>
+                <Link href="/businesses">
+                  <BukkaButton variant="glass" size="lg" asChild>
                     Explore Restaurants
                     <MapPin className="w-5 h-5 ml-2" />
-                  </Link>
-                </BukkaButton>
+                  </BukkaButton>
+                </Link>
               </div>
             </div>
           </motion.div>

@@ -79,7 +79,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/search"
+                  href="/businesses"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Find Restaurants
