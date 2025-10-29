@@ -32,14 +32,14 @@ import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/reviews`)
-@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
-@ApiSecurity('device-id')
-@UseGuards(JwtAuthGuard)
 @ApiTags('Reviews')
 export class ReviewController {
   constructor(private readonly reviewRepository: ReviewRepository) {}
 
   @Post()
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create a new review' })
   @ApiBody({ type: CreateReviewDto })
   async createReview(@Body() dto: CreateReviewDto, @Res() res: Response) {
@@ -71,10 +71,17 @@ export class ReviewController {
       businessId,
       filters,
     );
-    return BukkaResponse.GetPagedDataResponse('Reviews', response);
+    const data = BukkaResponse.GetPagedDataResponse(
+      'Business revieww',
+      response,
+    );
+    return BukkaResponse.GetStatusResponse(data, res);
   }
 
   @Put(':reviewId')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Update a review' })
   @ApiParam({ name: 'reviewId', example: 1 })
   @ApiBody({ type: UpdateReviewDto })
@@ -88,6 +95,9 @@ export class ReviewController {
   }
 
   @Delete(':reviewId')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete a review' })
   @ApiParam({ name: 'reviewId', example: 1 })
   async deleteReview(

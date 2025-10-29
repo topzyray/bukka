@@ -38,14 +38,14 @@ import type { Response } from 'express';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/files`)
-@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
-@ApiSecurity('device-id')
-@UseGuards(JwtAuthGuard)
 @ApiTags('File')
 export class FileController {
   constructor(private readonly fileRepository: FileRepository) {}
 
   @Post('upload')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Upload a single file and save to database' })
   @ApiConsumes('multipart/form-data')
@@ -97,6 +97,9 @@ export class FileController {
   }
 
   @Post('upload-multiple')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FilesInterceptor('files'))
   @ApiOperation({ summary: 'Upload multiple files and save to database' })
   @ApiConsumes('multipart/form-data')
@@ -144,6 +147,9 @@ export class FileController {
   }
 
   @Post('upload-multiple-from-urls')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Upload multiple files from URLs and save to database',
   })
@@ -216,6 +222,9 @@ export class FileController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete file by ID' })
   async deleteFile(
     @Param('id', ParseIntPipe) id: number,
@@ -230,6 +239,9 @@ export class FileController {
   }
 
   @Delete('user')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete all files for a user' })
   async deleteUserFiles(@Res() res: Response) {
     const response = await this.fileRepository.deleteUserFiles();
