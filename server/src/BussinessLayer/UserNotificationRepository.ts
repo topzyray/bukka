@@ -4,7 +4,7 @@ import {
   CreateNotificationDto,
   UserNotificationFilterDto,
 } from 'src/DomainLayer/Dtos/UserNotificationDto';
-import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
+import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { UserNotification } from 'src/DomainLayer/Models/UserNotification';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
@@ -124,7 +124,7 @@ export class UserNotificationRepository {
           pageNumber,
         );
       },
-      CacheTTLPolicy.NOTIFICATION,
+      CacheTTLPolicyEnum.NOTIFICATION,
     );
   }
 

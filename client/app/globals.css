@@ -57,6 +57,7 @@
   --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
   --animate-spin-slow: spin-slow 4s linear infinite;
   --animate-pulse-ring: pulse-ring 2s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.5s infinite;
 }
 
 :root {
@@ -277,6 +278,14 @@
     opacity: 0.8;
   }
 }
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: 200px 0;
+  }
+}
 
 /* Base layer */
 @layer base {
@@ -342,6 +351,17 @@
   .glass-dark {
     @apply bg-black/80 backdrop-blur-md border border-white/10;
   }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--muted) 25%,
+      var(--muted-foreground) 50%,
+      var(--muted) 75%
+    );
+    background-size: 400px 100%;
+    animation: shimmer 1.5s infinite;
+  }
 }
 
 /* Next.js root container */
@@ -371,13 +391,4 @@
 }
 .read-the-docs {
   color: #888;
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
 }

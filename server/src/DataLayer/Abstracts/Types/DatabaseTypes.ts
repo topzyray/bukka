@@ -20,7 +20,9 @@ export type FieldOp =
   | 'nin'
   | 'contains'
   | 'startsWith'
-  | 'endsWith';
+  | 'endsWith'
+  | 'has'
+  | 'hasSome';
 
 export type FilterExpression =
   | { field: string; op: FieldOp; value: any }

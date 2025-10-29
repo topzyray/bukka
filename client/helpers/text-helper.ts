@@ -16,7 +16,6 @@ export class TextHelper {
 
   static capitalize(text: string | undefined) {
     if (!text) return "";
-
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   }
 
@@ -26,6 +25,11 @@ export class TextHelper {
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+  }
+
+  static normalizeText(text: string | undefined) {
+    if (!text) return "";
+    return text.replace("_", " ").toLowerCase();
   }
 
   static getFormattedDate = (

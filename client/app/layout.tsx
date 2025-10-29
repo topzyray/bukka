@@ -8,6 +8,7 @@ import {
   GlobalStateProvider,
   ReactQueryProvider,
   ThemeProvider,
+  UserLocationProvider,
 } from "@/providers";
 import { SessionExpirationModal } from "@/events/session-event-listener";
 
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
   title: "Explore Nearby Food Businesses | Bukka",
   description:
     "Discover and explore restaurants, bars, lounges, bakeries, and catering services near you with Bukka. Search by location, category, or ratings.",
+  metadataBase: new URL(envConfig.NEXT_PUBLIC_DOMAIN_URL),
   openGraph: {
     title: "Explore Nearby Food Businesses | Bukka",
     description:
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
     siteName: "Bukka",
     images: [
       {
-        url: `${envConfig.NEXT_PUBLIC_DOMAIN_URL}/og-image.jpg`,
+        url: `${envConfig.NEXT_PUBLIC_DOMAIN_URL}/og-explore.png`,
         width: 1200,
         height: 630,
         alt: "Bukka Explore Page",
@@ -39,7 +41,11 @@ export const metadata: Metadata = {
     title: "Explore Nearby Food Businesses | Bukka",
     description:
       "Find top-rated restaurants and hidden gems near you with Bukka.",
-    images: ["/images/og-explore.jpg"],
+    images: [
+      "/images/og-explore.png",
+      "/images/homepage.png",
+      "find-business.png",
+    ],
     site: "@bukka",
   },
 };
@@ -51,7 +57,12 @@ export default function RootLayout({
 }>) {
   envConfig.validateConfig();
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Bukka" />
+      </head>
       <body className={`${urbanist.className} antialiased`}>
         <ReactQueryProvider>
           <ThemeProvider
@@ -61,12 +72,14 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <SessionExpirationModal />
-            <AuthProvider>
-              <GlobalStateProvider>
-                {children}
-                <Toaster richColors position="top-right" />
-              </GlobalStateProvider>
-            </AuthProvider>
+            <UserLocationProvider>
+              <AuthProvider>
+                <GlobalStateProvider>
+                  {children}
+                  <Toaster richColors position="top-right" />
+                </GlobalStateProvider>
+              </AuthProvider>
+            </UserLocationProvider>
           </ThemeProvider>
         </ReactQueryProvider>
         {/* <BackgroundIcons /> */}

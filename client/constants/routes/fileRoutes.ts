@@ -4,29 +4,31 @@ import { RouteHelper } from "../../helpers";
 const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 
 type IFileApi =
-  | "upload"
+  | "uploadFile"
+  | "uploadMultipleFiles"
   | "uploadMultipleFromUrls"
   | "getFiles"
-  | "getById"
+  | "getFileById"
   | "getLoggedInUserFiles"
   | "deleteById"
-  | "getByReferenceId"
-  | "getByReferenceIdAnType"
+  | "getFilesByReferenceId"
+  | "getByReferenceIdAndType"
   | "deleteUserFiles";
 
-const rawAuthRoutes: Record<IFileApi, string> = {
-  upload: "/files/upload",
+const rawFileRoutes: Record<IFileApi, string> = {
+  uploadFile: "/files/upload",
+  uploadMultipleFiles: "/files/upload-multiple",
   uploadMultipleFromUrls: "/files/upload-multiple-from-urls",
-  getById: "/files",
+  getFileById: "/files",
   getFiles: "/files",
   getLoggedInUserFiles: "/files/my-files",
   deleteById: "/files",
-  getByReferenceId: "/files/reference",
-  getByReferenceIdAnType: "/files/reference",
+  getFilesByReferenceId: "/files/reference",
+  getByReferenceIdAndType: "/files/reference",
   deleteUserFiles: "/files/user",
 };
 
 export const fileRoutes: Record<IFileApi, string> = RouteHelper.createRoutes(
   BACKEND_SVC_PATH,
-  rawAuthRoutes
+  rawFileRoutes
 );

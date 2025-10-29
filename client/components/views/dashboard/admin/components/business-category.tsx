@@ -3,14 +3,14 @@
 import React, { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { BusinessCategory } from "@/server/interfaces/BusinessCategory";
-import { DataTable } from "../../views/base/data-table";
-import { businessCategoryColumns } from "../../atoms/columns/business-category-columns";
+import { DataTable } from "../../../base/data-table";
+import { businessCategoryColumns } from "../../../../atoms/columns/business-category-columns";
 import {
   PageWrapper,
   PageWrapperContent,
   PageWrapperContentWithFramer,
-} from "../../ui/page-wrapper";
-import { CreateUpdateBusinessCategoryModal } from "../../forms/business/create-update-business-category-form";
+} from "../../../../ui/page-wrapper";
+import { CreateUpdateBusinessCategoryModal } from "../../../../forms/business/create-update-business-category-form";
 import { useAuth } from "@/providers";
 import { User } from "@/server/interfaces/User";
 import { useInfiniteBusinessCategories } from "@/server/queries/use-businesses-category-query";

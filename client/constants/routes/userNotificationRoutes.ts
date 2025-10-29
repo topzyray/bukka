@@ -13,7 +13,7 @@ type IUserNotificationApi =
   | "readAllMyNotification"
   | "getUnreadNotificationCount";
 
-const rawAuthRoutes: Record<IUserNotificationApi, string> = {
+const rawUserNotificationRoutes: Record<IUserNotificationApi, string> = {
   createNotification: "/users/notifications",
   deleteNotificationById: "/users/notifications",
   getNotificationById: "/users/notifications",
@@ -25,4 +25,4 @@ const rawAuthRoutes: Record<IUserNotificationApi, string> = {
 };
 
 export const userNotificationRoutes: Record<IUserNotificationApi, string> =
-  RouteHelper.createRoutes(BACKEND_SVC_PATH, rawAuthRoutes);
+  RouteHelper.createRoutes(BACKEND_SVC_PATH, rawUserNotificationRoutes);

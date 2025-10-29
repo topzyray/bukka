@@ -6,6 +6,7 @@ import { Heart, Filter, Search } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import { RestaurantCard } from "@/components/views/restaurant/RestaurantCard";
+import Link from "next/link";
 
 const mockFavorites = [
   {
@@ -138,7 +139,7 @@ export function Favorites() {
                 Start exploring restaurants and save your favorites here
               </p>
               <BukkaButton asChild>
-                <a href="/search">Discover Restaurants</a>
+                <Link href="/businesses">Discover Restaurants</Link>
               </BukkaButton>
             </motion.div>
           )}

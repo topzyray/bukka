@@ -70,7 +70,7 @@ export class NotificationSettingsController {
     return BukkaResponse.GetStatusResponse(settings, res);
   }
 
-  @Delete('notification-settings/:notificationId')
+  @Delete(':notificationId')
   @ApiOperation({
     summary: 'Delete user notifications settings by notificationId',
   })

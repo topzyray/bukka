@@ -38,12 +38,7 @@ export class FavoriteDataAgent {
     return this.model.findOne(spec);
   }
 
-  async deleteFavorite(id: number): Promise<void> {
-    const spec: QuerySpec = { filter: { field: 'id', op: 'eq', value: id } };
-    await this.model.deleteOne(spec);
-  }
-
-  async listByUser(
+  async getUserFavorites(
     userId: number,
     pageSize: number,
     pageNumber: number,
@@ -63,5 +58,10 @@ export class FavoriteDataAgent {
     pageData.pageCount = Math.ceil(total / pageSize);
     pageData.data = await this.model.find(spec);
     return pageData;
+  }
+
+  async deleteFavorite(id: number): Promise<void> {
+    const spec: QuerySpec = { filter: { field: 'id', op: 'eq', value: id } };
+    await this.model.deleteOne(spec);
   }
 }

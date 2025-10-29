@@ -22,11 +22,13 @@ import { SupportController } from './ServiceLayer/Controllers/SupportController'
 import { BusinessController } from './ServiceLayer/Controllers/BusinessController';
 import { LocationController } from './ServiceLayer/Controllers/LocationController';
 import { WaitListController } from './ServiceLayer/Controllers/WaitListController';
+import { FavoriteController } from './ServiceLayer/Controllers/FavoriteController';
+import { AdminControlController } from './ServiceLayer/Controllers/Admin/AdminControlController';
 import { UserNotificationController } from './ServiceLayer/Controllers/UserNotificationController';
 import { BusinessCategoryController } from './ServiceLayer/Controllers/BusinessCategoryController';
+import { UserManagementController } from './ServiceLayer/Controllers/Admin/UserManagementController';
 import { UserPersonalizationController } from './ServiceLayer/Controllers/UserPersonalizationController';
 import { NotificationSettingsController } from './ServiceLayer/Controllers/NotificationSettingsController';
-import { UserManagementController } from './ServiceLayer/Controllers/Admin/UserManagementController';
 
 // REPOSITORIES
 import { UserRepository } from './BussinessLayer/UserRepository';
@@ -34,6 +36,7 @@ import { AuthRepository } from './BussinessLayer/AuthRepository';
 import { TokenRepository } from './BussinessLayer/TokenRepository';
 import { ReviewRepository } from './BussinessLayer/ReviewRepository';
 import { SupportRepository } from './BussinessLayer/SupportRepository';
+import { FavoriteRepository } from './BussinessLayer/FavoriteRepository';
 import { WaitlistRepository } from './BussinessLayer/WaitlistRepository';
 import { BusinessRepository } from './BussinessLayer/BusinessRepository';
 import { LocationRepository } from './BussinessLayer/LocationRepository';
@@ -51,6 +54,7 @@ import { SupportDataAgent } from './DataLayer/DataAgents/SupportDataAgent';
 import { LocationDataAgent } from './DataLayer/DataAgents/LocationDataAgent';
 import { WaitlistDataAgent } from './DataLayer/DataAgents/WaitlistDataAgent';
 import { BusinessDataAgent } from './DataLayer/DataAgents/BusinessDataAgent';
+import { FavoriteDataAgent } from './DataLayer/DataAgents/FavoriteDataAgent';
 import { UserSessionDataAgent } from './DataLayer/DataAgents/UserSessionDataAgent';
 import { BusinessCategoryDataAgent } from './DataLayer/DataAgents/BusinessCategoryDataAgent';
 import { UserNotificationDataAgent } from './DataLayer/DataAgents/UserNotificationDataAgent';
@@ -69,6 +73,7 @@ import { AppConfigurationService } from './UtilityLayer/Configuration/AppConfigu
 import { RestaurantSearchService } from './InfrastructureLayer/Services/RestaurantSearchService';
 import { NotificationService } from './InfrastructureLayer/Services/notification/NotificationService';
 import { AuthNotificationService } from './InfrastructureLayer/Services/notification/auth/AuthNotificationService';
+import { AdminControlService } from './InfrastructureLayer/Services/AdminControlService';
 
 // FACTORIES
 import { FileRepository } from './BussinessLayer/FileRepository';
@@ -123,11 +128,13 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     UserNotificationController,
     NotificationSettingsController,
     UserPersonalizationController,
+    FavoriteController,
     BusinessCategoryController,
     BusinessController,
     LocationController,
     ReviewController,
     UserManagementController,
+    AdminControlController,
   ],
   providers: [
     {
@@ -141,6 +148,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     KeepAliveService,
     FileUploadService,
     NotificationService,
+    AdminControlService,
     AppConfigurationService,
     AuthNotificationService,
     RestaurantSearchService,
@@ -155,6 +163,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     SupportRepository,
     WaitlistRepository,
     BusinessRepository,
+    FavoriteRepository,
     LocationRepository,
     EmailTemplateFactory,
     UserSessionRepository,
@@ -169,6 +178,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     SupportDataAgent,
     WaitlistDataAgent,
     LocationDataAgent,
+    FavoriteDataAgent,
     BusinessDataAgent,
     UserSessionDataAgent,
     BusinessCategoryDataAgent,

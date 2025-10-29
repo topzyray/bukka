@@ -23,7 +23,7 @@ import {
   handleCache,
   invalidateCache,
 } from 'src/InfrastructureLayer/Services/cache/CacheUtils';
-import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
+import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 
 const TOLERANCE = 1e-5;
 
@@ -117,7 +117,7 @@ export class BusinessRepository {
         if (!business) throw new NotFoundException('Business not found');
         return BukkaResponse.GetSingleDataResponse('Business', business);
       },
-      CacheTTLPolicy.BUSINESS_DETAIL,
+      CacheTTLPolicyEnum.BUSINESS_DETAIL,
     );
   }
 
@@ -132,15 +132,29 @@ export class BusinessRepository {
   async getBusinesses(
     filterDto: FilterBusinessDto,
   ): Promise<PagedData<Business[]>> {
+    const query = FilterQueryHelper.buildQuery({
+      dto: filterDto,
+      rules: [{ field: 'type' }],
+      // rules: [{ field: 'type' }, { field: 'cuisines' }],
+      searchConfig: {
+        fields: [
+          'name',
+          'description',
+          'slug',
+          { field: 'cuisines', dtoKey: 'cuisines', defaultOp: 'has' },
+        ],
+        mode: 'insensitive',
+      },
+    });
+    const { pageSize, pageNumber } =
+      FilterQueryHelper.extractPagination(filterDto);
     return handleCache(
       'businesses',
       filterDto as Record<string, any>,
       () => {
-        const { pageSize, pageNumber } =
-          FilterQueryHelper.extractPagination(filterDto);
-        return this.businessDataAgent.findAll(pageSize, pageNumber);
+        return this.businessDataAgent.findAll(query, pageSize, pageNumber);
       },
-      CacheTTLPolicy.BUSINESS_LIST,
+      CacheTTLPolicyEnum.BUSINESS_LIST,
     );
   }
 

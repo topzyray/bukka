@@ -60,7 +60,8 @@ export const SignUpForm = () => {
   const { signUpUser, isSigningUp } = useSignUp({ resetForm: form.reset });
 
   async function onSubmit(data: z.infer<typeof signUpSchema>) {
-    signUpUser(data);
+    // TODE: Change from any later
+    signUpUser(data as any);
   }
 
   return (

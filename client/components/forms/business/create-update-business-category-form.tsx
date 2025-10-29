@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useUpdateBusiness } from "@/server/mutations/business/use-business-mutation";
-import { Business } from "@/server/dtos/BusinessDto";
 import { useBusinessCategories } from "@/server/queries/use-businesses-category-query";
 import { Loader2 } from "lucide-react";
 import { ScrollArea } from "../../ui/scroll-area";
@@ -23,6 +22,7 @@ import { InputComponent } from "../base/input-component";
 import { SelectComponent } from "../base/select-component";
 import { useCreateCategory } from "@/server/mutations/category/use-category-mutation";
 import { TextAreaComponent } from "../base/text-area-component";
+import { Business } from "@/server/interfaces/Business";
 
 const schema = z.object({
   name: z.string().min(2, "Business name is required"),
@@ -46,7 +46,6 @@ export function CreateUpdateBusinessCategoryModal({
   onSuccess,
 }: Props) {
   const isEdit = mode === "edit";
-  const { data: catData } = useBusinessCategories(true);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),

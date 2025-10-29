@@ -11,10 +11,12 @@ export interface Business {
   name: string;
   description: string;
   type: BusinessTypeEnum;
+  slug: string;
   phoneNumber: string;
   email: string;
   website: string;
   registrationNo: string;
+  cuisines: string[] | [];
   isVerified: boolean;
   isActive: boolean;
   rating: number;

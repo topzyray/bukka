@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   MapContainer,
   TileLayer,
@@ -14,7 +20,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { LAGOS } from "@/server/interfaces/Location";
 import { Business } from "@/server/interfaces/Business";
-import { Badge } from "@/components/ui/badge";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { useTheme } from "next-themes";
 import { BusinessTypeEnum } from "@/server/enums/BusinessTypeEnum";
@@ -28,6 +33,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { debounce } from "@/utils";
 
 const ICONS: Record<BusinessTypeEnum, L.Icon> = {
   [BusinessTypeEnum.RESTAURANT]: IconHelper.createColoredIcon(
@@ -73,30 +79,6 @@ const USER_ICON = IconHelper.createColoredIcon(
   [45, 61]
 );
 
-// function RecenterOnProp({ lat, lng }: { lat: number; lng: number }) {
-//   const map = useMap();
-//   const last = useRef<{ lat: number; lng: number } | null>(null);
-
-//   useEffect(() => {
-//     if (!lat && !lng) return;
-//     const newCenter = { lat, lng };
-//     if (
-//       !last.current ||
-//       LocationCoordsHelper.coordsDiffer(last.current, newCenter)
-//     ) {
-//       // only call setView if center truly changed (prevents continuous recenters)
-//       try {
-//         map.setView([lat, lng], map.getZoom(), { animate: true });
-//         last.current = newCenter;
-//       } catch {
-//         // ignore
-//       }
-//     }
-//   }, [lat, lng, map]);
-
-//   return null;
-// }
-
 function MapClickHandler({
   onClick,
   disabled,
@@ -114,10 +96,12 @@ function MapClickHandler({
 }
 
 interface ILocationIQMap {
+  zoom?: number;
   initial?: { lat: number; lng: number } | null;
   height?: string | number;
   disabled?: boolean;
   showLegend?: boolean;
+  showSearchPlaces?: boolean;
   businesses?: Business[];
   onSelect: (lat: number, lng: number) => void;
   onMarkerClick?: (businessId: number) => void;
@@ -127,7 +111,9 @@ export function LocationIQMap({
   initial = null,
   height = 360,
   disabled = false,
+  zoom = 13,
   showLegend = false,
+  showSearchPlaces = true,
   businesses = [],
   onSelect,
   onMarkerClick,
@@ -140,6 +126,8 @@ export function LocationIQMap({
   const geoAttempted = useRef(false);
   const lastEmitted = useRef<{ lat: number; lng: number } | null>(null);
   const router = useRouter();
+
+  const debouncedSelect = useMemo(() => debounce(onSelect, 400), [onSelect]);
 
   useEffect(() => {
     if (coordinates) {
@@ -166,7 +154,7 @@ export function LocationIQMap({
             LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
           ) {
             lastEmitted.current = coords;
-            onSelect(coords.lat, coords.lng);
+            debouncedSelect(coords.lat, coords.lng);
           }
         },
         () => {
@@ -177,7 +165,7 @@ export function LocationIQMap({
     } else {
       setMarker(DEFAULT_CENTER);
     }
-  }, [coordinates, initial, onSelect]);
+  }, [coordinates, initial, debouncedSelect]);
 
   useEffect(() => {
     if (!initial || initial.lat == null || initial.lng == null) return;
@@ -194,11 +182,11 @@ export function LocationIQMap({
         LocationCoordsHelper.coordsDiffer(lastEmitted.current, initial)
       ) {
         lastEmitted.current = initial;
-        onSelect(initial.lat, initial.lng);
+        debouncedSelect(initial.lat, initial.lng);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initial?.lat, initial?.lng, onSelect]);
+  }, [initial?.lat, initial?.lng, debouncedSelect]);
 
   const handleDragEnd = (e: L.LeafletEvent) => {
     if (disabled) return;
@@ -212,7 +200,7 @@ export function LocationIQMap({
         LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
       ) {
         lastEmitted.current = coords;
-        onSelect(coords.lat, coords.lng);
+        debouncedSelect(coords.lat, coords.lng);
       }
     } catch {}
   };
@@ -228,10 +216,10 @@ export function LocationIQMap({
         LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
       ) {
         lastEmitted.current = coords;
-        onSelect(lat, lng);
+        debouncedSelect(lat, lng);
       }
     },
-    [disabled, onSelect, setCoordinates]
+    [disabled, debouncedSelect, setCoordinates]
   );
 
   if (!marker) {
@@ -258,7 +246,7 @@ export function LocationIQMap({
     >
       <MapContainer
         center={[marker.lat, marker.lng]}
-        zoom={13}
+        zoom={zoom}
         scrollWheelZoom
         style={{ height: "100%", width: "100%" }}
       >
@@ -293,28 +281,6 @@ export function LocationIQMap({
           const markerIcon = ICONS[b?.type as BusinessTypeEnum] || ICONS.OTHER;
 
           return (
-            // <Marker
-            //   key={b.id}
-            //   position={[b?.location?.latitude, b?.location?.longitude]}
-            //   icon={ICONS[b?.type as BusinessTypeEnum] || ICONS.OTHER}
-            // >
-            //   <Popup>
-            //     <div className="flex flex-col">
-            //       <h2 className="text-primary text-xl font-bold">{b?.name}</h2>
-            //       {b?.category && <p>{b?.category?.name}</p>}
-            //       {b?.location?.address && (
-            //         <p className="text-xs text-muted-foreground">
-            //           {b?.location?.address}
-            //         </p>
-            //       )}
-            //       <div className="flex gap-2">
-            //         <Badge className="cursor-pointer">View Details</Badge>
-            //         <Badge className="cursor-pointer">Add to Favourite</Badge>
-            //       </div>
-            //     </div>
-            //   </Popup>
-            //   <Tooltip>{b?.name}</Tooltip>
-            // </Marker>
             <Marker
               key={b.id}
               position={[lat, lng]}
@@ -325,14 +291,13 @@ export function LocationIQMap({
                   if (onMarkerClick) {
                     try {
                       onMarkerClick(b.id);
-                    } catch (e) {
+                    } catch {
                       // safe no-op
                     }
                   }
                 },
               }}
             >
-              {/* Popup includes a View Details button that navigates to business detail */}
               <Popup>
                 <div className="flex flex-col gap-2">
                   <div className="font-semibold text-base">{b?.name}</div>
@@ -390,53 +355,21 @@ export function LocationIQMap({
           onLocate={(coords) => {
             setMarker(coords);
             setCoordinates(coords);
-            onSelect(coords.lat, coords.lng);
+            debouncedSelect(coords.lat, coords.lng);
           }}
         />
       </MapContainer>
 
-      <div
-        style={{
-          zIndex: 499,
-        }}
-        className="absolute top-2.5 left-12 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-[14rem] sm:max-w-[18rem] w-full"
-      >
-        <SearchPlacesWithAutocomplete />
-        {/* <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={async () => {
-            if (!navigator.geolocation) {
-              toast.error("Geolocation not supported");
-              return;
-            }
-            navigator.geolocation.getCurrentPosition(
-              (pos) => {
-                const coords = {
-                  lat: pos.coords.latitude,
-                  lng: pos.coords.longitude,
-                };
-                setMarker(coords);
-                setCoordinates(coords);
-                if (
-                  !lastEmitted.current ||
-                  LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
-                ) {
-                  lastEmitted.current = coords;
-                  onSelect(coords.lat, coords.lng);
-                }
-              },
-              () => {
-                setMarker(DEFAULT_CENTER);
-              },
-              { enableHighAccuracy: true, timeout: 10000 }
-            );
+      {showSearchPlaces && (
+        <div
+          style={{
+            zIndex: 499,
           }}
+          className="absolute top-2.5 left-12 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-[14rem] sm:max-w-[18rem] w-full"
         >
-          Me
-        </Button> */}
-      </div>
+          <SearchPlacesWithAutocomplete />
+        </div>
+      )}
       {showLegend && (
         <div
           style={{
@@ -573,4 +506,32 @@ export function RecenterButton({
       </Button>
     </div>
   );
+}
+
+export async function fetchLocationIQRoute(
+  start: { lat: number; lng: number },
+  end: { lat: number; lng: number },
+  mode: "driving" | "walking" | "cycling" = "driving"
+) {
+  const apiKey = process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY;
+  if (!apiKey) throw new Error("LocationIQ API key missing");
+
+  const url = `https://us1.locationiq.com/v1/directions/driving/${start.lng},${start.lat};${end.lng},${end.lat}?key=${apiKey}&overview=full&geometries=geojson`;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch route from LocationIQ");
+  const data = await res.json();
+
+  const route = data.routes?.[0];
+  if (!route) throw new Error("No route found");
+
+  const { distance, duration, geometry } = route;
+  return {
+    coordinates: geometry.coordinates.map(([lng, lat]: [number, number]) => [
+      lat,
+      lng,
+    ]),
+    distance, // in meters
+    duration, // in seconds
+  };
 }

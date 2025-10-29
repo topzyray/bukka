@@ -6,14 +6,13 @@ export interface Review {
   userId: number;
   businessId: number;
   rating: number;
-  title: string;
-  content: string;
   comment: string;
-  reply: string;
-  mediaUrls: string[];
   business: Business;
   user: User;
-  likesCount: number;
   createdAt: Date;
   updatedAt: Date;
+
+  // mediaUrls: string[];
+  // reply: string;
+  // likesCount: number;
 }

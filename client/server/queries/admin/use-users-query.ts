@@ -1,5 +1,5 @@
 import { useCustomQuery } from "@/server/queries/base";
-import { UserApiService } from "../../services";
+import { UserManagementApiService } from "@/server/services/UserManagementApiService";
 
 export const useUsers = ({
   enabled,
@@ -11,7 +11,7 @@ export const useUsers = ({
   useCustomQuery(
     ["admin:all-users"],
     () =>
-      UserApiService.adminGetUsers({
+      UserManagementApiService.adminGetAllUsers({
         pageNumber: 1,
         pageSize: 100,
         ...filter,

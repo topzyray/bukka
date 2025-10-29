@@ -17,7 +17,7 @@ import {
   handleCache,
   invalidateCache,
 } from 'src/InfrastructureLayer/Services/cache/CacheUtils';
-import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
+import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 
 @Injectable()
 export class BusinessCategoryRepository {
@@ -48,7 +48,7 @@ export class BusinessCategoryRepository {
         if (!cat) throw new NotFoundException('Category not found');
         return BukkaResponse.GetSingleDataResponse('BusinessCategory', cat);
       },
-      CacheTTLPolicy.CATEGORY,
+      CacheTTLPolicyEnum.CATEGORY,
     );
   }
 
@@ -69,7 +69,7 @@ export class BusinessCategoryRepository {
           FilterQueryHelper.extractPagination(filterDto);
         return this.dataAgent.findAll(query, pageSize, pageNumber);
       },
-      CacheTTLPolicy.CATEGORY,
+      CacheTTLPolicyEnum.CATEGORY,
     );
   }
 

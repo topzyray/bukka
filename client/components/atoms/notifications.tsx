@@ -203,7 +203,7 @@ export function Notifications() {
               variant="ghost"
               size="sm"
               className="h-7 text-xs"
-              onClick={() => markAllReadMutation.mutate({})}
+              onClick={() => markAllReadMutation.mutate()}
               disabled={
                 markAllReadMutation.isPending ||
                 isListEmpty ||
@@ -221,7 +221,7 @@ export function Notifications() {
               variant="ghost"
               size="sm"
               className="h-7 text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-              onClick={() => clearAllMutation.mutate({})}
+              onClick={() => clearAllMutation.mutate()}
               disabled={clearAllMutation.isPending || isListEmpty}
             >
               {clearAllMutation.isPending ? (

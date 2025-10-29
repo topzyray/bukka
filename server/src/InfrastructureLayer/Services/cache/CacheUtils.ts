@@ -90,6 +90,24 @@ export const invalidateCache = async (
   }
 };
 
+/**
+ * Deletes all cache keys.
+ * Example:
+ *  await deleteAllCache(); // deletes all cache
+ */
+export const deleteAllCache = async (): Promise<string> => {
+  const redisService = RedisService.getInstance();
+  const client = await redisService.getClient();
+
+  const logger = new Logger('CacheServiceUtils');
+  logger.warn('Flushing entire Redis cache...');
+
+  const result = await client.flushDb();
+  logger.log('Redis cache cleared successfully.');
+
+  return result;
+};
+
 // /**
 //  * Deletes a specific key from the cache.
 //  * @param prefix - Cache key prefix.
