@@ -91,8 +91,8 @@ export class AdminUpdateUserDto {
   @IsString()
   userStatus?: string;
 
-  @ApiProperty({ example: UserTypeEnum.USER })
-  userType?: string;
+  @ApiProperty({ example: UserRoleEnum.USER })
+  role?: string;
 }
 
 export class AdminUserFilterDto extends PaginationDto {

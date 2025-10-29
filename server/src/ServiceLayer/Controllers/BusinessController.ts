@@ -47,15 +47,15 @@ export class BusinessController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all businesses with filters' })
-  async getBusinesses(
-    @Query() filters: FilterBusinessDto,
+  @Get(':businessId')
+  @ApiOperation({ summary: 'Get a business by ID' })
+  @ApiParam({ name: 'businessId', example: 1 })
+  async getBusinessById(
+    @Param('businessId', ParseIntPipe) businessId: number,
     @Res() res: Response,
   ) {
-    const response = await this.businessRepository.getBusinesses(filters);
-    const data = BukkaResponse.GetPagedDataResponse('Businesses', response);
-    return BukkaResponse.GetStatusResponse(data, res);
+    const response = await this.businessRepository.getBusinessById(businessId);
+    return BukkaResponse.GetStatusResponse(response, res);
   }
 
   @Get('my-businesses')
@@ -69,15 +69,14 @@ export class BusinessController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Get(':businessId')
-  @ApiOperation({ summary: 'Get a business by ID' })
-  @ApiParam({ name: 'businessId', example: 1 })
-  async getBusinessById(
-    @Param('businessId', ParseIntPipe) businessId: number,
+  @Get()
+  @ApiOperation({ summary: 'Get all businesses with filters' })
+  async getBusinesses(
+    @Query() filters: FilterBusinessDto,
     @Res() res: Response,
   ) {
-    const response = await this.businessRepository.getBusinessById(businessId);
-    const data = BukkaResponse.GetSingleDataResponse('Business', response);
+    const response = await this.businessRepository.getBusinesses(filters);
+    const data = BukkaResponse.GetPagedDataResponse('Businesses', response);
     return BukkaResponse.GetStatusResponse(data, res);
   }
 

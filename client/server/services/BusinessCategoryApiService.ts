@@ -1,8 +1,16 @@
 import { HttpClient } from "@/configs";
-import { businessCategoryRoutes } from "@/constants/routes/businessCategoryRoutes";
-import { CreateCategoryDto } from "../dtos/CategoryDto";
+import { businessCategoryRoutes } from "@/constants/routes";
+import { CreateCategoryDto, UpdateCategoryDto } from "../dtos";
 
 export class BusinessCategoryApiService {
+  static async createCategory(payload: CreateCategoryDto) {
+    const response = await HttpClient.getClient().post(
+      `${businessCategoryRoutes.getCategories}`,
+      payload
+    );
+    return response.data;
+  }
+
   static async getCategories(params: Record<string, any> = {}) {
     const response = await HttpClient.getClient().get(
       `${businessCategoryRoutes.getCategories}`,
@@ -11,10 +19,24 @@ export class BusinessCategoryApiService {
     return response.data;
   }
 
-  static async createCategory(payload: CreateCategoryDto) {
-    const response = await HttpClient.getClient().post(
-      `${businessCategoryRoutes.getCategories}`,
+  static async getCategoryById(categoryId: number) {
+    const response = await HttpClient.getClient().get(
+      `${businessCategoryRoutes.getCategoryById}/${categoryId}`
+    );
+    return response.data;
+  }
+
+  static async updateCategory(payload: UpdateCategoryDto) {
+    const response = await HttpClient.getClient().put(
+      `${businessCategoryRoutes.updateCategory}`,
       payload
+    );
+    return response.data;
+  }
+
+  static async deleteCategory(categoryId: number) {
+    const response = await HttpClient.getClient().get(
+      `${businessCategoryRoutes.deleteCategory}/${categoryId}`
     );
     return response.data;
   }

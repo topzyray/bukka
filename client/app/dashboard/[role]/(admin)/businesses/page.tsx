@@ -1,4 +1,4 @@
-import BusinessList from "@/components/views/business/business-list";
+import BusinessList from "@/components/views/dashboard/admin/components/business-list";
 
 export default function Businesses() {
   return (

@@ -29,7 +29,7 @@ import {
 import { AdminAuthGuard } from 'src/MiddlewareLayer/Guards/AdminAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
-@Controller(`${BaseApiRoutesConstant.BASE_URL}/waitlist`)
+@Controller(`${BaseApiRoutesConstant.BASE_URL}/waitlists`)
 @ApiTags('Waitlist')
 export class WaitListController {
   constructor(private readonly _waitlistRepository: WaitlistRepository) {}

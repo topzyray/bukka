@@ -27,19 +27,17 @@ import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FileCategoryEnum } from "@/server/enums";
-import { UserFile } from "@/server/interfaces/UserFile";
+import { File } from "@/server/interfaces/File";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 
 export function Profile() {
   const { user, logout, userFiles, isLoadingUserFiles } = useAuth();
-  const profileAvatar: UserFile | null | undefined =
+  const profileAvatar: File | null | undefined =
     !isLoadingUserFiles && userFiles && userFiles.length
       ? userFiles.find(
           (file) => file.category === FileCategoryEnum.USER_PROFILE_IMAGE
         )
       : null;
-
-  console.log("Profile avaar: ", profileAvatar);
 
   const router = useRouter();
 

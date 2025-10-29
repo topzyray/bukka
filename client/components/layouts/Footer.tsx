@@ -79,7 +79,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/search"
+                  href="/businesses"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Find Restaurants
@@ -186,7 +186,7 @@ export function Footer() {
           <section className="flex items-center space-x-6 text-sm text-muted-foreground">
             <section className="flex items-center space-x-1">
               <Mail className="w-4 h-4" />
-              <span>hello@bukka.app</span>
+              <span>hello.bukka@proton.me</span>
             </section>
             <section className="flex items-center space-x-1">
               <Phone className="w-4 h-4" />

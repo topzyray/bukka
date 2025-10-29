@@ -3,7 +3,7 @@ import { userPersonalizationRoutes } from "@/constants/routes";
 import {
   CreateUserPersonalizationDto,
   UpdateUserPersonalizationDto,
-} from "../dtos/UserPersonalizationDto";
+} from "../dtos";
 
 export class UserPersonalizationApiService {
   static async createUserPersonalization(

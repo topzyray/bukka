@@ -13,14 +13,14 @@ export class WaitlistApiService {
 
   static async getWaitlistById(waitlistId: number) {
     const response = await HttpClient.getClient().get(
-      `${waitlistRoutes.getWaitlist}/${waitlistId}`
+      `${waitlistRoutes.getWaitlists}/${waitlistId}`
     );
     return response.data;
   }
 
   static async getWaitlistByFilters(queryParams: Record<string, any> = {}) {
     const response = await HttpClient.getClient().get(
-      `${waitlistRoutes.getWaitlist}`,
+      `${waitlistRoutes.getWaitlists}`,
       { params: queryParams }
     );
     return response.data;

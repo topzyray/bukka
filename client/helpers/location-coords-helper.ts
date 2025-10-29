@@ -95,15 +95,15 @@ export class LocationCoordsHelper {
    * @param coordinates.lon2 - Longitude of the second point in degrees.
    * @returns The distance between the two coordinates, in **meters**.
    */
-  static haversineDistance(coordinates: {
+  static calculateDistanceKm(coordinates: {
     lat1: number;
     lon1: number;
     lat2: number;
     lon2: number;
   }): number {
     const R = 6371e3; // Earth's radius in meters
-    const φ1 = (coordinates.lat1 * Math.PI) / 180;
-    const φ2 = (coordinates.lat2 * Math.PI) / 180;
+    const φ1 = (coordinates.lat1 * Math.PI) / 180; // dLat
+    const φ2 = (coordinates.lat2 * Math.PI) / 180; // dLon
     const Δφ = ((coordinates.lat2 - coordinates.lat1) * Math.PI) / 180;
     const Δλ = ((coordinates.lon2 - coordinates.lon1) * Math.PI) / 180;
 
@@ -142,12 +142,53 @@ export class LocationCoordsHelper {
     target: { lat: number; lng: number },
     radiusMeters: number
   ): boolean {
-    const distance = LocationCoordsHelper.haversineDistance({
+    const distance = LocationCoordsHelper.calculateDistanceKm({
       lat1: center.lat,
       lon1: center.lng,
       lat2: target.lat,
       lon2: target.lng,
     });
     return distance <= radiusMeters;
+  }
+
+  static calculateBearing(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ): string {
+    const y =
+      Math.sin(this.deg2rad(lon2 - lon1)) * Math.cos(this.deg2rad(lat2));
+    const x =
+      Math.cos(this.deg2rad(lat1)) * Math.sin(this.deg2rad(lat2)) -
+      Math.sin(this.deg2rad(lat1)) *
+        Math.cos(this.deg2rad(lat2)) *
+        Math.cos(this.deg2rad(lon2 - lon1));
+
+    const brng = (this.rad2deg(Math.atan2(y, x)) + 360) % 360;
+    return this.bearingToDirection(brng);
+  }
+
+  private static bearingToDirection(bearing: number): string {
+    const directions = [
+      "North",
+      "North-East",
+      "East",
+      "South-East",
+      "South",
+      "South-West",
+      "West",
+      "North-West",
+    ];
+    const index = Math.round(bearing / 45) % 8;
+    return directions[index];
+  }
+
+  private static deg2rad(deg: number) {
+    return deg * (Math.PI / 180);
+  }
+
+  private static rad2deg(rad: number) {
+    return rad * (180 / Math.PI);
   }
 }

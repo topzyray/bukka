@@ -24,7 +24,17 @@ export class BusinessDataAgent {
   }
 
   async findById(id: number): Promise<Business | null> {
-    const spec: QuerySpec = { filter: { field: 'id', op: 'eq', value: id } };
+    const spec: QuerySpec = {
+      filter: { field: 'id', op: 'eq', value: id },
+      extras: {
+        extras: {
+          include: {
+            category: true,
+            location: true,
+          },
+        },
+      },
+    };
     return this.model.findOne(spec);
   }
 
@@ -43,13 +53,14 @@ export class BusinessDataAgent {
   }
 
   async findAll(
+    filter: any,
     pageSize: number,
     pageNumber: number,
-    filter?: Record<string, any>,
   ): Promise<PagedData<Business[]>> {
     const pageData = new PagedData<Business[]>();
     pageData.page = pageNumber;
     pageData.pageSize = pageSize;
+
     const spec: QuerySpec = {
       filter,
       sort: [{ field: 'createdAt', direction: 'desc' }],

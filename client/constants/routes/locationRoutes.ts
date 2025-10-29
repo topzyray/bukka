@@ -3,11 +3,20 @@ import { RouteHelper } from "@/helpers";
 
 const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 
-type ILocationApi = "getLocations" | "searchPlaces" | "reverseGeocode";
+type ILocationApi =
+  | "getLocations"
+  | "getLocationById"
+  | "searchLocation"
+  | "updateLocation"
+  | "deleteLocation"
+  | "reverseGeocode";
 
 const rawLocationRoutes: Record<ILocationApi, string> = {
   getLocations: "/locations",
-  searchPlaces: "/locations/search",
+  getLocationById: "/locations",
+  searchLocation: "/locations/search",
+  updateLocation: "/locations",
+  deleteLocation: "/locations",
   reverseGeocode: "/locations/reverse",
 };
 

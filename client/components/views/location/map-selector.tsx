@@ -8,21 +8,27 @@ import { Business } from "@/server/interfaces/Business";
 import React, { useCallback } from "react";
 
 type Props = {
+  zoom?: number;
   initial?: { lat: number; lng: number } | null;
   provider: MapProviderEnum;
   showLegend?: boolean;
+  showSearchPlaces?: boolean;
   height?: string | number;
   businesses?: Business[];
   onSelect: (lat: number, lng: number) => void;
+  onMarkerClick?: (id: number) => void;
 };
 
 export function MapSelector({
+  zoom,
   initial = null,
   provider,
   showLegend,
+  showSearchPlaces,
   height,
   businesses,
   onSelect,
+  onMarkerClick,
 }: Props) {
   const PAGE_SIZE = 10;
 
@@ -81,11 +87,14 @@ export function MapSelector({
       );
       return (
         <LocationIQMap
+          zoom={zoom}
           initial={initial}
           onSelect={onSelect}
           height={height}
+          showSearchPlaces={showSearchPlaces}
           businesses={currentPageData || businesses}
           showLegend={showLegend}
+          onMarkerClick={onMarkerClick}
         />
       );
     }

@@ -14,7 +14,7 @@ import {
   handleCache,
   invalidateCache,
 } from 'src/InfrastructureLayer/Services/cache/CacheUtils';
-import { CacheTTLPolicy } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
+import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 
 @Injectable()
 export class LocationRepository {
@@ -82,7 +82,7 @@ export class LocationRepository {
           pageNumber,
         );
       },
-      CacheTTLPolicy.LOCATION,
+      CacheTTLPolicyEnum.LOCATION,
     );
   }
 
@@ -110,7 +110,7 @@ export class LocationRepository {
           pageNumber,
         );
       },
-      CacheTTLPolicy.LOCATION,
+      CacheTTLPolicyEnum.LOCATION,
     );
   }
 

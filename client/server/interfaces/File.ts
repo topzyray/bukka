@@ -1,4 +1,4 @@
-export interface UserFile {
+export interface File {
   id?: number;
   referenceId?: number;
   category: string;

@@ -19,8 +19,8 @@ export const useUserNotifications = ({
     ["notifications", userId],
     ({ pageNumber, ...rest }) =>
       UserNotificationApiService.getAllMyNotifications({
-        page: pageNumber,
-        limit: limit ?? 10,
+        pageNumber: pageNumber,
+        pageSize: limit ?? 10,
         search: searchQuery,
         ...rest,
       }),
