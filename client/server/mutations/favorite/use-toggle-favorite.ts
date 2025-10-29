@@ -10,8 +10,11 @@ export const useToggleFavorite = () => {
     onMutate: async (payload: ToggleFavoriteDto) => {
       await qc.cancelQueries({ queryKey: ["favorites"] });
       const prev = qc.getQueryData<number[]>(["favorites"]) || [];
+      console.log("PREV: ", prev);
 
       const isFavorite = prev.includes(payload.businessId);
+      console.log("IS FAVORITE: ", isFavorite);
+
       const next = isFavorite
         ? prev.filter((id) => id !== payload.businessId)
         : [...prev, payload.businessId];

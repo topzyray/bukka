@@ -9,7 +9,7 @@ interface IErrorBox {
   className?: string;
 }
 
-export default function ErrorBox({
+export function ErrorBox({
   error,
   message,
   containerClassName,

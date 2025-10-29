@@ -15,7 +15,7 @@ const rawReviewRoutes: Record<IReviewApi, string> = {
   getReviewById: "/reviews",
   updateReview: "/reviews",
   deleteReview: "/reviews",
-  getReviewByBusinessId: "/reviews",
+  getReviewByBusinessId: "/reviews/business",
 };
 
 export const reviewRoutes: Record<IReviewApi, string> =

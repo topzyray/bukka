@@ -34,6 +34,6 @@ export const useBusinessById = ({ businessId }: { businessId: number }) => {
   return useCustomQuery(
     ["business", businessId],
     () => BusinessApiService.getBusinessById(businessId),
-    { enabled: !!businessId }
+    { enabled: !!businessId, placeholderData: (prev) => prev }
   );
 };
