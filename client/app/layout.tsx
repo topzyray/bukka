@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     siteName: "Bukka",
     images: [
       {
-        url: `${envConfig.NEXT_PUBLIC_DOMAIN_URL}/og-image.jpg`,
+        url: `${envConfig.NEXT_PUBLIC_DOMAIN_URL}/og-explore.png`,
         width: 1200,
         height: 630,
         alt: "Bukka Explore Page",
@@ -41,7 +41,11 @@ export const metadata: Metadata = {
     title: "Explore Nearby Food Businesses | Bukka",
     description:
       "Find top-rated restaurants and hidden gems near you with Bukka.",
-    images: ["/images/og-explore.jpg"],
+    images: [
+      "/images/og-explore.png",
+      "/images/homepage.png",
+      "find-business.png",
+    ],
     site: "@bukka",
   },
 };
