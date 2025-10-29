@@ -60,10 +60,10 @@ export class SupportController {
   //   return BukkaResponse.GetStatusResponse(data, res);
   // }
 
+  @Get()
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
   @ApiSecurity('device-id')
   @UseGuards(JwtAuthGuard)
-  @Get()
   @ApiOperation({ summary: 'Get supports by filters' })
   async getReviewByFilters(
     @Query() filters: SupportFilterDto,

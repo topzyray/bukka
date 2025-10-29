@@ -33,20 +33,17 @@ import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/locations`)
-@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
-@ApiSecurity('device-id')
-@UseGuards(JwtAuthGuard)
 @ApiTags('Location')
 export class LocationController {
   constructor(private readonly locationRepository: LocationRepository) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create location (from placeId or lat/lng)' })
-  @ApiBody({ type: CreateLocationDto })
-  async createLocation(@Body() dto: CreateLocationDto, @Res() res: Response) {
-    const response = await this.locationRepository.createLocation(dto);
-    return BukkaResponse.GetStatusResponse(response, res);
-  }
+  // @Post()
+  // @ApiOperation({ summary: 'Create location (from placeId or lat/lng)' })
+  // @ApiBody({ type: CreateLocationDto })
+  // async createLocation(@Body() dto: CreateLocationDto, @Res() res: Response) {
+  //   const response = await this.locationRepository.createLocation(dto);
+  //   return BukkaResponse.GetStatusResponse(response, res);
+  // }
 
   @Get()
   @ApiOperation({ summary: 'Get paginated data for list of locations' })
@@ -84,6 +81,9 @@ export class LocationController {
   }
 
   @Put(':locationId')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Update a location by ID' })
   @ApiParam({ name: 'locationId', example: 1 })
   @ApiBody({ type: UpdateLocationDto })
@@ -100,6 +100,9 @@ export class LocationController {
   }
 
   @Delete(':locationId')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete a location by ID' })
   @ApiParam({ name: 'locationId', example: 1 })
   async deleteLocation(

@@ -32,14 +32,14 @@ import {
 } from 'src/DomainLayer/Dtos/BusinessDto';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/businesses`)
-@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
-@ApiSecurity('device-id')
-@UseGuards(JwtAuthGuard)
 @ApiTags('Business')
 export class BusinessController {
   constructor(private readonly businessRepository: BusinessRepository) {}
 
   @Post()
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create a new business' })
   @ApiBody({ type: CreateBusinessDto })
   async createBusiness(@Body() dto: CreateBusinessDto, @Res() res: Response) {
@@ -59,6 +59,9 @@ export class BusinessController {
   }
 
   @Get('my-businesses')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get all businesses for logged-in vendor' })
   async getMyBusinesses(@Res() res: Response) {
     const response = await this.businessRepository.getBusinessesByOwner();
@@ -81,6 +84,9 @@ export class BusinessController {
   }
 
   @Put(':businessId')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Update a business by ID' })
   @ApiParam({ name: 'businessId', example: 1 })
   @ApiBody({ type: UpdateBusinessDto })
@@ -97,6 +103,9 @@ export class BusinessController {
   }
 
   @Delete(':businessId')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete a business by ID' })
   @ApiParam({ name: 'businessId', example: 1 })
   async deleteBusiness(

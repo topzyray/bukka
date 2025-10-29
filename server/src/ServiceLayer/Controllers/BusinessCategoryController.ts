@@ -33,9 +33,6 @@ import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { AdminAuthGuard } from 'src/MiddlewareLayer/Guards/AdminAuthGuard';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/business-categories`)
-@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
-@ApiSecurity('device-id')
-@UseGuards(JwtAuthGuard)
 @ApiTags('Business Category')
 export class BusinessCategoryController {
   constructor(
@@ -43,7 +40,9 @@ export class BusinessCategoryController {
   ) {}
 
   @Post()
-  @UseGuards(AdminAuthGuard)
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard, AdminAuthGuard)
   @ApiOperation({ summary: 'Create a business category' })
   @ApiBody({ type: CreateBusinessCategoryDto })
   async createCategory(
@@ -69,7 +68,6 @@ export class BusinessCategoryController {
   }
 
   @Get(':categoryId')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get business category by ID' })
   @ApiParam({ name: 'categoryId', example: 1 })
   async getCategoryById(
@@ -85,7 +83,9 @@ export class BusinessCategoryController {
   }
 
   @Put(':categoryId')
-  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard, AdminAuthGuard)
   @ApiOperation({ summary: 'Update business category by ID' })
   @ApiParam({ name: 'categoryId', example: 1 })
   @ApiBody({ type: UpdateBusinessCategoryDto })
@@ -99,7 +99,9 @@ export class BusinessCategoryController {
   }
 
   @Delete(':categoryId')
-  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard, AdminAuthGuard)
   @ApiOperation({ summary: 'Delete business category by ID' })
   @ApiParam({ name: 'categoryId', example: 1 })
   async deleteCategory(
