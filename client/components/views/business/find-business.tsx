@@ -15,7 +15,7 @@ import { BukkaButton } from "@/components/ui/button-variants";
 import { FilterDialog } from "@/components/ui/filter-dialog";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { BusinessCard } from "./business-card";
+import { BusinessCard } from "./components/business-card";
 import { useBusinesses } from "@/server/queries/use-businesses-query";
 import { Business } from "@/server/interfaces/Business";
 import { useRouter, useSearchParams } from "next/navigation";

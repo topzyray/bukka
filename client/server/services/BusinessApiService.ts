@@ -13,8 +13,6 @@ export class BusinessApiService {
   }
 
   static async getBusinesses(params: Record<string, any> = {}) {
-    console.log("QUERY: ", params);
-
     const response = await HttpClient.getClient().get(
       `${businessRoutes.getBusinesses}`,
       { params }
@@ -22,9 +20,10 @@ export class BusinessApiService {
     return response.data as BukkaResponse<any>;
   }
 
-  static async getLoggedInVendorBusinesses() {
+  static async getLoggedInVendorBusinesses(params: Record<string, any> = {}) {
     const response = await HttpClient.getClient().get(
-      `${businessRoutes.getLoggedInVendorBusinesses}`
+      `${businessRoutes.getLoggedInVendorBusinesses}`,
+      { params }
     );
     return response.data;
   }

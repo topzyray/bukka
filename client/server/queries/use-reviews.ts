@@ -1,7 +1,7 @@
 import { ReviewApiService } from "../services";
 import { useCustomQuery } from "./base";
 
-export const useReviews = ({ businessId }: { businessId: number }) => {
+export const useBusinessReviews = ({ businessId }: { businessId: number }) => {
   return useCustomQuery(
     ["favorites"],
     () => ReviewApiService.getReviewByBusinessId(businessId),

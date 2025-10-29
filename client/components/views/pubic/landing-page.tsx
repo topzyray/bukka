@@ -19,13 +19,13 @@ import { Footer } from "@/components/layouts/Footer";
 import { TypeAnimation } from "react-type-animation";
 import { Business } from "@/server/interfaces/Business";
 import { useBusinesses } from "@/server/queries/use-businesses-query";
-import { BusinessCard } from "../business/business-card";
+import { BusinessCard } from "../business/components/business-card";
 import { TextHelper } from "@/helpers";
 import { BusinessTypeEnum } from "@/server/enums/BusinessTypeEnum";
 import { useRouter } from "next/navigation";
 import { SearchBox } from "@/components/atoms/search-box";
 import { CircularLoader } from "@/components/loaders/circular-loader";
-import ErrorBox from "@/components/atoms/error-box";
+import { ErrorBox } from "@/components/atoms/error-box";
 
 const categories = [
   { name: BusinessTypeEnum.RESTAURANT, icon: "🍛", count: "120+" },

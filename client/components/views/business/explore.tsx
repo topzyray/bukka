@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { debounce } from "lodash";
 import { MapProviderEnum } from "@/server/enums/MapProviderEnum";
 import { useBusinesses } from "@/server/queries/use-businesses-query";
-import { BusinessCard } from "./business-card";
+import { BusinessCard } from "./components/business-card";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Business } from "@/server/interfaces/Business";
 import { CircularLoader } from "@/components/loaders/circular-loader";
