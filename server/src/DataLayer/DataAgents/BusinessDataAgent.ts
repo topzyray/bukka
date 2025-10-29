@@ -27,11 +27,9 @@ export class BusinessDataAgent {
     const spec: QuerySpec = {
       filter: { field: 'id', op: 'eq', value: id },
       extras: {
-        extras: {
-          include: {
-            category: true,
-            location: true,
-          },
+        include: {
+          category: true,
+          location: true,
         },
       },
     };
