@@ -25,6 +25,9 @@ import { useBusinessFiles } from "@/server/queries/use-business-files";
 import { FileCategoryEnum } from "@/server/enums";
 import { File } from "@/server/interfaces/File";
 import { useDistance } from "@/hooks/use-distance";
+import { FavoriteButton } from "./favorite-button";
+import { useFavorites } from "@/server/queries/use-favorites";
+import { Favorite } from "@/server/interfaces/Favorite";
 
 interface BusinessCardProps {
   business: Business;
@@ -46,6 +49,9 @@ export const BusinessCard = memo(function BusinessCard({
     useBusinessFiles({
       businessId: business.id,
     });
+  const { data: userFavoriteData } = useFavorites();
+  console.log("USER FAVORITE: ", userFavoriteData);
+
   const toggleFavorite = useToggleFavorite();
 
   const { formatted } = useDistance({
@@ -89,7 +95,7 @@ export const BusinessCard = memo(function BusinessCard({
     return (
       <div className="flex items-center gap-1 text-muted-foreground">
         <MapPin className="w-6 h-6" />
-        <span className="text-xs capitalize">{formatted}</span>
+        <span className="text-xs">{formatted}</span>
       </div>
     );
   };
@@ -102,10 +108,13 @@ export const BusinessCard = memo(function BusinessCard({
       : null;
 
   const isUserFavorite =
-    business?.favorites &&
-    business?.favorites.find(
-      (fav) => fav.businessId === business?.id && fav.userId === currentUser?.id
+    userFavoriteData?.responseData?.data &&
+    userFavoriteData?.responseData?.data.find(
+      (fav: Favorite) =>
+        fav.businessId === business?.id && fav.userId === currentUser?.id
     );
+  console.log("BUSINESS: ", business);
+  console.log("IS FAV: ", !!isUserFavorite);
 
   if (variant === "compact") {
     return (
@@ -154,17 +163,21 @@ export const BusinessCard = memo(function BusinessCard({
               size="icon"
               className="flex-shrink-0 w-8 h-8"
               onClick={handleFavoriteClick}
-              aria-label={isUserFavorite ? "Unsave" : "Save"}
+              aria-label={!!isUserFavorite ? "Unsave" : "Save"}
             >
               <Heart
                 className={cn(
                   "w-4 h-4 transition-colors",
-                  isUserFavorite
+                  !!isUserFavorite
                     ? "fill-red-500 text-red-500"
                     : "text-muted-foreground"
                 )}
               />
             </BukkaButton>
+            {/* <FavoriteButton
+              businessId={business?.id}
+              isFavorite={!!isUserFavorite}
+            /> */}
           </CardContent>
         </Card>
       </motion.div>
@@ -204,12 +217,12 @@ export const BusinessCard = memo(function BusinessCard({
             size="icon"
             className="absolute top-3 right-3 w-8 h-8"
             onClick={handleFavoriteClick}
-            aria-label={isUserFavorite ? "Unsave" : "Save"}
+            aria-label={!!isUserFavorite ? "Unsave" : "Save"}
           >
             <Heart
               className={cn(
                 "w-4 h-4 transition-colors",
-                isUserFavorite
+                !!isUserFavorite
                   ? "fill-red-500 text-red-500"
                   : "text-muted-foreground"
               )}

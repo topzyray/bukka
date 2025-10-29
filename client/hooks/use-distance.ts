@@ -56,7 +56,7 @@ export function useDistance({
     formatted = `${meters} m away${bearing ? ` (${bearing})` : ""}`;
   } else {
     formatted = `Within ${distanceKm.toFixed(1)} km${
-      bearing ? ` ${bearing.toLowerCase()}` : ""
+      bearing ? ` ${bearing}` : ""
     } of your location`;
   }
 

@@ -2,11 +2,11 @@
 
 import { Loader2, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useReviews } from "@/server/queries/use-reviews";
+import { useBusinessReviews } from "@/server/queries/use-reviews";
 import { Review } from "@/server/interfaces/Review";
 
 export function BusinessReviews({ businessId }: { businessId: number }) {
-  const { data, isLoading } = useReviews({
+  const { data, isLoading } = useBusinessReviews({
     businessId,
   });
 

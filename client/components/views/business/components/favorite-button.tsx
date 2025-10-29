@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
-import { useCurrentUser } from "@/server/queries"; // assuming this hook returns { data: user }
+import { useCurrentUser } from "@/server/queries";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
 import { useToggleFavorite } from "@/server/mutations/favorite/use-toggle-favorite";

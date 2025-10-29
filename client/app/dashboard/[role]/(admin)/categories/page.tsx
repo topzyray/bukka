@@ -1,4 +1,4 @@
-import BusinessCategoryList from "@/components/views/dashboard/admin/components/business-category";
+import BusinessCategoryList from "@/components/views/dashboard/shared/components/business-category";
 
 export default function BusinessCategories() {
   return (
