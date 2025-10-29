@@ -101,9 +101,9 @@ export class LocationCoordsHelper {
     lat2: number;
     lon2: number;
   }): number {
-    const R = 6371e3; // Earth's radius in meters
-    const φ1 = (coordinates.lat1 * Math.PI) / 180; // dLat
-    const φ2 = (coordinates.lat2 * Math.PI) / 180; // dLon
+    const R = 6371; // Earth's radius in kilometers
+    const φ1 = (coordinates.lat1 * Math.PI) / 180;
+    const φ2 = (coordinates.lat2 * Math.PI) / 180;
     const Δφ = ((coordinates.lat2 - coordinates.lat1) * Math.PI) / 180;
     const Δλ = ((coordinates.lon2 - coordinates.lon1) * Math.PI) / 180;
 
@@ -113,9 +113,8 @@ export class LocationCoordsHelper {
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    return R * c; // Distance in meters
+    return R * c; // Distance in kilometers
   }
-
   /**
    * Determines whether a target coordinate lies within a specified radius (in meters)
    * of a reference coordinate. Uses the Haversine formula internally.
