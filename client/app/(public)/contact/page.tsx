@@ -128,7 +128,7 @@ const Contact = () => {
                   <Mail className="w-8 h-8 text-primary mb-3" />
                   <h3 className="font-semibold mb-2">Email</h3>
                   <p className="text-sm text-muted-foreground">
-                    support@bukka.com
+                    hello.bukka@proton.me
                   </p>
                 </CardContent>
               </Card>
@@ -138,12 +138,12 @@ const Contact = () => {
                   <Phone className="w-8 h-8 text-primary mb-3" />
                   <h3 className="font-semibold mb-2">Phone</h3>
                   <p className="text-sm text-muted-foreground">
-                    +1 (555) 123-4567
+                    +234 (703) 552-7946
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="shadow-card">
+              {/* <Card className="shadow-card">
                 <CardContent className="p-6">
                   <MapPin className="w-8 h-8 text-primary mb-3" />
                   <h3 className="font-semibold mb-2">Address</h3>
@@ -153,7 +153,7 @@ const Contact = () => {
                     Lagos, Nigeria
                   </p>
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
           </div>
         </motion.div>

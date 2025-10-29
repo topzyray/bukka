@@ -24,6 +24,8 @@ import { TextHelper } from "@/helpers";
 import { BusinessTypeEnum } from "@/server/enums/BusinessTypeEnum";
 import { useRouter } from "next/navigation";
 import { SearchBox } from "@/components/atoms/search-box";
+import { CircularLoader } from "@/components/loaders/circular-loader";
+import ErrorBox from "@/components/atoms/error-box";
 
 const categories = [
   { name: BusinessTypeEnum.RESTAURANT, icon: "🍛", count: "120+" },
@@ -43,7 +45,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const router = useRouter();
 
-  const { data } = useBusinesses({});
+  const { data, isLoading, isError, error } = useBusinesses({});
 
   const featuredBusinesses: Business[] = useMemo(
     () => data?.pages.flatMap((p) => p.data) ?? [],
@@ -171,9 +173,7 @@ export default function Home() {
                   <BukkaButton
                     variant="glass"
                     size="sm"
-                    onClick={() =>
-                      (window.location.href = "/businesses?filter=near_me")
-                    }
+                    onClick={() => router.push("/businesses?filter=near_me")}
                   >
                     <MapPin className="w-4 h-4 mr-2" />
                     Near Me
@@ -181,9 +181,7 @@ export default function Home() {
                   <BukkaButton
                     variant="glass"
                     size="sm"
-                    onClick={() =>
-                      (window.location.href = "/businesses?sort=rating")
-                    }
+                    onClick={() => router.push("/businesses?sort=rating")}
                   >
                     <Star className="w-4 h-4 mr-2" />
                     Top Rated
@@ -191,9 +189,7 @@ export default function Home() {
                   <BukkaButton
                     variant="glass"
                     size="sm"
-                    onClick={() =>
-                      (window.location.href = "/businesses?filter=openNow")
-                    }
+                    onClick={() => router.push("/businesses?filter=openNow")}
                   >
                     <Clock className="w-4 h-4 mr-2" />
                     Open Now
@@ -240,7 +236,8 @@ export default function Home() {
               Browse by Category
             </h2>
             <p className="text-muted-foreground text-lg">
-              Explore different cuisines and dining styles
+              {/* Explore different cuisines and dining styles */}
+              Explore local food businesses by cuisine and service
             </p>
           </motion.div>
 
@@ -264,9 +261,9 @@ export default function Home() {
                     <h3 className="font-semibold mb-1 uppercase">
                       {TextHelper.normalizeText(category.name)}
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    {/* <p className="text-sm text-muted-foreground">
                       {category.count}
-                    </p>
+                    </p> */}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -287,7 +284,7 @@ export default function Home() {
           >
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Featured Restaurants
+                Featured Businesses
               </h2>
               <p className="text-muted-foreground text-lg">
                 Hand-picked favorites from our community
@@ -302,17 +299,25 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredBusinesses.map((buiness, index) => (
-              <motion.div
-                key={buiness.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2, duration: 0.6 }}
-              >
-                <BusinessCard business={buiness} />
-              </motion.div>
-            ))}
+            {isLoading ? (
+              <CircularLoader />
+            ) : featuredBusinesses.length ? (
+              featuredBusinesses.map((buiness, index) => (
+                <motion.div
+                  key={buiness.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.2, duration: 0.6 }}
+                >
+                  <BusinessCard business={buiness} />
+                </motion.div>
+              ))
+            ) : isError ? (
+              <ErrorBox error={error} />
+            ) : (
+              <p>No featured business available yet.</p>
+            )}
           </div>
         </div>
       </section>
@@ -340,7 +345,7 @@ export default function Home() {
                 🚀
               </motion.div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Ready to Find Your Next Favorite Meal?
+                Ready to Discover Local Food Businesses?
               </h2>
               <p className="text-xl mb-8 opacity-90">
                 Join thousands of food lovers discovering amazing spots every
@@ -355,7 +360,7 @@ export default function Home() {
                 </Link>
                 <Link href="/businesses">
                   <BukkaButton variant="glass" size="lg" asChild>
-                    Explore Restaurants
+                    Explore Businesses
                     <MapPin className="w-5 h-5 ml-2" />
                   </BukkaButton>
                 </Link>

@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   title: "Explore Nearby Food Businesses | Bukka",
   description:
     "Discover and explore restaurants, bars, lounges, bakeries, and catering services near you with Bukka. Search by location, category, or ratings.",
+  metadataBase: new URL(envConfig.NEXT_PUBLIC_DOMAIN_URL),
   openGraph: {
     title: "Explore Nearby Food Businesses | Bukka",
     description:
@@ -52,7 +53,12 @@ export default function RootLayout({
 }>) {
   envConfig.validateConfig();
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Bukka" />
+      </head>
       <body className={`${urbanist.className} antialiased`}>
         <ReactQueryProvider>
           <ThemeProvider

@@ -49,7 +49,7 @@ const Help = () => {
     {
       question: "How do I contact customer support?",
       answer:
-        "You can reach us through the Contact page, via email at support@bukka.com, or call us at +1 (555) 123-4567. We typically respond within 24 hours.",
+        "You can reach us through the Contact page, via email at hello.bukka@proton.me, or call us at +1 (555) 123-4567. We typically respond within 24 hours.",
     },
   ];
 

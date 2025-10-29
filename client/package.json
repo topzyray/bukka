@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "exp": "next dev --experimental-https",
     "build": "next build --turbopack",
     "start": "next start",
     "analyze": "next build && ls .vercel/output/functions | wc -l",
@@ -82,6 +83,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-map-gl": "^6.1.7",
+    "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "husky": "^9.1.7",

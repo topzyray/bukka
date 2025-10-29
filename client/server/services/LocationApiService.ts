@@ -31,10 +31,7 @@ export class LocationApiService {
     return response.data?.responseData;
   }
 
-  static async reverseGeocode(payload: {
-    longitude: number;
-    latitude: number;
-  }) {
+  static async reverseGeocode(payload: { lng: number; lat: number }) {
     const response = await HttpClient.getClient().get(
       `${locationRoutes.reverseGeocode}`,
       { params: payload }
