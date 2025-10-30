@@ -2,7 +2,6 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { TokenRepository } from 'src/BussinessLayer/TokenRepository';
@@ -67,8 +66,6 @@ export class JwtAuthGuard implements CanActivate {
 
       return true;
     } catch (error: any) {
-      console.log(error);
-
       throw new UnauthorizedException(
         'You are not authorized to make this request. Invalid credentials.',
       );

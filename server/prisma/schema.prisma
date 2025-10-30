@@ -59,6 +59,29 @@ enum BusinessType {
   OTHER
 }
 
+enum Resource {
+  FILE
+  USER
+  USER_SESSION
+  USER_NOTIFICATION
+  USER_PERSONALIZATION
+  NOTIFICATION_SETTINGS
+  FAVORITE
+  BUSINESS
+  BUSINESS_CATEGORY
+  LOCATION
+  REVIEW
+  SUPPORT
+  WAITLIST
+}
+
+enum Action {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+}
+
 model File {
   id            Int               @id @default(autoincrement())
   referenceId   Int?
@@ -94,11 +117,34 @@ model Waitlist {
   updatedAt   DateTime @updatedAt
 }
 
+model Permission {
+  id                      Int                @id @default(autoincrement())
+  resource                Resource
+  actions                 Action[]
+
+  Role Role[]
+}
+
+model Role {
+  id                      Int                @id @default(autoincrement())
+  name                    UserRole           @default(USER)
+  permissions             Permission[]
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+
+  user                    User[]
+
+  @@unique([name])
+  @@index([name])
+}
+
 model User {
   id                      Int                @id @default(autoincrement())
   email                   String             @unique
   password                String
-  role                    UserRole           @default(USER)
+  // role                    UserRole           @default(USER)
+  roleId                  Int
+  role                    Role? @relation(fields: [roleId], references: [id])
   firstName               String
   lastName                String
   username                String?            @unique
