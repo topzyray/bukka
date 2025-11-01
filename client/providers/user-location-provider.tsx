@@ -13,19 +13,17 @@ interface CachedLocation {
   timestamp: number;
 }
 
-interface UserLocationContextType {
-  coordinates: Coordinate | null;
+interface IUserLocationContext {
+  userCoordinates: Coordinate | null;
+  setUserCoordinates: React.Dispatch<React.SetStateAction<Coordinate | null>>;
   loading: boolean;
   error: string | null;
-  refreshLocation: () => void;
+  refreshUserLocation: () => void;
 }
 
-const UserLocationContext = createContext<UserLocationContextType>({
-  coordinates: null,
-  loading: true,
-  error: null,
-  refreshLocation: () => {},
-});
+const UserLocationContext = createContext<IUserLocationContext>(
+  {} as IUserLocationContext
+);
 
 interface IUserLocationProvider {
   children: React.ReactNode;
@@ -36,7 +34,9 @@ export const UserLocationProvider = ({
   children,
   cacheDurationMs = 60 * 60 * 1000, // 1 hour default
 }: IUserLocationProvider) => {
-  const [coordinates, setCoordinates] = useState<Coordinate | null>(null);
+  const [userCoordinates, setUserCoordinates] = useState<Coordinate | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,7 +52,7 @@ export const UserLocationProvider = ({
           const isExpired = Date.now() - parsed.timestamp > cacheDurationMs;
 
           if (!isExpired && parsed.coords?.lat && parsed.coords?.lng) {
-            setCoordinates(parsed.coords);
+            setUserCoordinates(parsed.coords);
             setLoading(false);
             return;
           } else {
@@ -62,7 +62,6 @@ export const UserLocationProvider = ({
       }
     }
 
-    // Fallback to geolocation
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -80,13 +79,14 @@ export const UserLocationProvider = ({
             JSON.stringify(data)
           );
 
-          setCoordinates(newCoords);
+          setUserCoordinates(newCoords);
           setLoading(false);
         },
         (err) => {
           setError(err.message);
           setLoading(false);
-        }
+        },
+        { enableHighAccuracy: true }
       );
     } else {
       setError("Geolocation is not supported by your browser.");
@@ -94,35 +94,20 @@ export const UserLocationProvider = ({
     }
   };
 
-  // Initial load
   useEffect(() => {
     fetchLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const refreshLocation = () => fetchLocation(true); // Force prompt again
+  const refreshUserLocation = () => fetchLocation(true);
 
-  //   useEffect(() => {
-  //     if (!navigator.geolocation) {
-  //       setError("Geolocation is not supported by this browser.");
-  //       setLoading(false);
-  //       return;
-  //     }
-
-  //     navigator.geolocation.getCurrentPosition(
-  //       (pos) => {
-  //         setCoordinates({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-  //         setLoading(false);
-  //       },
-  //       (err) => {
-  //         setError(err.message || "Unable to retrieve coordinates.");
-  //         setLoading(false);
-  //       },
-  //       { enableHighAccuracy: true }
-  //     );
-  //   }, []);
-
-  const value = { coordinates, loading, error, refreshLocation };
+  const value = {
+    userCoordinates,
+    setUserCoordinates,
+    loading,
+    error,
+    refreshUserLocation,
+  };
   return (
     <UserLocationContext.Provider value={value}>
       {children}

@@ -29,16 +29,15 @@ export const useCustomQuery = <TData, TError = Error>(
     "queryKey" | "queryFn"
   > = {}
 ): UseQueryResult<TData, TError> => {
-  const dynamicQueryKey = [
-    ...((Array.isArray(queryKey) ? queryKey : [queryKey]) as (
-      | string
-      | number
-    )[]),
+  const base = Array.isArray(queryKey) ? queryKey : [queryKey];
+  const dynamicQueryKey: QueryKey = [
+    ...base,
     params?.id ?? null,
-    params?.page ?? null,
-    params?.limit ?? null,
-    params?.searchParams ?? null,
-  ].filter((key) => key !== null && key !== undefined);
+    params?.pageNumber ?? null,
+    params?.pageSize ?? null,
+    params?.search ?? null,
+    Object.keys(params || {}).length > 0 ? params : null,
+  ].filter((k) => k !== null && k !== undefined);
 
   const query = useQuery<TData, TError>({
     queryKey: dynamicQueryKey,

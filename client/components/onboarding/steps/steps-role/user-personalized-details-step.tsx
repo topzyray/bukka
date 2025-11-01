@@ -118,7 +118,9 @@ export function UserPersonalizedDetailsStep({
 
   const onSubmit = (data: UserPersonalizationFormData) => {
     if (!user?.id) {
-      toast.error("User not found. Please sign in again.");
+      toast.error("User not found.", {
+        description: "Please sign in again.",
+      });
       return;
     }
     createUserPersonalization({

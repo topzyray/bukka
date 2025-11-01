@@ -4,30 +4,18 @@ import React, { useState, memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import {
-  Star,
-  Heart,
-  MapPin,
-  Clock,
-  Phone,
-  ExternalLink,
-  Info,
-} from "lucide-react";
+import { Star, MapPin, Clock, Phone, ExternalLink, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useCurrentUser } from "@/server/queries";
 import { useRouter } from "next/navigation";
 import { Business } from "@/server/interfaces/Business";
-import { useToggleFavorite } from "@/server/mutations/favorite/use-toggle-favorite";
 import { useBusinessFiles } from "@/server/queries/use-business-files";
 import { FileCategoryEnum } from "@/server/enums";
 import { File } from "@/server/interfaces/File";
 import { useDistance } from "@/hooks/use-distance";
 import { FavoriteButton } from "./favorite-button";
-import { useFavorites } from "@/server/queries/use-favorites";
-import { Favorite } from "@/server/interfaces/Favorite";
 
 interface BusinessCardProps {
   business: Business;
@@ -44,35 +32,16 @@ export const BusinessCard = memo(function BusinessCard({
 }: BusinessCardProps) {
   const [imageError, setImageError] = useState(false);
   const router = useRouter();
-  const { data: currentUser } = useCurrentUser();
+
   const { data: businessFiles, isLoading: isLoadingBusinessFiles } =
     useBusinessFiles({
       businessId: business.id,
     });
-  const { data: userFavoriteData } = useFavorites();
-  console.log("USER FAVORITE: ", userFavoriteData);
-
-  const toggleFavorite = useToggleFavorite();
 
   const { formatted } = useDistance({
     targetLat: business.location.latitude,
     targetLng: business.location.longitude,
   });
-
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-
-    if (!currentUser) {
-      router.push("/signin");
-      return;
-    }
-
-    toggleFavorite.mutate({
-      businessId: business?.id,
-      userId: currentUser?.id,
-    });
-  };
 
   const renderRating = () =>
     business.rating ? (
@@ -107,24 +76,15 @@ export const BusinessCard = memo(function BusinessCard({
         )
       : null;
 
-  const isUserFavorite =
-    userFavoriteData?.responseData?.data &&
-    userFavoriteData?.responseData?.data.find(
-      (fav: Favorite) =>
-        fav.businessId === business?.id && fav.userId === currentUser?.id
-    );
-  console.log("BUSINESS: ", business);
-  console.log("IS FAV: ", !!isUserFavorite);
-
   if (variant === "compact") {
     return (
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className={cn("cursor-pointer", className)}
+        className={cn("cursor-pointer h-full", className)}
         onClick={onClick}
       >
-        <Card className="overflow-hidden shadow-card hover:shadow-elegant transition-smooth py-0">
+        <Card className="overflow-hidden shadow-card hover:shadow-elegant h-full transition-smooth py-0">
           <CardContent className="p-3 flex items-center gap-3">
             <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
               {!imageError ? (
@@ -158,7 +118,7 @@ export const BusinessCard = memo(function BusinessCard({
               </div>
             </div>
 
-            <BukkaButton
+            {/* <BukkaButton
               variant="ghost"
               size="icon"
               className="flex-shrink-0 w-8 h-8"
@@ -173,11 +133,11 @@ export const BusinessCard = memo(function BusinessCard({
                     : "text-muted-foreground"
                 )}
               />
-            </BukkaButton>
-            {/* <FavoriteButton
+            </BukkaButton> */}
+            <FavoriteButton
               businessId={business?.id}
-              isFavorite={!!isUserFavorite}
-            /> */}
+              className="flex-shrink-0 w-8 h-8"
+            />
           </CardContent>
         </Card>
       </motion.div>
@@ -190,10 +150,10 @@ export const BusinessCard = memo(function BusinessCard({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.3 }}
-      className={cn("cursor-pointer", className)}
+      className={cn("cursor-pointer h-full", className)}
       onClick={onClick}
     >
-      <Card className="py-0 overflow-hidden shadow-card hover:shadow-elegant transition-smooth group gap-0">
+      <Card className="py-0 overflow-hidden shadow-card hover:shadow-elegant h-full transition-smooth group gap-0">
         <div className="relative overflow-hidden">
           {!imageError ? (
             <Image
@@ -212,7 +172,7 @@ export const BusinessCard = memo(function BusinessCard({
             </div>
           )}
 
-          <BukkaButton
+          {/* <BukkaButton
             variant="glass"
             size="icon"
             className="absolute top-3 right-3 w-8 h-8"
@@ -227,7 +187,12 @@ export const BusinessCard = memo(function BusinessCard({
                   : "text-muted-foreground"
               )}
             />
-          </BukkaButton>
+          </BukkaButton> */}
+
+          <FavoriteButton
+            businessId={business?.id}
+            className="absolute top-3 right-3 w-8 h-8"
+          />
 
           {business.openingHours?.openNow !== undefined && (
             <Badge

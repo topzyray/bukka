@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, HttpStatus } from '@nestjs/common';
 import { FavoriteDataAgent } from 'src/DataLayer/DataAgents/FavoriteDataAgent';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
@@ -26,14 +26,24 @@ export class FavoriteRepository {
     if (existing) {
       await this.favoriteDataAgent.deleteFavorite(existing.id as number);
       await invalidateCache('user:favorites', { id: loggedInUser.id });
-      return BukkaResponse.DeleteResponse('Favorite', true);
+      return BukkaResponse.CustomResponse(
+        'Business removed from your favourite',
+        HttpStatus.OK,
+        true,
+        null,
+      );
     }
     const created = await this.favoriteDataAgent.createFavorite({
       userId: loggedInUser.id,
       businessId: dto.businessId,
     } as any);
     await invalidateCache('user:favorites', { id: loggedInUser.id });
-    return BukkaResponse.CreateResponse('Favorite', created);
+    return BukkaResponse.CustomResponse(
+      'Business added to your favourite',
+      HttpStatus.CREATED,
+      true,
+      created,
+    );
   }
 
   async addFavorite(dto: CreateFavoriteDto) {

@@ -14,11 +14,11 @@ import { BukkaButton } from "@/components/ui/button-variants";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { Header } from "@/components/layouts/Header";
-import { Footer } from "@/components/layouts/Footer";
+import { Header } from "@/components/layouts/header";
+import { Footer } from "@/components/layouts/footer";
 import { TypeAnimation } from "react-type-animation";
 import { Business } from "@/server/interfaces/Business";
-import { useBusinesses } from "@/server/queries/use-businesses-query";
+import { useInfiniteBusinessesQuery } from "@/server/queries/use-businesses-query";
 import { BusinessCard } from "../business/components/business-card";
 import { TextHelper } from "@/helpers";
 import { BusinessTypeEnum } from "@/server/enums/BusinessTypeEnum";
@@ -45,7 +45,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const router = useRouter();
 
-  const { data, isLoading, isError, error } = useBusinesses({});
+  const { data, isLoading, isError, error } = useInfiniteBusinessesQuery({});
 
   const featuredBusinesses: Business[] = useMemo(
     () => data?.pages.flatMap((p) => p.data) ?? [],

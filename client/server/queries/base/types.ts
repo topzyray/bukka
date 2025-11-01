@@ -7,10 +7,10 @@ export interface PagedResponse<T> {
 }
 
 export interface QueryParams {
-  page?: number;
-  limit?: number;
+  pageNumber?: number;
+  pageSize?: number;
+  search?: string;
   filter?: string;
-  searchParams?: string;
   id?: string | number | string[] | number[];
   [key: string]: any; // allow additional params if needed
 }

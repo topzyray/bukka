@@ -48,7 +48,7 @@ export class BusinessCategoryDataAgent {
 
     const spec: QuerySpec = {
       filter,
-      sort: [{ field: 'createdAt', direction: 'desc' }],
+      sort: [{ field: 'name', direction: 'asc' }],
       pagination: { page: pageNumber, pageSize },
     };
 

@@ -27,13 +27,19 @@ import { LocationCoordsHelper } from "@/helpers/location-coords-helper";
 import Image from "next/image";
 import { SearchPlacesWithAutocomplete } from "../search-places-with-autocomplete";
 import { envConfig } from "@/configs";
-import { useGlobalState } from "@/providers";
+import { useGlobalState, useUserLocation } from "@/providers";
 import { IconHelper } from "@/helpers/icon-helper";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { debounce } from "@/utils";
+import { Badge } from "@/components/ui/badge";
+import { TextHelper } from "@/helpers";
+import { Separator } from "@/components/ui/separator";
+import { FavoriteButton } from "../../business/components/favorite-button";
+import { BukkaButton } from "@/components/ui/button-variants";
+import { View } from "lucide-react";
 
 const ICONS: Record<BusinessTypeEnum, L.Icon> = {
   [BusinessTypeEnum.RESTAURANT]: IconHelper.createColoredIcon(
@@ -119,6 +125,8 @@ export function LocationIQMap({
   onMarkerClick,
 }: ILocationIQMap) {
   const { coordinates, setCoordinates } = useGlobalState();
+  const { userCoordinates } = useUserLocation();
+
   const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(
     initial ?? null
   );
@@ -134,38 +142,29 @@ export function LocationIQMap({
       setMarker(coordinates);
       return;
     }
+
     if (initial && initial.lat != null && initial.lng != null) {
       setMarker(initial);
       return;
     }
+
     if (geoAttempted.current) return;
     geoAttempted.current = true;
 
-    if (typeof navigator !== "undefined" && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const coords = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          };
-          setMarker(coords);
-          if (
-            !lastEmitted.current ||
-            LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
-          ) {
-            lastEmitted.current = coords;
-            debouncedSelect(coords.lat, coords.lng);
-          }
-        },
-        () => {
-          setMarker(DEFAULT_CENTER);
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    } else {
-      setMarker(DEFAULT_CENTER);
+    if (userCoordinates) {
+      setMarker(userCoordinates);
+      if (
+        !lastEmitted.current ||
+        LocationCoordsHelper.coordsDiffer(lastEmitted.current, userCoordinates)
+      ) {
+        lastEmitted.current = userCoordinates;
+        debouncedSelect(userCoordinates.lat, userCoordinates.lng);
+      }
+      return;
     }
-  }, [coordinates, initial, debouncedSelect]);
+
+    setMarker(DEFAULT_CENTER);
+  }, [coordinates, initial, debouncedSelect, userCoordinates]);
 
   useEffect(() => {
     if (!initial || initial.lat == null || initial.lng == null) return;
@@ -300,49 +299,51 @@ export function LocationIQMap({
             >
               <Popup>
                 <div className="flex flex-col gap-2">
-                  <div className="font-semibold text-base">{b?.name}</div>
-                  {b?.category && (
-                    <div className="text-xs text-muted-foreground">
-                      {b.category.name}
-                    </div>
-                  )}
-                  {b?.location?.address && (
-                    <div className="text-xs text-muted-foreground">
-                      {b.location.address}
-                    </div>
-                  )}
+                  <div className="flex justify-between gap-4">
+                    <div className="font-semibold text-base">{b?.name}</div>
+                    <Badge className="capitalize">
+                      {TextHelper.normalizeText(b?.type)}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    {b?.category && (
+                      <div className="text-xs text-muted-foreground">
+                        {b.category.name}
+                      </div>
+                    )}
+                    {b?.location?.address && (
+                      <div className="text-xs text-muted-foreground">
+                        {b.location.address}
+                      </div>
+                    )}
+                  </div>
+                  <Separator />
 
-                  <div className="flex gap-2 mt-2">
-                    <Button
-                      variant="ghost"
+                  <div className="flex gap-2">
+                    <BukkaButton
+                      variant="glow"
                       size="sm"
+                      className="text-xs"
                       onClick={() => {
-                        // Prefer next/navigation router
                         try {
                           router.push(`/businesses/${b.id}`);
                         } catch {
-                          // fallback to window
                           window.location.href = `/businesses/${b.id}`;
                         }
                       }}
+                      title={`More Details about ${b.name}`}
                     >
+                      <View />
                       View Details
-                    </Button>
-                    <Button
-                      variant="outline"
+                    </BukkaButton>
+
+                    <FavoriteButton
+                      variant="float"
                       size="sm"
-                      onClick={() => {
-                        // Toggle favorite inline if desired (optional)
-                        // You can call a global handler or simply open the details page
-                        try {
-                          router.push(`/businesses/${b.id}`);
-                        } catch {
-                          window.location.href = `/businesses/${b.id}`;
-                        }
-                      }}
-                    >
-                      Add to Favourite
-                    </Button>
+                      useIcon={false}
+                      businessId={b.id}
+                      className="rounded-lg"
+                    />
                   </div>
                 </div>
               </Popup>
@@ -419,49 +420,43 @@ export function RecenterButton({
 }) {
   const map = useMap();
   const { setCoordinates } = useGlobalState();
+  const {
+    userCoordinates,
+    setUserCoordinates,
+    loading: loadingUserLocation,
+    error: userCoordingError,
+    refreshUserLocation,
+  } = useUserLocation();
+
   const [locating, setLocating] = useState(false);
-  const [userLocation, setUserLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
 
   const handleLocate = () => {
-    // ✅ If we already have a user location, just re-center (don’t fetch again)
-    if (userLocation) {
-      map.flyTo([userLocation.lat, userLocation.lng], 16, { animate: true });
-      toast.info("Centered on your location");
-      return;
-    }
-
-    if (!navigator.geolocation) {
-      toast.error("Geolocation not supported");
-      return;
-    }
-
     setLocating(true);
+    if (loadingUserLocation) {
+      toast.info("Fetching your location...");
+      return;
+    }
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const coords = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        };
+    if (userCoordingError) {
+      toast.error("Failed to fetch location", {
+        description: userCoordingError,
+      });
+      return;
+    }
 
-        setUserLocation(coords);
-        setCoordinates(coords);
-        map.flyTo([coords.lat, coords.lng], 16, { animate: true });
-        onLocate(coords);
+    if (!userCoordinates) {
+      refreshUserLocation();
+      return;
+    }
 
-        toast.success("Located your position");
-        setLocating(false);
-      },
-      (err) => {
-        console.error("Geolocation error:", err);
-        toast.error("Unable to get your location");
-        setLocating(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
+    map.flyTo([userCoordinates.lat, userCoordinates.lng], 16, {
+      animate: true,
+    });
+    onLocate(userCoordinates);
+    setCoordinates(userCoordinates);
+    toast.success("Centered on your location");
+
+    setLocating(false);
   };
 
   return (
@@ -473,7 +468,7 @@ export function RecenterButton({
         onClick={handleLocate}
         onContextMenu={(e) => {
           e.preventDefault();
-          setUserLocation(null);
+          setUserCoordinates(null);
           toast("Next click will fetch your live location again");
         }}
         className="relative hover:text-blue-600 dark:hover:text-blue-400 transition-colors rounded-full"
@@ -508,30 +503,30 @@ export function RecenterButton({
   );
 }
 
-export async function fetchLocationIQRoute(
-  start: { lat: number; lng: number },
-  end: { lat: number; lng: number },
-  mode: "driving" | "walking" | "cycling" = "driving"
-) {
-  const apiKey = process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY;
-  if (!apiKey) throw new Error("LocationIQ API key missing");
+// export async function fetchLocationIQRoute(
+//   start: { lat: number; lng: number },
+//   end: { lat: number; lng: number },
+//   mode: "driving" | "walking" | "cycling" = "driving"
+// ) {
+//   const apiKey = process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY;
+//   if (!apiKey) throw new Error("LocationIQ API key missing");
 
-  const url = `https://us1.locationiq.com/v1/directions/driving/${start.lng},${start.lat};${end.lng},${end.lat}?key=${apiKey}&overview=full&geometries=geojson`;
+//   const url = `https://us1.locationiq.com/v1/directions/driving/${start.lng},${start.lat};${end.lng},${end.lat}?key=${apiKey}&overview=full&geometries=geojson`;
 
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch route from LocationIQ");
-  const data = await res.json();
+//   const res = await fetch(url);
+//   if (!res.ok) throw new Error("Failed to fetch route from LocationIQ");
+//   const data = await res.json();
 
-  const route = data.routes?.[0];
-  if (!route) throw new Error("No route found");
+//   const route = data.routes?.[0];
+//   if (!route) throw new Error("No route found");
 
-  const { distance, duration, geometry } = route;
-  return {
-    coordinates: geometry.coordinates.map(([lng, lat]: [number, number]) => [
-      lat,
-      lng,
-    ]),
-    distance, // in meters
-    duration, // in seconds
-  };
-}
+//   const { distance, duration, geometry } = route;
+//   return {
+//     coordinates: geometry.coordinates.map(([lng, lat]: [number, number]) => [
+//       lat,
+//       lng,
+//     ]),
+//     distance, // in meters
+//     duration, // in seconds
+//   };
+// }

@@ -34,7 +34,9 @@ export default function RiderVehicleStep({ onNext, onBack, finalize }: any) {
       if (finalize) await finalize();
       else onNext();
     } catch (err: any) {
-      toast.error(err.message ?? "Failed to save vehicle details");
+      toast.error("Failure", {
+        description: err.message ?? "Failed to save vehicle details",
+      });
     } finally {
       setLoading(false);
     }

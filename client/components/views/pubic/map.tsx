@@ -7,7 +7,7 @@ import { BukkaButton } from "@/components/ui/button-variants";
 import { Card, CardContent } from "@/components/ui/card";
 import MapWrapper from "@/components/map/MapWrapper";
 import { FilterDialog } from "@/components/ui/filter-dialog";
-import { Header } from "../../../components/layouts/Header";
+import { Header } from "../../layouts/header";
 
 const Map = () => {
   const [showSidebar, setShowSidebar] = useState(true);

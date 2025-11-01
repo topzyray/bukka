@@ -27,15 +27,16 @@ export class BusinessCategoryApiService {
   }
 
   static async updateCategory(payload: UpdateCategoryDto) {
+    const { id, ...updatePayload } = payload;
     const response = await HttpClient.getClient().put(
-      `${businessCategoryRoutes.updateCategory}`,
-      payload
+      `${businessCategoryRoutes.updateCategory}/${id}`,
+      updatePayload
     );
     return response.data;
   }
 
   static async deleteCategory(categoryId: number) {
-    const response = await HttpClient.getClient().get(
+    const response = await HttpClient.getClient().delete(
       `${businessCategoryRoutes.deleteCategory}/${categoryId}`
     );
     return response.data;

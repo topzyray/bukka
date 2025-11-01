@@ -1,47 +1,66 @@
-import { useCustomInfiniteQuery, useCustomQuery } from "@/server/queries/base";
+import {
+  BukkaResponse,
+  QueryParams,
+  useCustomInfiniteQuery,
+  useCustomQuery,
+} from "@/server/queries/base";
 import { BusinessCategoryApiService } from "../services/BusinessCategoryApiService";
 import { BusinessCategory } from "../interfaces/BusinessCategory";
-import { User } from "../interfaces/User";
 
-export const useBusinessCategories = (enabled = true) =>
-  useCustomQuery(
-    ["admin:business-categories"],
-    () =>
-      BusinessCategoryApiService.getCategories({
-        pageNumber: 1,
-        pageSize: 100,
-      }),
-    { enabled, staleTime: 1000 * 60 * 10 }
-  );
-
-export const useInfiniteBusinessCategories = ({
-  user,
-  limit,
-  type,
-  searchQuery = "",
-  initialPageParam,
+export const useInfiniteCategoriesQuery = ({
+  search = "",
+  filters = {},
+  pageSize = 10,
+  enabled = true,
 }: {
-  user?: User;
-  limit?: number;
-  type?: string;
-  searchQuery?: string;
-  initialPageParam?: number;
+  search?: string;
+  filters?: Record<string, any>;
+  pageSize?: number;
+  enabled?: boolean;
 }) => {
   return useCustomInfiniteQuery<BusinessCategory>(
-    ["business-categories", user?.id],
-    ({ pageNumber, ...rest }) =>
+    ["business-categories-infinite", search, filters],
+    ({ pageNumber, ...filters }) =>
       BusinessCategoryApiService.getCategories({
-        pageNumber: pageNumber,
-        pageSize: limit,
-        search: searchQuery,
-        type: type,
-        ...rest,
+        pageNumber,
+        pageSize,
+        search,
+        ...filters,
       }),
     {
-      params: { searchParams: searchQuery, type },
-      enabled: !!user?.id,
-      initialPageParam: initialPageParam ?? 1,
-      staleTime: 1000 * 60 * 5,
+      params: { search, pageSize, ...filters },
+      initialPageParam: 1,
+      enabled,
+    }
+  );
+};
+
+export const useCategoriesQuery = ({
+  pageNumber = 1,
+  search = "",
+  filters = {},
+  pageSize = 10,
+  enabled = true,
+}: {
+  pageNumber?: number;
+  search?: string;
+  filters?: Record<string, any>;
+  pageSize?: number;
+  enabled?: boolean;
+}) => {
+  return useCustomQuery<BukkaResponse<BusinessCategory[]>, Error>(
+    ["business-categories", search, filters, pageNumber, pageSize],
+    (params?: QueryParams) =>
+      BusinessCategoryApiService.getCategories({
+        pageNumber: params?.pageNumber ?? pageNumber,
+        pageSize: params?.pageSize ?? pageSize,
+        search: params?.search ?? search,
+        ...filters,
+        ...params,
+      }),
+    {
+      params: { pageNumber, pageSize, search, ...filters },
+      enabled,
     }
   );
 };

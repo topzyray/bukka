@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { BusinessCategory } from "@/server/interfaces/BusinessCategory";
 import { DataTable } from "../../../base/data-table";
@@ -10,103 +10,71 @@ import {
   PageWrapperContent,
   PageWrapperContentWithFramer,
 } from "../../../../ui/page-wrapper";
-import { CreateUpdateBusinessCategoryModal } from "../../../../forms/business/create-update-business-category-form";
-import { useAuth } from "@/providers";
-import { User } from "@/server/interfaces/User";
-import { useInfiniteBusinessCategories } from "@/server/queries/use-businesses-category-query";
-
-/**
- * This component:
- * - uses useCustomInfiniteQuery to fetch pages
- * - maintains a pageNumber state (1-based)
- * - when user asks to navigate to a page we don't have yet, we fetchNextPage until we have it
- * - uses the normal DataTable props (data is the current-page rows)
- */
+import { useCategoriesQuery } from "@/server/queries/use-businesses-category-query";
+import { CreateUpdateCategoryModal } from "@/components/forms/business/create-update-category-modal";
+import { Button } from "@/components/ui/button";
+import { PaginationHelper } from "@/helpers/pagination-helper";
+import { useDeleteCategory } from "@/server/mutations/category/use-category-mutation";
+import { BusinessTypeEnum } from "@/server/enums/BusinessTypeEnum";
 
 export default function BusinessCategoryList() {
   const PAGE_SIZE = 10;
+  const queryClient = useQueryClient();
+
+  const [mode, setMode] = useState<"create" | "edit">("create");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [initialData, setInitialData] = useState<
+    Partial<BusinessCategory> | undefined
+  >(undefined);
+  const [currentItemDeleting, setCurrentItemDeleting] = useState<number | null>(
+    null
+  );
+
   const [page, setPage] = React.useState<number>(1);
   const [search, setSearch] = React.useState<string>("");
   const [filters, setFilters] = React.useState<Record<string, any>>({});
-  const queryClient = useQueryClient();
-  const { user } = useAuth();
 
-  const {
-    data: infiniteData,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    isLoading,
-    refetch,
-  } = useInfiniteBusinessCategories({
-    user: user as User,
-    limit: PAGE_SIZE,
-    searchQuery: search,
-    type: filters.type,
+  const deleteCategoryMutation = useDeleteCategory({
+    onSuccess: () => {
+      setCurrentItemDeleting(null);
+    },
   });
 
-  // Helper: find page object (NormalizedPagedData) for a page number
-  const findPage = useCallback(
-    (pn: number) => {
-      return infiniteData?.pages?.find((p) => p.pageNumber === pn);
-    },
-    [infiniteData?.pages]
-  );
+  const { data: categoriesData, isLoading } = useCategoriesQuery({
+    search,
+    filters,
+    pageNumber: page,
+    pageSize: PAGE_SIZE,
+    enabled: true,
+  });
 
-  // When user clicks to go to a page:
+  const total = categoriesData?.responseData?.total ?? 0;
+  const currentPagedData = React.useMemo(() => {
+    return categoriesData?.responseData?.data ?? [];
+  }, [categoriesData]);
+
   const goToPage = async (pn: number) => {
-    if (pn <= 0) return;
-    // if page already loaded, simply set local state
-    if (findPage(pn)) {
-      setPage(pn);
-      return;
-    }
-    // otherwise, fetch next pages until we reach it (note: this will sequentially call fetchNextPage)
-    // guard to avoid infinite loop
-    let safety = 0;
-    while (!findPage(pn) && safety < 20) {
-      await fetchNextPage();
-      safety++;
-      // if no more pages to fetch, break
-      const last = infiniteData?.pages?.[infiniteData.pages.length - 1];
-      if (last && last.pageNumber >= pn) break;
-    }
-    // finally set page (if found fallback to last available)
-    setPage(
-      findPage(pn)
-        ? pn
-        : infiniteData?.pages?.[infiniteData.pages.length - 1]?.pageNumber ?? 1
-    );
+    await PaginationHelper.goToPage({
+      pn: pn,
+      total: total,
+      pageSize: PAGE_SIZE,
+      queryClient: queryClient,
+      queryKey: ["business-categories"],
+      setPage: setPage,
+    });
   };
 
-  // Flattened data for the page (or empty)
-  const currentPageData = React.useMemo(() => {
-    const pageObj = findPage(page) ?? infiniteData?.pages?.[0];
-    return pageObj?.data ?? [];
-  }, [findPage, infiniteData?.pages, page]);
-
-  // total records (from first page meta if available)
-  const total = infiniteData?.pages?.[0]?.totalRecords ?? 0;
-
-  // sorting handler (emit to refetch with sort params)
   const onSortChange = (sorting: any) => {
-    // react to sorting state change: call refetch with appropriate params if you want server-side sort
-    // for example: extract first sorted column
     const s = sorting?.[0];
     const sortBy = s?.id;
     const sortOrder = s?.desc ? "desc" : "asc";
-    // update filters or call refetch via queryClient if required
-    // Here we set filters and refetch
     setFilters((f) => ({ ...f, sortBy, sortOrder }));
-    // clear existing pages and refetch from page 1
     queryClient.removeQueries({ queryKey: ["business-categories"] });
     setPage(1);
   };
 
   const onSearchChange = (term: string) => {
     setSearch(term);
-    // clear cache and refetch
     queryClient.removeQueries({ queryKey: ["business-categories"] });
     setPage(1);
   };
@@ -117,22 +85,43 @@ export default function BusinessCategoryList() {
     setPage(1);
   };
 
-  // edit/delete callbacks
+  const handleCreate = () => {
+    setMode("create");
+    setInitialData(undefined);
+    setIsModalOpen(true);
+  };
+
   const handleEdit = (row: BusinessCategory) => {
-    // open modal with row (you wire BusinessFormModal)
-    // ...
+    setMode("edit");
+    setInitialData(row);
+    setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    // implement with your delete mutation hook
-    // await deleteMutation.mutateAsync(id)
-    // then refetch or invalidate queries
+  const handleDelete = useCallback(
+    async (id: number) => {
+      setCurrentItemDeleting(id);
+      deleteCategoryMutation.mutate(id);
+    },
+    [deleteCategoryMutation]
+  );
+
+  const handleOpenChange = (open: boolean) => {
+    setIsModalOpen(open);
+    if (!open) {
+      setMode("create");
+      setInitialData(undefined);
+    }
   };
 
-  // build columns
   const columns = React.useMemo(
-    () => businessCategoryColumns(handleEdit, handleDelete),
-    []
+    () =>
+      businessCategoryColumns(
+        handleEdit,
+        handleDelete,
+        deleteCategoryMutation.isPending,
+        currentItemDeleting
+      ),
+    [currentItemDeleting, deleteCategoryMutation.isPending, handleDelete]
   );
 
   return (
@@ -149,13 +138,18 @@ export default function BusinessCategoryList() {
               </div>
 
               <div className="flex items-center gap-2">
-                <CreateUpdateBusinessCategoryModal
-                  mode="create"
+                <Button onClick={handleCreate}>Add Category</Button>
+                <CreateUpdateCategoryModal
+                  open={isModalOpen}
+                  onOpenChange={handleOpenChange}
+                  mode={mode}
+                  initialData={mode === "edit" ? initialData : undefined}
                   onSuccess={() => {
                     queryClient.removeQueries({
                       queryKey: ["business-categories"],
                     });
                     setPage(1);
+                    setIsModalOpen(false);
                   }}
                 />
               </div>
@@ -164,7 +158,7 @@ export default function BusinessCategoryList() {
             <div>
               <DataTable
                 columns={columns}
-                data={currentPageData}
+                data={currentPagedData}
                 totalRecords={total}
                 pageNumber={page}
                 pageSize={PAGE_SIZE}
@@ -177,24 +171,58 @@ export default function BusinessCategoryList() {
                     key: "type",
                     label: "Type",
                     options: [
-                      { label: "ALL", value: undefined },
-                      { label: "RESTAURANT", value: "RESTAURANT" },
-                      { label: "BAR", value: "BAR" },
-                      { label: "LOUNGE", value: "LOUNGE" },
-                      { label: "CATERING", value: "CATERING" },
-                      { label: "BAKERY", value: "BAKERY" },
-                      { label: "FOOD VENDOR", value: "FOOD_VENDOR" },
-                      { label: "STREET EATRY", value: "STREET_EATRY" },
-                      { label: "GROCERY", value: "GROCERY" },
+                      {
+                        label: "ALL",
+                        value: undefined,
+                      },
+                      {
+                        label: BusinessTypeEnum.RESTAURANT,
+                        value: BusinessTypeEnum.RESTAURANT,
+                      },
+                      {
+                        label: BusinessTypeEnum.BAR,
+                        value: BusinessTypeEnum.BAR,
+                      },
+                      {
+                        label: BusinessTypeEnum.LOUNGE,
+                        value: BusinessTypeEnum.LOUNGE,
+                      },
+                      {
+                        label: BusinessTypeEnum.CATERING,
+                        value: BusinessTypeEnum.CATERING,
+                      },
+                      {
+                        label: BusinessTypeEnum.BAKERY,
+                        value: BusinessTypeEnum.BAKERY,
+                      },
+                      {
+                        label: "FOOD VENDOR",
+                        value: BusinessTypeEnum.FOOD_VENDOR,
+                      },
+                      {
+                        label: "FAST FOOD",
+                        value: BusinessTypeEnum.FAST_FOOD,
+                      },
+                      {
+                        label: "STREET EATRY",
+                        value: BusinessTypeEnum.STREET_EATRY,
+                      },
+                      {
+                        label: BusinessTypeEnum.GROCERY,
+                        value: BusinessTypeEnum.GROCERY,
+                      },
                       {
                         label: "DELIVERY SERVICE",
-                        value: "DELIVERY_SERVICE",
+                        value: BusinessTypeEnum.DELIVERY_SERVICE,
                       },
-                      { label: "OTHER", value: "OTHER" },
+                      {
+                        label: BusinessTypeEnum.OTHER,
+                        value: BusinessTypeEnum.OTHER,
+                      },
                     ],
                   },
                 ]}
-                isLoading={isLoading || isFetchingNextPage}
+                isLoading={isLoading}
                 selectable
                 enableDateFilter
                 idAccessor={(r) => (r as BusinessCategory).id}
