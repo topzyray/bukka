@@ -16,9 +16,9 @@ import { BukkaButton } from "@/components/ui/button-variants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Header } from "@/components/layouts/Header";
+import { Header } from "@/components/layouts/header";
 import Image from "next/image";
-import { Footer } from "@/components/layouts/Footer";
+import { Footer } from "@/components/layouts/footer";
 
 const RestaurantDetail = () => {
   // Mock restaurant data

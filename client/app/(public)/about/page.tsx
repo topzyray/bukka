@@ -3,8 +3,8 @@
 import { motion } from "framer-motion";
 import { Target, Users, Award, Heart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Header } from "../../../components/layouts/Header";
-import { Footer } from "../../../components/layouts/Footer";
+import { Header } from "../../../components/layouts/header";
+import { Footer } from "../../../components/layouts/footer";
 
 const About = () => {
   const values = [

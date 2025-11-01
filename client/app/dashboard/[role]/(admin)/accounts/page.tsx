@@ -1,7 +1,5 @@
+import UsersList from "@/components/views/dashboard/admin/users-list";
+
 export default function BusinessCategories() {
-  return (
-    <div>
-      <h1>Work in progress</h1>
-    </div>
-  );
+  return <UsersList />;
 }

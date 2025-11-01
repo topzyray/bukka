@@ -7,6 +7,6 @@ export class UserManagementApiService {
       `${userManagementRoutes.adminGetAllUsers}`,
       { params }
     );
-    return response.data?.responseData;
+    return response.data;
   }
 }

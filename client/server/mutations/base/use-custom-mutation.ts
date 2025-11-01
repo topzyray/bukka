@@ -1,7 +1,7 @@
-import { TextHelper } from "@/helpers/text-helper";
-import { extractErrorMessage } from "@/utils";
-import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { extractErrorMessage } from "@/utils";
+import { TextHelper } from "@/helpers/text-helper";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
 interface UseCustomMutationOptions<TData, TError, TVariables, TContext>
   extends UseMutationOptions<TData, TError, TVariables, TContext> {
@@ -36,11 +36,12 @@ export const useCustomMutation = <
     mutationFn,
     onSuccess: (data, variables, context, mutation) => {
       if (toastStatusMessage) {
-        toast.success(
-          onSuccessMessage ??
+        toast.success("Success", {
+          description:
+            onSuccessMessage ??
             TextHelper.capitalize((data as any)?.responseMessage) ??
-            "Operation successful"
-        );
+            "Operation successful",
+        });
       }
 
       onSuccessCallback?.(data);
@@ -48,11 +49,12 @@ export const useCustomMutation = <
     },
     onError: (error, variables, context, mutation) => {
       if (toastStatusMessage) {
-        toast.error(
-          onErrorMessage ??
+        toast.error("Failure", {
+          description:
+            onErrorMessage ??
             TextHelper.capitalize(extractErrorMessage(error as any)) ??
-            "Something went wrong"
-        );
+            "Something went wrong",
+        });
       }
 
       onErrorCallback?.(error);

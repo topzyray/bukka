@@ -2,13 +2,15 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Edit, Trash } from "lucide-react";
+import { ArrowUpDown, Edit, Loader2, Trash } from "lucide-react";
 import { BusinessCategory } from "@/server/interfaces/BusinessCategory";
 import { TextHelper } from "@/helpers";
 
 export const businessCategoryColumns = (
   onEdit: (data: BusinessCategory) => void,
-  onDelete: (id: number) => void
+  onDelete: (id: number) => void,
+  isdeleting: boolean,
+  currentItemDeleting: number | null
 ): ColumnDef<BusinessCategory>[] => [
   {
     accessorKey: "name",
@@ -118,18 +120,22 @@ export const businessCategoryColumns = (
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const business = row.original;
+      const category = row.original;
       return (
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => onEdit(business)}>
+          <Button variant="outline" size="sm" onClick={() => onEdit(category)}>
             <Edit size={16} />
           </Button>
           <Button
             variant="destructive"
             size="sm"
-            onClick={() => onDelete(business.id)}
+            onClick={() => onDelete(category.id)}
           >
-            <Trash size={16} />
+            {isdeleting && currentItemDeleting === category.id ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Trash size={16} />
+            )}
           </Button>
         </div>
       );

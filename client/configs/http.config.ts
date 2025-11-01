@@ -145,7 +145,9 @@ class HttpClient {
         if (hadSession && !HttpClient.sessionExpiredFired) {
           HttpClient.sessionExpiredFired = true;
 
-          toast.error("Your session has expired. Please sign in again.");
+          toast.error("Your session has expired.", {
+            description: " Please sign in again.",
+          });
 
           const sessionEvent = new CustomEvent("sessionExpired", {
             detail: { reason: "refresh_token_failed", time: new Date() },
@@ -162,7 +164,9 @@ class HttpClient {
     }
 
     if (error.response?.status === HttpStatusCode.Forbidden) {
-      toast.error("You do not have permission to perform this action.");
+      toast.error("Failure", {
+        description: "You do not have permission to perform this action.",
+      });
       return Promise.reject(error);
     }
 

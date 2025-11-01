@@ -77,7 +77,9 @@ export function ImageUploadStep({
 
   const onSubmit = async (data: ImageUploadFormData) => {
     if (!user?.id) {
-      toast.error("User not found. Please sign in again.");
+      toast.error("User not found.", {
+        description: "Please sign in again",
+      });
       return;
     }
 

@@ -54,13 +54,12 @@ export const useProfileUpdate = () => {
   });
 
   const updateUserProfileMutation = useCustomMutation(AuthApiService.signUp, {
-    onSuccessCallback: (data) => {
-      console.log("SIGN UP DATA: ", data);
-    },
+    onSuccessCallback: (data) => {},
 
     onErrorCallback: (error) => {
-      console.log("ERROR SIGNING UP USER: ", error);
-      toast.error(extractErrorMessage(error));
+      toast.error("Failure", {
+        description: extractErrorMessage(error),
+      });
     },
   });
 

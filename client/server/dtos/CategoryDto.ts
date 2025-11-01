@@ -8,6 +8,7 @@ export interface CreateCategoryDto {
 }
 
 export interface UpdateCategoryDto {
+  id: number;
   name?: string;
   type?: BusinessTypeEnum;
   description?: string;

@@ -3,30 +3,22 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Business } from "@/server/interfaces/Business";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Edit, Trash } from "lucide-react";
+import { Edit, Loader2, Trash } from "lucide-react";
 
 export const businessColumns = (
   onEdit: (data: Business) => void,
-  onDelete: (id: number) => void
+  onDelete: (id: number) => void,
+  isdeleting: boolean,
+  currentItemDeleting: number | null
 ): ColumnDef<Business>[] => [
   {
     accessorKey: "name",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Name <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Name",
     cell: ({ row }) => {
       const r = row.original;
       return (
         <div className="flex flex-col">
           <div className="font-semibold">{r.name}</div>
-          <div className="text-xs text-muted-foreground">
-            {r.email || r.phoneNumber}
-          </div>
         </div>
       );
     },
@@ -38,26 +30,44 @@ export const businessColumns = (
     cell: ({ getValue }) => <div>{getValue() as string}</div>,
   },
   {
+    accessorKey: "type",
+    header: "Type",
+  },
+  {
     accessorKey: "email",
     header: "Email",
   },
   {
-    accessorKey: "phone",
+    accessorKey: "phoneNumber",
     header: "Phone",
   },
   {
-    accessorKey: "address",
+    accessorKey: "location.address",
     header: "Address",
   },
   {
     accessorFn: (row) => row.location?.city ?? row.location?.address ?? "-",
-    id: "location",
+    id: "location.city",
     header: "Location",
   },
   {
     accessorKey: "isActive",
     header: "Active",
     cell: ({ getValue }) => <span>{getValue() ? "Yes" : "No"}</span>,
+  },
+  {
+    accessorKey: "owner",
+    header: "Owned By",
+    cell: ({ row }) => {
+      const r = row.original;
+      return (
+        <div className="flex flex-col">
+          <div className="font-semibold capitalize">
+            {r.owner?.firstName} {r.owner?.lastName}
+          </div>
+        </div>
+      );
+    },
   },
   {
     id: "actions",
@@ -74,7 +84,11 @@ export const businessColumns = (
             size="sm"
             onClick={() => onDelete(business.id)}
           >
-            <Trash size={16} />
+            {isdeleting && currentItemDeleting === business.id ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Trash size={16} />
+            )}
           </Button>
         </div>
       );

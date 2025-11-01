@@ -32,10 +32,6 @@ interface UseCustomInfiniteQueryOptions<TData, TError>
   staleTime?: number;
 }
 
-/**
- * A reusable, strongly-typed wrapper for React Query's useInfiniteQuery.
- * Designed for APIs that return a BukkaResponse structure (pageNumber, totalPages).
- */
 export const useCustomInfiniteQuery = <TData, TError = Error>(
   queryKey: QueryKey,
   queryFn: (
@@ -73,15 +69,14 @@ export const useCustomInfiniteQuery = <TData, TError = Error>(
   >({
     queryKey: dynamicQueryKey,
     initialPageParam,
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam = initialPageParam }) => {
       const backendResponse = await queryFn({
         ...params,
-        pageNumber: pageParam,
+        pageNumber: pageParam as number,
       });
 
       const rd = backendResponse.responseData;
 
-      // ✅ Normalize backend fields to a unified shape
       return {
         data: rd.data ?? [],
         pageNumber: rd.page,

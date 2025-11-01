@@ -44,21 +44,6 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { SearchBox } from "@/components/atoms/search-box";
 
-/**
- * Generic, reusable DataTable
- *
- * Features:
- * - Server-side pagination (pageNumber + pageSize)
- * - Sorting (emits onSortChange)
- * - Search (debounced)
- * - Column filter dropdowns (via `filters` prop)
- * - Optional date-range filter (Shadcn Calendar)
- * - Row selection (bulk actions)
- * - Export CSV (selected / all)
- *
- * Usage: import DataTable and pass `columns`, `data` (current page), `totalRecords`, `pageNumber`, `pageSize`, handlers...
- */
-
 export type FilterOption = {
   key: string;
   label: string;

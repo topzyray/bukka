@@ -4,7 +4,7 @@ import { z } from "zod";
 import { useAuth, useGlobalState } from "@/providers";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Form } from "@/components/ui/form";
 import { UserRoleEnum } from "@/server/enums";
 import { Input } from "@/components/ui/input";
@@ -16,20 +16,19 @@ import { DialogFooter } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Business } from "@/server/interfaces/Business";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SelectField } from "../../custom/category-select";
+import { SelectFieldCustom } from "../../custom/entity-select-field";
 import {
   useCreateBusiness,
   useUpdateBusiness,
 } from "@/server/mutations/business/use-business-mutation";
 import { InputComponent } from "../../base/input-component";
 import { MapProviderEnum } from "@/server/enums/MapProviderEnum";
-import { useUsers } from "@/server/queries/admin/use-users-query";
+import { useInfiniteUsers } from "@/server/queries/admin/use-users-query";
 import { TextAreaComponent } from "../../base/text-area-component";
 import { PhoneNumberInput } from "../../base/phone-number-component";
 import { LocationInput } from "@/components/views/location/location-input";
-import { useBusinessCategories } from "@/server/queries/use-businesses-category-query";
+import { useCategoriesQuery } from "@/server/queries/use-businesses-category-query";
 import { cn } from "@/lib/utils";
-import { CreateBusinessDto } from "@/server/dtos";
 import { BusinessCategory } from "@/server/interfaces/BusinessCategory";
 import { OpeningHoursField } from "../../custom/openin-hours-field";
 import { TagInputComponent } from "../../base/tag-input-component";
@@ -99,7 +98,7 @@ const locationSchema = z.object({
   landmark: z.string().or(z.literal("")).optional().nullable(),
 });
 
-export const createBusinessSchema = z.object({
+export const businessSchema = z.object({
   ownerId: z.coerce
     .number({ error: "Owner ID is required" })
     .int()
@@ -144,42 +143,113 @@ export const createBusinessSchema = z.object({
   location: locationSchema,
 });
 
-export type CreateBusinessFormValues = z.infer<typeof createBusinessSchema>;
+export type BusinessFormValues = z.infer<typeof businessSchema>;
 
-interface ICreateBusinessForm {
-  initial?: Partial<Business>;
+interface ICreateEditBusinessForm {
   isEdit: boolean;
-  onSuccess?: () => void;
+  busy?: boolean;
+  initialData?: Partial<Business>;
   scrollAreaClassName?: string;
   containerClassName?: string;
   onBack?: () => void;
-  busy?: boolean;
+  onSuccess?: () => void;
 }
 
 export function CreateEditBusinessForm({
-  initial,
   isEdit,
-  onSuccess,
+  busy,
+  initialData,
   scrollAreaClassName,
   containerClassName,
   onBack,
-  busy,
-}: ICreateBusinessForm) {
+  onSuccess,
+}: ICreateEditBusinessForm) {
+  const PAGE_SIZE = 20;
   const [ownerInfo, setOwnerInfo] = useState<User | null>(null);
   const { user } = useAuth();
   const { coordinates } = useGlobalState();
-  const { data: catData } = useBusinessCategories(true);
-  const { data: allUserData } = useUsers({
+
+  const { data: categoryApiData } = useCategoriesQuery({
+    search: "",
+    filters: {},
+    pageSize: PAGE_SIZE,
+    enabled: true,
+  });
+
+  const { data: vendorUserApiData } = useInfiniteUsers({
     enabled: user?.role === UserRoleEnum.ADMIN,
-    filter: {
+    filters: {
       role: UserRoleEnum.VENDOR,
     },
   });
 
+  const categoriesData: BusinessCategory[] = useMemo(
+    () => categoryApiData?.responseData?.data ?? [],
+    [categoryApiData]
+  );
+
+  const vendorsData: User[] = useMemo(
+    () => vendorUserApiData?.pages.flatMap((p) => p.data) ?? [],
+    [vendorUserApiData]
+  );
+
   const form = useForm({
-    resolver: zodResolver(createBusinessSchema),
+    resolver: zodResolver(businessSchema),
     mode: "onSubmit",
   });
+
+  // useEffect(() => {
+  //   if (isEdit && initialData) {
+  //     form.reset({
+  //       location: {
+  //         latitude: initialData?.location?.latitude,
+  //         longitude: initialData?.location?.longitude,
+  //         address: initialData?.location?.address,
+  //         city: initialData?.location?.city,
+  //         state: initialData?.location?.state,
+  //         country: initialData?.location?.country,
+  //       },
+  //       name: initialData?.name,
+  //       ownerId: initialData?.ownerId,
+  //       phoneNumber: initialData?.phoneNumber,
+  //       email: initialData?.email,
+  //       registrationNo: initialData?.registrationNo,
+  //       description: initialData?.description,
+  //       website: initialData?.website,
+  //       cuisines: initialData?.cuisines,
+  //       categoryId: initialData?.category?.id,
+  //       socialLinks: initialData?.socialLinks,
+  //       openingHours: initialData?.openingHours,
+  //     });
+  //   }
+  // }, [form, initialData, isEdit]);
+
+  useEffect(() => {
+    if (isEdit && initialData) {
+      form.reset({
+        location: {
+          latitude: initialData?.location?.latitude,
+          longitude: initialData?.location?.longitude,
+          address: initialData?.location?.address,
+          city: initialData?.location?.city,
+          state: initialData?.location?.state,
+          country: initialData?.location?.country,
+        },
+        name: initialData?.name ?? "",
+        // prefer initialData.owner?.id first, fallback to initialData.ownerId
+        ownerId: initialData?.owner?.id ?? initialData?.ownerId,
+        phoneNumber: initialData?.phoneNumber ?? "",
+        email: initialData?.email ?? "",
+        registrationNo: initialData?.registrationNo ?? "",
+        description: initialData?.description ?? "",
+        website: initialData?.website ?? "",
+        cuisines: initialData?.cuisines ?? [],
+        categoryId: initialData?.category?.id ?? "",
+        socialLinks: initialData?.socialLinks,
+        openingHours: initialData?.openingHours,
+      });
+    }
+  }, [form, initialData, isEdit]);
 
   useEffect(() => {
     if (coordinates) {
@@ -205,23 +275,73 @@ export function CreateEditBusinessForm({
 
   busy = createMutation.isPending || updateMutation.isPending || busy;
 
-  const ownerId = form.watch("ownerId");
+  // const ownerId = form.watch("ownerId");
+
+  // useEffect(() => {
+  //   if (user?.role === UserRoleEnum.ADMIN && ownerId !== undefined) {
+  //     const owner =
+  //       vendorsData &&
+  //       vendorsData.length &&
+  //       vendorsData.find((user: User) => user?.id === ownerId);
+  //     if (owner) setOwnerInfo(owner);
+  //   } else {
+  //     form.setValue("ownerId", user?.id);
+  //     setOwnerInfo(user);
+  //   }
+  // }, [vendorsData, form, ownerId, user]);
+  const watchedOwnerId = form.watch("ownerId");
 
   useEffect(() => {
-    if (user?.role === UserRoleEnum.ADMIN) {
-      const owner =
-        allUserData?.responseData?.data.length &&
-        allUserData?.responseData?.data.find(
-          (user: User) => user?.id === ownerId
-        );
-      setOwnerInfo(owner);
-    } else {
-      form.setValue("ownerId", user?.id);
-      setOwnerInfo(user);
-    }
-  }, [allUserData?.responseData?.data, form, ownerId, user]);
+    if (!user) return;
 
-  const onSubmit = (data: CreateBusinessFormValues) => {
+    // Vendor logged in => always use current user
+    if (user.role === UserRoleEnum.VENDOR) {
+      form.setValue("ownerId", user.id);
+      setOwnerInfo(user);
+      return;
+    }
+
+    // Admin logic
+    if (user.role === UserRoleEnum.ADMIN) {
+      // Edit: prefer initialData.owner (server-side owner object)
+      if (isEdit && initialData?.owner) {
+        setOwnerInfo(initialData.owner as User);
+        // ensure form has ownerId (in case reset didn't run yet)
+        form.setValue("ownerId", initialData.owner.id);
+        return;
+      }
+
+      // Create: if admin selected a vendor (watchedOwnerId) and vendorsData available, use it
+      if (
+        watchedOwnerId !== undefined &&
+        watchedOwnerId !== null &&
+        String(watchedOwnerId) !== ""
+      ) {
+        const found = vendorsData?.find(
+          (v) => String(v.id) === String(watchedOwnerId)
+        );
+        if (found) {
+          setOwnerInfo(found);
+          return;
+        }
+        // If not found in vendorsData but initialData.owner matches id, use it
+        if (
+          isEdit &&
+          initialData?.owner &&
+          String(initialData.owner.id) === String(watchedOwnerId)
+        ) {
+          setOwnerInfo(initialData.owner as User);
+          return;
+        }
+      }
+
+      // Default for admin create: no selection yet
+      setOwnerInfo(null);
+      return;
+    }
+  }, [user, vendorsData, watchedOwnerId, isEdit, initialData, form]);
+
+  const onSubmit = (data: BusinessFormValues) => {
     const weekdayText =
       data.openingHours?.periods.map((p) => {
         const day = weekdayNames[p.day as number];
@@ -229,46 +349,32 @@ export function CreateEditBusinessForm({
       }) ?? [];
 
     const { location, ...otherData } = data;
-    const category: BusinessCategory =
-      catData?.responseData?.data.length &&
-      catData?.responseData?.data.find(
-        (cat: BusinessCategory) => cat?.id === data?.categoryId
-      );
+    const category =
+      (categoriesData &&
+        categoriesData.length &&
+        (categoriesData.find(
+          (cat: BusinessCategory) => cat?.id === data?.categoryId
+        ) as BusinessCategory)) ||
+      null;
 
-    let payload: any;
-    if (isEdit && initial?.id) {
-      payload = {
-        ...otherData,
-        longitude: Number(location?.longitude.toFixed(6)),
-        latitude: Number(location?.latitude.toFixed(6)),
-        type: category?.type,
-        slug: category?.slug,
-        address: location?.address,
-        city: location?.city,
-        state: location?.state,
-        country: location?.country,
-        openingHours: {
-          ...data.openingHours,
-          weekdayText,
-        },
-      } as Partial<CreateBusinessDto>;
-      updateMutation.mutate({ id: initial.id, payload });
+    let payload: any = {
+      ...otherData,
+      longitude: Number(location?.longitude.toFixed(6)),
+      latitude: Number(location?.latitude.toFixed(6)),
+      type: category?.type,
+      slug: category?.slug,
+      address: location?.address,
+      city: location?.city,
+      state: location?.state,
+      country: location?.country,
+      openingHours: {
+        ...data.openingHours,
+        weekdayText,
+      },
+    };
+    if (isEdit && initialData?.id) {
+      updateMutation.mutate({ id: initialData.id, payload });
     } else {
-      payload = {
-        ...otherData,
-        longitude: Number(location?.longitude.toFixed(6)),
-        latitude: Number(location?.latitude.toFixed(6)),
-        type: category?.type,
-        slug: category?.slug,
-        address: location?.address,
-        city: location?.city,
-        state: location?.state,
-        country: location?.country,
-        openingHours: {
-          ...data.openingHours,
-          weekdayText,
-        },
-      } as CreateBusinessDto;
       createMutation.mutate(payload);
     }
   };
@@ -280,7 +386,6 @@ export function CreateEditBusinessForm({
           <div
             className={cn("h-full w-full px-4 space-y-4", containerClassName)}
           >
-            {/* LOCATION */}
             <div className="space-y-2">
               <h3 className="text-base font-semibold">
                 Business Location Info (all required)
@@ -331,18 +436,17 @@ export function CreateEditBusinessForm({
 
             <Separator />
 
-            {/* BUSINESS BASICS */}
             <div className="space-y-2">
               <h3 className="text-base font-semibold">
                 Vendor Details (all required)
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {user?.role === UserRoleEnum.ADMIN ? (
-                  <SelectField
+                  <SelectFieldCustom
                     control={form.control}
                     formName="ownerId"
                     formLabel="Vendor's Email"
-                    formData={allUserData?.responseData?.data}
+                    formData={vendorsData ?? []}
                     placeholder="Select user"
                     valueKey="id"
                     labelKey="email"
@@ -353,22 +457,61 @@ export function CreateEditBusinessForm({
                     <Label>Vendor&apos;s Email</Label>
                     <Input
                       type="text"
-                      name="fullName"
-                      value={ownerInfo ? ownerInfo?.email : ""}
+                      name="email"
+                      value={
+                        // vendor always uses logged-in user (edit/create)
+                        user?.role === UserRoleEnum.VENDOR
+                          ? user?.email ?? ""
+                          : ""
+                      }
                       className="focus:border-none text-sm placeholder:text-sm"
                       readOnly
                       disabled={busy}
                     />
                   </div>
                 )}
+                {/* <div className="space-y-2">
+                  <Label>Vendor&apos;s Full Name</Label>
+                  <Input
+                    type="text"
+                    name="fullName"
+                    // value={
+                    //   ownerInfo
+                    //     ? ownerInfo?.firstName + " " + ownerInfo?.lastName
+                    //     : ""
+                    // }
+                    value={
+                      isEdit
+                        ? initialData?.owner?.firstName +
+                            " " +
+                            initialData?.owner?.lastName ||
+                          ownerInfo?.firstName + " " + ownerInfo?.lastName
+                        : ownerInfo?.firstName + " " + ownerInfo?.lastName || ""
+                    }
+                    className="focus:border-none text-sm placeholder:text-sm"
+                    readOnly
+                    disabled={busy}
+                  />
+                </div> */}
+
                 <div className="space-y-2">
                   <Label>Vendor&apos;s Full Name</Label>
                   <Input
                     type="text"
                     name="fullName"
                     value={
-                      ownerInfo
-                        ? ownerInfo?.firstName + " " + ownerInfo?.lastName
+                      // prefer initialData.owner when editing (authoritative),
+                      // otherwise use ownerInfo (from select or logged-in user)
+                      isEdit
+                        ? initialData?.owner
+                          ? `${initialData.owner.firstName} ${initialData.owner.lastName}`
+                          : ownerInfo
+                          ? `${ownerInfo.firstName} ${ownerInfo.lastName}`
+                          : ""
+                        : ownerInfo
+                        ? `${ownerInfo.firstName} ${ownerInfo.lastName}`
+                        : user?.role === UserRoleEnum.VENDOR
+                        ? `${user?.firstName} ${user?.lastName}`
                         : ""
                     }
                     className="focus:border-none text-sm placeholder:text-sm"
@@ -381,7 +524,6 @@ export function CreateEditBusinessForm({
 
             <Separator />
 
-            {/* BUSINESS INFO */}
             <div className="space-y-2">
               <h3 className="text-base font-semibold">Business Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -394,11 +536,11 @@ export function CreateEditBusinessForm({
                   disabled={busy}
                 />
 
-                <SelectField
+                <SelectFieldCustom
                   control={form.control}
                   formName="categoryId"
                   formLabel="Category (required)"
-                  formData={catData?.responseData?.data ?? []}
+                  formData={categoriesData ?? []}
                   placeholder="Select category"
                   disabled={busy}
                 />
@@ -439,7 +581,6 @@ export function CreateEditBusinessForm({
               </div>
             </div>
 
-            {/* DESCRIPTION */}
             <TextAreaComponent
               formControl={form.control}
               formName="description"
@@ -475,7 +616,6 @@ export function CreateEditBusinessForm({
 
             <Separator />
 
-            {/* SOCIAL LINKS */}
             <div className="space-y-2">
               <h3 className="text-base font-semibold">
                 Business Social Links (optional)
@@ -524,19 +664,6 @@ export function CreateEditBusinessForm({
               </div>
             </div>
 
-            {/* OPENING HOURS (SIMPLE JSON INPUT FOR NOW) */}
-            {/* <div className="space-y-2">
-                  <InputComponent
-                    formControl={form.control}
-                    formName="openingHours.monday"
-                    formInputType="text"
-                    formLabel="Opening Hours (e.g. Mon)"
-                    formPlaceholder="08:00-17:00"
-                  />
-           
-                </div> */}
-
-            {/* FOOTER BUTTONS */}
             <DialogFooter>
               <div className="flex gap-2 w-full">
                 {onBack && (

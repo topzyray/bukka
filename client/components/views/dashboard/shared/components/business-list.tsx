@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Business } from "@/server/interfaces/Business";
 import { CreateUpdateBusinessModal } from "../../../../forms/business/create-update-business-modal";
@@ -11,94 +11,70 @@ import {
   PageWrapperContent,
   PageWrapperContentWithFramer,
 } from "../../../../ui/page-wrapper";
-import { useBusinesses } from "@/server/queries/use-businesses-query";
-
-/**
- * This component:
- * - uses useCustomInfiniteQuery to fetch pages
- * - maintains a pageNumber state (1-based)
- * - when user asks to navigate to a page we don't have yet, we fetchNextPage until we have it
- * - uses the normal DataTable props (data is the current-page rows)
- */
+import { useBusinessesQuery } from "@/server/queries/use-businesses-query";
+import { Button } from "@/components/ui/button";
+import { useDeleteBusiness } from "@/server/mutations/business/use-business-mutation";
+import { PaginationHelper } from "@/helpers/pagination-helper";
+import { BusinessTypeEnum } from "@/server/enums/BusinessTypeEnum";
 
 export default function BusinessList() {
   const PAGE_SIZE = 10;
+  const queryClient = useQueryClient();
+
+  const [mode, setMode] = useState<"create" | "edit">("create");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [initialData, setInitialData] = useState<Partial<Business> | undefined>(
+    undefined
+  );
+  const [currentItemDeleting, setCurrentItemDeleting] = useState<number | null>(
+    null
+  );
+
   const [page, setPage] = React.useState<number>(1);
   const [search, setSearch] = React.useState<string>("");
   const [filters, setFilters] = React.useState<Record<string, any>>({});
-  const queryClient = useQueryClient();
 
-  const {
-    data: infiniteData,
-    fetchNextPage,
-    isFetchingNextPage,
-    isLoading,
-    refetch,
-  } = useBusinesses({
+  const deleteBusinessMutation = useDeleteBusiness({
+    onSuccess: () => {
+      setCurrentItemDeleting(null);
+    },
+  });
+
+  const { data: businessesData, isLoading } = useBusinessesQuery({
     search,
     filters,
+    pageNumber: page,
     pageSize: PAGE_SIZE,
     enabled: true,
   });
 
-  // Helper: find page object (NormalizedPagedData) for a page number
-  const findPage = useCallback(
-    (pn: number) => {
-      return infiniteData?.pages?.find((p) => p.pageNumber === pn)?.data ?? [];
-    },
-    [infiniteData?.pages]
-  );
+  const total = businessesData?.responseData?.total ?? 0;
+  const currentPagedData = React.useMemo(() => {
+    return businessesData?.responseData?.data ?? [];
+  }, [businessesData]);
 
-  // When user clicks to go to a page:
   const goToPage = async (pn: number) => {
-    if (pn <= 0) return;
-    // if page already loaded, simply set local state
-    if (findPage(pn).length > 0) {
-      setPage(pn);
-      return;
-    }
-    // otherwise, fetch next pages until we reach it (note: this will sequentially call fetchNextPage)
-    // guard to avoid infinite loop
-    let safety = 0;
-    while (!findPage(pn) && safety < 20) {
-      await fetchNextPage();
-      safety++;
-      // if no more pages to fetch, break
-      const last = infiniteData?.pages?.[infiniteData.pages.length - 1];
-      if (last && last.pageNumber >= pn) break;
-    }
-    // finally set page (if found fallback to last available)
-    setPage(
-      findPage(pn).length
-        ? pn
-        : infiniteData?.pages?.[infiniteData.pages.length - 1]?.pageNumber ?? 1
-    );
+    await PaginationHelper.goToPage({
+      pn: pn,
+      total: total,
+      pageSize: PAGE_SIZE,
+      queryClient: queryClient,
+      queryKey: ["businesses"],
+      setPage: setPage,
+    });
   };
 
-  // Flattened data for the page (or empty)
-  const currentPageData = React.useMemo(() => findPage(page), [page, findPage]);
-
-  // total records (from first page meta if available)
-  const total = infiniteData?.pages?.[0]?.totalRecords ?? 0;
-
-  // sorting handler (emit to refetch with sort params)
   const onSortChange = (sorting: any) => {
-    // react to sorting state change: call refetch with appropriate params if you want server-side sort
-    // for example: extract first sorted column
     const s = sorting?.[0];
     const sortBy = s?.id;
     const sortOrder = s?.desc ? "desc" : "asc";
-    // update filters or call refetch via queryClient if required
-    // Here we set filters and refetch
     setFilters((f) => ({ ...f, sortBy, sortOrder }));
-    // clear existing pages and refetch from page 1
     queryClient.removeQueries({ queryKey: ["businesses"] });
     setPage(1);
   };
 
   const onSearchChange = (term: string) => {
     setSearch(term);
-    // clear cache and refetch
     queryClient.removeQueries({ queryKey: ["businesses"] });
     setPage(1);
   };
@@ -109,22 +85,43 @@ export default function BusinessList() {
     setPage(1);
   };
 
-  // edit/delete callbacks
+  const handleCreate = () => {
+    setMode("create");
+    setInitialData(undefined);
+    setIsModalOpen(true);
+  };
+
   const handleEdit = (row: Business) => {
-    // open modal with row (you wire BusinessFormModal)
-    // ...
+    setMode("edit");
+    setInitialData(row);
+    setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    // implement with your delete mutation hook
-    // await deleteMutation.mutateAsync(id)
-    // then refetch or invalidate queries
+  const handleDelete = useCallback(
+    async (id: number) => {
+      setCurrentItemDeleting(id);
+      deleteBusinessMutation.mutate(id);
+    },
+    [deleteBusinessMutation]
+  );
+
+  const handleOpenChange = (open: boolean) => {
+    setIsModalOpen(open);
+    if (!open) {
+      setMode("create");
+      setInitialData(undefined);
+    }
   };
 
-  // build columns
   const columns = React.useMemo(
-    () => businessColumns(handleEdit, handleDelete),
-    []
+    () =>
+      businessColumns(
+        handleEdit,
+        handleDelete,
+        deleteBusinessMutation.isPending,
+        currentItemDeleting
+      ),
+    [currentItemDeleting, deleteBusinessMutation.isPending, handleDelete]
   );
 
   return (
@@ -141,11 +138,16 @@ export default function BusinessList() {
               </div>
 
               <div className="flex items-center gap-2">
+                <Button onClick={handleCreate}>Add Business</Button>
                 <CreateUpdateBusinessModal
-                  mode="create"
+                  open={isModalOpen}
+                  onOpenChange={handleOpenChange}
+                  mode={mode}
+                  initialData={mode === "edit" ? initialData : undefined}
                   onSuccess={() => {
                     queryClient.removeQueries({ queryKey: ["businesses"] });
                     setPage(1);
+                    setIsModalOpen(false);
                   }}
                 />
               </div>
@@ -154,7 +156,7 @@ export default function BusinessList() {
             <div>
               <DataTable
                 columns={columns}
-                data={currentPageData}
+                data={currentPagedData}
                 totalRecords={total}
                 pageNumber={page}
                 pageSize={PAGE_SIZE}
@@ -164,11 +166,58 @@ export default function BusinessList() {
                 onFilterChange={onFilterChange}
                 filters={[
                   {
-                    key: "categoryId",
-                    label: "Category",
+                    key: "type",
+                    label: "Type",
                     options: [
-                      { label: "All", value: undefined },
-                    ] /* fetch and populate dynamically */,
+                      {
+                        label: "ALL",
+                        value: undefined,
+                      },
+                      {
+                        label: BusinessTypeEnum.RESTAURANT,
+                        value: BusinessTypeEnum.RESTAURANT,
+                      },
+                      {
+                        label: BusinessTypeEnum.BAR,
+                        value: BusinessTypeEnum.BAR,
+                      },
+                      {
+                        label: BusinessTypeEnum.LOUNGE,
+                        value: BusinessTypeEnum.LOUNGE,
+                      },
+                      {
+                        label: BusinessTypeEnum.CATERING,
+                        value: BusinessTypeEnum.CATERING,
+                      },
+                      {
+                        label: BusinessTypeEnum.BAKERY,
+                        value: BusinessTypeEnum.BAKERY,
+                      },
+                      {
+                        label: "FOOD VENDOR",
+                        value: BusinessTypeEnum.FOOD_VENDOR,
+                      },
+                      {
+                        label: "FAST FOOD",
+                        value: BusinessTypeEnum.FAST_FOOD,
+                      },
+                      {
+                        label: "STREET EATRY",
+                        value: BusinessTypeEnum.STREET_EATRY,
+                      },
+                      {
+                        label: BusinessTypeEnum.GROCERY,
+                        value: BusinessTypeEnum.GROCERY,
+                      },
+                      {
+                        label: "DELIVERY SERVICE",
+                        value: BusinessTypeEnum.DELIVERY_SERVICE,
+                      },
+                      {
+                        label: BusinessTypeEnum.OTHER,
+                        value: BusinessTypeEnum.OTHER,
+                      },
+                    ],
                   },
                   {
                     key: "isVerified",
@@ -180,7 +229,7 @@ export default function BusinessList() {
                     ],
                   },
                 ]}
-                isLoading={isLoading || isFetchingNextPage}
+                isLoading={isLoading}
                 selectable
                 enableDateFilter
                 idAccessor={(r) => (r as Business).id}

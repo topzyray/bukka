@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
   Star,
-  Heart,
   MapPin,
   Phone,
   Globe,
@@ -24,8 +23,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Header } from "@/components/layouts/Header";
-import { Footer } from "@/components/layouts/Footer";
+import { Header } from "@/components/layouts/header";
+import { Footer } from "@/components/layouts/footer";
 import { ErrorBox } from "@/components/atoms/error-box";
 import { BusinessReviews } from "./components/business-reviews";
 import { BusinessSkeleton } from "./components/business-skeleton";
@@ -36,6 +35,9 @@ import { useBusinessFiles } from "@/server/queries/use-business-files";
 import { LazyImage } from "@/components/ui/lazy-image";
 import { BusinessHelper } from "./helper/bussiness-helper";
 import { LazyMapObserver } from "./components/lazy-map-observer";
+import Link from "next/link";
+import { FavoriteButton } from "./components/favorite-button";
+import { Business } from "@/server/interfaces/Business";
 
 export default function BusinessDetails(): JSX.Element {
   const { id } = useParams() as { id?: string };
@@ -44,7 +46,7 @@ export default function BusinessDetails(): JSX.Element {
     businessId: Number(id),
   });
 
-  const business = data?.responseData;
+  const business: Business = data?.responseData;
 
   const { data: businessFiles, isLoading: isLoadingFiles } = useBusinessFiles({
     businessId: Number(id),
@@ -81,11 +83,15 @@ export default function BusinessDetails(): JSX.Element {
         });
       } else {
         await navigator.clipboard.writeText(window.location.href);
-        toast.success("Link copied to clipboard!");
+        toast.success("Success", {
+          description: "Link copied to clipboard!",
+        });
       }
     } catch {
       // swallow but optionally show
-      toast.error("Unable to copy/share link.");
+      toast.error("Failure", {
+        description: "Unable to copy/share link.",
+      });
     }
   };
 
@@ -130,12 +136,21 @@ export default function BusinessDetails(): JSX.Element {
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" size="icon" onClick={handleShare}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleShare}
+                  title={"Share Business"}
+                >
                   <Share2 className="w-4 h-4" />
                 </Button>
-                <Button variant="outline" size="icon">
-                  <Heart className="w-4 h-4 text-red-500" />
-                </Button>
+
+                <FavoriteButton
+                  variant="outline"
+                  businessId={business?.id}
+                  className="rounded-lg"
+                  iconClassName="w-4 h-4 text-red-500"
+                />
               </div>
             </div>
           </div>
@@ -287,14 +302,14 @@ export default function BusinessDetails(): JSX.Element {
                   {business.website && (
                     <div>
                       <p className="text-muted-foreground text-xs">Website</p>
-                      <a
+                      <Link
                         href={business.website}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-primary underline"
+                        className="underline"
                       >
                         {business.website}
-                      </a>
+                      </Link>
                     </div>
                   )}
                 </CardContent>
