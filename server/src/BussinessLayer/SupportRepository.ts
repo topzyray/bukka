@@ -1,10 +1,13 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Support } from '@prisma/client';
 import { SupportDataAgent } from 'src/DataLayer/DataAgents/SupportDataAgent';
 import {
+  AssignSupportDto,
   CreateSupportDto,
+  ResolveSupportDto,
   SupportFilterDto,
 } from 'src/DomainLayer/Dtos/SupportDto';
+import { SupportStatusEnum } from 'src/DomainLayer/Enums/SupportStatusEnum';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { PagedData } from 'src/DomainLayer/Models/PagedData';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
@@ -76,6 +79,38 @@ export class SupportRepository {
       query,
       pageSize,
       pageNumber,
+    );
+  }
+
+  async assignSupportTicket(dto: AssignSupportDto) {
+    const { supportId: id, assigneeId } = dto;
+    const existing = await this._supportDataAgent.getSupportById(id);
+    if (!existing) throw new NotFoundException('Support ticket not found');
+    const updated = await this._supportDataAgent.updateSupport(id, {
+      assigneeId,
+      status: SupportStatusEnum.PENDING,
+    });
+    return BukkaResponse.CustomResponse(
+      'Ticket assigned successfully',
+      HttpStatus.OK,
+      true,
+      updated,
+    );
+  }
+
+  async resolveSupportTicket(dto: ResolveSupportDto) {
+    const existing = await this._supportDataAgent.getSupportById(dto.supportId);
+    if (!existing) throw new NotFoundException('Support ticket not found');
+    const resolvedAt = new Date();
+    const updated = await this._supportDataAgent.updateSupport(dto.supportId, {
+      resolvedAt,
+      status: SupportStatusEnum.RESOLVED,
+    });
+    return BukkaResponse.CustomResponse(
+      'Ticket resolved successfully',
+      HttpStatus.OK,
+      true,
+      updated,
     );
   }
 

@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { BackgroundIcons } from "@/components/ui/background-icons";
 import { OnboardingGuard } from "@/guards/onboarding-guard";
-import { UserRole } from "@/server/interfaces/Auth";
-import { ThemeToggle } from "@/components/atoms/mode-toggle";
+import { UserRole } from "@/data/interfaces/Auth";
+import { ThemeToggle } from "@/components/ui/mode-toggle";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 
 interface IOnboardingLayout {

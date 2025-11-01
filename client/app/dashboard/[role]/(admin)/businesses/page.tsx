@@ -1,9 +1,5 @@
-import BusinessList from "@/components/views/dashboard/shared/components/business-list";
+import { BusinessList } from "@/features/dashboard/admin/business-list";
 
 export default function Businesses() {
-  return (
-    <div>
-      <BusinessList />
-    </div>
-  );
+  return <BusinessList />;
 }

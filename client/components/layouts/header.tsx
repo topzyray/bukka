@@ -18,10 +18,10 @@ import { BukkaButton } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { ThemeToggle } from "../atoms/mode-toggle";
+import { ThemeToggle } from "../ui/mode-toggle";
 import { useAuth } from "@/providers/auth-provider";
 import { RouteHelper } from "@/helpers";
-import { User } from "@/server/interfaces/User";
+import { User } from "@/data/interfaces/User";
 
 interface HeaderProps {
   className?: string;

@@ -1,5 +1,5 @@
-import { UserRoleEnum } from "@/server/enums";
-import { User } from "@/server/interfaces/User";
+import { UserRoleEnum } from "@/data/enums";
+import { User } from "@/data/interfaces/User";
 
 export class RouteHelper {
   static createRoutes(

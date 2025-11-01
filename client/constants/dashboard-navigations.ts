@@ -62,7 +62,7 @@ export const VENDOR: TDashboardNavigation = [
   },
   {
     title: "My Business",
-    url: "/dashboard/vendor/my-business",
+    url: "/dashboard/vendor/my-businesses",
     icon: "Food",
     hasSubmenu: false,
     isSidebarNav: true,

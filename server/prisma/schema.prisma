@@ -59,6 +59,12 @@ enum BusinessType {
   OTHER
 }
 
+enum SupportStatus {
+  SUBMITTED
+  PENDING
+  RESOLVED
+}
+
 model File {
   id            Int               @id @default(autoincrement())
   referenceId   Int?
@@ -129,6 +135,7 @@ model User {
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
   location                Location?          @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  Support                 Support[]
 
   @@index([email])
   @@index([username])
@@ -291,20 +298,26 @@ model UserSession {
   expiresAt    DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, deviceId])
 }
 
 model Support {
-  id        Int      @id @default(autoincrement())
-  ticketId  String   @unique
-  name      String
-  email     String
-  subject   String
-  message   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int           @id @default(autoincrement())
+  ticketId   String        @unique
+  name       String
+  email      String
+  subject    String
+  message    String
+  status     SupportStatus @default(SUBMITTED)
+  assigneeId Int?
+  assignee   User?         @relation(fields: [assigneeId], references: [id])
+  resolvedAt DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 
   @@index([ticketId])
+  @@index([status])
+  @@index([assigneeId])
 }

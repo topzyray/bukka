@@ -1,6 +1,6 @@
 "use client";
 
-import { UserRole } from "@/server/interfaces/Auth";
+import { UserRole } from "@/data/interfaces/Auth";
 import React, { createContext, useContext, useState } from "react";
 
 export interface OnboardingState {

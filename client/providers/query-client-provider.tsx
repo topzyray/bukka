@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { envConfig, HttpClient } from "@/configs";
-import { EnvironmentTypeEnum } from "@/server/enums";
+import { EnvironmentTypeEnum } from "@/data/enums";
 
 interface IReactQueryClientContext {
   isSignedIn: boolean;

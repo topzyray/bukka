@@ -59,6 +59,14 @@ export class SupportDataAgent {
     return pageData;
   }
 
+  async updateSupport(
+    id: number,
+    updateData: Partial<Support>,
+  ): Promise<Support> {
+    const spec: QuerySpec = { filter: { field: 'id', op: 'eq', value: id } };
+    return (await this.model.updateOne(spec, updateData)) as Support;
+  }
+
   async deleteSupport(supportId: number) {
     const spec: QuerySpec = {
       filter: { field: 'id', op: 'eq', value: supportId },

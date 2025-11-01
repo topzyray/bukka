@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { RouteGuard } from "@/guards/route-guard";
-import { ThemeToggle } from "@/components/atoms/mode-toggle";
+import { ThemeToggle } from "@/components/ui/mode-toggle";
 import { BackgroundIcons } from "@/components/ui/background-icons";
 
 interface IAuthLayout {

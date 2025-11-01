@@ -3,7 +3,7 @@ const ASSETS_TO_CACHE = [
   "/",
   "/web-app-manifest-192x192.png",
   "/web-app-manifest-512x512.png",
-  "/app/favicon.ico",
+  "/favicon.ico",
 ];
 
 self.addEventListener("install", (event) => {

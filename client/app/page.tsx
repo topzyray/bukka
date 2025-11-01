@@ -1,9 +1,11 @@
-import BukkaWaitList from "@/components/views/pubic/waitlist";
+import { Home } from "@/features/public/landing-page";
+import { BukkaWaitList } from "@/features/public/waitlist";
 
-export default function Home() {
+export default function Index() {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <BukkaWaitList />
+      {/* <Home /> */}
     </div>
   );
 }

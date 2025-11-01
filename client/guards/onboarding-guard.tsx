@@ -1,5 +1,5 @@
 import { RouteGuard } from "./route-guard";
-import { UserRole } from "@/server/interfaces/Auth";
+import { UserRole } from "@/data/interfaces/Auth";
 
 export function OnboardingGuard({
   children,

@@ -3,9 +3,9 @@
 import { ReactNode, useEffect, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { RouteHelper } from "@/helpers";
-import { UserRole } from "@/server/interfaces/Auth";
+import { UserRole } from "@/data/interfaces/Auth";
 import { useAuth } from "@/providers/auth-provider";
-import { User } from "@/server/interfaces/User";
+import { User } from "@/data/interfaces/User";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 
 interface RouteGuardProps {

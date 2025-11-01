@@ -1,4 +1,4 @@
-import { Profile } from "@/components/views/dashboard/shared/profile";
+import { Profile } from "@/features/dashboard/shared/profile";
 
 export default function ProfilePage() {
   return <Profile />;

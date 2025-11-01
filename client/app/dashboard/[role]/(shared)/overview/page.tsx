@@ -1,11 +1,11 @@
 "use client";
 
-import { AdminOverview } from "@/components/views/dashboard/admin/overview";
-import { VendorOverview } from "@/components/views/dashboard/vendor/overview";
-import { DefaultOverview } from "@/components/views/dashboard/other/overview-default";
-import { UserOverview } from "@/components/views/dashboard/user/overview";
-import { UserRoleEnum } from "@/server/enums";
-import { useCurrentUser } from "@/server/queries";
+import { AdminOverview } from "@/features/dashboard/admin/overview";
+import { VendorOverview } from "@/features/dashboard/vendor/overview";
+import { DefaultOverview } from "@/features/dashboard/other/overview-default";
+import { UserOverview } from "@/features/dashboard/user/overview";
+import { UserRoleEnum } from "@/data/enums";
+import { useCurrentUser } from "@/data/queries";
 
 export default function OverviewPage() {
   const { data: user } = useCurrentUser();

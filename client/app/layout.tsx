@@ -1,16 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Urbanist } from "next/font/google";
-import { Toaster } from "@/components/ui/sonner";
 import { envConfig } from "@/configs";
-import {
-  AuthProvider,
-  GlobalStateProvider,
-  ReactQueryProvider,
-  ThemeProvider,
-  UserLocationProvider,
-} from "@/providers";
-import { SessionExpirationModal } from "@/events/session-event-listener";
+import { RootProvider } from "@/providers";
 
 const urbanist = Urbanist({ subsets: ["latin"] });
 
@@ -64,25 +56,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Bukka" />
       </head>
       <body className={`${urbanist.className} antialiased`}>
-        <ReactQueryProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <SessionExpirationModal />
-            <UserLocationProvider>
-              <AuthProvider>
-                <GlobalStateProvider>
-                  {children}
-                  <Toaster richColors position="top-right" />
-                </GlobalStateProvider>
-              </AuthProvider>
-            </UserLocationProvider>
-          </ThemeProvider>
-        </ReactQueryProvider>
-        {/* <BackgroundIcons /> */}
+        <RootProvider>{children}</RootProvider>
       </body>
     </html>
   );

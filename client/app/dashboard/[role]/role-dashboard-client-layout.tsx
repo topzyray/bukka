@@ -1,10 +1,10 @@
 "use client";
 
-import DashboardLayout from "@/components/global/dashboard-layout";
+import { DashboardLayout } from "@/components/layouts/dashboard";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { RouteGuard } from "@/guards/route-guard";
 import { useAuth } from "@/providers";
-import { UserRole } from "@/server/interfaces/Auth";
+import { UserRole } from "@/data/interfaces/Auth";
 import { useEffect, useState } from "react";
 
 export function RoleBasedDashboardLayoutClient({
@@ -21,7 +21,6 @@ export function RoleBasedDashboardLayoutClient({
     setHydrated(true);
   }, []);
 
-  // During hydration, render a placeholder loader to match SSR output
   if (!hydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center">

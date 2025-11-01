@@ -9,6 +9,7 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
+  Put,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -21,7 +22,9 @@ import type { Response } from 'express';
 import { SupportRepository } from 'src/BussinessLayer/SupportRepository';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import {
+  AssignSupportDto,
   CreateSupportDto,
+  ResolveSupportDto,
   SupportFilterDto,
 } from 'src/DomainLayer/Dtos/SupportDto';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
@@ -88,6 +91,32 @@ export class SupportController {
     const response = await this._supportRepo.getSupportByTicketId(ticketId);
     const data = BukkaResponse.GetSingleDataResponse('Support', response);
     return BukkaResponse.GetStatusResponse(data, res);
+  }
+
+  @Put('assign')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Assign Ticket to User' })
+  async assignSupportTicket(
+    @Body() dto: AssignSupportDto,
+    @Res() res: Response,
+  ) {
+    const response = await this._supportRepo.assignSupportTicket(dto);
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Put('resolve')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Resolve Ticket' })
+  async resolveSupportTicket(
+    @Body() dto: ResolveSupportDto,
+    @Res() res: Response,
+  ) {
+    const response = await this._supportRepo.resolveSupportTicket(dto);
+    return BukkaResponse.GetStatusResponse(response, res);
   }
 
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
