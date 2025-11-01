@@ -38,7 +38,7 @@ export default function BusinessDetailsStep({
       ) : (
         <CreateEditBusinessForm
           isEdit={false}
-          initial={undefined}
+          initialData={undefined}
           onSuccess={() => {
             updateUserData({ onboardingProgress: savedProgress + 1 });
           }}

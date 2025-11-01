@@ -69,8 +69,6 @@ export function SelectComponent({
         //   }
         // };
 
-        console.log("Gender field value:", field.value);
-
         return (
           <FormItem className="space-y-0.5">
             {/* Label */}

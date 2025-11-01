@@ -18,7 +18,7 @@ export function useDistance({
   targetLng,
   format = true,
 }: UseDistanceOptions) {
-  const { coordinates: userLocation, loading } = useUserLocation();
+  const { userCoordinates: userLocation, loading } = useUserLocation();
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
   const [bearing, setBearing] = useState<string | null>(null);
 

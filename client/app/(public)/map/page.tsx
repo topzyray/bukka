@@ -2,7 +2,7 @@
 
 import React from "react";
 import { MapProviderEnum } from "@/server/enums/MapProviderEnum";
-import { Header } from "@/components/layouts/Header";
+import { Header } from "@/components/layouts/header";
 import { MapSelector } from "@/components/views/location/map-selector";
 
 const Map = () => {

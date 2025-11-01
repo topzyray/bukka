@@ -10,6 +10,8 @@ import { useEffect } from "react";
 import axios from "axios";
 import { envConfig } from "@/configs";
 import { cn } from "@/lib/utils";
+import { useUserLocation } from "@/providers";
+import { toast } from "sonner";
 
 interface ILocationInputProps {
   formControl: any;
@@ -35,20 +37,35 @@ export default function LocationInput2({
   inputClassName,
   icon: Icon,
 }: ILocationInputProps) {
+  const {
+    userCoordinates,
+    loading: loadingUserLocation,
+    error: userCoordingError,
+    refreshUserLocation,
+  } = useUserLocation();
   const { setValue, register, watch, formState } = formControl;
   const value = watch(formName as string);
   const errors = formState.errors as any;
 
   useEffect(() => {
     if (!autoDetect) return;
-    if (!navigator.geolocation) return;
 
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
+    if (loadingUserLocation) {
+      toast.info("Fetching your location...");
+      return;
+    }
 
+    if (userCoordingError) {
+      toast.error("Failed to fetch location", {
+        description: userCoordingError,
+      });
+      return;
+    }
+
+    if (userCoordinates) {
+      (async () => {
         try {
+          const { lat, lng } = userCoordinates;
           const res = await axios.get(
             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${envConfig.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
           );
@@ -58,15 +75,21 @@ export default function LocationInput2({
             handlePlaceSelect(place, setValue);
           }
         } catch (err) {
-          console.error("Geolocation lookup failed", err);
+          console.error("Reverse geocode failed", err);
         }
-      },
-      (err) => {
-        console.warn("User denied geolocation or error occurred:", err);
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  }, [autoDetect, handlePlaceSelect, setValue]);
+      })();
+    } else {
+      refreshUserLocation();
+    }
+  }, [
+    autoDetect,
+    handlePlaceSelect,
+    loadingUserLocation,
+    refreshUserLocation,
+    setValue,
+    userCoordinates,
+    userCoordingError,
+  ]);
 
   return (
     <FormField

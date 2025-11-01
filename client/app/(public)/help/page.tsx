@@ -16,8 +16,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Header } from "../../../components/layouts/Header";
-import { Footer } from "../../../components/layouts/Footer";
+import { Header } from "../../../components/layouts/header";
+import { Footer } from "../../../components/layouts/footer";
 
 const Help = () => {
   const faqs = [

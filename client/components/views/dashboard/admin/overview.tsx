@@ -101,7 +101,7 @@ export function AdminOverview() {
 
   return (
     <PageWrapper>
-      <PageWrapperContent className="container mx-auto px-4 py-8">
+      <PageWrapperContent>
         <PageWrapperContentWithFramer>
           {/* Header */}
           <div className="flex items-center justify-between">

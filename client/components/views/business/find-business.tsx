@@ -9,14 +9,14 @@ import React, {
 } from "react";
 import { motion } from "framer-motion";
 import { Filter, Grid, List, Loader2 } from "lucide-react";
-import { Header } from "@/components/layouts/Header";
-import { Footer } from "@/components/layouts/Footer";
+import { Header } from "@/components/layouts/header";
+import { Footer } from "@/components/layouts/footer";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { FilterDialog } from "@/components/ui/filter-dialog";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { BusinessCard } from "./components/business-card";
-import { useBusinesses } from "@/server/queries/use-businesses-query";
+import { useInfiniteBusinessesQuery } from "@/server/queries/use-businesses-query";
 import { Business } from "@/server/interfaces/Business";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -88,7 +88,7 @@ export default function FindBusinessPage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useBusinesses({
+  } = useInfiniteBusinessesQuery({
     search: debouncedSearch,
     filters: filterObj,
     pageSize: PAGE_SIZE,

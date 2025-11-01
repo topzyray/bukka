@@ -1,8 +1,13 @@
-import { useCustomQuery, useCustomInfiniteQuery } from "@/server/queries/base";
+import {
+  useCustomQuery,
+  useCustomInfiniteQuery,
+  BukkaResponse,
+  QueryParams,
+} from "@/server/queries/base";
 import { BusinessApiService } from "@/server/services/BusinessApiService";
 import { Business } from "@/server/interfaces/Business";
 
-export const useBusinesses = ({
+export const useInfiniteBusinessesQuery = ({
   search = "",
   filters = {},
   pageSize = 10,
@@ -14,7 +19,7 @@ export const useBusinesses = ({
   enabled?: boolean;
 }) => {
   return useCustomInfiniteQuery<Business>(
-    ["businesses", search, filters],
+    ["businesses-infinite", search, filters],
     ({ pageNumber, ...filters }) =>
       BusinessApiService.getBusinesses({
         pageNumber,
@@ -25,6 +30,36 @@ export const useBusinesses = ({
     {
       params: { search, pageSize, ...filters },
       initialPageParam: 1,
+      enabled,
+    }
+  );
+};
+
+export const useBusinessesQuery = ({
+  pageNumber = 1,
+  search = "",
+  filters = {},
+  pageSize = 10,
+  enabled = true,
+}: {
+  pageNumber?: number;
+  search?: string;
+  filters?: Record<string, any>;
+  pageSize?: number;
+  enabled?: boolean;
+}) => {
+  return useCustomQuery<BukkaResponse<Business[]>, Error>(
+    ["businesses", search, filters, pageNumber, pageSize],
+    (params?: QueryParams) =>
+      BusinessApiService.getBusinesses({
+        pageNumber: params?.pageNumber ?? pageNumber,
+        pageSize: params?.pageSize ?? pageSize,
+        search: params?.search ?? search,
+        ...filters,
+        ...params,
+      }),
+    {
+      params: { pageNumber, pageSize, search, ...filters },
       enabled,
     }
   );

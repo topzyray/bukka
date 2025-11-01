@@ -27,8 +27,7 @@ export class BusinessCategoryRepository {
     const loggedInAdmin = await UserHelper.getLoggedInUser();
     const slug = slugify(dto.name, { lower: true, strict: true });
     const existing = await this.dataAgent.findBySlug(slug);
-    if (existing)
-      throw new BadRequestException('Category slug already exists.');
+    if (existing) throw new BadRequestException('Category already exists.');
     const newCategory = {
       ...dto,
       slug,
@@ -83,8 +82,8 @@ export class BusinessCategoryRepository {
   }
 
   async delete(id: number) {
-    const existing = await this.dataAgent.findById(id);
-    if (!existing) throw new NotFoundException('Category not found');
+    // const existing = await this.dataAgent.findById(id);
+    // if (!existing) throw new NotFoundException('Category not found');
     await this.dataAgent.deleteCategory(id);
     await invalidateCache('category', { id });
     await invalidateCache('categories', {});

@@ -67,6 +67,13 @@ export class BusinessDataAgent {
         include: {
           category: true,
           location: true,
+          owner: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
         },
       },
     };

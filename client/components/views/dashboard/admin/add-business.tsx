@@ -15,8 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { toast } from "sonner";
-import { Header } from "../../../layouts/Header";
-import { Footer } from "../../../layouts/Footer";
+import { Header } from "../../../layouts/header";
+import { Footer } from "../../../layouts/footer";
 
 export const AddBusiness = () => {
   const [formData, setFormData] = useState({
