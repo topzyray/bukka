@@ -31,14 +31,36 @@ export class CreateSupportDto {
   message: string;
 }
 
+export class AssignSupportDto {
+  @ApiProperty({ example: 1, required: true })
+  @IsNotEmpty()
+  @IsNumber()
+  @Transform(({ value }) => Number.parseInt(value, 10))
+  supportId: number;
+
+  @ApiProperty({ example: 1, required: true })
+  @IsNotEmpty()
+  @IsNumber()
+  @Transform(({ value }) => Number.parseInt(value, 10))
+  assigneeId: number;
+}
+
+export class ResolveSupportDto {
+  @ApiProperty({ example: 1, required: true })
+  @IsNotEmpty()
+  @IsNumber()
+  @Transform(({ value }) => Number.parseInt(value, 10))
+  supportId: number;
+}
+
 export class SupportFilterDto extends PaginationDto {
-  @ApiProperty({ example: 'Bruce Willis', required: false })
+  @ApiProperty({ example: 1, required: false })
   @IsOptional()
   @IsNumber()
   @Transform(({ value }) => Number.parseInt(value, 10))
   supportId?: number;
 
-  @ApiProperty({ example: 'INU-1741470230523-6789', required: false })
+  @ApiProperty({ example: 'BUKKA-1741470230523-6789', required: false })
   @IsOptional()
   @IsString()
   ticketId?: string;

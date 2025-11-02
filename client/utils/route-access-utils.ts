@@ -5,7 +5,7 @@ import {
   RIDER,
   INVESTOR,
 } from "@/constants/dashboard-navigations";
-import { UserRoleEnum } from "@/server/enums";
+import { UserRoleEnum } from "@/data/enums";
 
 export function getAllowedRoutesForRole(role: UserRoleEnum): string[] {
   switch (role) {

@@ -11,12 +11,12 @@ import {
 } from "react";
 import { StorageUtilsHelper } from "@/utils";
 import { authRoutes } from "@/constants/routes";
-import { useUserFiles } from "@/server/queries";
-import { User } from "@/server/interfaces/User";
+import { useUserFiles } from "@/data/queries";
+import { User } from "@/data/interfaces/User";
 import { useQueryClient } from "@tanstack/react-query";
-import { File } from "@/server/interfaces/File";
+import { File } from "@/data/interfaces/File";
 import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
-import { useCurrentUser } from "@/server/queries/use-current-user";
+import { useCurrentUser } from "@/data/queries/use-current-user";
 
 interface IAuthContextType {
   user: User | null;

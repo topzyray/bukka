@@ -1,9 +1,9 @@
-import BusinessCategoryList from "@/components/views/dashboard/shared/components/business-category";
+import { CategoryList } from "@/features/dashboard/admin/category-list";
 
 export default function BusinessCategories() {
   return (
     <div>
-      <BusinessCategoryList />
+      <CategoryList />
     </div>
   );
 }

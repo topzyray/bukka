@@ -1,7 +1,7 @@
 "use client";
 
-import SignUpInfo from "@/components/auth/signup-info";
-import { SignUpForm } from "@/components/forms/auth/sign-up";
+import SignUpInfo from "@/features/auth/components/signup-info";
+import { SignUpForm } from "@/features/auth/forms/sign-up";
 import { useState } from "react";
 
 export default function SignUp() {
@@ -9,7 +9,7 @@ export default function SignUp() {
   return (
     <>
       {openForm ? (
-        <SignUpForm />
+        <SignUpForm onBack={() => setOpenForm(false)} />
       ) : (
         <SignUpInfo setOpenForm={() => setOpenForm(true)} />
       )}

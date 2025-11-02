@@ -1,10 +1,10 @@
 "use client";
 
-import OnboardingWizard from "@/components/onboarding/onboarding-wizard";
+import { OnboardingWizard } from "@/features/onboarding/onboarding-wizard";
 import { useAuth } from "@/providers/auth-provider";
 import { useParams } from "next/navigation";
-import { UserRoleEnum } from "@/server/enums";
-import { UserRole } from "@/server/interfaces/Auth";
+import { UserRoleEnum } from "@/data/enums";
+import { UserRole } from "@/data/interfaces/Auth";
 
 export default function OnboardingPage() {
   const { user } = useAuth();
