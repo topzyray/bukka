@@ -39,7 +39,7 @@ export class NotificationService {
       template: string;
       subject: string;
       to: string;
-      context: any;
+      context: Record<string, any>;
     };
   }) {
     const settings = await this.getUserNotificationSettings();
@@ -57,7 +57,6 @@ export class NotificationService {
             });
           }
           break;
-
         case NotificationTypeEnum.EMAIL:
           if (settings?.isEmailTurnedOn && input.email) {
             await this._emailService.sendTemplateMail({
@@ -68,7 +67,6 @@ export class NotificationService {
             });
           }
           break;
-
         default:
           break;
       }
@@ -76,13 +74,10 @@ export class NotificationService {
   }
 
   private async getUserNotificationSettings(): Promise<NotificationSettings> {
-    // Later: check Redis cache here
     const settings =
       await this._settingsRepo.getLoggedInUserNotificationSetting();
-
     const userSettings =
       settings?.responseData?.settings ?? DEFAULT_NOTIFICATION_SETTINGS;
-
     return userSettings;
   }
 

@@ -28,7 +28,7 @@ import { SearchPlacesWithAutocomplete } from "../search-places-with-autocomplete
 import { envConfig } from "@/configs";
 import { useGlobalState, useUserLocation } from "@/providers";
 import { IconHelper } from "@/helpers/icon-helper";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { debounce } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import { TextHelper } from "@/helpers";
@@ -49,19 +49,19 @@ const ICONS: Record<BusinessTypeEnum, L.Icon> = {
     `/icons/pin/${BusinessTypeEnum.BAR.toLowerCase()}.svg`
   ),
   [BusinessTypeEnum.LOUNGE]: IconHelper.createColoredIcon(
-    `/icons/pin/${BusinessTypeEnum.LOUNGE.toLowerCase()}.svg`
+    `/icons/pin/${"default"}.svg`
   ),
   [BusinessTypeEnum.CATERING]: IconHelper.createColoredIcon(
-    `/icons/pin/${BusinessTypeEnum.CATERING.toLowerCase()}.svg`
+    `/icons/pin/${BusinessTypeEnum.FAST_FOOD.toLowerCase()}.svg`
   ),
   [BusinessTypeEnum.BAKERY]: IconHelper.createColoredIcon(
     `/icons/pin/${BusinessTypeEnum.BAKERY.toLowerCase()}.svg`
   ),
   [BusinessTypeEnum.FOOD_VENDOR]: IconHelper.createColoredIcon(
-    `/icons/pin/${BusinessTypeEnum.FOOD_VENDOR.toLowerCase()}.svg`
+    `/icons/pin/${BusinessTypeEnum.FAST_FOOD.toLowerCase()}.svg`
   ),
   [BusinessTypeEnum.STREET_EATRY]: IconHelper.createColoredIcon(
-    `/icons/pin/${BusinessTypeEnum.STREET_EATRY.toLowerCase()}.svg`
+    `/icons/pin/${BusinessTypeEnum.FAST_FOOD.toLowerCase()}.svg`
   ),
   [BusinessTypeEnum.GROCERY]: IconHelper.createColoredIcon(
     `/icons/pin/${BusinessTypeEnum.GROCERY.toLowerCase()}.svg`
@@ -76,8 +76,14 @@ const ICONS: Record<BusinessTypeEnum, L.Icon> = {
 
 const DEFAULT_CENTER = LAGOS;
 
-const USER_ICON = IconHelper.createColoredIcon(
+const CURRENT_CLICK_ICON = IconHelper.createColoredIcon(
   "/icons/custom/you.svg",
+  "animate-pulse",
+  [45, 61]
+);
+
+const USER_LOCATION_ICON = IconHelper.createColoredIcon(
+  "/icons/flat/you.svg",
   "animate-pulse",
   [45, 61]
 );
@@ -105,6 +111,7 @@ interface ILocationIQMap {
   disabled?: boolean;
   showLegend?: boolean;
   showSearchPlaces?: boolean;
+  syncQuery?: boolean;
   businesses?: Business[];
   onSelect: (lat: number, lng: number) => void;
   onMarkerClick?: (businessId: number) => void;
@@ -117,10 +124,13 @@ export function LocationIQMap({
   zoom = 13,
   showLegend = false,
   showSearchPlaces = true,
+  syncQuery = false,
   businesses = [],
   onSelect,
   onMarkerClick,
 }: ILocationIQMap) {
+  const icons = useMemo(() => ICONS, []);
+
   const { coordinates, setCoordinates } = useGlobalState();
   const { userCoordinates } = useUserLocation();
 
@@ -131,8 +141,26 @@ export function LocationIQMap({
   const geoAttempted = useRef(false);
   const lastEmitted = useRef<{ lat: number; lng: number } | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const debouncedSelect = useMemo(() => debounce(onSelect, 400), [onSelect]);
+
+  useEffect(() => {
+    if (!syncQuery) return;
+
+    const q = searchParams.get("q");
+    if (q) {
+      const parts = q.split(",");
+      if (parts.length === 2) {
+        const [lat, lng] = parts.map(Number);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          setMarker({ lat, lng });
+          debouncedSelect(lat, lng);
+        }
+      }
+    }
+  }, [syncQuery, searchParams, debouncedSelect]);
 
   useEffect(() => {
     if (coordinates) {
@@ -184,6 +212,16 @@ export function LocationIQMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial?.lat, initial?.lng, debouncedSelect]);
 
+  const updateQuery = useCallback(
+    (lat: number, lng: number) => {
+      if (!syncQuery) return;
+      const newQuery = `?q=${lat.toFixed(6)},${lng.toFixed(6)}`;
+      // router.replace(`${pathname}${newQuery}`, { scroll: false });
+      window.history.replaceState(null, "", `${pathname}${newQuery}`);
+    },
+    [syncQuery, pathname]
+  );
+
   const handleDragEnd = (e: L.LeafletEvent) => {
     if (disabled) return;
     try {
@@ -207,6 +245,7 @@ export function LocationIQMap({
       const coords = { lat, lng };
       setMarker(coords);
       setCoordinates(coords);
+      updateQuery(lat, lng);
       if (
         !lastEmitted.current ||
         LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
@@ -215,8 +254,14 @@ export function LocationIQMap({
         debouncedSelect(lat, lng);
       }
     },
-    [disabled, debouncedSelect, setCoordinates]
+    [disabled, setCoordinates, updateQuery, debouncedSelect]
   );
+
+  const tileUrl = !envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN
+    ? `https://{s}-tiles.locationiq.com/v3/${
+        theme === "light" ? "streets" : "dark"
+      }/r/{z}/{x}/{y}.png?key=${envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN}`
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
   if (!marker) {
     return (
@@ -228,12 +273,6 @@ export function LocationIQMap({
       </div>
     );
   }
-
-  const tileUrl = !envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN
-    ? `https://{s}-tiles.locationiq.com/v3/${
-        theme === "light" ? "streets" : "dark"
-      }/r/{z}/{x}/{y}.png?key=${envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN}`
-    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
   return (
     <div
@@ -256,7 +295,7 @@ export function LocationIQMap({
           position={[marker.lat, marker.lng]}
           draggable={!disabled}
           eventHandlers={{ dragend: handleDragEnd }}
-          icon={USER_ICON}
+          icon={CURRENT_CLICK_ICON}
         >
           <Popup>
             <div className="text-sm">
@@ -269,12 +308,27 @@ export function LocationIQMap({
           </Popup>
         </Marker>
 
+        {userCoordinates?.lat && userCoordinates?.lng && (
+          <Marker
+            position={[userCoordinates?.lat, userCoordinates?.lng]}
+            draggable={false}
+            // eventHandlers={{ dragend: handleDragEnd }}
+            icon={USER_LOCATION_ICON}
+          >
+            <Popup>
+              <div className="text-sm">
+                <p>My Location</p>
+              </div>
+            </Popup>
+          </Marker>
+        )}
+
         {businesses.map((b) => {
           const lat = b?.location?.latitude;
           const lng = b?.location?.longitude;
           if (lat == null || lng == null) return null;
 
-          const markerIcon = ICONS[b?.type as BusinessTypeEnum] || ICONS.OTHER;
+          const markerIcon = icons[b?.type as BusinessTypeEnum] || icons.OTHER;
 
           return (
             <Marker
@@ -290,6 +344,9 @@ export function LocationIQMap({
                     } catch {
                       // safe no-op
                     }
+                  }
+                  if (syncQuery && b?.location) {
+                    updateQuery(b.location.latitude, b.location.longitude);
                   }
                 },
               }}
@@ -363,7 +420,7 @@ export function LocationIQMap({
           style={{
             zIndex: 499,
           }}
-          className="absolute top-2.5 left-12 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-[14rem] sm:max-w-[18rem] w-full"
+          className="absolute top-2.5 left-1/2 transform -translate-x-1/2 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-[14rem] sm:max-w-[18rem] w-full"
         >
           <SearchPlacesWithAutocomplete />
         </div>
@@ -375,19 +432,20 @@ export function LocationIQMap({
           }}
           className="absolute bottom-4.5 right-0.5 bg-background backdrop-blur-md p-2 rounded shadow-md text-xs space-y-2 max-h-60 sm:max-h-max overflow-auto"
         >
-          {Object.entries(ICONS).map(([key]) => {
+          {Object.entries(icons).map(([key]) => {
             let icon: string = `/icons/pin/${key.toLowerCase()}.svg`;
             switch (key) {
               case BusinessTypeEnum.OTHER:
                 icon = "/icons/pin/default.svg";
+                break;
               case BusinessTypeEnum.CATERING:
-                icon = "/icons/pin/fast_food.svg";
-              case BusinessTypeEnum.LOUNGE:
-                icon = "/icons/pin/default.svg";
               case BusinessTypeEnum.FOOD_VENDOR:
-                icon = "/icons/pin/fast_food.svg";
               case BusinessTypeEnum.STREET_EATRY:
                 icon = "/icons/pin/fast_food.svg";
+                break;
+              case BusinessTypeEnum.LOUNGE:
+                icon = "/icons/pin/default.svg";
+                break;
               default:
                 break;
             }

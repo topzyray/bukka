@@ -40,7 +40,7 @@ export const useSignIn = () => {
             queryFn: () => UserApiService.getLoggedInUser(),
           }),
           queryClient.prefetchQuery({
-            queryKey: ["userFiles"],
+            queryKey: ["user-files"],
             queryFn: () => FileApiService.getLoggedInUserFiles(),
           }),
           queryClient.prefetchQuery({

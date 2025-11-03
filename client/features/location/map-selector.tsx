@@ -13,6 +13,7 @@ type Props = {
   provider: MapProviderEnum;
   showLegend?: boolean;
   showSearchPlaces?: boolean;
+  syncQuery?: boolean;
   height?: string | number;
   businesses?: Business[];
   onSelect: (lat: number, lng: number) => void;
@@ -24,6 +25,7 @@ export function MapSelector({
   initial = null,
   provider,
   showLegend,
+  syncQuery,
   showSearchPlaces,
   height,
   businesses,
@@ -54,9 +56,10 @@ export function MapSelector({
   );
 
   const currentPageData = React.useMemo(() => {
-    const pageObj = findPage(100) ?? infiniteData?.pages?.[0];
+    // const pageObj = findPage(100) ?? infiniteData?.pages?.[0];
+    const pageObj = infiniteData?.pages?.[0];
     return pageObj?.data ?? [];
-  }, [findPage, infiniteData?.pages]);
+  }, [infiniteData?.pages]);
 
   switch (provider) {
     case MapProviderEnum.GOOGLE: {
@@ -81,6 +84,7 @@ export function MapSelector({
           onSelect={onSelect}
           height={height}
           showSearchPlaces={showSearchPlaces}
+          syncQuery={syncQuery}
           businesses={currentPageData || businesses}
           showLegend={showLegend}
           onMarkerClick={onMarkerClick}

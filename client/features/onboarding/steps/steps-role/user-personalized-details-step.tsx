@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,11 @@ import { toast } from "sonner";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
 import { cuisineSuggestions } from "@/constants/menu-info";
+import { useUserPersonalization } from "@/data/queries/use-personalization";
+import { DietaryRestrictionEnum } from "@/data/enums/DietRestrictionEnum";
+import { DeliveryTimeEnum } from "@/data/enums/DeliveryTimeEnum";
+import { PaymentMethodEnum } from "@/data/enums/PaymentMethodEnum";
+import { MealPreferenceEnum } from "@/data/enums/MealPreferenceEnum";
 
 export const userPersonalizedSchema = z.object({
   preferredCuisines: z
@@ -24,56 +29,91 @@ export const userPersonalizedSchema = z.object({
     .min(1, "Please select at least one cuisine"),
   dietaryRestrictions: z
     .array(
-      z.enum(["None", "Vegetarian", "Vegan", "Gluten-Free", "Halal", "Kosher"])
+      z.enum([
+        DietaryRestrictionEnum.NONE,
+        DietaryRestrictionEnum.VEGETARIAN,
+        DietaryRestrictionEnum.VEGAN,
+        DietaryRestrictionEnum.GLUTEN_FREE,
+        DietaryRestrictionEnum.HALAL,
+        DietaryRestrictionEnum.KOSHER,
+      ])
     )
     .optional(),
   mealPreferences: z
     .array(
-      z.enum(["Breakfast", "Lunch", "Dinner", "Snacks", "Prefer not to say"])
+      z.enum([
+        MealPreferenceEnum.BREAKFAST,
+        MealPreferenceEnum.LUNCH,
+        MealPreferenceEnum.DINNER,
+        MealPreferenceEnum.SNACKS,
+        MealPreferenceEnum.PREFER_NOT_TO_SAY,
+      ])
     )
     .optional(),
   preferredDeliveryTime: z.enum([
-    "Morning",
-    "Afternoon",
-    "Evening",
-    "Night",
-    "Anytime of the day",
+    DeliveryTimeEnum.MORNING,
+    DeliveryTimeEnum.AFTERNOON,
+    DeliveryTimeEnum.EVENING,
+    DeliveryTimeEnum.NIGHT,
+    DeliveryTimeEnum.ANYTIME,
   ]),
-  paymentPreference: z.enum(["Card", "Mobile Money", "Cash on Delivery"]),
-  allergies: z.string().max(200).optional(),
+  paymentPreference: z.enum([
+    PaymentMethodEnum.CARD,
+    PaymentMethodEnum.MOBILE_MONEY,
+    PaymentMethodEnum.CASH_ON_DELIVERY,
+  ]),
+  allergies: z.string().or(z.literal("")).optional().nullable(),
 });
 
 type UserPersonalizationFormData = z.infer<typeof userPersonalizedSchema>;
 
 const dietaryOptions = [
-  { label: "None", value: "None" },
-  { label: "Vegetarian", value: "Vegetarian" },
-  { label: "Vegan", value: "Vegan" },
-  { label: "Gluten Free", value: "Gluten Free" },
-  { label: "Halal", value: "Halal" },
-  { label: "Kosher", value: "Kosher" },
+  { label: DietaryRestrictionEnum.NONE, value: DietaryRestrictionEnum.NONE },
+  {
+    label: DietaryRestrictionEnum.VEGETARIAN,
+    value: DietaryRestrictionEnum.VEGETARIAN,
+  },
+  { label: DietaryRestrictionEnum.VEGAN, value: DietaryRestrictionEnum.VEGAN },
+  {
+    label: DietaryRestrictionEnum.GLUTEN_FREE,
+    value: DietaryRestrictionEnum.GLUTEN_FREE,
+  },
+  { label: DietaryRestrictionEnum.HALAL, value: DietaryRestrictionEnum.HALAL },
+  {
+    label: DietaryRestrictionEnum.KOSHER,
+    value: DietaryRestrictionEnum.KOSHER,
+  },
 ];
 
 const mealOptions = [
-  { label: "Breakfast", value: "Breakfast" },
-  { label: "Lunch", value: "Lunch" },
-  { label: "Dinner", value: "Dinner" },
-  { label: "Snacks", value: "Snacks" },
-  { label: "Prefer not to say", value: "Prefer not to say" },
+  { label: MealPreferenceEnum.BREAKFAST, value: MealPreferenceEnum.BREAKFAST },
+  { label: MealPreferenceEnum.LUNCH, value: MealPreferenceEnum.LUNCH },
+  { label: MealPreferenceEnum.DINNER, value: MealPreferenceEnum.DINNER },
+  { label: MealPreferenceEnum.SNACKS, value: MealPreferenceEnum.SNACKS },
+  {
+    label: MealPreferenceEnum.PREFER_NOT_TO_SAY,
+    value: MealPreferenceEnum.PREFER_NOT_TO_SAY,
+  },
 ];
 
 const deliveryTimes = [
-  { label: "Morning", value: "Morning" },
-  { label: "Afternoon", value: "Afternoon" },
-  { label: "Evening", value: "Evening" },
-  { label: "Night", value: "Night" },
-  { label: "Anytime of the Day", value: "Anytime of the day" },
+  { label: DeliveryTimeEnum.MORNING, value: DeliveryTimeEnum.MORNING },
+  { label: DeliveryTimeEnum.AFTERNOON, value: DeliveryTimeEnum.AFTERNOON },
+  { label: DeliveryTimeEnum.EVENING, value: DeliveryTimeEnum.EVENING },
+  { label: DeliveryTimeEnum.NIGHT, value: DeliveryTimeEnum.NIGHT },
+  { label: DeliveryTimeEnum.ANYTIME, value: DeliveryTimeEnum.ANYTIME },
 ];
 
 const paymentMethods = [
-  { label: "Card", value: "Card" },
-  { label: "Mobile Money", value: "Mobile Money" },
-  { label: "Cash on Delivery", value: "Cash on Delivery" },
+  { label: PaymentMethodEnum.CARD, value: PaymentMethodEnum.CARD },
+  {
+    label: PaymentMethodEnum.MOBILE_MONEY,
+    value: PaymentMethodEnum.MOBILE_MONEY,
+  },
+  {
+    label: PaymentMethodEnum.CASH_ON_DELIVERY,
+    value: PaymentMethodEnum.CASH_ON_DELIVERY,
+  },
 ];
 
 export function UserPersonalizedDetailsStep({
@@ -84,14 +124,30 @@ export function UserPersonalizedDetailsStep({
   onBack?: () => void;
   stepIndex?: number;
 }) {
-  const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const { data: personalization } = useUserPersonalization({
+    userId: user?.id,
+  });
+  const userPersonalizaton = personalization?.responseData;
 
   const form = useForm({
     resolver: zodResolver(userPersonalizedSchema),
     defaultValues: {},
     mode: "all",
   });
+
+  useEffect(() => {
+    if (!userPersonalizaton) return;
+    form.reset({
+      preferredCuisines: userPersonalizaton?.preferredCuisines,
+      dietaryRestrictions: userPersonalizaton?.dietaryRestrictions,
+      mealPreferences: userPersonalizaton?.mealPreferences,
+      preferredDeliveryTime: userPersonalizaton?.preferredDeliveryTime,
+      paymentPreference: userPersonalizaton?.paymentPreference,
+      allergies: userPersonalizaton?.allergies,
+    });
+  }, [form, userPersonalizaton]);
 
   const { data: savedProgress, isLoading: isFetchingProgress } =
     useOnboardingProgress(user?.id as number);
@@ -129,7 +185,7 @@ export function UserPersonalizedDetailsStep({
       paymentPreference: data.paymentPreference,
       preferredCuisines: data.preferredCuisines,
       preferredDeliveryTime: data.preferredDeliveryTime,
-      allergies: data?.allergies,
+      allergies: data?.allergies ?? "",
     });
   };
 
@@ -201,7 +257,7 @@ export function UserPersonalizedDetailsStep({
               disabled={isCreatingUserPersonalization || isUpdatingUserData}
             />
 
-            <div className="flex gap-2">
+            <div className="flex justify-end gap-2">
               <Button
                 variant="ghost"
                 onClick={onBack}

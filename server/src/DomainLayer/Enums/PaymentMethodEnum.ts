@@ -1,5 +1,5 @@
 export enum PaymentMethodEnum {
   CARD = 'Card',
-  MOBILE_MONEY = 'MobileMoney',
-  CASH_ON_DELIVERY = 'CashOnDelivery',
+  MOBILE_MONEY = 'Mobile Money',
+  CASH_ON_DELIVERY = 'Cash on Delivery',
 }

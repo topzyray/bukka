@@ -72,7 +72,7 @@ import { FileUploadService } from './InfrastructureLayer/Services/upload/FileUpl
 import { AppConfigurationService } from './UtilityLayer/Configuration/AppConfiguration.service';
 import { RestaurantSearchService } from './InfrastructureLayer/Services/RestaurantSearchService';
 import { NotificationService } from './InfrastructureLayer/Services/notification/NotificationService';
-import { AuthNotificationService } from './InfrastructureLayer/Services/notification/auth/AuthNotificationService';
+import { AuthNotificationService } from './InfrastructureLayer/Services/notification/services/AuthNotificationService';
 import { AdminControlService } from './InfrastructureLayer/Services/AdminControlService';
 
 // FACTORIES

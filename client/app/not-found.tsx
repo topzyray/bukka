@@ -57,7 +57,7 @@ export default function NotFound() {
 
           <BukkaButton variant="ghost" size="lg" asChild className="w-full">
             <Link
-              href="/map"
+              href="/maps"
               className="flex items-center justify-center gap-2"
             >
               <MapPin className="w-5 h-5" />

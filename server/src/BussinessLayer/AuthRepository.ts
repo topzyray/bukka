@@ -21,7 +21,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { TokenClaims } from 'src/DomainLayer/Models/TokenClaims';
 import { TypeSafeMapper } from 'src/MiddlewareLayer/Mappings/TypeSafeMapper';
 import { UserWithCounts } from 'src/DomainLayer/Models/UserWithCounts';
-import { AuthNotificationService } from 'src/InfrastructureLayer/Services/notification/auth/AuthNotificationService';
+import { AuthNotificationService } from 'src/InfrastructureLayer/Services/notification/services/AuthNotificationService';
 import { NotificationSettingsDataAgent } from 'src/DataLayer/DataAgents/NotificationSettingsDataAgent';
 import { AuthQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/AuthQueueEnum';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';

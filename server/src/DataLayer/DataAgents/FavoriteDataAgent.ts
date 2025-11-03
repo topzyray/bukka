@@ -34,6 +34,18 @@ export class FavoriteDataAgent {
           { field: 'businessId', op: 'eq', value: businessId },
         ],
       },
+      extras: {
+        include: {
+          business: {
+            include: {
+              owner: true,
+              location: true,
+              reviews: true,
+              category: true,
+            },
+          },
+        },
+      },
     };
     return this.model.findOne(spec);
   }
@@ -50,6 +62,18 @@ export class FavoriteDataAgent {
       filter: { field: 'userId', op: 'eq', value: userId },
       sort: [{ field: 'createdAt', direction: 'desc' }],
       pagination: { page: pageNumber, pageSize },
+      extras: {
+        include: {
+          business: {
+            include: {
+              owner: true,
+              location: true,
+              reviews: true,
+              category: true,
+            },
+          },
+        },
+      },
     };
     const total = await this.model.count({
       filter: { field: 'userId', op: 'eq', value: userId },

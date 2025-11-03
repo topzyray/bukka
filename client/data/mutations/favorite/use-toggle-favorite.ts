@@ -7,7 +7,7 @@ export const useToggleFavorite = () => {
 
   return useCustomMutation(FavoriteApiService.toggleFavorite, {
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["favourites"] });
     },
   });
 };
