@@ -3,14 +3,17 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Heart, Filter, Search } from "lucide-react";
+import { Heart, Filter, Search, Loader2 } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import { BusinessCard } from "@/features/business/components/business-card";
 import { useFavorites } from "@/data/queries/use-favorites";
+import { CircularLoader } from "@/components/loaders/circular-loader";
+import { extractErrorMessage } from "@/utils";
 
-export function Favorites() {
-  const { data: mockFavorites } = useFavorites();
+export function UserFavorites() {
+  const { data: favourites, isLoading, isError, error } = useFavorites();
+  const userFavourites = favourites?.responseData?.data;
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,7 +32,16 @@ export function Favorites() {
                 My Favorites
               </h1>
               <p className="text-muted-foreground mt-1">
-                {mockFavorites.length} saved restaurants
+                {isLoading ? (
+                  <Loader2 />
+                ) : userFavourites && userFavourites.length ? (
+                  userFavourites.length
+                ) : isError ? (
+                  0
+                ) : (
+                  0
+                )}{" "}
+                saved businesses
               </p>
             </div>
           </div>
@@ -50,39 +62,46 @@ export function Favorites() {
             </BukkaButton>
           </div>
 
-          {/* Favorites List */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockFavorites.map((favorite: any, index: number) => (
-              <motion.div
-                key={favorite.restaurant.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-              >
-                <BusinessCard business={favorite.restaurant} />
-              </motion.div>
-            ))}
+            {isLoading ? (
+              <CircularLoader />
+            ) : userFavourites?.length ? (
+              userFavourites.map((favorite: any, index: number) => (
+                <motion.div
+                  key={favorite?.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                >
+                  <BusinessCard business={favorite?.business} />
+                </motion.div>
+              ))
+            ) : isError ? (
+              extractErrorMessage(error)
+            ) : null}
           </div>
 
-          {/* Empty State - Hidden when there are favorites */}
-          {mockFavorites.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-16"
-            >
-              <Heart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-foreground mb-2">
-                No favorites yet
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                Start exploring restaurants and save your favorites here
-              </p>
-              <BukkaButton asChild>
-                <Link href="/businesses">Discover Restaurants</Link>
-              </BukkaButton>
-            </motion.div>
-          )}
+          {!isLoading &&
+            !isError &&
+            userFavourites &&
+            userFavourites.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-16"
+              >
+                <Heart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  No favorites yet
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  Start exploring businesses and save your favorites here
+                </p>
+                <BukkaButton asChild>
+                  <Link href="/businesses">Discover Businesses</Link>
+                </BukkaButton>
+              </motion.div>
+            )}
         </motion.div>
       </main>
     </div>

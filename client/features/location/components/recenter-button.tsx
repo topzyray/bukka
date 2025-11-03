@@ -9,10 +9,10 @@ import { toast } from "sonner";
 export function RecenterButton({
   onLocate,
 }: {
-  onLocate: (coords: { lat: number; lng: number }) => void;
+  onLocate?: (coords: { lat: number; lng: number }) => void;
 }) {
   const map = useMap();
-  const { setCoordinates } = useGlobalState();
+  // const { setCoordinates } = useGlobalState();
   const {
     userCoordinates,
     setUserCoordinates,
@@ -45,8 +45,8 @@ export function RecenterButton({
     map.flyTo([userCoordinates.lat, userCoordinates.lng], 16, {
       animate: true,
     });
-    onLocate(userCoordinates);
-    setCoordinates(userCoordinates);
+    onLocate?.(userCoordinates);
+    // setCoordinates(userCoordinates);
     toast.success("Centered on your location");
 
     setLocating(false);

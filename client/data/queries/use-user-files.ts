@@ -3,7 +3,7 @@ import { useCustomQuery } from "./base";
 
 export const useUserFiles = ({ userId }: { userId?: number }) => {
   return useCustomQuery(
-    ["userFiles", userId],
+    ["user-files", userId],
     () => FileApiService.getLoggedInUserFiles(),
     {
       enabled: !!userId,

@@ -161,9 +161,9 @@ export const BusinessDetails: React.FC = () => {
                       </Card> */}
 
                       <Card>
-                        <CardHeader>
+                        {/* <CardHeader>
                           <CardTitle>Business Details</CardTitle>
-                        </CardHeader>
+                        </CardHeader> */}
                         <CardContent>
                           <motion.div
                             initial={{ opacity: 0, y: 10 }}

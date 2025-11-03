@@ -6,7 +6,7 @@ import {
   processResendConfirmationDto,
   ProcessSignupDto,
 } from 'src/DomainLayer/Dtos/AuthNotificationHelperDto';
-import { AuthNotificationService } from '../Services/notification/auth/AuthNotificationService';
+import { AuthNotificationService } from '../Services/notification/services/AuthNotificationService';
 
 @Injectable()
 export class AuthNotificationHelper {

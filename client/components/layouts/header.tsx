@@ -104,7 +104,7 @@ export function Header({ className }: HeaderProps) {
               </Link>
             </BukkaButton>
             <BukkaButton variant="ghost" size="sm" asChild>
-              <Link href="/map" className="flex items-center gap-2">
+              <Link href="/maps" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Map View
               </Link>
@@ -188,7 +188,7 @@ export function Header({ className }: HeaderProps) {
               </Link>
             </BukkaButton>
             <BukkaButton variant="ghost" size="sm" asChild className="w-full ">
-              <Link href="/map" className="flex items-center gap-2">
+              <Link href="/maps" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Map View
               </Link>

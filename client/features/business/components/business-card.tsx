@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, memo } from "react";
+import React, { useState, memo, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -16,8 +16,9 @@ import { FileCategoryEnum } from "@/data/enums";
 import { File } from "@/data/interfaces/File";
 import { useDistance } from "@/hooks/use-distance";
 import { FavoriteButton } from "./favorite-button";
+import { BusinessHelper } from "../helper/bussiness-helper";
 
-interface BusinessCardProps {
+interface IBusinessCard {
   business: Business;
   variant?: "default" | "compact" | "featured";
   className?: string;
@@ -29,33 +30,38 @@ export const BusinessCard = memo(function BusinessCard({
   variant = "default",
   className,
   onClick,
-}: BusinessCardProps) {
+}: IBusinessCard) {
   const [imageError, setImageError] = useState(false);
   const router = useRouter();
 
   const { data: businessFiles, isLoading: isLoadingBusinessFiles } =
     useBusinessFiles({
-      businessId: business.id,
+      businessId: business?.id,
     });
 
   const { formatted } = useDistance({
-    targetLat: business.location.latitude,
-    targetLng: business.location.longitude,
+    targetLat: business?.location?.latitude,
+    targetLng: business?.location?.longitude,
   });
 
+  const openNow = useMemo(
+    () => BusinessHelper.isOpenNow(business?.openingHours),
+    [business?.openingHours]
+  );
+
   const renderRating = () =>
-    business.rating ? (
+    business?.rating ? (
       <div className="flex items-center gap-1">
         <Star className="w-4 h-4 fill-accent text-accent" />
         <span className="text-sm font-medium">
-          {business.rating.toFixed(1)}
+          {business?.rating.toFixed(1)}
         </span>
       </div>
     ) : (
       <div className="flex items-center gap-1">
         <Star className="w-4 h-4 fill-accent text-accent" />
         <span className="text-sm font-medium">
-          {business.rating.toFixed(1)}
+          {business?.rating.toFixed(1)}
         </span>
       </div>
     );
@@ -99,7 +105,7 @@ export const BusinessCard = memo(function BusinessCard({
               ) : (
                 <div className="w-full h-full warm-gradient flex items-center justify-center">
                   <span className="text-white text-xs font-bold">
-                    {business.name.charAt(0)}
+                    {business?.name.charAt(0)}
                   </span>
                 </div>
               )}
@@ -107,10 +113,10 @@ export const BusinessCard = memo(function BusinessCard({
 
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-sm truncate">
-                {business.name}
+                {business?.name}
               </h3>
               <p className="text-xs text-muted-foreground truncate">
-                {business.location?.address ?? business.description}
+                {business?.location?.address ?? business?.description}
               </p>
               <div className="flex items-center gap-2 mt-1">
                 {renderRating()}
@@ -118,22 +124,6 @@ export const BusinessCard = memo(function BusinessCard({
               </div>
             </div>
 
-            {/* <BukkaButton
-              variant="ghost"
-              size="icon"
-              className="flex-shrink-0 w-8 h-8"
-              onClick={handleFavoriteClick}
-              aria-label={!!isUserFavorite ? "Unsave" : "Save"}
-            >
-              <Heart
-                className={cn(
-                  "w-4 h-4 transition-colors",
-                  !!isUserFavorite
-                    ? "fill-red-500 text-red-500"
-                    : "text-muted-foreground"
-                )}
-              />
-            </BukkaButton> */}
             <FavoriteButton
               businessId={business?.id}
               className="flex-shrink-0 w-8 h-8"
@@ -167,7 +157,7 @@ export const BusinessCard = memo(function BusinessCard({
           ) : (
             <div className="w-full h-full warm-gradient flex items-center justify-center">
               <span className="text-white text-4xl font-bold">
-                {business.name.charAt(0)}
+                {business?.name.charAt(0)}
               </span>
             </div>
           )}
@@ -194,13 +184,13 @@ export const BusinessCard = memo(function BusinessCard({
             className="absolute top-3 right-3 w-8 h-8"
           />
 
-          {business.openingHours?.openNow !== undefined && (
+          {openNow !== undefined && (
             <Badge
-              variant={business.openingHours.openNow ? "default" : "secondary"}
+              variant={openNow ? "default" : "secondary"}
               className="absolute bottom-3 left-3"
             >
               <Clock className="w-3 h-3 mr-1" />
-              {business.openingHours.openNow ? "Open" : "Closed"}
+              {openNow ? "Open" : "Closed"}
             </Badge>
           )}
         </div>
@@ -209,10 +199,10 @@ export const BusinessCard = memo(function BusinessCard({
           <div className="space-y-3">
             <div>
               <h3 className="font-semibold text-lg truncate group-hover:text-primary transition-colors">
-                {business.name}
+                {business?.name}
               </h3>
               <p className="text-sm text-muted-foreground truncate">
-                {business.location?.address ?? business.description}
+                {business?.location?.address ?? business?.description}
               </p>
             </div>
 
@@ -223,19 +213,21 @@ export const BusinessCard = memo(function BusinessCard({
               <div className="flex-1">{renderDistance()}</div>
             </div>
 
-            {business?.cuisines && business.cuisines.length > 0 && (
+            {business?.cuisines && business?.cuisines.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {business.cuisines.slice(0, 3).map((c: string, idx: number) => (
-                  <Badge key={idx} variant="secondary" className="text-xs">
-                    {typeof c === "string" ? c : String(c)}
-                  </Badge>
-                ))}
+                {business?.cuisines
+                  .slice(0, 3)
+                  .map((c: string, idx: number) => (
+                    <Badge key={idx} variant="secondary" className="text-xs">
+                      {typeof c === "string" ? c : String(c)}
+                    </Badge>
+                  ))}
               </div>
             )}
 
             <div className="flex gap-2 pt-2 justify-end flex-wrap">
-              {business.phoneNumber && (
-                <Link href={`tel:${business.phoneNumber}`}>
+              {business?.phoneNumber && (
+                <Link href={`tel:${business?.phoneNumber}`}>
                   <BukkaButton
                     variant="outline"
                     size="sm"
@@ -249,8 +241,8 @@ export const BusinessCard = memo(function BusinessCard({
               )}
               <Link
                 href={
-                  business.location
-                    ? `/maps?q=${business.location.latitude},${business.location.longitude}`
+                  business?.location
+                    ? `/maps?q=${business?.location?.latitude},${business?.location?.longitude}`
                     : "#"
                 }
                 // href={
@@ -258,7 +250,7 @@ export const BusinessCard = memo(function BusinessCard({
                 //     ? `https://www.google.com/maps?q=${business.location.latitude},${business.location.longitude}`
                 //     : "#"
                 // }
-                target="_blank"
+                // target="_blank"
                 rel="noreferrer"
               >
                 <BukkaButton
@@ -271,7 +263,7 @@ export const BusinessCard = memo(function BusinessCard({
                   Directions
                 </BukkaButton>
               </Link>
-              {business.website && (
+              {business?.website && (
                 <Link
                   href={
                     business?.website.startsWith("http")

@@ -69,7 +69,7 @@ export function ImageUploadStep({
     uploadFn: async (formData: FormData) => FileApiService.uploadFile(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      queryClient.invalidateQueries({ queryKey: ["userFiles"] });
+      queryClient.invalidateQueries({ queryKey: ["user-files"] });
       saveOnboardingProgressMutation(progressPayload);
       onNext();
     },
@@ -97,11 +97,11 @@ export function ImageUploadStep({
   };
 
   return (
-    <div className="animate-in fade-in duration-300">
-      <h2 className="text-xl font-semibold mb-2">
+    <div className="animate-in fade-in duration-300 border p-4 rounded-lg">
+      <h2 className="text-base font-semibold mb-2">
         Upload your profile picture
       </h2>
-      <p className="text-sm text-muted-foreground mb-4">
+      <p className="text-xs text-muted-foreground mb-4">
         Recommended size: 300x300px
       </p>
 
@@ -118,7 +118,7 @@ export function ImageUploadStep({
                   <FormLabel>Profile Image</FormLabel>
                   <FormControl>
                     <ImageUploader
-                      label="Select image"
+                      // label="Select image"
                       onChange={(file) => {
                         field.onChange(file);
                       }}

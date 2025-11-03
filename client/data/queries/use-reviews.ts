@@ -3,7 +3,7 @@ import { useCustomQuery } from "./base";
 
 export const useBusinessReviews = ({ businessId }: { businessId: number }) => {
   return useCustomQuery(
-    ["favorites"],
+    ["reviews"],
     () => ReviewApiService.getReviewByBusinessId(businessId),
     { enabled: !!businessId }
   );

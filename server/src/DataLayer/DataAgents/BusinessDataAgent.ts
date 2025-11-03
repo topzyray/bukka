@@ -30,6 +30,8 @@ export class BusinessDataAgent {
         include: {
           category: true,
           location: true,
+          reviews: true,
+          owner: true,
         },
       },
     };

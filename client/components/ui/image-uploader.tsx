@@ -1,472 +1,318 @@
-// "use client";
-
-// import { useRef, useState } from "react";
-// import { Upload, X, Star } from "lucide-react";
-// import Image from "next/image";
-// import clsx from "clsx";
-// import { Card, CardContent } from "./card";
-// import { Button } from "./button";
-// import { Input } from "./input";
-// import { FileHelper } from "@/helpers/file-helper";
-// import { cn } from "@/lib/utils";
-
-// interface IImageUploaderProp {
-//   onChange: (files: File[] | File | null) => void;
-//   label?: string;
-//   isMultiple?: boolean;
-// }
-
-// export const ImageUploader = ({
-//   onChange,
-//   label,
-//   isMultiple = false,
-// }: IImageUploaderProp) => {
-//   const [previews, setPreviews] = useState<{ file: File; url: string }[]>([]);
-//   const [coverIndex, setCoverIndex] = useState<number | null>(null);
-//   const [isvalidFile, setIsValidFile] = useState<boolean>(false);
-//   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-//   const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const files = e.target.files ? Array.from(e.target.files) : [];
-//     if (!files.length) return;
-
-//     const validFiles = await FileHelper.validateFile(files);
-
-//     if (validFiles.length) {
-//       setIsValidFile(true);
-//     }
-
-//     const mapped = validFiles.map((file) => ({
-//       file,
-//       url: URL.createObjectURL(file),
-//     }));
-
-//     const updated = isMultiple ? [...previews, ...mapped] : mapped;
-//     setPreviews(updated);
-
-//     if (isMultiple) {
-//       onChange(updated.map((item) => item.file));
-//     } else {
-//       onChange(updated[0]?.file ?? null);
-//     }
-//   };
-
-//   const handleRemove = (index: number) => {
-//     const updated = previews.filter((_, i) => i !== index);
-//     setPreviews(updated);
-//     setIsValidFile(false);
-
-//     if (fileInputRef.current) {
-//       fileInputRef.current.value = "";
-//     }
-
-//     if (isMultiple) {
-//       onChange(updated.map((item) => item.file));
-//     } else {
-//       onChange(updated[0]?.file ?? null);
-//     }
-//     if (index === coverIndex) setCoverIndex(null);
-//   };
-
-//   const handleSelectCover = (index: number) => {
-//     if (index === coverIndex) return;
-//     const newPreviews = [...previews];
-//     const [selected] = newPreviews.splice(index, 1);
-//     newPreviews.unshift(selected);
-//     setPreviews(newPreviews);
-//     setCoverIndex(0);
-//     if (isMultiple) {
-//       onChange(newPreviews.map((item) => item.file));
-//     }
-//   };
-
-//   const handleClick = () => fileInputRef.current?.click();
-
-//   return (
-//     <section className="flex flex-col gap-0 w-full">
-//       {/* Upload Box */}
-//       <div
-//         className={cn(
-//           "flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-6 bg-muted/40 cursor-pointer hover:bg-muted/60 hover:shadow-md transition-all text-center"
-//           // isvalidFile ? "border-green-600 border-2 border-dashed" : ""
-//         )}
-//         onClick={handleClick}
-//         tabIndex={0}
-//         onKeyDown={(e) => e.key === "Enter" && handleClick()}
-//       >
-//         <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-//         <p className="text-sm text-muted-foreground">
-//           {label ||
-//             (isMultiple
-//               ? "Upload multiple photos (max 5)"
-//               : "Upload your profile image")}
-//         </p>
-//         <p className="text-sm">Note: Max Size 200kb</p>
-//         <Input
-//           type="file"
-//           ref={fileInputRef}
-//           onChange={handleFiles}
-//           className="hidden"
-//           accept="image/*"
-//           multiple={isMultiple}
-//         />
-//       </div>
-
-//       {/* Preview Section */}
-//       {previews.length > 0 ? (
-//         <div
-//           className={clsx(
-//             "grid gap-4 mt-2",
-//             isMultiple
-//               ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4"
-//               : "grid-cols-1 place-items-center"
-//           )}
-//         >
-//           {previews.map((item, index) => (
-//             <div
-//               key={index}
-//               className={clsx(
-//                 "relative group rounded-xl overflow-hidden border border-border bg-background shadow-sm hover:shadow-lg transition-all",
-//                 index === coverIndex && "ring-2 ring-primary"
-//               )}
-//             >
-//               <Image
-//                 src={item.url}
-//                 alt={`Preview ${index + 1}`}
-//                 width={200}
-//                 height={200}
-//                 className="object-cover w-full h-32 sm:h-36 md:h-40"
-//               />
-
-//               {/* Remove Button */}
-//               <Button
-//                 type="button"
-//                 variant="ghost"
-//                 size="icon"
-//                 onClick={() => handleRemove(index)}
-//                 className="absolute top-2 right-2 bg-background/50 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition"
-//               >
-//                 <X className="w-4 h-4 text-destructive" />
-//               </Button>
-
-//               {/* Cover Selection (Business only) */}
-//               {isMultiple && (
-//                 <button
-//                   type="button"
-//                   onClick={() => handleSelectCover(index)}
-//                   className={clsx(
-//                     "absolute bottom-1 left-2 flex items-center gap-1 text-xs font-medium rounded-md px-1.5 py-0.5 transition-all",
-//                     index === coverIndex
-//                       ? "bg-primary text-primary-foreground"
-//                       : "bg-background/80 text-muted-foreground hover:bg-background"
-//                   )}
-//                 >
-//                   <Star
-//                     className={clsx(
-//                       "w-3 h-3",
-//                       index === coverIndex && "fill-current"
-//                     )}
-//                   />
-//                   {index === coverIndex ? "Cover" : "Set cover"}
-//                 </button>
-//               )}
-//             </div>
-//           ))}
-//         </div>
-//       ) : (
-//         <Card className="flex justify-center items-center border-dashed border-2 text-primary mt-2 min-h-[80px]">
-//           <CardContent className="text-sm text-muted-foreground">
-//             No image selected yet.
-//           </CardContent>
-//         </Card>
-//       )}
-//     </section>
-//   );
-// };
-
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { Upload, X, Star, Camera } from "lucide-react";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { Upload, X, Camera } from "lucide-react";
 import Image from "next/image";
 import clsx from "clsx";
 import { Card, CardContent } from "./card";
 import { Button } from "./button";
 import { Input } from "./input";
 import { FileHelper } from "@/helpers/file-helper";
-import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 interface IImageUploaderProp {
   onChange: (files: File[] | File | null) => void;
-  label?: string;
   isMultiple?: boolean;
+  useRearCamera?: boolean;
 }
 
 export const ImageUploader = ({
   onChange,
-  label,
   isMultiple = false,
+  useRearCamera = false,
 }: IImageUploaderProp) => {
   const [previews, setPreviews] = useState<{ file: File; url: string }[]>([]);
   const [coverIndex, setCoverIndex] = useState<number | null>(null);
-  const [isvalidFile, setIsValidFile] = useState<boolean>(false);
-
-  // Camera state
   const [isCameraActive, setIsCameraActive] = useState(false);
-  const [isStartingCamera, setIsStartingCamera] = useState(false);
+  const [loadingCamera, setLoadingCamera] = useState(false);
+  const [useRearCameraState, setUseRearCameraState] = useState(useRearCamera);
+  const [switching, setSwitching] = useState(false);
+  const [flash, setFlash] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const mobileCameraRef = useRef<HTMLInputElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // Hidden file inputs
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const mobileCameraRef = useRef<HTMLInputElement | null>(null);
-
-  // Cleanup stream on unmount
   useEffect(() => {
     return () => {
-      stopCameraStream();
-      // revoke preview object URLs
-      previews.forEach((p) => URL.revokeObjectURL(p.url));
+      stopCamera();
+      previews.forEach((p) => URL.revokeObjectURL(p?.url));
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [previews]);
 
-  const stopCameraStream = () => {
+  const stopCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     }
   };
 
-  // Common file handler (used by file input and camera capture result)
   const handleFiles = async (filesArg: File[] | FileList | null) => {
-    const files = filesArg ? Array.from(filesArg as File[]) : [];
+    const files = filesArg ? Array.from(filesArg) : [];
     if (!files.length) return;
 
     const validFiles = await FileHelper.validateFile(files);
-    if (validFiles.length) setIsValidFile(true);
 
-    const mapped = validFiles.map((file) => ({
+    const resizedFiles = await Promise.all(
+      validFiles.map(async (file) => {
+        if (file.size > 2 * 1024 * 1024) {
+          return await resizeImage(file, 1024, 1024);
+        }
+        return file;
+      })
+    );
+
+    const mapped = resizedFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
     }));
 
     const updated = isMultiple ? [...previews, ...mapped] : mapped;
     setPreviews(updated);
-
-    if (isMultiple) {
-      onChange(updated.map((item) => item.file));
-    } else {
-      onChange(updated[0]?.file ?? null);
-    }
+    onChange(
+      isMultiple ? updated.map((p) => p.file) : updated[0]?.file ?? null
+    );
   };
 
-  // Handler for hidden file inputs' native change event
-  const onFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    await handleFiles(e.target.files);
-  };
+  const resizeImage = useCallback(
+    async (file: File, maxW: number, maxH: number) => {
+      const img = document.createElement("img");
+      const reader = new FileReader();
+      const dataUrl: string = await new Promise((resolve) => {
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.readAsDataURL(file);
+      });
+
+      img.src = dataUrl;
+      await new Promise((res) => (img.onload = res));
+
+      const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const blob: Blob = await new Promise((resolve) =>
+        canvas.toBlob((b) => resolve(b!), "image/jpeg", 0.9)
+      );
+      return new File([blob], file.name, { type: "image/jpeg" });
+    },
+    []
+  );
 
   const handleRemove = (index: number) => {
     const updated = previews.filter((_, i) => i !== index);
+    URL.revokeObjectURL(previews[index]?.url);
     setPreviews(updated);
-    setIsValidFile(false);
-
-    if (fileInputRef.current) fileInputRef.current.value = "";
-    if (mobileCameraRef.current) mobileCameraRef.current.value = "";
-
-    if (isMultiple) {
-      onChange(updated.map((item) => item.file));
-    } else {
-      onChange(updated[0]?.file ?? null);
-    }
-    if (index === coverIndex) setCoverIndex(null);
+    onChange(
+      isMultiple ? updated.map((i) => i.file) : updated[0]?.file ?? null
+    );
   };
 
-  const handleSelectCover = (index: number) => {
-    if (index === coverIndex) return;
-    const newPreviews = [...previews];
-    const [selected] = newPreviews.splice(index, 1);
-    newPreviews.unshift(selected);
-    setPreviews(newPreviews);
-    setCoverIndex(0);
-    if (isMultiple) {
-      onChange(newPreviews.map((item) => item.file));
-    } else {
-      onChange(newPreviews[0]?.file ?? null);
-    }
-  };
+  const handleUploadClick = () => fileInputRef.current?.click();
 
-  const handleClickUpload = () => fileInputRef.current?.click();
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
-  // Main camera button: mobile -> native capture input, desktop -> getUserMedia live preview
-  const handleClickCamera = async () => {
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const handleCameraClick = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     if (isMobile) {
+      // Use rear or front camera for mobile uploads
+      if (mobileCameraRef.current) {
+        if (useRearCamera) {
+          mobileCameraRef.current.setAttribute("capture", "environment");
+        } else {
+          mobileCameraRef.current.setAttribute("capture", "user");
+        }
+      }
       mobileCameraRef.current?.click();
       return;
     }
 
-    // Desktop: start live camera preview
-    setIsStartingCamera(true);
     try {
-      // Request camera; prefer environment (rear) by default, fallback to any available
-      const constraints: MediaStreamConstraints = {
-        video: { facingMode: "environment" as any },
+      setLoadingCamera(true);
+      stopCamera();
+
+      // Dynamically choose camera
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: useRearCameraState ? "environment" : "user" },
         audio: false,
-      };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      });
+
       streamRef.current = stream;
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.playsInline = true;
-        // Some browsers need an explicit play() call and wait for metadata
-        try {
-          await videoRef.current.play();
-        } catch (err) {
-          // If autoplay blocked, user will still see a black video until they interact; still set active
-          // We keep active state so UI shows capture controls
-        }
-      }
-
       setIsCameraActive(true);
+
+      requestAnimationFrame(async () => {
+        const video = videoRef.current;
+        if (video) {
+          video.srcObject = stream;
+          await new Promise<void>((resolve) => {
+            video.onloadedmetadata = () => resolve();
+          });
+          await video.play().catch(() => {});
+        }
+      });
     } catch (err) {
-      console.error("Failed to access camera:", err);
-      // If camera permission denied or unavailable, fallback to file input
-      fileInputRef.current?.click();
+      console.error("Camera access error:", err);
+      toast.error("Camera Failure", {
+        description:
+          "Unable to access your camera. Check permissions or use HTTPS.",
+      });
     } finally {
-      setIsStartingCamera(false);
+      setLoadingCamera(false);
     }
   };
 
-  // Capture snapshot from video -> file -> reuse handleFiles
-  const handleCaptureSnapshot = async () => {
-    if (!videoRef.current) return;
+  const handleCapture = async () => {
+    setFlash(true);
+    setTimeout(() => setFlash(false), 150);
 
-    // Ensure video has dimensions
     const video = videoRef.current;
-    const width = video.videoWidth || video.clientWidth;
-    const height = video.videoHeight || video.clientHeight;
-    if (!width || !height) {
-      // try waiting for loadedmetadata
-      await new Promise<void>((resolve) => {
-        const onLoaded = () => {
-          video.removeEventListener("loadedmetadata", onLoaded);
-          resolve();
-        };
-        video.addEventListener("loadedmetadata", onLoaded);
-        // timeout fallback
-        setTimeout(() => {
-          try {
-            video.removeEventListener("loadedmetadata", onLoaded);
-          } catch {}
-          resolve();
-        }, 500);
-      });
-    }
+    if (!video) return;
 
     const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth || video.clientWidth || 640;
-    canvas.height = video.videoHeight || video.clientHeight || 480;
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Mirror front camera if needed (we used facingMode environment, but just draw normally)
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    // Convert to blob and create File
     canvas.toBlob(
       async (blob) => {
         if (!blob) return;
-
-        const file = new File([blob], "camera-photo.jpg", {
-          type: blob.type || "image/jpeg",
+        const file = new File([blob], `photo-${Date.now()}.jpg`, {
+          type: "image/jpeg",
         });
 
-        // reuse existing validation + preview flow
         await handleFiles([file]);
-
-        // stop camera
-        stopCameraStream();
+        stopCamera();
         setIsCameraActive(false);
       },
       "image/jpeg",
-      0.92
+      0.9
     );
   };
 
   const handleCancelCamera = () => {
-    stopCameraStream();
+    stopCamera();
     setIsCameraActive(false);
+  };
+
+  const handleSwitchCamera = async () => {
+    if (switching || !navigator.mediaDevices?.getUserMedia) return;
+    setSwitching(true);
+    const newFacingMode = !useRearCameraState;
+    setUseRearCameraState(newFacingMode);
+    try {
+      stopCamera();
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: newFacingMode ? "environment" : "user" },
+        audio: false,
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await new Promise<void>((resolve) => {
+          videoRef.current!.onloadedmetadata = () => resolve();
+        });
+        await videoRef.current!.play().catch(() => {});
+      }
+    } catch (err) {
+      console.error("Camera switch error:", err);
+    } finally {
+      setSwitching(false);
+    }
   };
 
   return (
     <section className="flex flex-col gap-2 w-full">
-      {/* Upload / Camera Buttons */}
       <div className="flex justify-center gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleClickUpload}
-          className="flex items-center gap-2"
-        >
-          <Upload className="w-4 h-4" />
-          Upload from Files
+        <Button variant="outline" onClick={handleUploadClick}>
+          <Upload className="w-4 h-4 mr-2" /> Upload
         </Button>
-
         <Button
-          type="button"
           variant="outline"
-          onClick={handleClickCamera}
-          className="flex items-center gap-2"
+          onClick={handleCameraClick}
+          disabled={loadingCamera}
         >
-          <Camera className="w-4 h-4" />
-          Use Camera
+          <Camera className="w-4 h-4 mr-2" />
+          {loadingCamera ? "Opening..." : "Use Camera"}
         </Button>
       </div>
 
-      {/* Hidden File Inputs */}
+      {/* Hidden inputs */}
       <Input
         type="file"
         ref={fileInputRef}
-        onChange={onFileInputChange}
+        onChange={(e) => handleFiles(e.target.files)}
         className="hidden"
         accept="image/*"
         multiple={isMultiple}
       />
-      {/* Mobile camera capture input */}
       <Input
         type="file"
         ref={mobileCameraRef}
-        onChange={onFileInputChange}
+        onChange={(e) => handleFiles(e.target.files)}
         className="hidden"
         accept="image/*"
-        capture="environment"
+        capture={useRearCamera ? "environment" : "user"} // rear camera for mobile
       />
 
-      {/* Live Camera Preview (Desktop) */}
       {isCameraActive && (
-        <div className="mt-4 flex flex-col items-center gap-2">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="rounded-lg border border-border w-full max-w-md bg-black"
-          />
-          <div className="flex gap-2">
-            <Button onClick={handleCaptureSnapshot} disabled={isStartingCamera}>
-              Capture Photo
-            </Button>
-            <Button onClick={handleCancelCamera} variant="ghost">
-              Cancel
-            </Button>
+        <Card className="w-full border-dashed border text-center py-4  min-h-26 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={useRearCameraState ? "rear" : "front"}
+                initial={{ rotateY: 90, opacity: 0 }}
+                animate={{ rotateY: 0, opacity: 1 }}
+                exit={{ rotateY: -90, opacity: 0 }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
+                className="rounded-lg border w-full max-w-sm bg-black overflow-hidden perspective-1000"
+              >
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="object-cover w-full h-full"
+                />
+              </motion.div>
+            </AnimatePresence>
+
+            <div className="flex flex-wrap gap-2 justify-center">
+              <Button size="sm" onClick={handleCapture}>
+                Capture
+              </Button>
+              {isMobile && (
+                <Button
+                  size="sm"
+                  onClick={handleSwitchCamera}
+                  variant="outline"
+                >
+                  Switch Camera
+                </Button>
+              )}
+              <Button size="sm" onClick={handleCancelCamera} variant="ghost">
+                Cancel
+              </Button>
+            </div>
+
+            {flash && (
+              <motion.div
+                className="absolute inset-0 bg-primary"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 1, 0] }}
+                transition={{ duration: 0.3 }}
+              />
+            )}
           </div>
-        </div>
+        </Card>
       )}
 
-      {/* Preview Section */}
-      {!isCameraActive && previews.length > 0 ? (
+      {!isCameraActive && previews.length > 0 && (
         <div
           className={clsx(
             "grid gap-4 mt-2",
@@ -475,65 +321,53 @@ export const ImageUploader = ({
               : "grid-cols-1 place-items-center"
           )}
         >
-          {previews.map((item, index) => (
-            <div
-              key={index}
-              className={clsx(
-                "relative group rounded-xl overflow-hidden border border-border bg-background shadow-sm hover:shadow-lg transition-all",
-                index === coverIndex && "ring-2 ring-primary"
-              )}
+          {previews.map((item, i) => (
+            <Card
+              key={i}
+              className="w-full border-dashed border text-center py-4  min-h-26 flex items-center justify-center"
             >
-              <Image
-                src={item.url}
-                alt={`Preview ${index + 1}`}
-                width={200}
-                height={200}
-                className="object-cover w-full h-32 sm:h-36 md:h-40"
-              />
-
-              {/* Remove Button */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => handleRemove(index)}
-                className="absolute top-2 right-2 bg-background/50 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition"
-              >
-                <X className="w-4 h-4 text-destructive" />
-              </Button>
-
-              {/* Cover Selection (Business only) */}
-              {isMultiple && (
-                <button
-                  type="button"
-                  onClick={() => handleSelectCover(index)}
-                  className={clsx(
-                    "absolute bottom-1 left-2 flex items-center gap-1 text-xs font-medium rounded-md px-1.5 py-0.5 transition-all",
-                    index === coverIndex
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-background/80 text-muted-foreground hover:bg-background"
-                  )}
+              <div className="relative group rounded-xl overflow-hidden border">
+                <Image
+                  src={item.url}
+                  alt="preview"
+                  width={200}
+                  height={200}
+                  className="object-cover w-full h-36"
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="absolute top-2 right-2 bg-white/60 rounded-full opacity-0 group-hover:opacity-100 transition"
+                  onClick={() => handleRemove(i)}
                 >
-                  <Star
+                  <X className="w-4 h-4 text-destructive" />
+                </Button>
+                {isMultiple && (
+                  <button
+                    type="button"
+                    onClick={() => setCoverIndex(i)}
                     className={clsx(
-                      "w-3 h-3",
-                      index === coverIndex && "fill-current"
+                      "absolute bottom-2 left-2 px-2 py-1 text-xs rounded-md",
+                      i === coverIndex
+                        ? "bg-primary text-white"
+                        : "bg-white/70 text-black"
                     )}
-                  />
-                  {index === coverIndex ? "Cover" : "Set cover"}
-                </button>
-              )}
-            </div>
+                  >
+                    {i === coverIndex ? "Cover" : "Set cover"}
+                  </button>
+                )}
+              </div>
+            </Card>
           ))}
         </div>
-      ) : (
-        !isCameraActive && (
-          <Card className="flex justify-center items-center border-dashed border-2 text-primary mt-2 min-h-[80px]">
-            <CardContent className="text-sm text-muted-foreground">
-              No image selected yet.
-            </CardContent>
-          </Card>
-        )
+      )}
+
+      {!isCameraActive && previews.length === 0 && (
+        <Card className="border-dashed border text-center py-4  min-h-40 flex items-center justify-center">
+          <CardContent className="text-muted-foreground text-sm">
+            No image selected yet.
+          </CardContent>
+        </Card>
       )}
     </section>
   );
