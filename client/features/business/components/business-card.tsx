@@ -17,6 +17,7 @@ import { File } from "@/data/interfaces/File";
 import { useDistance } from "@/hooks/use-distance";
 import { FavoriteButton } from "./favorite-button";
 import { BusinessHelper } from "../helper/bussiness-helper";
+import { PlanMyJourneyButton } from "./ui/plan-my-journey";
 
 interface IBusinessCard {
   business: Business;
@@ -213,16 +214,22 @@ export const BusinessCard = memo(function BusinessCard({
               <div className="flex-1">{renderDistance()}</div>
             </div>
 
-            {business?.cuisines && business?.cuisines.length > 0 && (
+            {business?.cuisines && business?.cuisines.length > 0 ? (
               <div className="flex flex-wrap gap-1">
                 {business?.cuisines
                   .slice(0, 3)
                   .map((c: string, idx: number) => (
-                    <Badge key={idx} variant="secondary" className="text-xs">
+                    <Badge
+                      key={idx}
+                      variant="secondary"
+                      className="text-xs capitalize"
+                    >
                       {typeof c === "string" ? c : String(c)}
                     </Badge>
                   ))}
               </div>
+            ) : (
+              <Badge variant="outline">No cuisines added yet</Badge>
             )}
 
             <div className="flex gap-2 pt-2 justify-end flex-wrap">
@@ -239,7 +246,7 @@ export const BusinessCard = memo(function BusinessCard({
                   </BukkaButton>
                 </Link>
               )}
-              <Link
+              {/* <Link
                 href={
                   business?.location
                     ? `/maps?q=${business?.location?.latitude},${business?.location?.longitude}`
@@ -252,17 +259,30 @@ export const BusinessCard = memo(function BusinessCard({
                 // }
                 // target="_blank"
                 rel="noreferrer"
+              > */}
+              <BukkaButton
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                asChild
+                onClick={() => {
+                  window.location.href = business?.location
+                    ? `/maps?q=${business?.location?.latitude},${business?.location?.longitude}`
+                    : "#";
+                  // window.history.replaceState(
+                  //   null,
+                  //   "",
+                  //   business?.location
+                  //     ? `/maps?q=${business?.location?.latitude},${business?.location?.longitude}`
+                  //     : "#"
+                  // );
+                }}
               >
-                <BukkaButton
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  asChild
-                >
-                  <MapPin className="w-3 h-3 mr-1" />
-                  Directions
-                </BukkaButton>
-              </Link>
+                <MapPin className="w-3 h-3 mr-1" />
+                View on Map
+              </BukkaButton>
+              {/* </Link> */}
+              <PlanMyJourneyButton business={business} />
               {business?.website && (
                 <Link
                   href={
