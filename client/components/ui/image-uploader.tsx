@@ -119,18 +119,18 @@ export const ImageUploader = ({
   const handleCameraClick = async () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    if (isMobile) {
-      // Use rear or front camera for mobile uploads
-      if (mobileCameraRef.current) {
-        if (useRearCamera) {
-          mobileCameraRef.current.setAttribute("capture", "environment");
-        } else {
-          mobileCameraRef.current.setAttribute("capture", "user");
-        }
-      }
-      mobileCameraRef.current?.click();
-      return;
-    }
+    // if (isMobile) {
+    //   // Use rear or front camera for mobile uploads
+    //   if (mobileCameraRef.current) {
+    //     if (useRearCamera) {
+    //       mobileCameraRef.current.setAttribute("capture", "environment");
+    //     } else {
+    //       mobileCameraRef.current.setAttribute("capture", "user");
+    //     }
+    //   }
+    //   mobileCameraRef.current?.click();
+    //   return;
+    // }
 
     try {
       setLoadingCamera(true);
@@ -138,7 +138,11 @@ export const ImageUploader = ({
 
       // Dynamically choose camera
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: useRearCameraState ? "environment" : "user" },
+        video: {
+          facingMode: useRearCameraState ? "environment" : "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
         audio: false,
       });
 

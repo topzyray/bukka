@@ -179,7 +179,7 @@ export function Profile() {
 
                 <BukkaButton
                   variant="ghost"
-                  className="w-full justify-start text-destructive dark:text-white"
+                  className="w-full justify-start"
                   onClick={logout}
                 >
                   <LogOut className="w-4 h-4 mr-3" />
