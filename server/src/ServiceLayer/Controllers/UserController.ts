@@ -78,6 +78,17 @@ export class UserController {
     return BukkaResponse.GetStatusResponse(data, res);
   }
 
+  @Get('activities/summary')
+  @ApiOperation({ summary: 'Get user activity summary' })
+  async getUserSummary(@Res() res?: Response) {
+    const response = await this._userRepository.getUserActivitiesOverview();
+    const data = BukkaResponse.GetPagedDataResponse(
+      'Activity summary',
+      response,
+    );
+    return BukkaResponse.GetStatusResponse(data, res as any);
+  }
+
   // @Get('/getByEmail/:email')
   // @ApiOperation({ summary: 'Get a user by email' })
   // @ApiParam({

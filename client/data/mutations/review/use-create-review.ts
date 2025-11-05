@@ -7,7 +7,9 @@ export const useCreateReview = () => {
 
   return useCustomMutation(ReviewApiService.addReview, {
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["business-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["user-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["user-activities-summary"] });
     },
   });
 };

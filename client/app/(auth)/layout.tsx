@@ -29,7 +29,7 @@ export default function AuthLayout({ children }: IAuthLayout) {
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
-              className="w-20 h-16 flex items-center justify-center mx-auto hover:cursor-pointer"
+              className="w-20 h-16 flex items-center justify-center mx-auto hover:cursor-pointer dark:bg-white dark:p-1 dark:rounded-lg"
               onClick={() => router.push("/")}
             >
               <Image

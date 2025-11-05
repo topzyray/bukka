@@ -17,7 +17,7 @@ export function RecenterButton({
     userCoordinates,
     setUserCoordinates,
     loading: loadingUserLocation,
-    error: userCoordingError,
+    error: userLocationError,
     refreshUserLocation,
   } = useUserLocation();
 
@@ -30,9 +30,9 @@ export function RecenterButton({
       return;
     }
 
-    if (userCoordingError) {
+    if (userLocationError) {
       toast.error("Failed to fetch location", {
-        description: userCoordingError,
+        description: userLocationError,
       });
       return;
     }

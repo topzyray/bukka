@@ -6,6 +6,7 @@ export * from "./supportRoutes";
 export * from "./favoriteRoutes";
 export * from "./businessRoutes";
 export * from "./waitlistRoutes";
+export * from "./userSessionRoutes";
 export * from "./adminControlRoutes";
 export * from "./userManagementRoutes";
 export * from "./businessCategoryRoutes";

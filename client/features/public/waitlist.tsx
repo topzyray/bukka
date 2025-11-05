@@ -77,6 +77,7 @@ export function BukkaWaitList() {
     useCustomMutation(WaitlistApiService.joinWaitlist, {
       onSuccessCallback: () => {
         setSuccess(true);
+        form.reset();
         queryClient.invalidateQueries({ queryKey: ["waitlistCount"] });
       },
     });

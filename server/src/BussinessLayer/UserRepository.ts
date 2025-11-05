@@ -299,4 +299,12 @@ export class UserRepository {
     const result = await this._userDataAgent.getAdminOverview();
     return result;
   }
+
+  async getUserActivitiesOverview() {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const result = await this._userDataAgent.getUserActivitiesOverview(
+      loggedInUser?.id,
+    );
+    return result;
+  }
 }

@@ -26,9 +26,7 @@ export function DashboardLayout({
       <DashBoardSidebar navItems={navItems} />
       <main className="relative max-h-screen w-full">
         <DashboardHeader dashboardTitle={title} userData={user as User} />
-        <section className="flex pt-14">
-          <section className="w-full p-4 sm:p-4">{children}</section>
-        </section>
+        <section className="pt-14 w-full">{children}</section>
       </main>
     </SidebarProvider>
   );

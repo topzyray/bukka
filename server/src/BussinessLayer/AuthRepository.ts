@@ -149,6 +149,10 @@ export class AuthRepository {
       expiresAt: Generator.CalculateExpirationTime(20160), // 14 days
     });
 
+    await this._userRepository.updateOtherUserAsync(user?.id, {
+      lastLoginAt: new Date(),
+    });
+
     const LoginResponse = new LoginResponseDto();
     LoginResponse.user = TypeSafeMapper.mapObject(user, {
       exclude: ['password'],

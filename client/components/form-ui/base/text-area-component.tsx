@@ -19,6 +19,7 @@ type ITextAreaComponentProps = {
   formDescription?: string;
   rows?: number;
   disabled?: boolean;
+  readOnly?: boolean;
   inputClassName?: string;
   maxLength?: number;
   icon?: React.ElementType;
@@ -32,9 +33,11 @@ export function TextAreaComponent({
   formDescription,
   rows = 10,
   disabled = false,
+  readOnly,
   inputClassName,
   maxLength,
   icon: Icon,
+
   ...props
 }: ITextAreaComponentProps) {
   return (
@@ -81,6 +84,7 @@ export function TextAreaComponent({
                     "pr-8 focus:outline-none focus:ring-1 focus:border-green-600"
                   )}
                   maxLength={maxLength}
+                  readOnly={readOnly}
                   {...props}
                 />
               </FormControl>

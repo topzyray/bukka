@@ -40,9 +40,10 @@ export default function LocationInput2({
   const {
     userCoordinates,
     loading: loadingUserLocation,
-    error: userCoordingError,
+    error: userLocationError,
     refreshUserLocation,
   } = useUserLocation();
+
   const { setValue, register, watch, formState } = formControl;
   const value = watch(formName as string);
   const errors = formState.errors as any;
@@ -55,9 +56,9 @@ export default function LocationInput2({
       return;
     }
 
-    if (userCoordingError) {
+    if (userLocationError) {
       toast.error("Failed to fetch location", {
-        description: userCoordingError,
+        description: userLocationError,
       });
       return;
     }
@@ -88,7 +89,7 @@ export default function LocationInput2({
     refreshUserLocation,
     setValue,
     userCoordinates,
-    userCoordingError,
+    userLocationError,
   ]);
 
   return (

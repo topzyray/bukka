@@ -43,13 +43,6 @@ export const ADMIN: TDashboardNavigation = [
     hasSubmenu: false,
     isSidebarNav: true,
   },
-  {
-    title: "Profile",
-    url: "/dashboard/admin/profile",
-    icon: "UserCircle",
-    hasSubmenu: false,
-    isSidebarNav: true,
-  },
 ];
 
 export const VENDOR: TDashboardNavigation = [
@@ -85,13 +78,6 @@ export const VENDOR: TDashboardNavigation = [
     title: "Settings",
     url: "/dashboard/vendor/settings",
     icon: "Settings",
-    hasSubmenu: false,
-    isSidebarNav: true,
-  },
-  {
-    title: "Profile",
-    url: "/dashboard/vendor/profile",
-    icon: "UserCircle",
     hasSubmenu: false,
     isSidebarNav: true,
   },
@@ -140,13 +126,6 @@ export const USER: TDashboardNavigation = [
     hasSubmenu: false,
     isSidebarNav: true,
   },
-  {
-    title: "Profile",
-    url: "/dashboard/user/profile",
-    icon: "UserCircle",
-    hasSubmenu: false,
-    isSidebarNav: true,
-  },
 ];
 
 export const RIDER: TDashboardNavigation = [
@@ -185,13 +164,6 @@ export const RIDER: TDashboardNavigation = [
     hasSubmenu: false,
     isSidebarNav: true,
   },
-  {
-    title: "Profile",
-    url: "/dashboard/rider/profile",
-    icon: "UserCircle",
-    hasSubmenu: false,
-    isSidebarNav: true,
-  },
 ];
 
 export const INVESTOR: TDashboardNavigation = [
@@ -227,13 +199,6 @@ export const INVESTOR: TDashboardNavigation = [
     title: "Settings",
     url: "/dashboard/investor/settings",
     icon: "Settings",
-    hasSubmenu: false,
-    isSidebarNav: true,
-  },
-  {
-    title: "Profile",
-    url: "/dashboard/investor/profile",
-    icon: "UserCircle",
     hasSubmenu: false,
     isSidebarNav: true,
   },

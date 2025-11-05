@@ -33,7 +33,7 @@ export class UserSessionRepository {
     return await this._userSessionDataAgent.getSessionById(personalizationId);
   }
 
-  async getLoggedInUserSession(): Promise<BukkaResponse<UserSession>> {
+  async getLoggedInUserSessions(): Promise<BukkaResponse<UserSession>> {
     const loggedInUser = await UserHelper.getLoggedInUser();
     const data = await this._userSessionDataAgent.getAllSessions(
       loggedInUser?.id,
@@ -56,17 +56,12 @@ export class UserSessionRepository {
     deviceId: string,
   ): Promise<BukkaResponse<UserSession>> {
     const activeSesison =
-      this._userSessionDataAgent.getSessionByUserIdAndDeviceId(
+      await this._userSessionDataAgent.getSessionByUserIdAndDeviceId(
         userId,
         deviceId,
       );
 
-    return BukkaResponse.DeleteResponse(
-      'Session',
-      true,
-      undefined,
-      activeSesison,
-    );
+    return BukkaResponse.GetSingleDataResponse('Session', activeSesison);
   }
 
   async updateUserSession(
@@ -74,11 +69,9 @@ export class UserSessionRepository {
     updateData: Partial<UserSession>,
   ): Promise<BukkaResponse<UserSession>> {
     const session = await this._userSessionDataAgent.getSessionById(sessionId);
-
     if (!session) {
       return BukkaResponse.GetSingleDataResponse('User session', null);
     }
-
     const updatedSession = await this._userSessionDataAgent.updateSession(
       sessionId,
       updateData,
@@ -87,7 +80,7 @@ export class UserSessionRepository {
   }
 
   async deleteSessionById(id: number): Promise<void> {
-    await this._userSessionDataAgent.deleteSessionById(id);
+    return await this._userSessionDataAgent.deleteSessionById(id);
   }
 
   async deleteSessionByUserIdAndDeviceId(
@@ -119,18 +112,9 @@ export class UserSessionRepository {
     );
   }
 
-  async deleteAllSession(): Promise<BukkaResponse<UserSession>> {
-    const loggedInUser = await UserHelper.getLoggedInUser();
-    await UserHelper.hasAccess(loggedInUser.id);
-
-    const deletedSession = this._userSessionDataAgent.deleteAllSessions(
-      loggedInUser.id,
-    );
-
-    // if (!deletedSession) {
-    //   return BukkaResponse.GetSingleDataResponse("Session", null)
-    // }
-
+  async deleteAllUserSessions(userId: number): Promise<BukkaResponse<void>> {
+    await UserHelper.hasAccess(userId);
+    const deletedSession = this._userSessionDataAgent.deleteAllSessions(userId);
     return BukkaResponse.DeleteResponse(
       'Session',
       true,
