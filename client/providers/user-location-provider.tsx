@@ -1,9 +1,15 @@
 "use client";
 
 import { STORE_KEYS } from "@/configs";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-interface Coordinate {
+export interface Coordinate {
   lat: number;
   lng: number;
 }
@@ -40,64 +46,66 @@ export const UserLocationProvider = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchLocation = (forceRefresh = false) => {
-    setLoading(true);
-    setError(null);
+  const fetchLocation = useCallback(
+    (forceRefresh = false) => {
+      setLoading(true);
+      setError(null);
 
-    if (!forceRefresh) {
-      const cached = localStorage.getItem(STORE_KEYS.USER_LAST_LOCATION);
-      if (cached) {
-        try {
-          const parsed: CachedLocation = JSON.parse(cached);
-          const isExpired = Date.now() - parsed.timestamp > cacheDurationMs;
+      if (!forceRefresh) {
+        const cached = localStorage.getItem(STORE_KEYS.USER_LAST_LOCATION);
+        if (cached) {
+          try {
+            const parsed: CachedLocation = JSON.parse(cached);
+            const isExpired = Date.now() - parsed.timestamp > cacheDurationMs;
 
-          if (!isExpired && parsed.coords?.lat && parsed.coords?.lng) {
-            setUserCoordinates(parsed.coords);
-            setLoading(false);
-            return;
-          } else {
-            localStorage.removeItem(STORE_KEYS.USER_LAST_LOCATION);
-          }
-        } catch {}
+            if (!isExpired && parsed.coords?.lat && parsed.coords?.lng) {
+              setUserCoordinates(parsed.coords);
+              setLoading(false);
+              return;
+            } else {
+              localStorage.removeItem(STORE_KEYS.USER_LAST_LOCATION);
+            }
+          } catch {}
+        }
       }
-    }
 
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const newCoords = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const newCoords = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
 
-          const data: CachedLocation = {
-            coords: newCoords,
-            timestamp: Date.now(),
-          };
-          localStorage.setItem(
-            STORE_KEYS.USER_LAST_LOCATION,
-            JSON.stringify(data)
-          );
+            const data: CachedLocation = {
+              coords: newCoords,
+              timestamp: Date.now(),
+            };
+            localStorage.setItem(
+              STORE_KEYS.USER_LAST_LOCATION,
+              JSON.stringify(data)
+            );
 
-          setUserCoordinates(newCoords);
-          setLoading(false);
-        },
-        (err) => {
-          setError(err.message);
-          setLoading(false);
-        },
-        { enableHighAccuracy: true }
-      );
-    } else {
-      setError("Geolocation is not supported by your browser.");
-      setLoading(false);
-    }
-  };
+            setUserCoordinates(newCoords);
+            setLoading(false);
+          },
+          (err) => {
+            setError(err.message);
+            setLoading(false);
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        setError("Geolocation is not supported by your browser.");
+        setLoading(false);
+      }
+    },
+    [cacheDurationMs]
+  );
 
   useEffect(() => {
     fetchLocation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchLocation]);
 
   const refreshUserLocation = () => fetchLocation(true);
 

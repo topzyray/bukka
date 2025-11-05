@@ -48,6 +48,7 @@ export const useOrderMutation = () => {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["user-activities-summary"] });
     },
   });
 
@@ -96,6 +97,7 @@ export const useOrderStatusMutation = (businessId: number) => {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["user-activities-summary"] });
     },
   });
 

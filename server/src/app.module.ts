@@ -20,6 +20,7 @@ import { ReviewController } from './ServiceLayer/Controllers/ReviewController';
 import { HealthController } from './ServiceLayer/Controllers/HealthController';
 import { SupportController } from './ServiceLayer/Controllers/SupportController';
 import { BusinessController } from './ServiceLayer/Controllers/BusinessController';
+import { UserSessionController } from './ServiceLayer/Controllers/UserSessionController';
 import { LocationController } from './ServiceLayer/Controllers/LocationController';
 import { WaitListController } from './ServiceLayer/Controllers/WaitListController';
 import { FavoriteController } from './ServiceLayer/Controllers/FavoriteController';
@@ -125,6 +126,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     AuthController,
     FileController,
     UserController,
+    UserSessionController,
     UserNotificationController,
     NotificationSettingsController,
     UserPersonalizationController,

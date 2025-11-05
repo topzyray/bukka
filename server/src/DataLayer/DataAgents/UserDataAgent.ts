@@ -12,16 +12,31 @@ import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { IReferenceEntityAgent } from '../Abstracts/Interfaces/IReferenceEntityAgent';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
+import { Favorite } from 'src/DomainLayer/Models/Favorite';
+import { Review } from 'src/DomainLayer/Models/Review';
+import { File } from 'src/DomainLayer/Models/File';
+import { UserSession } from 'src/DomainLayer/Models/UserSession';
+import { Business } from 'src/DomainLayer/Models/Business';
 
 @Injectable()
 export class UserDataAgent implements IReferenceEntityAgent {
   private readonly model: ModelProxy<User>;
+  private readonly favouriteModel: ModelProxy<Favorite>;
+  private readonly reviewModel: ModelProxy<Review>;
+  private readonly fileModel: ModelProxy<File>;
+  private readonly sessionModel: ModelProxy<UserSession>;
+  private readonly businessModel: ModelProxy<Business>;
 
   constructor(
     @Inject(DatabaseConstant.DATABASE_ADAPTER)
     private readonly db: IDatabaseAdapter,
   ) {
     this.model = this.db.getModel<User>('user');
+    this.favouriteModel = this.db.getModel<Favorite>('favorite');
+    this.reviewModel = this.db.getModel<Review>('review');
+    this.fileModel = this.db.getModel<File>('file');
+    this.sessionModel = this.db.getModel<UserSession>('userSession');
+    this.businessModel = this.db.getModel<Business>('business');
   }
 
   async createUserAsync(data: Partial<User>): Promise<User> {
@@ -185,6 +200,8 @@ export class UserDataAgent implements IReferenceEntityAgent {
     const pageData = new PagedData<User[]>();
     pageData.page = pageNumber;
     pageData.pageSize = pageSize;
+    console.log('FILTERS: ', filter);
+
     const spec: QuerySpec = {
       filter,
       sort: [{ field: 'createdAt', direction: 'desc' }],
@@ -234,6 +251,56 @@ export class UserDataAgent implements IReferenceEntityAgent {
       newSignups: newSignups,
       activeAccounts: activeAccounts,
       deletedAccounts: deletedAccounts,
+    };
+  }
+
+  async getUserActivitiesOverview(userId: number) {
+    const businesses = await this.businessModel.count({
+      filter: {
+        field: 'ownerId',
+        op: 'eq',
+        value: userId,
+      },
+    });
+
+    const favorites = await this.favouriteModel.count({
+      filter: {
+        field: 'userId',
+        op: 'eq',
+        value: userId,
+      },
+    });
+
+    const reviews = await this.reviewModel.count({
+      filter: {
+        field: 'userId',
+        op: 'eq',
+        value: userId,
+      },
+    });
+
+    const files = await this.fileModel.count({
+      filter: {
+        field: 'referenceId',
+        op: 'eq',
+        value: userId,
+      },
+    });
+
+    const sessions = await this.sessionModel.count({
+      filter: {
+        field: 'userId',
+        op: 'eq',
+        value: userId,
+      },
+    });
+
+    return {
+      businesses: businesses ?? 0,
+      favorites: favorites ?? 0,
+      reviews: reviews ?? 0,
+      files: files ?? 0,
+      sessions: sessions ?? 0,
     };
   }
 }

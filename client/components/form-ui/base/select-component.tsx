@@ -28,8 +28,8 @@ interface ISelectComponentProps {
   formOptionData: Record<string, string>[];
   disabled?: boolean;
   inputClassName?: string;
-  icon?: React.ElementType; // Left icon support
-  multiSelect?: boolean; // NEW: enables multi-select
+  icon?: React.ElementType;
+  multiSelect?: boolean;
 }
 
 export function SelectComponent({
@@ -42,7 +42,7 @@ export function SelectComponent({
   disabled,
   inputClassName,
   icon: Icon,
-  multiSelect = false, // default is false for backward compatibility
+  multiSelect = false,
 }: ISelectComponentProps) {
   return (
     <FormField
@@ -115,19 +115,19 @@ export function SelectComponent({
                 <FormControl>
                   <SelectTrigger
                     className={cn(
-                      "w-full pr-8 flex flex-wrap gap-1",
+                      "w-full pr-8",
                       "items-center py-2 px-3",
                       Icon && "pl-8",
-                      "overflow-y-auto max-h-24 scrollbar-thin",
-                      inputClassName,
+                      "max-h-24 scrollbar-thin",
                       isError && "border-red-600",
-                      isValid && "border-green-600"
+                      isValid && "border-green-600",
+                      inputClassName
                     )}
                   >
                     {multiSelect &&
                     Array.isArray(field.value) &&
                     field.value.length > 0 ? (
-                      // ✅ Multi-select view: render badges
+                      // Multi-select view: render badges
                       <div className="flex flex-wrap gap-1">
                         {field.value.map((val: string) => (
                           <span
@@ -139,12 +139,12 @@ export function SelectComponent({
                         ))}
                       </div>
                     ) : !multiSelect && field.value ? (
-                      // ✅ Single-select view: show selected label
+                      // Single-select view: show selected label
                       <span className="text-foreground text-sm">
                         {field.value}
                       </span>
                     ) : (
-                      // ✅ Default fallback: show placeholder
+                      // Default fallback: show placeholder
                       <span className="text-muted-foreground text-sm">
                         {formPlaceholder}
                       </span>

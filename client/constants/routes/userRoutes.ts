@@ -6,6 +6,7 @@ const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 type IUserApi =
   | "getUsers"
   | "getLoggedInUser"
+  | "getUserActivitySummary"
   | "updateUser"
   | "updateUserProfile"
   | "completeOnboarding";
@@ -13,6 +14,7 @@ type IUserApi =
 const rawUserRoutes: Record<IUserApi, string> = {
   getUsers: "/users",
   getLoggedInUser: "/users/me/profile",
+  getUserActivitySummary: "/users/activities/summary",
   updateUser: "/users",
   updateUserProfile: "/users",
   completeOnboarding: "/users/profile/complete-onboarding",

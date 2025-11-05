@@ -296,4 +296,34 @@ export class TextHelper {
       currentTime >= todayPeriod.openTime && currentTime < todayPeriod.closeTime
     );
   }
+
+  static parseUserAgent(userAgent: string): string {
+    if (!userAgent) {
+      return "Unknown device";
+    }
+
+    const ua = userAgent.toLowerCase();
+    const isMobile = /mobile|android|iphone|ipad|ipod/i.test(userAgent);
+    const isTablet = /ipad|tablet/i.test(userAgent);
+
+    let browser = "Unknown Browser";
+    if (ua.includes("chrome") && !ua.includes("edg/")) browser = "Chrome";
+    else if (ua.includes("safari") && !ua.includes("chrome"))
+      browser = "Safari";
+    else if (ua.includes("firefox")) browser = "Firefox";
+    else if (ua.includes("edg/")) browser = "Edge";
+
+    let deviceType = "Desktop";
+    if (isTablet) deviceType = "Tablet";
+    else if (isMobile) deviceType = "Mobile";
+
+    let os = "Unknown OS";
+    if (ua.includes("windows")) os = "Windows";
+    else if (ua.includes("mac os")) os = "macOS";
+    else if (ua.includes("android")) os = "Android";
+    else if (/iphone|ipad|ipod/.test(ua)) os = "iOS";
+    else if (ua.includes("linux")) os = "Linux";
+
+    return `${browser} (${os}, ${deviceType})`;
+  }
 }

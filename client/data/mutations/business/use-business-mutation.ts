@@ -13,6 +13,9 @@ export const useCreateBusiness = ({
   return useCustomMutation(BusinessApiService.createBusiness, {
     onSuccessCallback: async () => {
       await queryClient.invalidateQueries({ queryKey: ["businesses"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["user-activities-summary"],
+      });
       resetForm();
       onSuccess?.();
     },
@@ -49,6 +52,9 @@ export const useDeleteBusiness = ({
   return useCustomMutation(BusinessApiService.deleteBusiness, {
     onSuccessCallback: async () => {
       await queryClient.invalidateQueries({ queryKey: ["businesses"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["user-activities-summary"],
+      });
       onSuccess?.();
     },
   });

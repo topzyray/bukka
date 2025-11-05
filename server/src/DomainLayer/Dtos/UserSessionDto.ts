@@ -99,3 +99,16 @@ export class FilterUserSessionDto {
   @IsOptional()
   expiresAt?: Date;
 }
+
+export class ActiveSessionDto {
+  @ApiProperty({ example: 1, required: true })
+  @IsNumber()
+  @IsNotEmpty()
+  @Transform(({ value }) => Number.parseInt(value, 10))
+  userId: number;
+
+  @ApiProperty({ example: 'dffdifhweirpwoudroer', required: true })
+  @IsString()
+  @IsNotEmpty()
+  deviceId: string;
+}

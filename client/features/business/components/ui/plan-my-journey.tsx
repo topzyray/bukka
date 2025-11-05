@@ -15,7 +15,7 @@ export const PlanMyJourneyButton = ({ business }: IPlanMyJourneyButton) => {
   const {
     userCoordinates,
     loading: loadingUserLocation,
-    error: userCoordingError,
+    error: userLocationError,
     refreshUserLocation,
   } = useUserLocation();
 
@@ -72,9 +72,9 @@ export const PlanMyJourneyButton = ({ business }: IPlanMyJourneyButton) => {
       return;
     }
 
-    if (userCoordingError) {
+    if (userLocationError) {
       toast.error("Failed to fetch location", {
-        description: userCoordingError,
+        description: userLocationError,
       });
       return;
     }

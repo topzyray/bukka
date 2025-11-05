@@ -10,6 +10,13 @@ export class UserApiService {
     return response.data?.responseData;
   }
 
+  static async getUserActivitySummary() {
+    const response = await HttpClient.getClient().get(
+      `${userRoutes.getUserActivitySummary}`
+    );
+    return response.data;
+  }
+
   static async getOnboardingProgress() {
     const response = await this.getLoggedInUser();
     return response?.onboardingProgress;
