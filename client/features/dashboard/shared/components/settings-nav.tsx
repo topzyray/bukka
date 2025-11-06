@@ -3,7 +3,14 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Settings, User, Lock, Activity, LayoutDashboard } from "lucide-react";
+import {
+  Settings,
+  User,
+  Lock,
+  Activity,
+  LayoutDashboard,
+  Mail,
+} from "lucide-react";
 import { useAuth } from "@/providers";
 
 const navItems = [
@@ -30,6 +37,12 @@ const navItems = [
     href: "settings/account",
     icon: User,
     description: "Profile, password, and email preferences",
+  },
+  {
+    name: "Notification",
+    href: "settings/notification",
+    icon: Mail,
+    description: "Manage Notification preference preferences",
   },
   {
     name: "Privacy",

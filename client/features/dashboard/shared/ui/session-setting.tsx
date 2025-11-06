@@ -22,6 +22,7 @@ import { BukkaButton } from "@/components/ui";
 import { motion } from "framer-motion";
 import { useRevokeSession } from "@/data/mutations/userSession/use-revoke-session";
 import { useState } from "react";
+import { SettingsPageTitleCard } from "../components/setting-title-card";
 
 export function SessionsSettings() {
   const [itemToDeleteId, setItemToDeleteId] = useState<number | null>(null);
@@ -72,40 +73,36 @@ export function SessionsSettings() {
       transition={{ duration: 0.5 }}
       className="w-full mx-auto space-y-6"
     >
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">All Sessions</h1>
-        <p className="text-muted-foreground">
-          View and manage your active login sessions across devices.
-        </p>
-      </div>
+      <SettingsPageTitleCard
+        title="All Sessions"
+        description="View and manage your active login sessions across devices."
+      />
+
       <div className="flex flex-col lg:flex-row">
         <div className="max-w-4xl w-full rounded-xl shadow-md border dark:border-sidebar-accent overflow-hidden transition-all hover:shadow-lg">
           <div className="">
-            {isLoadingUserSessions ||
-              (isLoadingActiveSessions && (
-                <div className="flex justify-center items-center py-10 text-muted-foreground">
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  Loading sessions…
-                </div>
-              ))}
+            {(isLoadingUserSessions || isLoadingActiveSessions) && (
+              <div className="flex justify-center items-center py-16 text-muted-foreground">
+                <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                Loading sessions…
+              </div>
+            )}
 
-            {isUserSessionsError ||
-              (isActiveSessionsError && (
-                <div className="flex flex-col items-center justify-center text-destructive text-sm py-10">
-                  <AlertTriangle className="w-5 h-5 mb-2" />
-                  {extractErrorMessage(userSessionsError) ||
-                    extractErrorMessage(activeSessionsError) ||
-                    "Failed to load sessions"}
-                  <button
-                    onClick={() => refetch()}
-                    className="mt-2 px-3 py-1 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/80"
-                  >
-                    Retry
-                  </button>
-                </div>
-              ))}
+            {(isUserSessionsError || isActiveSessionsError) && (
+              <div className="flex flex-col items-center justify-center text-destructive text-sm py-10">
+                <AlertTriangle className="w-5 h-5 mb-2" />
+                {extractErrorMessage(userSessionsError) ||
+                  extractErrorMessage(activeSessionsError) ||
+                  "Failed to load sessions"}
+                <button
+                  onClick={() => refetch()}
+                  className="mt-2 px-3 py-1 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/80"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
 
-            {/* Empty State */}
             {!isLoadingUserSessions &&
               !isUserSessionsError &&
               userSessions &&
@@ -115,7 +112,6 @@ export function SessionsSettings() {
                 </div>
               )}
 
-            {/* List of Sessions */}
             {!isLoadingUserSessions &&
               currentSession !== undefined &&
               userSessions &&
@@ -125,10 +121,6 @@ export function SessionsSettings() {
                     const isExpired =
                       new Date(session.expiresAt).getTime() < Date.now();
                     const isCurrent = currentSession?.id === session.id;
-
-                    console.log("Session Id: ", session.id);
-                    console.log("Current Session ID: ", currentSession?.id);
-                    console.log("Is Current: ", isCurrent);
 
                     return (
                       <li

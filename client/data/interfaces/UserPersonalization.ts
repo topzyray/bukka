@@ -2,6 +2,7 @@ import { MealPreferenceEnum } from "./../enums/MealPreferenceEnum";
 import { DietaryRestrictionEnum } from "../enums/DietRestrictionEnum";
 import { DeliveryTimeEnum } from "../enums/DeliveryTimeEnum";
 import { PaymentMethodEnum } from "../enums/PaymentMethodEnum";
+import { User } from "./User";
 
 export interface UserPersonalization {
   id: number;
@@ -12,7 +13,7 @@ export interface UserPersonalization {
   preferredDeliveryTime: DeliveryTimeEnum;
   paymentPreference: PaymentMethodEnum;
   allergies: string;
-  user: any;
+  user: User;
   createdAt: Date;
   updatedAt: Date;
 }

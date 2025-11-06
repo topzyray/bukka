@@ -68,7 +68,7 @@ export function ImageUploadStep({
   const { handleFileUpload, isUploading } = useFileUpload({
     uploadFn: async (formData: FormData) => FileApiService.uploadFile(formData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      queryClient.invalidateQueries({ queryKey: ["current-user"] });
       queryClient.invalidateQueries({ queryKey: ["user-files"] });
       saveOnboardingProgressMutation(progressPayload);
       onNext();

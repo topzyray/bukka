@@ -12,6 +12,7 @@ import { ProfileAvatar } from "../components/profile-avatar";
 import { Label } from "@/components/ui";
 import { Briefcase, FileIcon, Heart, Laptop, Pen } from "lucide-react";
 import { useUserActivitySummary } from "@/data/queries";
+import { SettingsPageTitleCard } from "../components/setting-title-card";
 
 export function ProfileSettings() {
   const [editProfile, setEditProfile] = useState(false);
@@ -58,14 +59,11 @@ export function ProfileSettings() {
       transition={{ duration: 0.5 }}
       className="w-full mx-auto space-y-6"
     >
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">
-          Profile Information
-        </h1>
-        <p className="text-muted-foreground">
-          View and update your user information.
-        </p>
-      </div>
+      <SettingsPageTitleCard
+        title="Profile Information"
+        description="View and update your user information.."
+      />
+
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="w-full mx-auto rounded-xl shadow-md border dark:border-sidebar-accent overflow-hidden transition-all hover:shadow-lg">
           <ProfileAvatar

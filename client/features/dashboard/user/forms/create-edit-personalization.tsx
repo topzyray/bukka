@@ -13,9 +13,9 @@ import { MealPreferenceEnum } from "@/data/enums/MealPreferenceEnum";
 import { PaymentMethodEnum } from "@/data/enums/PaymentMethodEnum";
 import { UserPersonalization } from "@/data/interfaces/UserPersonalization";
 import { useAuth } from "@/providers";
-import { useUserPersonalization } from "@/data/queries/use-personalization";
 import { useCreateUserPersonalization } from "@/data/mutations/userPersonalizaton/use-create-user-personalization";
 import { toast } from "sonner";
+import { useUpdateUserPersonalization } from "@/data/mutations/userPersonalizaton/use-update-user-personalization";
 
 export const userPersonalizedSchema = z.object({
   preferredCuisines: z
@@ -67,14 +67,16 @@ interface ICreateEditPersonalizationForm {
   initialData?: Partial<UserPersonalization>;
   onBack?: () => void;
   onSuccess?: () => void;
+  setEditProfile?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function CreateEditPersonalizationForm({
+export function CreateEditPersonalizationForm({
   isEdit,
   busy,
   initialData,
   onBack,
   onSuccess,
+  setEditProfile,
 }: ICreateEditPersonalizationForm) {
   const { user } = useAuth();
 
@@ -85,21 +87,32 @@ export default function CreateEditPersonalizationForm({
   });
 
   useEffect(() => {
-    if (!initialData) return;
-    form.reset({
-      preferredCuisines: initialData?.preferredCuisines,
-      dietaryRestrictions: initialData?.dietaryRestrictions,
-      mealPreferences: initialData?.mealPreferences,
-      preferredDeliveryTime: initialData?.preferredDeliveryTime,
-      paymentPreference: initialData?.paymentPreference,
-      allergies: initialData?.allergies,
-    });
-  }, [form, initialData]);
+    if (isEdit && initialData) {
+      form.reset({
+        preferredCuisines: initialData?.preferredCuisines,
+        dietaryRestrictions: initialData?.dietaryRestrictions,
+        mealPreferences: initialData?.mealPreferences,
+        preferredDeliveryTime: initialData?.preferredDeliveryTime,
+        paymentPreference: initialData?.paymentPreference,
+        allergies: initialData?.allergies,
+      });
+    }
+  }, [form, initialData, isEdit]);
 
   const {
     mutateAsync: createUserPersonalization,
     isPending: isCreatingUserPersonalization,
   } = useCreateUserPersonalization({
+    userId: user?.id,
+    onSuccess: () => {
+      onSuccess?.();
+    },
+  });
+
+  const {
+    mutateAsync: updateUserPersonalization,
+    isPending: isUpdatingUserPersonalization,
+  } = useUpdateUserPersonalization({
     userId: user?.id,
     onSuccess: () => {
       onSuccess?.();
@@ -113,15 +126,23 @@ export default function CreateEditPersonalizationForm({
       });
       return;
     }
-    createUserPersonalization({
+    const payload = {
       dietaryRestrictions: data.dietaryRestrictions as string[],
       mealPreferences: data.mealPreferences as string[],
       paymentPreference: data.paymentPreference,
       preferredCuisines: data.preferredCuisines,
       preferredDeliveryTime: data.preferredDeliveryTime,
       allergies: data?.allergies ?? "",
-    });
+    };
+    isEdit && initialData
+      ? updateUserPersonalization({
+          personalizationId: initialData?.id as number,
+          ...payload,
+        })
+      : createUserPersonalization(payload);
   };
+
+  busy = busy || isCreatingUserPersonalization || isUpdatingUserPersonalization;
 
   return (
     <Form {...form}>
@@ -188,11 +209,16 @@ export default function CreateEditPersonalizationForm({
         />
 
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" onClick={onBack} disabled={busy}>
-            Back
-          </Button>
+          {onBack && (
+            <Button variant="ghost" onClick={onBack} disabled={busy}>
+              Back
+            </Button>
+          )}
+          {!onBack && isEdit && setEditProfile && (
+            <Button onClick={() => setEditProfile?.(false)}>Cancel</Button>
+          )}
           <Button type="submit" disabled={!form.formState.isValid || busy}>
-            {busy ? "Saving..." : "Continue"}
+            {busy ? "Saving..." : "Save Preferences"}
           </Button>
         </div>
       </form>

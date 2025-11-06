@@ -25,7 +25,7 @@ export default function BusinessDetailsStep({
   const { mutateAsync: updateUserData, isPending: isUpdatingUserData } =
     useUpdateUserData({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+        queryClient.invalidateQueries({ queryKey: ["current-user"] });
         onNext();
       },
       toastStatusMessage: false,

@@ -101,7 +101,7 @@ export function PersonalDetailsStep({
     useUpdateUserData({
       onSuccess: () => {
         form.reset;
-        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+        queryClient.invalidateQueries({ queryKey: ["current-user"] });
         onNext();
       },
     });

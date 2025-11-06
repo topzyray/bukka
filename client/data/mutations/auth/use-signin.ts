@@ -32,11 +32,11 @@ export const useSignIn = () => {
           }
         }
 
-        queryClient.setQueryData(["currentUser"], user);
+        queryClient.setQueryData(["current-user"], user);
 
         await Promise.allSettled([
           queryClient.prefetchQuery({
-            queryKey: ["currentUser"],
+            queryKey: ["current-user"],
             queryFn: () => UserApiService.getLoggedInUser(),
           }),
           queryClient.prefetchQuery({
@@ -54,7 +54,7 @@ export const useSignIn = () => {
           }),
         ]);
 
-        await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+        await queryClient.invalidateQueries({ queryKey: ["current-user"] });
       },
 
       onErrorCallback: (error) => {

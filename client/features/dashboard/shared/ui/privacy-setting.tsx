@@ -1,14 +1,20 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { SettingsPageTitleCard } from "../components/setting-title-card";
+
 export function PrivacySettings() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">
-          Privacy Settings
-        </h1>
-        <p className="text-muted-foreground">
-          Control who can see your data and manage data sharing preferences.
-        </p>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full mx-auto space-y-6"
+    >
+      <SettingsPageTitleCard
+        title="Privacy Settings"
+        description="Control who can see your data and manage data sharing preferences."
+      />
 
       <div className="space-y-3">
         <label className="flex items-center gap-2">
@@ -27,6 +33,6 @@ export function PrivacySettings() {
       >
         Save Changes
       </button>
-    </div>
+    </motion.div>
   );
 }

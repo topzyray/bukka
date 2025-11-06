@@ -6,7 +6,7 @@ import { UserActivitiesSummary } from "../interfaces/User";
 
 export const useCurrentUser = () => {
   return useCustomQuery(
-    ["currentUser"],
+    ["current-user"],
     () => UserApiService.getLoggedInUser(),
     {
       enabled: true,
@@ -68,7 +68,7 @@ export const useUserActivitySummary = ({ userId }: { userId: number }) => {
 //   }, [pathname, allowedPathPatterns]);
 
 //   const query = useCustomQuery(
-//     ["currentUser"],
+//     ["current-user"],
 //     () => UserApiService.getLoggedInUser(),
 //     {
 //       enabled: false, // start disabled to avoid SSR/client mismatch

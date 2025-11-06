@@ -1,14 +1,20 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { SettingsPageTitleCard } from "../components/setting-title-card";
+
 export function AccountSettings() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">
-          Account Settings
-        </h1>
-        <p className="text-muted-foreground">
-          Manage your login credentials and account details.
-        </p>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full mx-auto space-y-6"
+    >
+      <SettingsPageTitleCard
+        title="Account Settings"
+        description=" Manage your login credentials and account details."
+      />
 
       <div className="space-y-4">
         <form className="space-y-4">
@@ -38,6 +44,6 @@ export function AccountSettings() {
           </button>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 }
