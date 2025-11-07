@@ -7,17 +7,17 @@ type IUserManagementApi =
   | "createAdminAccount"
   | "adminGetAllUsers"
   | "adminGetUserById"
-  | "adminGetUsersOverview"
   | "adminUpdateUser"
-  | "adminDeleteUser";
+  | "adminDeleteUser"
+  | "adminGetUsersOverview";
 
 const rawUserManagementRoutes: Record<IUserManagementApi, string> = {
   createAdminAccount: "/admin/users",
   adminGetAllUsers: "/admin/users",
   adminGetUserById: "/admin/users",
-  adminGetUsersOverview: "/admin/users",
   adminUpdateUser: "/admin/users",
   adminDeleteUser: "/admin/users",
+  adminGetUsersOverview: "/admin/users/overview",
 };
 
 export const userManagementRoutes: Record<IUserManagementApi, string> =

@@ -99,6 +99,14 @@ export class BusinessDataAgent {
     await this.model.deleteOne(spec);
   }
 
+  async deleteAllUserBusinesses(userId: number) {
+    const spec: QuerySpec = {
+      filter: { field: 'userId', op: 'eq', value: userId },
+    };
+    const result = await this.model.deleteMany(spec);
+    return result;
+  }
+
   // async connectBusnessFile(businessId: number, fileId: number) {
   //   const spec: QuerySpec = {
   //     filter: { field: 'id', op: 'eq', value: businessId },

@@ -25,7 +25,7 @@ function PageWrapperContent({
   ...props
 }: React.ComponentProps<"main">) {
   return (
-    <main className={cn("container mx-auto px-4 py-8", className)} {...props} />
+    <main className={cn("container mx-auto px-4 py-4", className)} {...props} />
   );
 }
 

@@ -28,6 +28,8 @@ import { useCustomQuery } from "@/data/queries/base";
 import { useQueryClient } from "@tanstack/react-query";
 import { CircleLoader } from "react-spinners";
 import { ThemeToggle } from "@/components/ui/mode-toggle";
+import { TextHelper } from "@/helpers";
+import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 
 const phoneNumberSchema = z
   .string()
@@ -121,32 +123,43 @@ export function BukkaWaitList() {
           />
         </motion.div>
         <h1 className="text-4xl md:text-5xl font-bold leading-tight sm:text-6xl text-shine">
-          Discover Nigeria’s Finest{" "}
-          <TypeAnimation
-            sequence={[
-              "Tasty Meals",
-              1000,
-              "Nice Bar",
-              1000,
-              "Restaurants",
-              1000,
-              "Confectionaries",
-              1000,
-              "Super Bukka",
-              1000,
-              "Sharwama",
-              1000,
-              "Eatries",
-              1000,
-              "Mama Put",
-              1000,
-            ]}
-            wrapper="span"
-            className="text-accent"
-            repeat={Infinity}
-          />{" "}
+          Find Your Next <br />
+          <span className="text-shine">
+            Favorite{" "}
+            <TypeAnimation
+              sequence={[
+                TextHelper.normalizeText(BusinessTypeEnum.RESTAURANT),
+                1500,
+                TextHelper.normalizeText(BusinessTypeEnum.FAST_FOOD),
+                1500,
+                TextHelper.normalizeText(BusinessTypeEnum.FOOD_VENDOR),
+                1500,
+                TextHelper.normalizeText(BusinessTypeEnum.BAR),
+                1500,
+                TextHelper.normalizeText(BusinessTypeEnum.LOUNGE),
+                1500,
+                TextHelper.normalizeText(BusinessTypeEnum.BAKERY),
+                1500,
+                TextHelper.normalizeText(BusinessTypeEnum.STREET_EATRY),
+                1500,
+                TextHelper.normalizeText(BusinessTypeEnum.GROCERY),
+                1500,
+                TextHelper.normalizeText(BusinessTypeEnum.CATERING),
+                1500,
+                TextHelper.normalizeText(BusinessTypeEnum.DELIVERY_SERVICE),
+                1500,
+                TextHelper.normalizeText(BusinessTypeEnum.OTHER) +
+                  " " +
+                  "Services",
+                1500,
+              ]}
+              wrapper="span"
+              repeat={Infinity}
+              className="capitalize text-accent"
+            />{" "}
+          </span>
           <br />
-          nearby with <span className="text-primary">Bukka</span>
+          near you with <span className="text-primary">Bukka</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-xl mx-auto">
           We’re redefining how Nigerians find, order, and enjoy local

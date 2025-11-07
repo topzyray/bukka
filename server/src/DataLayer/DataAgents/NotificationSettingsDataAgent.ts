@@ -81,9 +81,9 @@ export class NotificationSettingsDataAgent {
   }
 
   async updateNotificationSetting(data: Partial<NotificationSettings>) {
-    const { id: notificationId, ...updateData } = data;
+    const { id, ...updateData } = data;
     const spec: QuerySpec = {
-      filter: { field: 'id', op: 'eq', value: notificationId },
+      filter: { field: 'id', op: 'eq', value: id },
     };
     return this.model.updateOne(spec, updateData);
   }
@@ -98,7 +98,7 @@ export class NotificationSettingsDataAgent {
     return null;
   }
 
-  async deleteNotificationSettingsByUserId(userId: number) {
+  async deleteUserNotificationSettings(userId: number) {
     const spec: QuerySpec = {
       filter: { field: 'userId', op: 'eq', value: userId },
     };

@@ -17,6 +17,9 @@ export const useCreateUserPersonalization = ({
         queryClient.invalidateQueries({
           queryKey: ["user-personalization", userId],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["admin-overview"],
+        });
         onSuccess?.();
       },
     }

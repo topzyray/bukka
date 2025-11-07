@@ -92,7 +92,7 @@ export class FileDataAgent {
     return await this.model.deleteOne(querySpec);
   }
 
-  async deleteUserFiles(userId: number): Promise<{ count: number }> {
+  async deleteAllUserFiles(userId: number): Promise<{ count: number }> {
     const querySpec: QuerySpec = {
       filter: { field: 'createdById', op: 'eq', value: userId },
     };

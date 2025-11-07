@@ -1,13 +1,17 @@
 "use client";
 
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Separator,
+} from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { UserPersonalization } from "@/data/interfaces/UserPersonalization";
-import { Button } from "@/components/ui";
 
 interface IUserPersonalizationCard {
   data?: UserPersonalization | null;

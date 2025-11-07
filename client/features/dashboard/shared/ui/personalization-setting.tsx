@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/providers";
 import { motion } from "framer-motion";
 import { SettingsPageTitleCard } from "../components/setting-title-card";
+import { ThemePreferenceCard } from "../components/theme-preference-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { useUserPersonalization } from "@/data/queries/use-personalization";
 import { UserPersonalizationCard } from "../components/personalization-card";
@@ -55,6 +56,7 @@ export function PersonalizationSettings() {
           )}
         </div>
       </div>
+      <ThemePreferenceCard />
     </motion.div>
   );
 }

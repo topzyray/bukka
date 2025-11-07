@@ -1,5 +1,5 @@
-import { useCustomMutation } from "@/data/mutations/base";
 import { useState } from "react";
+import { useCustomMutation } from "@/data/mutations/base";
 
 interface UseFileUploadProps<T> {
   uploadFn: (params: FormData | any) => Promise<T>;
@@ -79,35 +79,6 @@ export const useFileUpload = <T,>({
 
     uploadMutation.mutate(formData);
   };
-
-  // const handleFileUpload = (
-  //   files: File | File[],
-  //   extraData?: Record<string, any>,
-  //   fieldName: string = "file"
-  // ) => {
-  //   if (!files) return;
-
-  //   setIsUploading(true);
-  //   const formData = new FormData();
-
-  //   // Convert to array if single file
-  //   const fileArray = Array.isArray(files) ? files : [files];
-  //   fileArray.forEach((file) => formData.append(fieldName, file));
-
-  //   // Append additional data
-  //   if (extraData) {
-  //     Object.entries(extraData).forEach(([key, value]) => {
-  //       // FormData only accepts string | Blob
-  //       if (value instanceof Blob) {
-  //         formData.append(key, value);
-  //       } else {
-  //         formData.append(key, String(value));
-  //       }
-  //     });
-  //   }
-
-  //   uploadMutation.mutate(formData);
-  // };
 
   /**
    * Optional helper to handle `<input type="file">` change events directly.

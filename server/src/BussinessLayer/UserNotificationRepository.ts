@@ -161,10 +161,10 @@ export class UserNotificationRepository {
     );
   }
 
-  async deleteAllUserNotificationsByUserId() {
+  async deleteAllUserNotifications() {
     const loggedInUser = await UserHelper.getLoggedInUser();
     const deletedUserNotifications =
-      await this._userNotificationDataAgent.deleteAllUserNotificationsByUserId(
+      await this._userNotificationDataAgent.deleteAllUserNotifications(
         loggedInUser?.id,
       );
     if (deletedUserNotifications === null) {

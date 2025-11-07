@@ -77,7 +77,7 @@ export function Home() {
                 className="text-center text-primary max-w-4xl lg:max-w-6xl mx-auto"
               >
                 <motion.h1
-                  className="text-4xl md:text-6xl lg:text-8xl font-bold mb-6"
+                  className="text-4xl md:text-6xl lg:text-8xl font-bold mb-6 dark:text-foreground"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.8 }}
@@ -123,7 +123,7 @@ export function Home() {
                 </motion.h1>
 
                 <motion.p
-                  className="text-xl md:text-2xl mb-8 opacity-90"
+                  className="text-xl md:text-2xl mb-8 opacity-90 dark:text-foreground"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.8 }}
@@ -145,7 +145,7 @@ export function Home() {
                         placeholder="Search businesses, cuisines, or services..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="shadow-card h-11 md:h-full border-none"
+                        className="h-11 md:h-full border-none dark:bg-transparent"
                       />
                     </div>
 

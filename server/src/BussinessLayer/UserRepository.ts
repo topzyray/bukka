@@ -24,19 +24,38 @@ import {
   invalidateCache,
 } from 'src/InfrastructureLayer/Services/cache/CacheUtils';
 import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
+import { UserSessionDataAgent } from 'src/DataLayer/DataAgents/UserSessionDataAgent';
+import { FavoriteDataAgent } from 'src/DataLayer/DataAgents/FavoriteDataAgent';
+import { ReviewDataAgent } from 'src/DataLayer/DataAgents/ReviewDataAgent';
+import { BusinessDataAgent } from 'src/DataLayer/DataAgents/BusinessDataAgent';
+import { UserNotificationDataAgent } from 'src/DataLayer/DataAgents/UserNotificationDataAgent';
+import { NotificationSettingsDataAgent } from 'src/DataLayer/DataAgents/NotificationSettingsDataAgent';
+import { UserPersonalizationDataAgent } from 'src/DataLayer/DataAgents/UserPersonalizationDataAgent';
+import { FileRepository } from './FileRepository';
+import { IAdminOverview } from 'src/DataLayer/Abstracts/Interfaces/IAdminOverview';
 @Injectable()
 export class UserRepository {
-  constructor(private readonly _userDataAgent: UserDataAgent) {}
+  constructor(
+    private readonly userDataAgent: UserDataAgent,
+    private readonly userSessionDataAgent: UserSessionDataAgent,
+    private readonly favoriteDataAgent: FavoriteDataAgent,
+    private readonly reviewDataAgent: ReviewDataAgent,
+    private readonly businessDataAgent: BusinessDataAgent,
+    private readonly notificationDataAgent: UserNotificationDataAgent,
+    private readonly notificaitonSettingDataAgent: NotificationSettingsDataAgent,
+    private readonly personalizationDataAgent: UserPersonalizationDataAgent,
+    private readonly fileRepository: FileRepository,
+  ) {}
 
   async createUserAsync(data: CreateUserDto): Promise<BukkaResponse<User>> {
-    const existingUser = await this._userDataAgent.getUserByEmail(data.email);
+    const existingUser = await this.userDataAgent.getUserByEmail(data.email);
     if (existingUser) {
       throw new ConflictException('User already exists!');
     }
     data.confirmationCode = Generator.GenerateDigits(6).toString();
     data.confirmationCodeExpires = Generator.CalculateExpirationTime(30);
     const user = data as User;
-    const result = await this._userDataAgent.createUserAsync(user);
+    const result = await this.userDataAgent.createUserAsync(user);
     return BukkaResponse.CustomResponse(
       `We've sent a verification token to ${result.email}. Check your Inbox or Spam for further actions.`,
       HttpStatus.CREATED,
@@ -46,7 +65,7 @@ export class UserRepository {
   }
 
   async findUserById(userId: number) {
-    return this._userDataAgent.getUserById(userId);
+    return this.userDataAgent.getUserById(userId);
   }
 
   async getLoggedInUserData() {
@@ -54,25 +73,25 @@ export class UserRepository {
     return handleCache(
       'user:profile',
       { id: user.id },
-      () => this._userDataAgent.getUserById(user.id),
+      () => this.userDataAgent.getUserById(user.id),
       CacheTTLPolicyEnum.PROFILE,
     );
   }
 
   async findUserByToken(token: string, type: TokenTypeEnum) {
-    return this._userDataAgent.getUserByToken(token, type);
+    return this.userDataAgent.getUserByToken(token, type);
   }
 
   async findAdminUserById(userId: number) {
-    return this._userDataAgent.getAdminUserById(userId);
+    return this.userDataAgent.getAdminUserById(userId);
   }
 
   async findAdminUserByRole() {
-    return this._userDataAgent.getAdminUserByRole();
+    return this.userDataAgent.getAdminUserByRole();
   }
 
   async findUserByEmail(email: string) {
-    return this._userDataAgent.getUserByEmail(email);
+    return this.userDataAgent.getUserByEmail(email);
   }
 
   async updateOtherUserAsync(
@@ -83,7 +102,7 @@ export class UserRepository {
     if (!user) {
       throw new NotFoundException('User not found!');
     }
-    const updatedUser = await this._userDataAgent.updateUser(userId, data);
+    const updatedUser = await this.userDataAgent.updateUser(userId, data);
     return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
@@ -128,7 +147,7 @@ export class UserRepository {
     //   locationId: location.id,
     // };
 
-    const updatedUser = await this._userDataAgent.updateUser(
+    const updatedUser = await this.userDataAgent.updateUser(
       loggedInUser?.id,
       data,
     );
@@ -196,7 +215,7 @@ export class UserRepository {
     //   bio,
     //   locationId: location.id,
     // };
-    const updatedUser = await this._userDataAgent.updateUser(
+    const updatedUser = await this.userDataAgent.updateUser(
       loggedInUser?.id,
       userProfileDto,
     );
@@ -209,7 +228,7 @@ export class UserRepository {
     const data = {
       isOnboarded: true,
     } as Partial<User>;
-    const updatedUser = await this._userDataAgent.updateUser(
+    const updatedUser = await this.userDataAgent.updateUser(
       loggedInUser?.id,
       data,
     );
@@ -225,7 +244,7 @@ export class UserRepository {
     if (!user) {
       throw new NotFoundException('User not found!');
     }
-    const updatedUser = await this._userDataAgent.updateUser(
+    const updatedUser = await this.userDataAgent.updateUser(
       id as number,
       updateData,
     );
@@ -237,10 +256,23 @@ export class UserRepository {
     if (!user) {
       throw new NotFoundException('User not found!');
     }
-    await this._userDataAgent.deleteUser(user?.id as number);
+    await this.userSessionDataAgent.deleteAllUserSessions(userId);
+    await this.favoriteDataAgent.deleteAllUserFavorites(userId);
+    await this.reviewDataAgent.deleteAllUserReviews(userId);
+    await this.businessDataAgent.deleteAllUserBusinesses(userId);
+    await this.notificationDataAgent.deleteAllUserNotifications(userId);
+    await this.notificaitonSettingDataAgent.deleteUserNotificationSettings(
+      userId,
+    );
+    await this.fileRepository.deleteAllUserFiles(userId);
+    await this.personalizationDataAgent.deleteUserPersonalization(userId);
+    await this.userDataAgent.deleteUser(user?.id as number);
     await invalidateCache('users:list', {});
     await invalidateCache('users:admin', {});
     await invalidateCache('user:profile', { id: userId });
+
+    // TODO : INVALIDATE OTHER CACHES ABOVE
+
     return BukkaResponse.DeleteResponse('User', true);
   }
 
@@ -260,7 +292,7 @@ export class UserRepository {
     return handleCache(
       'users:list',
       mergedFilters,
-      () => this._userDataAgent.getUsersByFilter(query, pageSize, pageNumber),
+      () => this.userDataAgent.getUsersByFilter(query, pageSize, pageNumber),
       CacheTTLPolicyEnum.USER_LIST,
     );
   }
@@ -290,21 +322,92 @@ export class UserRepository {
       'users:admin',
       mergedFilters,
       () =>
-        this._userDataAgent.adminGetUsersByFilter(query, pageSize, pageNumber),
+        this.userDataAgent.adminGetUsersByFilter(query, pageSize, pageNumber),
       CacheTTLPolicyEnum.USER_LIST,
     );
   }
 
-  async getAdminOverview() {
-    const result = await this._userDataAgent.getAdminOverview();
-    return result;
-  }
-
   async getUserActivitiesOverview() {
     const loggedInUser = await UserHelper.getLoggedInUser();
-    const result = await this._userDataAgent.getUserActivitiesOverview(
+    const result = await this.userDataAgent.getUserActivitiesOverview(
       loggedInUser?.id,
     );
     return result;
+  }
+
+  async getAdminOverview(): Promise<IAdminOverview> {
+    const overview = await this.userDataAgent.getAdminOverview();
+
+    const [userGrowthData, businessStatus, orderDataRaw, recentActivitiesRaw] =
+      await Promise.all([
+        this.userDataAgent.getMonthlyUserRegistrations(6),
+        this.userDataAgent.getBusinessStatusDistribution(),
+        this.userDataAgent.getOrdersPerDay(7),
+        this.userDataAgent.getRecentActivities(6),
+      ]);
+
+    // Build stats array (format values nicely; you can add change calculations if you want)
+    const stats = [
+      {
+        title: 'Total Users',
+        value: Intl.NumberFormat().format((overview.totalUsers as number) ?? 0),
+        change: undefined,
+        positive: true,
+      },
+      {
+        title: 'Active Businesses',
+        value: Intl.NumberFormat().format(
+          businessStatus.find((b) => b.name === 'Active')?.value ?? 0,
+        ),
+        change: undefined,
+        positive: true,
+      },
+      {
+        title: 'Total Orders',
+        value: Intl.NumberFormat().format(
+          orderDataRaw.reduce((s, d) => s + d.orders, 0),
+        ),
+        change: undefined,
+        positive: true,
+      },
+      {
+        title: 'Revenue',
+        value: '₦0', // revenue isn't available in the user data agent; replace with real source if available
+        change: undefined,
+        positive: true,
+      },
+    ];
+
+    // Add colors (frontend uses CSS variables; provide css variable strings)
+    const businessCategoryData = businessStatus.map((b, i) => ({
+      ...b,
+      color:
+        i === 0
+          ? 'hsl(var(--primary))'
+          : i === 1
+            ? 'hsl(var(--accent))'
+            : 'hsl(var(--destructive))',
+    }));
+
+    const orderData = orderDataRaw.map((d) => ({
+      day: d.day,
+      orders: d.orders,
+    }));
+
+    const recentActivity = recentActivitiesRaw.map((a) => ({
+      action: a.action,
+      user: a.user,
+      // formatted relative time - you can compute actual "2 minutes ago" on frontend; here provide ISO
+      time: a.time.toISOString(),
+    }));
+
+    return {
+      stats,
+      userGrowthData,
+      businessCategoryData,
+      orderData,
+      recentActivity,
+      others: overview,
+    } as IAdminOverview;
   }
 }

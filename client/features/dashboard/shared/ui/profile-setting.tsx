@@ -9,10 +9,10 @@ import { ProfileUpdateForm } from "../components/profile-update-form";
 import { File } from "@/data/interfaces/File";
 import { FileCategoryEnum } from "@/data/enums";
 import { ProfileAvatar } from "../components/profile-avatar";
-import { Label } from "@/components/ui";
+import { Card, Label } from "@/components/ui";
 import { Briefcase, FileIcon, Heart, Laptop, Pen } from "lucide-react";
-import { useUserActivitySummary } from "@/data/queries";
 import { SettingsPageTitleCard } from "../components/setting-title-card";
+import { useUserActivitySummary } from "@/data/queries/use-analytics-query";
 
 export function ProfileSettings() {
   const [editProfile, setEditProfile] = useState(false);
@@ -65,7 +65,7 @@ export function ProfileSettings() {
       />
 
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="w-full mx-auto rounded-xl shadow-md border dark:border-sidebar-accent overflow-hidden transition-all hover:shadow-lg">
+        <div className="w-full mx-auto rounded-xl shadow-md overflow-hidden transition-all hover:shadow-lg">
           <ProfileAvatar
             user={user as User}
             isLoadingUserFiles={isLoadingUserFiles}
@@ -86,11 +86,11 @@ export function ProfileSettings() {
         </div>
 
         <div className="lg:max-w-md w-full h-full">
-          <div className="w-full mx-auto rounded-xl shadow-md border dark:border-sidebar-accent overflow-hidden transition-all hover:shadow-lg py-6">
+          <Card className="w-full mx-auto rounded-xl shadow-md border dark:border-sidebar-accent overflow-hidden transition-all hover:shadow-lg py-6">
             <div className="px-6 mb-4">
               <Label className="font-semibold text-base">User Activities</Label>
             </div>
-            <div className="text-center grid grid-cols-2 gap-3 px-6 ">
+            <div className="text-center grid grid-cols-2 gap-3 px-6">
               {stats?.length &&
                 stats?.map((stat) => (
                   <div
@@ -105,7 +105,7 @@ export function ProfileSettings() {
                   </div>
                 ))}
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </motion.div>

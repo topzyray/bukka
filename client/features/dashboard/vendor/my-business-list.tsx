@@ -6,11 +6,6 @@ import { Business } from "@/data/interfaces/Business";
 import { CreateUpdateBusinessModal } from "./modals/create-update-business-modal";
 import { DataTable } from "@/components/ui/data-table";
 import { businessColumns } from "../shared/components/business-columns";
-import {
-  PageWrapper,
-  PageWrapperContent,
-  PageWrapperContentWithFramer,
-} from "@/components/ui/page-wrapper";
 import { useBusinessesQuery } from "@/data/queries/use-businesses-query";
 import { Button } from "@/components/ui/button";
 import { useDeleteBusiness } from "@/data/mutations/business/use-business-mutation";
@@ -126,119 +121,113 @@ export function MyBusinessList() {
   );
 
   return (
-    <PageWrapper>
-      <PageWrapperContent>
-        <PageWrapperContentWithFramer>
-          <div className="space-y-6">
-            <header className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold">My Businesses</h1>
-                <p className="text-sm text-muted-foreground">
-                  My business manage page
-                </p>
-              </div>
+    <section className="space-y-6">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">My Businesses</h1>
+          <p className="text-sm text-muted-foreground">
+            My business manage page
+          </p>
+        </div>
 
-              <div className="flex items-center gap-2">
-                <Button onClick={handleCreate}>Add Business</Button>
-                <CreateUpdateBusinessModal
-                  open={isModalOpen}
-                  onOpenChange={handleOpenChange}
-                  mode={mode}
-                  initialData={mode === "edit" ? initialData : undefined}
-                  onSuccess={() => {
-                    queryClient.removeQueries({ queryKey: ["businesses"] });
-                    setPage(1);
-                    setIsModalOpen(false);
-                  }}
-                />
-              </div>
-            </header>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleCreate}>Add Business</Button>
+          <CreateUpdateBusinessModal
+            open={isModalOpen}
+            onOpenChange={handleOpenChange}
+            mode={mode}
+            initialData={mode === "edit" ? initialData : undefined}
+            onSuccess={() => {
+              queryClient.removeQueries({ queryKey: ["businesses"] });
+              setPage(1);
+              setIsModalOpen(false);
+            }}
+          />
+        </div>
+      </header>
 
-            <div>
-              <DataTable
-                columns={columns}
-                data={currentPagedData}
-                totalRecords={total}
-                pageNumber={page}
-                pageSize={PAGE_SIZE}
-                onPageChange={(pn) => goToPage(pn)}
-                onSortChange={onSortChange}
-                onSearchChange={onSearchChange}
-                onFilterChange={onFilterChange}
-                filters={[
-                  {
-                    key: "type",
-                    label: "Type",
-                    options: [
-                      {
-                        label: "ALL",
-                        value: undefined,
-                      },
-                      {
-                        label: BusinessTypeEnum.RESTAURANT,
-                        value: BusinessTypeEnum.RESTAURANT,
-                      },
-                      {
-                        label: BusinessTypeEnum.BAR,
-                        value: BusinessTypeEnum.BAR,
-                      },
-                      {
-                        label: BusinessTypeEnum.LOUNGE,
-                        value: BusinessTypeEnum.LOUNGE,
-                      },
-                      {
-                        label: BusinessTypeEnum.CATERING,
-                        value: BusinessTypeEnum.CATERING,
-                      },
-                      {
-                        label: BusinessTypeEnum.BAKERY,
-                        value: BusinessTypeEnum.BAKERY,
-                      },
-                      {
-                        label: "FOOD VENDOR",
-                        value: BusinessTypeEnum.FOOD_VENDOR,
-                      },
-                      {
-                        label: "FAST FOOD",
-                        value: BusinessTypeEnum.FAST_FOOD,
-                      },
-                      {
-                        label: "STREET EATRY",
-                        value: BusinessTypeEnum.STREET_EATRY,
-                      },
-                      {
-                        label: BusinessTypeEnum.GROCERY,
-                        value: BusinessTypeEnum.GROCERY,
-                      },
-                      {
-                        label: "DELIVERY SERVICE",
-                        value: BusinessTypeEnum.DELIVERY_SERVICE,
-                      },
-                      {
-                        label: BusinessTypeEnum.OTHER,
-                        value: BusinessTypeEnum.OTHER,
-                      },
-                    ],
-                  },
-                  {
-                    key: "isVerified",
-                    label: "Verified",
-                    options: [
-                      { label: "All", value: undefined },
-                      { label: "Yes", value: "true" },
-                      { label: "No", value: "false" },
-                    ],
-                  },
-                ]}
-                isLoading={isLoading}
-                selectable
-                enableDateFilter
-                idAccessor={(r) => (r as Business).id}
-              />
-            </div>
-          </div>
-        </PageWrapperContentWithFramer>
-      </PageWrapperContent>
-    </PageWrapper>
+      <div>
+        <DataTable
+          columns={columns}
+          data={currentPagedData}
+          totalRecords={total}
+          pageNumber={page}
+          pageSize={PAGE_SIZE}
+          onPageChange={(pn) => goToPage(pn)}
+          onSortChange={onSortChange}
+          onSearchChange={onSearchChange}
+          onFilterChange={onFilterChange}
+          filters={[
+            {
+              key: "type",
+              label: "Type",
+              options: [
+                {
+                  label: "ALL",
+                  value: undefined,
+                },
+                {
+                  label: BusinessTypeEnum.RESTAURANT,
+                  value: BusinessTypeEnum.RESTAURANT,
+                },
+                {
+                  label: BusinessTypeEnum.BAR,
+                  value: BusinessTypeEnum.BAR,
+                },
+                {
+                  label: BusinessTypeEnum.LOUNGE,
+                  value: BusinessTypeEnum.LOUNGE,
+                },
+                {
+                  label: BusinessTypeEnum.CATERING,
+                  value: BusinessTypeEnum.CATERING,
+                },
+                {
+                  label: BusinessTypeEnum.BAKERY,
+                  value: BusinessTypeEnum.BAKERY,
+                },
+                {
+                  label: "FOOD VENDOR",
+                  value: BusinessTypeEnum.FOOD_VENDOR,
+                },
+                {
+                  label: "FAST FOOD",
+                  value: BusinessTypeEnum.FAST_FOOD,
+                },
+                {
+                  label: "STREET EATRY",
+                  value: BusinessTypeEnum.STREET_EATRY,
+                },
+                {
+                  label: BusinessTypeEnum.GROCERY,
+                  value: BusinessTypeEnum.GROCERY,
+                },
+                {
+                  label: "DELIVERY SERVICE",
+                  value: BusinessTypeEnum.DELIVERY_SERVICE,
+                },
+                {
+                  label: BusinessTypeEnum.OTHER,
+                  value: BusinessTypeEnum.OTHER,
+                },
+              ],
+            },
+            {
+              key: "isVerified",
+              label: "Verified",
+              options: [
+                { label: "All", value: undefined },
+                { label: "Yes", value: "true" },
+                { label: "No", value: "false" },
+              ],
+            },
+          ]}
+          isLoading={isLoading}
+          selectable
+          enableDateFilter
+          idAccessor={(r) => (r as Business).id}
+        />
+      </div>
+    </section>
   );
 }

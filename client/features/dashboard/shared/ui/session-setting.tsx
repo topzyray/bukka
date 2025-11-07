@@ -78,8 +78,8 @@ export function SessionsSettings() {
         description="View and manage your active login sessions across devices."
       />
 
-      <div className="flex flex-col lg:flex-row">
-        <div className="max-w-4xl w-full rounded-xl shadow-md border dark:border-sidebar-accent overflow-hidden transition-all hover:shadow-lg">
+      <div className="flex flex-col lg:flex-row w-full">
+        <div className="w-full rounded-xl shadow-md border dark:border-sidebar-accent overflow-hidden transition-all hover:shadow-lg">
           <div className="">
             {(isLoadingUserSessions || isLoadingActiveSessions) && (
               <div className="flex justify-center items-center py-16 text-muted-foreground">
@@ -126,7 +126,7 @@ export function SessionsSettings() {
                       <li
                         key={session.id}
                         className={cn(
-                          "flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-6 hover:bg-muted/30 transition-colors duration-150",
+                          "flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 p-6 hover:bg-muted/30 transition-colors duration-150",
                           isCurrent && "bg-primary/5"
                         )}
                       >
@@ -159,12 +159,13 @@ export function SessionsSettings() {
                             <span className="flex items-center gap-1">
                               <Clock className="w-3.5 h-3.5" />
                               Last active{" "}
-                              {formatDistanceToNow(
+                              {/* {formatDistanceToNow(
                                 new Date(session.updatedAt),
                                 {
                                   addSuffix: true,
                                 }
-                              )}
+                              )} */}
+                              {TextHelper.smartTimeAgo(session?.updatedAt)}
                             </span>
                           </div>
                         </div>
@@ -187,13 +188,13 @@ export function SessionsSettings() {
                           </div>
 
                           <BukkaButton
-                            variant="link"
+                            variant="destructive"
                             size="sm"
                             onClick={() => {
                               revokeAccess(session?.id);
                               if (isCurrent) logout();
                             }}
-                            className="text-destructive hover:bg-destructive/10 transition-colors"
+                            className="text-white transition-colors dark:bg-destructive"
                             aria-label={`Revoke session ${session.id}`}
                             title="Revoke Session Access"
                             disabled={

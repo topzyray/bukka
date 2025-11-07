@@ -138,7 +138,7 @@ export class UserNotificationController {
   @ApiOperation({ summary: 'Delete all user notifications' })
   async deleteAllUserNotifications(@Res() res: Response) {
     const response =
-      await this._userNotificationRepository.deleteAllUserNotificationsByUserId();
+      await this._userNotificationRepository.deleteAllUserNotifications();
     return BukkaResponse.GetStatusResponse(response, res);
   }
 

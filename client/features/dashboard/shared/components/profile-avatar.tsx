@@ -1,7 +1,18 @@
+"use client";
+
 import { CircularLoader } from "@/components/loaders/circular-loader";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Card,
+  SingleFileUploader,
+} from "@/components/ui";
+import { FileCategoryEnum, FileReferenceTypeEnum } from "@/data/enums";
 import { File } from "@/data/interfaces/File";
 import { User } from "@/data/interfaces/User";
+import { FileApiService } from "@/data/services";
+import { useQueryClient } from "@tanstack/react-query";
 import { Shield } from "lucide-react";
 
 interface IProfileAvatar {
@@ -15,10 +26,11 @@ export function ProfileAvatar({
   profileAvatar,
 }: IProfileAvatar) {
   const fullName = `${user?.firstName} ${user?.lastName}`.trim();
+  const queryClient = useQueryClient();
 
   return (
-    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-6 border-b dark:border-sidebar-accent">
-      <Avatar className="w-20 h-20 border border-primary">
+    <Card className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-6 border-b dark:border-sidebar-accent">
+      <Avatar className="w-24 h-24 border border-primary">
         {isLoadingUserFiles ? (
           <CircularLoader />
         ) : profileAvatar ? (
@@ -33,6 +45,27 @@ export function ProfileAvatar({
             {user?.lastName?.[0].toUpperCase()}
           </AvatarFallback>
         )}
+        <SingleFileUploader
+          title="Upload Profile Avatar"
+          uploadFn={FileApiService.uploadFile}
+          extraParams={{
+            referenceType: FileReferenceTypeEnum.USER,
+            category: FileCategoryEnum.USER_PROFILE_IMAGE,
+            referenceId: user?.id,
+            isPublic: true,
+            metadata: {
+              altText: `${user?.firstName} ${user?.lastName} - Profile Photo`,
+            },
+          }}
+          onUploadSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ["current-user"] });
+            queryClient.invalidateQueries({ queryKey: ["user-files"] });
+            queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+            queryClient.invalidateQueries({
+              queryKey: ["user-activities-summary"],
+            });
+          }}
+        />
       </Avatar>
       <div className="text-center sm:text-left">
         <h2 className="text-xl font-semibold text-foreground">{fullName}</h2>
@@ -42,6 +75,6 @@ export function ProfileAvatar({
           <span>{user.role}</span>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

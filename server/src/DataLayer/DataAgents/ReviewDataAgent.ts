@@ -75,4 +75,12 @@ export class ReviewDataAgent {
     const spec: QuerySpec = { filter: { field: 'id', op: 'eq', value: id } };
     await this.model.deleteOne(spec);
   }
+
+  async deleteAllUserReviews(userId: number) {
+    const spec: QuerySpec = {
+      filter: { field: 'userId', op: 'eq', value: userId },
+    };
+    const result = await this.model.deleteMany(spec);
+    return result;
+  }
 }

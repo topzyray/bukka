@@ -114,7 +114,8 @@ export class UserSessionRepository {
 
   async deleteAllUserSessions(userId: number): Promise<BukkaResponse<void>> {
     await UserHelper.hasAccess(userId);
-    const deletedSession = this._userSessionDataAgent.deleteAllSessions(userId);
+    const deletedSession =
+      this._userSessionDataAgent.deleteAllUserSessions(userId);
     return BukkaResponse.DeleteResponse(
       'Session',
       true,

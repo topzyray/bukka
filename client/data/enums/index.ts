@@ -6,3 +6,4 @@ export * from "./GenderEnum";
 export * from "./TimeZoneTypeEnum";
 export * from "./UserRoleEnum";
 export * from "./EnvironmentTypeEnum";
+export * from "./NotificationTypeEnum";

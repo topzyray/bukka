@@ -24,3 +24,8 @@ export type ResetPasswordDto = {
 export type RefreshTokenDto = {
   refreshToken: string;
 };
+
+export type ChangePasswordDto = {
+  currentPassword: string;
+  newPassword: string;
+};

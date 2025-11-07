@@ -89,10 +89,10 @@ export class UserPersonalizationDataAgent {
   }
 
   async deleteUserPersonalization(
-    id: number,
+    userId: number,
   ): Promise<UserPersonalization | null> {
     const spec: QuerySpec = {
-      filter: { field: 'id', op: 'eq', value: id },
+      filter: { field: 'userId', op: 'eq', value: userId },
     };
     await this.model.deleteOne(spec);
     return null;

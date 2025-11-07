@@ -31,6 +31,7 @@ import { TextHelper } from 'src/InfrastructureLayer/Helpers/TextHelper';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { UserSessionRepository } from './UserSessionRepository';
 import { UserSession } from 'src/DomainLayer/Models/UserSession';
+import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
 
 @Injectable()
 export class AuthRepository {
@@ -334,11 +335,11 @@ export class AuthRepository {
   }
 
   async changePassword(
-    changePassword: ChangePasswordDto,
+    changePasswordDto: ChangePasswordDto,
   ): Promise<BukkaResponse<User>> {
-    const response = await this._userRepository.findUserById(
-      changePassword.userId,
-    );
+    const loggedInUser = await UserHelper.getLoggedInUser();
+
+    const response = await this._userRepository.findUserById(loggedInUser.id);
 
     if (!response) {
       return BukkaResponse.LoginResponse(
@@ -351,7 +352,7 @@ export class AuthRepository {
 
     const validUser = await this.validateUserAsync(
       response,
-      changePassword.currentPassword,
+      changePasswordDto.currentPassword,
     );
 
     if (!validUser) {
@@ -363,7 +364,7 @@ export class AuthRepository {
       );
     }
 
-    return await this.updatePassword(response, changePassword.newPassword);
+    return await this.updatePassword(response, changePasswordDto.newPassword);
   }
 
   async resendConfirmationEmail(

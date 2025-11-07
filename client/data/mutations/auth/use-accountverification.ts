@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { UseFormReset } from "react-hook-form";
 import { extractErrorMessage } from "@/utils";
 import { useCustomMutation } from "../base";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useAccountVerification = ({
   resetForm,
@@ -11,10 +12,12 @@ export const useAccountVerification = ({
     token: string;
   }>;
 }) => {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const { mutate: verifyNewUser, isPending: isVerifyingUser } =
     useCustomMutation(AuthApiService.confirmEmail, {
       onSuccessCallback: () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
         setTimeout(() => {
           router.push("/signin");
         }, 3000);

@@ -5,11 +5,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { BusinessCategory } from "@/data/interfaces/BusinessCategory";
 import { DataTable } from "@/components/ui/data-table";
 import { categoryColumns } from "./components/category-columns";
-import {
-  PageWrapper,
-  PageWrapperContent,
-  PageWrapperContentWithFramer,
-} from "@/components/ui/page-wrapper";
 import { useCategoriesQuery } from "@/data/queries/use-businesses-category-query";
 import { CreateUpdateCategoryModal } from "@/features/dashboard/admin/modals/create-update-category-modal";
 import { Button } from "@/components/ui/button";
@@ -125,112 +120,106 @@ export function CategoryList() {
   );
 
   return (
-    <PageWrapper>
-      <PageWrapperContent>
-        <PageWrapperContentWithFramer>
-          <div className="space-y-6">
-            <header className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold">Business Categories</h1>
-                <p className="text-sm text-muted-foreground">
-                  Manage business categories
-                </p>
-              </div>
+    <div className="space-y-6">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Business Categories</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage business categories
+          </p>
+        </div>
 
-              <div className="flex items-center gap-2">
-                <Button onClick={handleCreate}>Add Category</Button>
-                <CreateUpdateCategoryModal
-                  open={isModalOpen}
-                  onOpenChange={handleOpenChange}
-                  mode={mode}
-                  initialData={mode === "edit" ? initialData : undefined}
-                  onSuccess={() => {
-                    queryClient.removeQueries({
-                      queryKey: ["business-categories"],
-                    });
-                    setPage(1);
-                    setIsModalOpen(false);
-                  }}
-                />
-              </div>
-            </header>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleCreate}>Add Category</Button>
+          <CreateUpdateCategoryModal
+            open={isModalOpen}
+            onOpenChange={handleOpenChange}
+            mode={mode}
+            initialData={mode === "edit" ? initialData : undefined}
+            onSuccess={() => {
+              queryClient.removeQueries({
+                queryKey: ["business-categories"],
+              });
+              setPage(1);
+              setIsModalOpen(false);
+            }}
+          />
+        </div>
+      </header>
 
-            <div>
-              <DataTable
-                columns={columns}
-                data={currentPagedData}
-                totalRecords={total}
-                pageNumber={page}
-                pageSize={PAGE_SIZE}
-                onPageChange={(pn) => goToPage(pn)}
-                onSortChange={onSortChange}
-                onSearchChange={onSearchChange}
-                onFilterChange={onFilterChange}
-                filters={[
-                  {
-                    key: "type",
-                    label: "Type",
-                    options: [
-                      {
-                        label: "ALL",
-                        value: undefined,
-                      },
-                      {
-                        label: BusinessTypeEnum.RESTAURANT,
-                        value: BusinessTypeEnum.RESTAURANT,
-                      },
-                      {
-                        label: BusinessTypeEnum.BAR,
-                        value: BusinessTypeEnum.BAR,
-                      },
-                      {
-                        label: BusinessTypeEnum.LOUNGE,
-                        value: BusinessTypeEnum.LOUNGE,
-                      },
-                      {
-                        label: BusinessTypeEnum.CATERING,
-                        value: BusinessTypeEnum.CATERING,
-                      },
-                      {
-                        label: BusinessTypeEnum.BAKERY,
-                        value: BusinessTypeEnum.BAKERY,
-                      },
-                      {
-                        label: "FOOD VENDOR",
-                        value: BusinessTypeEnum.FOOD_VENDOR,
-                      },
-                      {
-                        label: "FAST FOOD",
-                        value: BusinessTypeEnum.FAST_FOOD,
-                      },
-                      {
-                        label: "STREET EATRY",
-                        value: BusinessTypeEnum.STREET_EATRY,
-                      },
-                      {
-                        label: BusinessTypeEnum.GROCERY,
-                        value: BusinessTypeEnum.GROCERY,
-                      },
-                      {
-                        label: "DELIVERY SERVICE",
-                        value: BusinessTypeEnum.DELIVERY_SERVICE,
-                      },
-                      {
-                        label: BusinessTypeEnum.OTHER,
-                        value: BusinessTypeEnum.OTHER,
-                      },
-                    ],
-                  },
-                ]}
-                isLoading={isLoading}
-                selectable
-                enableDateFilter
-                idAccessor={(r) => (r as BusinessCategory).id}
-              />
-            </div>
-          </div>
-        </PageWrapperContentWithFramer>
-      </PageWrapperContent>
-    </PageWrapper>
+      <div>
+        <DataTable
+          columns={columns}
+          data={currentPagedData}
+          totalRecords={total}
+          pageNumber={page}
+          pageSize={PAGE_SIZE}
+          onPageChange={(pn) => goToPage(pn)}
+          onSortChange={onSortChange}
+          onSearchChange={onSearchChange}
+          onFilterChange={onFilterChange}
+          filters={[
+            {
+              key: "type",
+              label: "Type",
+              options: [
+                {
+                  label: "ALL",
+                  value: undefined,
+                },
+                {
+                  label: BusinessTypeEnum.RESTAURANT,
+                  value: BusinessTypeEnum.RESTAURANT,
+                },
+                {
+                  label: BusinessTypeEnum.BAR,
+                  value: BusinessTypeEnum.BAR,
+                },
+                {
+                  label: BusinessTypeEnum.LOUNGE,
+                  value: BusinessTypeEnum.LOUNGE,
+                },
+                {
+                  label: BusinessTypeEnum.CATERING,
+                  value: BusinessTypeEnum.CATERING,
+                },
+                {
+                  label: BusinessTypeEnum.BAKERY,
+                  value: BusinessTypeEnum.BAKERY,
+                },
+                {
+                  label: "FOOD VENDOR",
+                  value: BusinessTypeEnum.FOOD_VENDOR,
+                },
+                {
+                  label: "FAST FOOD",
+                  value: BusinessTypeEnum.FAST_FOOD,
+                },
+                {
+                  label: "STREET EATRY",
+                  value: BusinessTypeEnum.STREET_EATRY,
+                },
+                {
+                  label: BusinessTypeEnum.GROCERY,
+                  value: BusinessTypeEnum.GROCERY,
+                },
+                {
+                  label: "DELIVERY SERVICE",
+                  value: BusinessTypeEnum.DELIVERY_SERVICE,
+                },
+                {
+                  label: BusinessTypeEnum.OTHER,
+                  value: BusinessTypeEnum.OTHER,
+                },
+              ],
+            },
+          ]}
+          isLoading={isLoading}
+          selectable
+          enableDateFilter
+          idAccessor={(r) => (r as BusinessCategory).id}
+        />
+      </div>
+    </div>
   );
 }

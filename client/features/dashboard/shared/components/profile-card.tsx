@@ -11,7 +11,7 @@ import {
 import type { User } from "@/data/interfaces/User";
 import { Coordinate, useUserLocation } from "@/providers";
 import { useEffect, useState } from "react";
-import { Button, Separator } from "@/components/ui";
+import { Button, Card, Separator } from "@/components/ui";
 import { toast } from "sonner";
 import { TextHelper } from "@/helpers";
 
@@ -55,7 +55,7 @@ export function UserProfileCard({ user, setEditProfile }: IUserProfileCard) {
   ]);
 
   return (
-    <div className="p-6 space-y-5">
+    <Card className="p-6 space-y-5 shadow-card">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex items-center gap-2">
           <Mail className="w-5 h-5 text-muted-foreground" />
@@ -141,6 +141,6 @@ export function UserProfileCard({ user, setEditProfile }: IUserProfileCard) {
       <div className="flex justify-end">
         <Button onClick={() => setEditProfile(true)}>Edit Profile</Button>
       </div>
-    </div>
+    </Card>
   );
 }

@@ -12,7 +12,7 @@ const bukkaButtonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-background text-primary dark:text-white hover:bg-accent hover:text-accent-foregrounds hover:dark:text-primary",
+          "border border-input bg-background text-primary dark:text-white hover:bg-accent hover:text-accent-foreground hover:dark:text-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
@@ -25,7 +25,7 @@ const bukkaButtonVariants = cva(
         glass:
           "glass text-white hover:text-foreground hover:bg-white/90 backdrop-blur-md",
         float:
-          "bg-white text-primary shadow-card hover:shadow-elegant hover:bg-primary hover:text-white hover-lift",
+          "bg-white text-primary dark:text-foreground shadow-card hover:shadow-elegant hover:bg-primary hover:text-white hover-lift",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
