@@ -238,13 +238,16 @@ export class FileController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Delete('user')
+  @Delete('user/:userId')
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
   @ApiSecurity('device-id')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete all files for a user' })
-  async deleteUserFiles(@Res() res: Response) {
-    const response = await this.fileRepository.deleteUserFiles();
+  async deleteUserFiles(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Res() res: Response,
+  ) {
+    const response = await this.fileRepository.deleteAllUserFiles(userId);
     return BukkaResponse.GetStatusResponse(response, res);
   }
 }

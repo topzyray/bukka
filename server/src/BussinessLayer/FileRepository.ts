@@ -371,9 +371,10 @@ export class FileRepository {
     }
   }
 
-  async deleteUserFiles(): Promise<BukkaResponse<void>> {
-    const loggedInUser = await UserHelper.getLoggedInUser();
-    const files = await this.fileDataAgent.deleteUserFiles(loggedInUser?.id);
+  async deleteAllUserFiles(userId: number): Promise<BukkaResponse<void>> {
+    // TODO: ALSO DELETE USER FILES FROM BLOB
+
+    const files = await this.fileDataAgent.deleteAllUserFiles(userId);
     if (files.count === 0) {
       return BukkaResponse.ErrorResponse(
         'No files found for this user',

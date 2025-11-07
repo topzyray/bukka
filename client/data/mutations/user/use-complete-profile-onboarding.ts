@@ -9,8 +9,9 @@ export const useCompleteProfileOnboarding = ({
 }) => {
   const queryClient = useQueryClient();
   return useCustomMutation(UserApiService.completeProfileOnboarding, {
-    onSuccessCallback: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({ queryKey: ["current-user"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
       onSuccess?.();
     },
   });

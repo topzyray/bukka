@@ -114,7 +114,7 @@ export function RouteGuard({
     // Instead of returning null, render a minimal loader so we don't show a blank page
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <CircularLoader text="Loading your session..." />
+        <CircularLoader text="Verifying session..." />
       </div>
     );
   }

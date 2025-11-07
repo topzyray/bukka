@@ -38,11 +38,3 @@ export interface User {
     radius: number;
   };
 }
-
-export interface UserActivitiesSummary {
-  businesses: number;
-  favorites: number;
-  files: number;
-  reviews: number;
-  sessions: number;
-}

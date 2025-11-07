@@ -3,11 +3,6 @@
 import React, { useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { DataTable } from "@/components/ui/data-table";
-import {
-  PageWrapper,
-  PageWrapperContent,
-  PageWrapperContentWithFramer,
-} from "@/components/ui/page-wrapper";
 import { PaginationHelper } from "@/helpers/pagination-helper";
 import { useAdminGetUsersQuery } from "@/data/queries/admin/use-users-query";
 import { userColumnsAdmin } from "@/features/dashboard/admin/components/user-admin-columns";
@@ -121,19 +116,14 @@ export function UsersList() {
   );
 
   return (
-    <PageWrapper>
-      <PageWrapperContent>
-        <PageWrapperContentWithFramer>
-          <div className="space-y-6">
-            <header className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold">Users Account</h1>
-                <p className="text-sm text-muted-foreground">
-                  Manage all users
-                </p>
-              </div>
+    <section className="space-y-6">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Users Account</h1>
+          <p className="text-sm text-muted-foreground">Manage all users</p>
+        </div>
 
-              {/* <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
                 <Button onClick={handleCreate}>Add Business</Button>
                 <CreateUpdateBusinessModal
                   open={isModalOpen}
@@ -147,50 +137,47 @@ export function UsersList() {
                   }}
                 />
               </div> */}
-            </header>
+      </header>
 
-            <div>
-              <DataTable
-                columns={columns}
-                data={currentPagedData}
-                totalRecords={total}
-                pageNumber={page}
-                pageSize={PAGE_SIZE}
-                onPageChange={(pn) => goToPage(pn)}
-                onSortChange={onSortChange}
-                onSearchChange={onSearchChange}
-                onFilterChange={onFilterChange}
-                filters={[
-                  {
-                    key: "role",
-                    label: "Role",
-                    options: [
-                      { label: "All", value: undefined },
-                      { label: "Admins", value: UserRoleEnum.ADMIN },
-                      { label: "Vendors", value: UserRoleEnum.VENDOR },
-                      { label: "Users", value: UserRoleEnum.USER },
-                      { label: "Investors", value: UserRoleEnum.INVESTOR },
-                    ] /* fetch and populate dynamically */,
-                  },
-                  {
-                    key: "isVerified",
-                    label: "Verified",
-                    options: [
-                      { label: "All", value: undefined },
-                      { label: "Yes", value: "true" },
-                      { label: "No", value: "false" },
-                    ],
-                  },
-                ]}
-                isLoading={isLoading}
-                selectable
-                enableDateFilter
-                idAccessor={(r) => (r as User).id}
-              />
-            </div>
-          </div>
-        </PageWrapperContentWithFramer>
-      </PageWrapperContent>
-    </PageWrapper>
+      <div>
+        <DataTable
+          columns={columns}
+          data={currentPagedData}
+          totalRecords={total}
+          pageNumber={page}
+          pageSize={PAGE_SIZE}
+          onPageChange={(pn) => goToPage(pn)}
+          onSortChange={onSortChange}
+          onSearchChange={onSearchChange}
+          onFilterChange={onFilterChange}
+          filters={[
+            {
+              key: "role",
+              label: "Role",
+              options: [
+                { label: "All", value: undefined },
+                { label: "Admins", value: UserRoleEnum.ADMIN },
+                { label: "Vendors", value: UserRoleEnum.VENDOR },
+                { label: "Users", value: UserRoleEnum.USER },
+                { label: "Investors", value: UserRoleEnum.INVESTOR },
+              ] /* fetch and populate dynamically */,
+            },
+            {
+              key: "isVerified",
+              label: "Verified",
+              options: [
+                { label: "All", value: undefined },
+                { label: "Yes", value: "true" },
+                { label: "No", value: "false" },
+              ],
+            },
+          ]}
+          isLoading={isLoading}
+          selectable
+          enableDateFilter
+          idAccessor={(r) => (r as User).id}
+        />
+      </div>
+    </section>
   );
 }

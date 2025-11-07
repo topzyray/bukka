@@ -7,6 +7,11 @@ export class TextHelper {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   }
 
+  static normalizeText(text: string | undefined) {
+    if (!text) return '';
+    return text.replace('_', ' ').toLowerCase();
+  }
+
   static getFormattedDate = (date: string) => {
     const dateObject = new Date(date);
 

@@ -18,23 +18,27 @@ import { useDistance } from "@/hooks/use-distance";
 import { FavoriteButton } from "./favorite-button";
 import { BusinessHelper } from "../helper/bussiness-helper";
 import { PlanMyJourneyButton } from "./ui/plan-my-journey";
+import { useAuth } from "@/providers";
 
 interface IBusinessCard {
   business: Business;
   variant?: "default" | "compact" | "featured";
   className?: string;
+  inDashboard?: boolean;
   onClick?: () => void;
 }
 
 export const BusinessCard = memo(function BusinessCard({
   business,
   variant = "default",
+  inDashboard = false,
   className,
   onClick,
 }: IBusinessCard) {
   const [imageError, setImageError] = useState(false);
   const router = useRouter();
 
+  const { user } = useAuth();
   const { data: businessFiles, isLoading: isLoadingBusinessFiles } =
     useBusinessFiles({
       businessId: business?.id,
@@ -113,7 +117,7 @@ export const BusinessCard = memo(function BusinessCard({
             </div>
 
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm truncate">
+              <h3 className="font-semibold text-sm truncate hover:text-foreground">
                 {business?.name}
               </h3>
               <p className="text-xs text-muted-foreground truncate">
@@ -163,23 +167,6 @@ export const BusinessCard = memo(function BusinessCard({
             </div>
           )}
 
-          {/* <BukkaButton
-            variant="glass"
-            size="icon"
-            className="absolute top-3 right-3 w-8 h-8"
-            onClick={handleFavoriteClick}
-            aria-label={!!isUserFavorite ? "Unsave" : "Save"}
-          >
-            <Heart
-              className={cn(
-                "w-4 h-4 transition-colors",
-                !!isUserFavorite
-                  ? "fill-red-500 text-red-500"
-                  : "text-muted-foreground"
-              )}
-            />
-          </BukkaButton> */}
-
           <FavoriteButton
             businessId={business?.id}
             className="absolute top-3 right-3 w-8 h-8"
@@ -199,7 +186,7 @@ export const BusinessCard = memo(function BusinessCard({
         <CardContent className="p-4">
           <div className="space-y-3">
             <div>
-              <h3 className="font-semibold text-lg truncate group-hover:text-primary transition-colors">
+              <h3 className="font-semibold text-lg truncate group-hover:text-foreground transition-colors">
                 {business?.name}
               </h3>
               <p className="text-sm text-muted-foreground truncate">
@@ -246,42 +233,27 @@ export const BusinessCard = memo(function BusinessCard({
                   </BukkaButton>
                 </Link>
               )}
-              {/* <Link
-                href={
-                  business?.location
-                    ? `/maps?q=${business?.location?.latitude},${business?.location?.longitude}`
-                    : "#"
-                }
-                // href={
-                //   business.location
-                //     ? `https://www.google.com/maps?q=${business.location.latitude},${business.location.longitude}`
-                //     : "#"
-                // }
-                // target="_blank"
-                rel="noreferrer"
-              > */}
+
               <BukkaButton
                 variant="outline"
                 size="sm"
                 className="flex-1"
                 asChild
                 onClick={() => {
-                  window.location.href = business?.location
-                    ? `/maps?q=${business?.location?.latitude},${business?.location?.longitude}`
-                    : "#";
-                  // window.history.replaceState(
-                  //   null,
-                  //   "",
-                  //   business?.location
-                  //     ? `/maps?q=${business?.location?.latitude},${business?.location?.longitude}`
-                  //     : "#"
-                  // );
+                  window.location.href =
+                    business?.location && !inDashboard
+                      ? `/maps?q=${business?.location?.latitude},${business?.location?.longitude}`
+                      : business?.location && inDashboard
+                      ? `/dashboard/${user?.role?.toLowerCase()}/maps?q=${
+                          business?.location?.latitude
+                        },${business?.location?.longitude}`
+                      : "#";
                 }}
               >
                 <MapPin className="w-3 h-3 mr-1" />
                 View on Map
               </BukkaButton>
-              {/* </Link> */}
+
               <PlanMyJourneyButton business={business} />
               {business?.website && (
                 <Link

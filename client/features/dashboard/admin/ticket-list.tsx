@@ -3,20 +3,14 @@
 import React, { useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { DataTable } from "@/components/ui/data-table";
-import {
-  PageWrapper,
-  PageWrapperContent,
-  PageWrapperContentWithFramer,
-} from "@/components/ui/page-wrapper";
 import { useDeleteBusiness } from "@/data/mutations/business/use-business-mutation";
 import { PaginationHelper } from "@/helpers/pagination-helper";
-import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { useSupportsQuery } from "@/data/queries/use-support-query";
 import { Support } from "@/data/interfaces/Support";
-import { supportColumns } from "./components/support-columns";
+import { supportColumns } from "../shared/components/support-columns";
 import { SupportStatusEnum } from "@/data/enums/SupportStatusEnum";
 
-export function SupportTicketList() {
+export function AdminSupportTicketList() {
   const PAGE_SIZE = 10;
   const queryClient = useQueryClient();
 
@@ -124,19 +118,16 @@ export function SupportTicketList() {
   );
 
   return (
-    <PageWrapper>
-      <PageWrapperContent>
-        <PageWrapperContentWithFramer>
-          <div className="space-y-6">
-            <header className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold">Support Tickets</h1>
-                <p className="text-sm text-muted-foreground">
-                  Manage all support tickets
-                </p>
-              </div>
+    <section className="space-y-6">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Support Tickets</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage all support tickets
+          </p>
+        </div>
 
-              {/* <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
                 <Button onClick={handleCreate}>Add Support</Button>
                 <CreateUpdateBusinessModal
                   open={isModalOpen}
@@ -150,52 +141,49 @@ export function SupportTicketList() {
                   }}
                 />
               </div> */}
-            </header>
+      </header>
 
-            <div>
-              <DataTable
-                columns={columns}
-                data={currentPagedData}
-                totalRecords={total}
-                pageNumber={page}
-                pageSize={PAGE_SIZE}
-                onPageChange={(pn) => goToPage(pn)}
-                onSortChange={onSortChange}
-                onSearchChange={onSearchChange}
-                onFilterChange={onFilterChange}
-                filters={[
-                  {
-                    key: "status",
-                    label: "Status",
-                    options: [
-                      {
-                        label: "ALL",
-                        value: undefined,
-                      },
-                      {
-                        label: SupportStatusEnum.SUBMITTED,
-                        value: SupportStatusEnum.SUBMITTED,
-                      },
-                      {
-                        label: SupportStatusEnum.PENDING,
-                        value: SupportStatusEnum.PENDING,
-                      },
-                      {
-                        label: SupportStatusEnum.RESOLVED,
-                        value: SupportStatusEnum.RESOLVED,
-                      },
-                    ],
-                  },
-                ]}
-                isLoading={isLoading}
-                selectable
-                enableDateFilter
-                idAccessor={(r) => (r as Support).id}
-              />
-            </div>
-          </div>
-        </PageWrapperContentWithFramer>
-      </PageWrapperContent>
-    </PageWrapper>
+      <div>
+        <DataTable
+          columns={columns}
+          data={currentPagedData}
+          totalRecords={total}
+          pageNumber={page}
+          pageSize={PAGE_SIZE}
+          onPageChange={(pn) => goToPage(pn)}
+          onSortChange={onSortChange}
+          onSearchChange={onSearchChange}
+          onFilterChange={onFilterChange}
+          filters={[
+            {
+              key: "status",
+              label: "Status",
+              options: [
+                {
+                  label: "ALL",
+                  value: undefined,
+                },
+                {
+                  label: SupportStatusEnum.SUBMITTED,
+                  value: SupportStatusEnum.SUBMITTED,
+                },
+                {
+                  label: SupportStatusEnum.PENDING,
+                  value: SupportStatusEnum.PENDING,
+                },
+                {
+                  label: SupportStatusEnum.RESOLVED,
+                  value: SupportStatusEnum.RESOLVED,
+                },
+              ],
+            },
+          ]}
+          isLoading={isLoading}
+          selectable
+          enableDateFilter
+          idAccessor={(r) => (r as Support).id}
+        />
+      </div>
+    </section>
   );
 }

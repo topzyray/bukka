@@ -218,8 +218,8 @@ export class AuthController {
   @Post('change-password')
   @ApiOperation({ summary: 'Change user password' })
   @ApiBody({ type: ChangePasswordDto })
-  async changePassword(@Body() req: ChangePasswordDto, @Res() res: Response) {
-    const response = await this._authRepository.changePassword(req);
+  async changePassword(@Body() dto: ChangePasswordDto, @Res() res: Response) {
+    const response = await this._authRepository.changePassword(dto);
     return BukkaResponse.GetStatusResponse(response, res);
   }
 }

@@ -1,4 +1,3 @@
-import { UpdateCategoryDto } from "@/data/dtos";
 import { useCustomMutation } from "@/data/mutations/base";
 import { BusinessCategoryApiService } from "@/data/services/BusinessCategoryApiService";
 import { useQueryClient } from "@tanstack/react-query";
@@ -13,9 +12,12 @@ export const useCreateCategory = ({
   const queryClient = useQueryClient();
 
   return useCustomMutation(BusinessCategoryApiService.createCategory, {
-    onSuccessCallback: async () => {
-      await queryClient.invalidateQueries({
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
         queryKey: ["business-categories"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["admin-overview"],
       });
       resetForm();
       onSuccess?.();
@@ -30,9 +32,12 @@ export const useUpdateCategory = ({
 }) => {
   const queryClient = useQueryClient();
   return useCustomMutation(BusinessCategoryApiService.updateCategory, {
-    onSuccessCallback: async () => {
-      await queryClient.invalidateQueries({
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
         queryKey: ["business-categories"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["admin-overview"],
       });
       onSuccess?.();
     },

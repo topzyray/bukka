@@ -20,10 +20,11 @@ import { ReviewController } from './ServiceLayer/Controllers/ReviewController';
 import { HealthController } from './ServiceLayer/Controllers/HealthController';
 import { SupportController } from './ServiceLayer/Controllers/SupportController';
 import { BusinessController } from './ServiceLayer/Controllers/BusinessController';
-import { UserSessionController } from './ServiceLayer/Controllers/UserSessionController';
 import { LocationController } from './ServiceLayer/Controllers/LocationController';
 import { WaitListController } from './ServiceLayer/Controllers/WaitListController';
 import { FavoriteController } from './ServiceLayer/Controllers/FavoriteController';
+import { UserSessionController } from './ServiceLayer/Controllers/UserSessionController';
+import { AnalyticsController } from './ServiceLayer/Controllers/Shared/AnalyticsController';
 import { AdminControlController } from './ServiceLayer/Controllers/Admin/AdminControlController';
 import { UserNotificationController } from './ServiceLayer/Controllers/UserNotificationController';
 import { BusinessCategoryController } from './ServiceLayer/Controllers/BusinessCategoryController';
@@ -137,6 +138,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     ReviewController,
     UserManagementController,
     AdminControlController,
+    AnalyticsController,
   ],
   providers: [
     {

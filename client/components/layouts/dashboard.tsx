@@ -7,6 +7,14 @@ import { getDashboardConfig } from "@/utils";
 import { UserRoleEnum } from "@/data/enums";
 import { useAuth } from "@/providers/auth-provider";
 import { DashboardHeader } from "../dashboard/dashboard-header";
+import {
+  BackButton,
+  PageWrapper,
+  PageWrapperContent,
+  PageWrapperContentWithFramer,
+  PageWrapperHeader,
+  Separator,
+} from "../ui";
 
 interface IDashboardLayout {
   defaultOpen: boolean;
@@ -26,7 +34,17 @@ export function DashboardLayout({
       <DashBoardSidebar navItems={navItems} />
       <main className="relative max-h-screen w-full">
         <DashboardHeader dashboardTitle={title} userData={user as User} />
-        <section className="pt-14 w-full">{children}</section>
+        <PageWrapper className="pt-14 w-full">
+          <PageWrapperHeader className="mt-4">
+            <BackButton />
+          </PageWrapperHeader>
+          <PageWrapperContent className="h-full">
+            <PageWrapperContentWithFramer className="h-full">
+              <Separator className="border-2" />
+              {children}
+            </PageWrapperContentWithFramer>
+          </PageWrapperContent>
+        </PageWrapper>
       </main>
     </SidebarProvider>
   );

@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
 import {
   User,
   Settings,
@@ -16,25 +14,37 @@ import {
   Laptop,
   Briefcase,
 } from "lucide-react";
-import { toast } from "sonner";
-import { BukkaButton } from "@/components/ui/button-variants";
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  BukkaButton,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/providers/auth-provider";
+  Separator,
+  SmartFileUploader,
+} from "@/components/ui";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { FileCategoryEnum, UserRoleEnum } from "@/data/enums";
 import { File } from "@/data/interfaces/File";
+import { useAuth } from "@/providers/auth-provider";
+import {
+  FileCategoryEnum,
+  FileReferenceTypeEnum,
+  UserRoleEnum,
+} from "@/data/enums";
 import { CircularLoader } from "@/components/loaders/circular-loader";
-import { useUserActivitySummary } from "@/data/queries";
+import { SettingsPageTitleCard } from "./components/setting-title-card";
+import { useUserActivitySummary } from "@/data/queries/use-analytics-query";
+import { FileApiService } from "@/data/services";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function SettingsOverview() {
+  const queryClient = useQueryClient();
   const { user, logout, userFiles, isLoadingUserFiles } = useAuth();
   const profileAvatar: File | null | undefined =
     !isLoadingUserFiles && userFiles && userFiles.length
@@ -79,8 +89,13 @@ export function SettingsOverview() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="h-full max-w-4xl mx-auto space-y-6"
+      className="space-y-4"
     >
+      <SettingsPageTitleCard
+        title="Profile Overview"
+        description="View summary and navigate to other setting page."
+      />
+
       <Card className="shadow-card py-6 lg:py-10">
         <CardHeader className="text-center">
           <Avatar className="w-24 h-24 mx-auto mb-4 border border-primary flex justify-center items-center">
@@ -99,6 +114,28 @@ export function SettingsOverview() {
                 {user?.email?.[0].toUpperCase()}
               </AvatarFallback>
             )}
+            <SmartFileUploader
+              title="Upload Profile Avatar"
+              useCameraModal
+              uploadFn={FileApiService.uploadFile}
+              extraParams={{
+                referenceType: FileReferenceTypeEnum.USER,
+                category: FileCategoryEnum.USER_PROFILE_IMAGE,
+                referenceId: user?.id,
+                isPublic: true,
+                metadata: {
+                  altText: `${user?.firstName} ${user?.lastName} - Profile Photo`,
+                },
+              }}
+              onUploadSuccess={() => {
+                queryClient.invalidateQueries({ queryKey: ["current-user"] });
+                queryClient.invalidateQueries({ queryKey: ["user-files"] });
+                queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+                queryClient.invalidateQueries({
+                  queryKey: ["user-activities-summary"],
+                });
+              }}
+            />
           </Avatar>
           <CardTitle className="text-2xl">
             {`${user?.firstName} ${user?.lastName}`}
@@ -114,7 +151,7 @@ export function SettingsOverview() {
                   key={stat.title}
                   className="border p-4 rounded-lg max-w-sm w-full sm:w-[9.5rem]"
                 >
-                  <div className="text-2xl font-bold text-primary flex-1">
+                  <div className="text-2xl font-bold text-primary dark:text-foreground flex-1">
                     {stat.count}
                   </div>
                   <div className="text-sm text-muted-foreground flex justify-center items-center gap-2">
@@ -132,7 +169,7 @@ export function SettingsOverview() {
             variant="outline"
             className="h-auto p-4 flex-col gap-2"
             onClick={() =>
-              router.push(`/dashboard/${user?.role.toLowerCase()}/favorites`)
+              router.push(`/dashboard/${user?.role.toLowerCase()}/favourites`)
             }
           >
             <Heart className="w-6 h-6" />

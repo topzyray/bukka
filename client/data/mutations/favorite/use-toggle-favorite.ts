@@ -9,6 +9,7 @@ export const useToggleFavorite = () => {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["favourites"] });
       queryClient.invalidateQueries({ queryKey: ["user-activities-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
     },
   });
 };

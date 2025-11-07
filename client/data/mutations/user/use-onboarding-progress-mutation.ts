@@ -16,7 +16,8 @@ export const useSaveOnboardingProgress = ({
       queryClient.invalidateQueries({
         queryKey: ["onboarding-progress", user?.id],
       });
-      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      queryClient.invalidateQueries({ queryKey: ["current-user"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
     },
     toastStatusMessage,
     onErrorCallback: () => {},

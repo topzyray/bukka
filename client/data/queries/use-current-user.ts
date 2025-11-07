@@ -1,12 +1,11 @@
 "use client";
 
 import { UserApiService } from "@/data/services";
-import { BukkaResponse, useCustomQuery } from "./base";
-import { UserActivitiesSummary } from "../interfaces/User";
+import { useCustomQuery } from "./base";
 
 export const useCurrentUser = () => {
   return useCustomQuery(
-    ["currentUser"],
+    ["current-user"],
     () => UserApiService.getLoggedInUser(),
     {
       enabled: true,
@@ -15,17 +14,6 @@ export const useCurrentUser = () => {
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
       placeholderData: (prev) => prev,
-    }
-  );
-};
-
-export const useUserActivitySummary = ({ userId }: { userId: number }) => {
-  return useCustomQuery<BukkaResponse<UserActivitiesSummary>>(
-    ["user-activities-summary"],
-    () => UserApiService.getUserActivitySummary(),
-    {
-      enabled: !!userId,
-      staleTime: 1000 * 60 * 10,
     }
   );
 };
@@ -68,7 +56,7 @@ export const useUserActivitySummary = ({ userId }: { userId: number }) => {
 //   }, [pathname, allowedPathPatterns]);
 
 //   const query = useCustomQuery(
-//     ["currentUser"],
+//     ["current-user"],
 //     () => UserApiService.getLoggedInUser(),
 //     {
 //       enabled: false, // start disabled to avoid SSR/client mismatch

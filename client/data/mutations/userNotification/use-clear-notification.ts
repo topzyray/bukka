@@ -8,6 +8,7 @@ export const useClearAllNotifications = ({ userId }: { userId?: number }) => {
     onSuccessCallback() {
       queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
       queryClient.invalidateQueries({ queryKey: ["unread-count", userId] });
+      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
     },
   });
 };

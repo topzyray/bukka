@@ -23,11 +23,6 @@ import {
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { BukkaButton } from "@/components/ui/button-variants";
-import {
-  PageWrapper,
-  PageWrapperContent,
-  PageWrapperContentWithFramer,
-} from "@/components/ui/page-wrapper";
 
 // Mock data for restaurant metrics
 const weeklyVisitors = [
@@ -103,201 +98,180 @@ export function VendorOverview() {
   ];
 
   return (
-    <PageWrapper>
-      <PageWrapperContent className="container mx-auto px-4 py-8">
-        <PageWrapperContentWithFramer>
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                <Store className="w-8 h-8 text-primary" />
-                Vendor&apos;s Dashboard
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Manage your business presence on Bukka
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <BukkaButton variant="outline">Edit Profile</BukkaButton>
-              <BukkaButton variant="hero">View Public Page</BukkaButton>
-            </div>
-          </div>
+    <section className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+            <Store className="w-8 h-8 text-primary" />
+            Vendor&apos;s Dashboard
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your business presence on Bukka
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <BukkaButton variant="outline">Edit Profile</BukkaButton>
+          <BukkaButton variant="hero">View Public Page</BukkaButton>
+        </div>
+      </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={stat.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-              >
-                <Card className="shadow-card">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">
-                          {stat.title}
-                        </p>
-                        <p className="text-2xl font-bold">{stat.value}</p>
-                        <Badge
-                          variant={stat.positive ? "default" : "destructive"}
-                          className="mt-1"
-                        >
-                          {stat.change}
-                        </Badge>
-                      </div>
-                      <stat.icon className="w-8 h-8 text-primary" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Charts Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Weekly Visitors */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat, index) => (
+          <motion.div
+            key={stat.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1, duration: 0.5 }}
+          >
             <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Weekly Visitors
-                </CardTitle>
-                <CardDescription>
-                  Visitors to your restaurant this week
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={weeklyVisitors}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      className="opacity-30"
-                    />
-                    <XAxis dataKey="day" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="visitors" fill="hsl(var(--primary))" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            {/* Monthly Revenue */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
-                  Revenue Trend
-                </CardTitle>
-                <CardDescription>Monthly revenue growth</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={monthlyRevenue}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      className="opacity-30"
-                    />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Recent Reviews */}
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="w-5 h-5" />
-                Recent Reviews
-              </CardTitle>
-              <CardDescription>
-                What customers are saying about you
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentReviews.map((review, index) => (
-                <div key={index} className="p-4 rounded-lg bg-muted/30">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{review.user}</span>
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-4 h-4 ${
-                              i < review.rating
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "text-muted-foreground"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <span className="text-sm text-muted-foreground">
-                      {review.time}
-                    </span>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {stat.title}
+                    </p>
+                    <p className="text-2xl font-bold">{stat.value}</p>
+                    <Badge
+                      variant={stat.positive ? "default" : "destructive"}
+                      className="mt-1"
+                    >
+                      {stat.change}
+                    </Badge>
                   </div>
-                  <p className="text-sm">{review.comment}</p>
+                  <stat.icon className="w-8 h-8 text-primary" />
                 </div>
-              ))}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
 
-          {/* Quick Actions */}
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>
-                Manage your restaurant efficiently
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <BukkaButton
-                  variant="outline"
-                  className="h-auto py-4 flex-col gap-2"
-                >
-                  <Store className="w-6 h-6" />
-                  <span>Update Menu</span>
-                </BukkaButton>
-                <BukkaButton
-                  variant="outline"
-                  className="h-auto py-4 flex-col gap-2"
-                >
-                  <Users className="w-6 h-6" />
-                  <span>View Analytics</span>
-                </BukkaButton>
-                <BukkaButton
-                  variant="outline"
-                  className="h-auto py-4 flex-col gap-2"
-                >
-                  <Star className="w-6 h-6" />
-                  <span>Respond to Reviews</span>
-                </BukkaButton>
-                <BukkaButton
-                  variant="outline"
-                  className="h-auto py-4 flex-col gap-2"
-                >
-                  <TrendingUp className="w-6 h-6" />
-                  <span>Boost Visibility</span>
-                </BukkaButton>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Weekly Visitors
+            </CardTitle>
+            <CardDescription>
+              Visitors to your restaurant this week
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={weeklyVisitors}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis dataKey="day" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="visitors" fill="hsl(var(--primary))" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5" />
+              Revenue Trend
+            </CardTitle>
+            <CardDescription>Monthly revenue growth</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={monthlyRevenue}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="shadow-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="w-5 h-5" />
+            Recent Reviews
+          </CardTitle>
+          <CardDescription>What customers are saying about you</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {recentReviews.map((review, index) => (
+            <div key={index} className="p-4 rounded-lg bg-muted/30">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{review.user}</span>
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-4 h-4 ${
+                          i < review.rating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-muted-foreground"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {review.time}
+                </span>
               </div>
-            </CardContent>
-          </Card>
-        </PageWrapperContentWithFramer>
-      </PageWrapperContent>
-    </PageWrapper>
+              <p className="text-sm">{review.comment}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-card">
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+          <CardDescription>Manage your restaurant efficiently</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <BukkaButton
+              variant="outline"
+              className="h-auto py-4 flex-col gap-2"
+            >
+              <Store className="w-6 h-6" />
+              <span>Update Menu</span>
+            </BukkaButton>
+            <BukkaButton
+              variant="outline"
+              className="h-auto py-4 flex-col gap-2"
+            >
+              <Users className="w-6 h-6" />
+              <span>View Analytics</span>
+            </BukkaButton>
+            <BukkaButton
+              variant="outline"
+              className="h-auto py-4 flex-col gap-2"
+            >
+              <Star className="w-6 h-6" />
+              <span>Respond to Reviews</span>
+            </BukkaButton>
+            <BukkaButton
+              variant="outline"
+              className="h-auto py-4 flex-col gap-2"
+            >
+              <TrendingUp className="w-6 h-6" />
+              <span>Boost Visibility</span>
+            </BukkaButton>
+          </div>
+        </CardContent>
+      </Card>
+    </section>
   );
 }

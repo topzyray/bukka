@@ -282,6 +282,78 @@ export class TextHelper {
     return past.toLocaleDateString();
   }
 
+  // static smartTimeAgo(date: Date): string {
+  //   const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+  //   if (diff < 60) return `${diff} seconds ago`;
+  //   if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+  //   if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+  //   return `${Math.floor(diff / 86400)} days ago`;
+  // }
+
+  static smartTimeAgo(date: Date | string | number) {
+    const d =
+      typeof date === "number"
+        ? new Date(date)
+        : date instanceof Date
+        ? date
+        : new Date(date);
+
+    if (isNaN(d.getTime())) return "Invalid date";
+
+    const now = new Date();
+    const diffSeconds = Math.floor((now.getTime() - d.getTime()) / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    const diffWeeks = Math.floor(diffDays / 7);
+    const diffMonths = Math.floor(diffDays / 30);
+    const diffYears = Math.floor(diffDays / 365);
+
+    if (diffSeconds < 10) return "just now";
+    if (diffSeconds < 60)
+      return `${diffSeconds} second${diffSeconds > 1 ? "s" : ""} ago`;
+    if (diffMinutes < 60)
+      return `${diffMinutes} minute${diffMinutes > 1 ? "s" : ""} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+    if (diffDays === 1) return "yesterday";
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+    if (diffWeeks < 5)
+      return `${diffWeeks} week${diffWeeks > 1 ? "s" : ""} ago`;
+    if (diffMonths < 12)
+      return `${diffMonths} month${diffMonths > 1 ? "s" : ""} ago`;
+
+    // ✅ use diffYears
+    return `${diffYears} year${diffYears > 1 ? "s" : ""} ago`;
+  }
+
+  static smartTimeAgoIntl(date: Date | string | number, locale = "en"): string {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "Invalid date";
+
+    const diff = d.getTime() - Date.now();
+    const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+
+    const units: [Intl.RelativeTimeFormatUnit, number][] = [
+      ["year", 1000 * 60 * 60 * 24 * 365],
+      ["month", 1000 * 60 * 60 * 24 * 30],
+      ["week", 1000 * 60 * 60 * 24 * 7],
+      ["day", 1000 * 60 * 60 * 24],
+      ["hour", 1000 * 60 * 60],
+      ["minute", 1000 * 60],
+      ["second", 1000],
+    ];
+
+    for (const [unit, ms] of units) {
+      const delta = diff / ms;
+      if (Math.abs(delta) >= 1 || unit === "second") {
+        return rtf.format(Math.round(delta), unit);
+      }
+    }
+
+    return "just now";
+  }
+
   static isOPenNow(periods: any[]) {
     if (!periods?.length) return false;
 

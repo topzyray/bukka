@@ -16,6 +16,9 @@ export const useCreateBusiness = ({
       await queryClient.invalidateQueries({
         queryKey: ["user-activities-summary"],
       });
+      await queryClient.invalidateQueries({
+        queryKey: ["admin-overview"],
+      });
       resetForm();
       onSuccess?.();
     },
@@ -54,6 +57,9 @@ export const useDeleteBusiness = ({
       await queryClient.invalidateQueries({ queryKey: ["businesses"] });
       await queryClient.invalidateQueries({
         queryKey: ["user-activities-summary"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["admin-overview"],
       });
       onSuccess?.();
     },

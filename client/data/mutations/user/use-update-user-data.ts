@@ -12,7 +12,8 @@ export const useUpdateUserData = ({
   const queryClient = useQueryClient();
   return useCustomMutation(UserApiService.updateUser, {
     onSuccessCallback: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
       onSuccess?.();
     },
     toastStatusMessage,

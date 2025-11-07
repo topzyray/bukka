@@ -116,7 +116,7 @@ class HttpClient {
 
         if (this.queryClient) {
           await this.queryClient.invalidateQueries({
-            queryKey: ["currentUser"],
+            queryKey: ["current-user"],
           });
         }
         return this.client(originalRequest);

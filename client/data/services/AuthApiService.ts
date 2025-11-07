@@ -5,6 +5,7 @@ import {
   ResendEmailVerificationDto,
   RefreshTokenDto,
   ResetPasswordDto,
+  ChangePasswordDto,
 } from "../dtos";
 import { authRoutes } from "@/constants/routes";
 import { StorageUtilsHelper } from "@/utils";
@@ -85,6 +86,14 @@ export class AuthApiService {
   static async resetPassword(requestBody: ResetPasswordDto) {
     const response = await HttpClient.getClient().post(
       `${authRoutes.resetPassword}`,
+      requestBody
+    );
+    return response.data;
+  }
+
+  static async changePassword(requestBody: ChangePasswordDto) {
+    const response = await HttpClient.getClient().post(
+      `${authRoutes.changePassword}`,
       requestBody
     );
     return response.data;

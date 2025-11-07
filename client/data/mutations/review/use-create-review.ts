@@ -10,6 +10,7 @@ export const useCreateReview = () => {
       queryClient.invalidateQueries({ queryKey: ["business-reviews"] });
       queryClient.invalidateQueries({ queryKey: ["user-reviews"] });
       queryClient.invalidateQueries({ queryKey: ["user-activities-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
     },
   });
 };

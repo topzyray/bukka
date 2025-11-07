@@ -90,7 +90,7 @@ export class UserSessionDataAgent {
     return null;
   }
 
-  async deleteAllSessions(userId: number) {
+  async deleteAllUserSessions(userId: number) {
     const spec: QuerySpec = {
       filter: { field: 'userId', op: 'eq', value: userId },
     };

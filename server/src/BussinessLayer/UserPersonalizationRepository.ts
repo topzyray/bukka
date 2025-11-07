@@ -100,7 +100,7 @@ export class UserPersonalizationRepository {
 
   async updateUserPersonalization(
     dto: UpdateUserPersonalizationDto,
-  ): Promise<BukkaResponse<any>> {
+  ): Promise<BukkaResponse<UserPersonalization>> {
     const loggedInUser = await UserHelper.getLoggedInUser();
     await UserHelper.hasAccess(loggedInUser.id);
 
@@ -124,6 +124,7 @@ export class UserPersonalizationRepository {
       await this._userPersonalizationDataAgent.updateUserPersonalization(
         updateData,
       );
+
     return BukkaResponse.UpdateResponse(
       'User personalization',
       updatedUserPersonalization,

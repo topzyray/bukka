@@ -12,6 +12,9 @@ export const useRevokeSession = ({ onSuccess }: { onSuccess?: () => void }) => {
       queryClient.invalidateQueries({
         queryKey: ["user-active-session"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["admin-overview"],
+      });
       onSuccess?.();
     },
   });

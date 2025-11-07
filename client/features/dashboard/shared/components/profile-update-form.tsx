@@ -1,22 +1,22 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { InputComponent } from "@/components/form-ui/base/input-component";
-import { PhoneNumberInput } from "@/components/form-ui/base/phone-number-component";
-import { SelectComponent } from "@/components/form-ui/base/select-component";
-import { GenderEnum } from "@/data/enums";
-import { Form } from "@/components/ui";
-import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
-import parsePhoneNumberFromString from "libphonenumber-js";
-import { TextAreaComponent } from "@/components/form-ui/base/text-area-component";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { TextHelper } from "@/helpers";
+import { GenderEnum } from "@/data/enums";
+import { useForm } from "react-hook-form";
+import { Card, Form } from "@/components/ui";
 import { User } from "@/data/interfaces/User";
+import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
+import { InputComponent } from "@/components/form-ui/base/input-component";
+import { SelectComponent } from "@/components/form-ui/base/select-component";
+import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
+import { TextAreaComponent } from "@/components/form-ui/base/text-area-component";
+import { PhoneNumberInput } from "@/components/form-ui/base/phone-number-component";
+import parsePhoneNumberFromString from "libphonenumber-js";
 
 const allowedGenders = Object.values(GenderEnum);
 
@@ -95,7 +95,7 @@ export function ProfileUpdateForm({
   const { mutateAsync: updateUserData, isPending: isUpdatingUserData } =
     useUpdateUserData({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+        queryClient.invalidateQueries({ queryKey: ["current-user"] });
       },
     });
 
@@ -114,7 +114,7 @@ export function ProfileUpdateForm({
   };
 
   return (
-    <div className="w-full mx-auto rounded-xl shadow-md border border-border overflow-hidden transition-all hover:shadow-lg">
+    <Card className="w-full mx-auto rounded-xl shadow-md border border-border overflow-hidden transition-all hover:shadow-lg">
       <div className="w-full p-6">
         <Form {...form}>
           <form
@@ -206,6 +206,6 @@ export function ProfileUpdateForm({
           </form>
         </Form>
       </div>
-    </div>
+    </Card>
   );
 }

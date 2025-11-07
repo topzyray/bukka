@@ -61,7 +61,7 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
 
   return (
     <Sidebar side="left" variant="floating" collapsible="offcanvas">
-      <SidebarHeader>
+      <SidebarHeader className="bg-card">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-4">
             <Link href={`/dashboard/${user?.role.toLowerCase()}/overview`}>
@@ -84,7 +84,7 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarSeparator className="max-w-[11rem] w-full" />
-      <SidebarContent>
+      <SidebarContent className="bg-card">
         <SidebarGroupLabel>Navigations</SidebarGroupLabel>
 
         {navItems.map((item) => {
@@ -194,7 +194,7 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
         })}
       </SidebarContent>
       <Separator />
-      <SidebarFooter>
+      <SidebarFooter className="bg-card">
         <SidebarMenu>
           <Link href="/">
             <SidebarMenuItem className="flex items-center gap-2 overflow-hidden py-2 text-sm text-ellipsis capitalize hover:bg-accent hover:text-black rounded-lg">

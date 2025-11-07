@@ -119,7 +119,7 @@ export class UserNotificationDataAgent {
     return null;
   }
 
-  async deleteAllUserNotificationsByUserId(userId: number) {
+  async deleteAllUserNotifications(userId: number) {
     const spec: QuerySpec = {
       filter: { field: 'userId', op: 'eq', value: userId },
     };

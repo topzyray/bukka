@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 export function SessionExpirationModal() {
   const [open, setOpen] = useState(false);
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(20);
   const hasHandled = useRef(false); // ✅ prevents duplicate triggers
   const router = useRouter();
 

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Put,
   Query,
   Res,
@@ -12,6 +13,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
+  ApiParam,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
@@ -28,6 +30,7 @@ import { UserRepository } from 'src/BussinessLayer/UserRepository';
 import { TypeSafeMapper } from 'src/MiddlewareLayer/Mappings/TypeSafeMapper';
 import { User } from 'src/DomainLayer/Models/User';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
+import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/users`)
 @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
@@ -76,17 +79,6 @@ export class UserController {
     });
     const data = BukkaResponse.GetSingleDataResponse('User', mappedData);
     return BukkaResponse.GetStatusResponse(data, res);
-  }
-
-  @Get('activities/summary')
-  @ApiOperation({ summary: 'Get user activity summary' })
-  async getUserSummary(@Res() res?: Response) {
-    const response = await this._userRepository.getUserActivitiesOverview();
-    const data = BukkaResponse.GetPagedDataResponse(
-      'Activity summary',
-      response,
-    );
-    return BukkaResponse.GetStatusResponse(data, res as any);
   }
 
   // @Get('/getByEmail/:email')
@@ -162,10 +154,11 @@ export class UserController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  // @Delete()
-  // @ApiOperation({ summary: 'Delete a user by user ID' })
-  // async deleteUserAccount(@Res() res: Response) {
-  //   const result = await this._userRepository.deleteUser();
-  //   return res.status(result.responseCode).json(result);
-  // }
+  @Delete()
+  @ApiOperation({ summary: 'Delete a user by user account' })
+  async deleteUserAccount(@Res() res: Response) {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const result = await this._userRepository.deleteUser(loggedInUser?.id);
+    return res.status(result.responseCode).json(result);
+  }
 }

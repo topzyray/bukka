@@ -75,11 +75,6 @@ export class ResetPasswordDto {
 }
 
 export class ChangePasswordDto {
-  @ApiProperty({ example: 12, required: true })
-  @IsNotEmpty()
-  @IsString()
-  userId: number;
-
   @ApiProperty({ example: '********', required: true })
   @IsNotEmpty()
   @IsString()

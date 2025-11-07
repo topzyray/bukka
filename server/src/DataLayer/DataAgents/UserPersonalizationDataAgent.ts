@@ -81,18 +81,18 @@ export class UserPersonalizationDataAgent {
   }
 
   async updateUserPersonalization(data: Partial<UserPersonalization>) {
-    const { id: personalizationId, ...updateData } = data;
+    const { userId, ...updateData } = data;
     const spec: QuerySpec = {
-      filter: { field: 'id', op: 'eq', value: personalizationId },
+      filter: { field: 'userId', op: 'eq', value: userId },
     };
     return this.model.updateOne(spec, updateData);
   }
 
   async deleteUserPersonalization(
-    id: number,
+    userId: number,
   ): Promise<UserPersonalization | null> {
     const spec: QuerySpec = {
-      filter: { field: 'id', op: 'eq', value: id },
+      filter: { field: 'userId', op: 'eq', value: userId },
     };
     await this.model.deleteOne(spec);
     return null;

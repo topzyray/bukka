@@ -28,7 +28,7 @@ export class NotificationSettingsRepository {
   ): Promise<BukkaResponse<NotificationSettings>> {
     const settings =
       await this._notificationSettingsDataAgent.createNotificationSetting(
-        dto as INotificationSettings,
+        dto as NotificationSettings,
       );
     return BukkaResponse.CreateResponse('Notification setting', settings);
   }
@@ -92,7 +92,9 @@ export class NotificationSettingsRepository {
     }
 
     const updatedNotificationSettings =
-      await this._notificationSettingsDataAgent.updateNotificationSetting(dto);
+      await this._notificationSettingsDataAgent.updateNotificationSetting(
+        dto as Partial<NotificationSettings>,
+      );
     await invalidateCache('user:settings', { id: dto.id });
     return BukkaResponse.UpdateResponse(
       'Settings',

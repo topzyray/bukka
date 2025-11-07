@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Settings, User, Lock, Activity, LayoutDashboard } from "lucide-react";
+import { Settings, User, Activity, LayoutDashboard, Mail } from "lucide-react";
 import { useAuth } from "@/providers";
 
 const navItems = [
@@ -25,23 +25,30 @@ const navItems = [
     icon: Settings,
     description: "Manage dietary and delivery preferences",
   },
+
   {
-    name: "Account",
-    href: "settings/account",
-    icon: User,
-    description: "Profile, password, and email preferences",
+    name: "Notification",
+    href: "settings/notification",
+    icon: Mail,
+    description: "Manage Notification preference preferences",
   },
-  {
-    name: "Privacy",
-    href: "settings/privacy",
-    icon: Lock,
-    description: "Control visibility and data sharing",
-  },
+  // {
+  //   name: "Privacy",
+  //   href: "settings/privacy",
+  //   icon: Lock,
+  //   description: "Control visibility and data sharing",
+  // },
   {
     name: "Sessions",
     href: "settings/sessions",
     icon: Activity,
     description: "View active sessions and activity logs",
+  },
+  {
+    name: "Account",
+    href: "settings/account",
+    icon: User,
+    description: "Profile, password, and email preferences",
   },
 ];
 
@@ -51,7 +58,7 @@ export function SettingsNav() {
 
   return (
     // <nav className="bg-card border border-border rounded-lg p-3 space-y-1 shadow-card">
-    <nav className="flex flex-wrap gap-1 md:flex-col space-y-1">
+    <nav className="flex flex-wrap gap-1 lg:flex-col space-y-1">
       {navItems.map((tab) => {
         const isActive = pathname.endsWith(tab.href);
 

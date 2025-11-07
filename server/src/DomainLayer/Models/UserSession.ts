@@ -1,6 +1,9 @@
+import { User } from './User';
+
 export class UserSession {
   id: number;
   userId: number;
+  user: User;
   deviceId: string;
   refreshToken: string;
   userAgent?: string;

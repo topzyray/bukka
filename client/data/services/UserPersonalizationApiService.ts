@@ -23,7 +23,9 @@ export class UserPersonalizationApiService {
     return response.data;
   }
 
-  static async getWaitlistByFilters(payload: UpdateUserPersonalizationDto) {
+  static async updateLoggedUserPersonalization(
+    payload: UpdateUserPersonalizationDto
+  ) {
     const response = await HttpClient.getClient().put(
       `${userPersonalizationRoutes.updateLoggedUserPersonalization}`,
       payload
