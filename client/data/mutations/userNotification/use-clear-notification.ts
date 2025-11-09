@@ -7,6 +7,23 @@ export const useClearAllNotifications = ({ userId }: { userId?: number }) => {
   return useCustomMutation(UserNotificationApiService.deleteAllNofifications, {
     onSuccessCallback() {
       queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["notifications-infinite", userId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["unread-count", userId] });
+      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+    },
+  });
+};
+
+export const useDeleteNotification = ({ userId }: { userId?: number }) => {
+  const queryClient = useQueryClient();
+  return useCustomMutation(UserNotificationApiService.deleteNotificationById, {
+    onSuccessCallback() {
+      queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["notifications-infinite", userId],
+      });
       queryClient.invalidateQueries({ queryKey: ["unread-count", userId] });
       queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
     },

@@ -111,7 +111,8 @@ export function SettingsOverview() {
               />
             ) : (
               <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                {user?.email?.[0].toUpperCase()}
+                {user?.firstName?.[0].toUpperCase()}{" "}
+                {user?.lastName?.[0].toUpperCase()}
               </AvatarFallback>
             )}
             <SmartFileUploader
@@ -226,7 +227,7 @@ export function SettingsOverview() {
             <BukkaButton
               variant="ghost"
               className="w-full justify-start"
-              onClick={() => handleAction("Notification settings coming soon")}
+              onClick={() => router.push(`notifications`)}
             >
               <Bell className="w-4 h-4 mr-3" />
               Notifications
@@ -234,7 +235,8 @@ export function SettingsOverview() {
             <BukkaButton
               variant="ghost"
               className="w-full justify-start"
-              onClick={() => router.push(`settings/privacy`)}
+              // onClick={() => router.push(`settings/privacy`)}
+              onClick={() => handleAction("Privacy settings coming soon")}
             >
               <Shield className="w-4 h-4 mr-3" />
               Privacy & Security

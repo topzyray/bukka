@@ -20,8 +20,8 @@ import { Input } from "@/components/ui/input"; // Assuming you have an Input com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import {
+  useInfiniteUserNotifications,
   useNotificationUnreadCount,
-  useUserNotifications,
 } from "@/data/queries";
 import { useAuth } from "@/providers";
 import {
@@ -84,7 +84,7 @@ const NotificationItem = ({
             {notification?.message}
           </p>
           <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
-            {TextHelper.timeAgo(notification?.createdAt)}
+            {TextHelper.smartTimeAgo(notification?.createdAt)}
           </p>
         </div>
       </div>
@@ -119,7 +119,7 @@ export function Notifications() {
     isFetchingNextPage,
     isLoading,
     refetch,
-  } = useUserNotifications({
+  } = useInfiniteUserNotifications({
     userId: user?.id,
     isMenuOpen: isMenuOpen,
     limit: PAGE_SIZE,
@@ -194,9 +194,11 @@ export function Notifications() {
       >
         {/* Header Section */}
         <div className="flex justify-between items-center p-4">
-          <h4 className="text-lg font-semibold">
-            All Notifications ({totalRecords})
-          </h4>
+          <Link href={`/dashboard/${user?.role.toLowerCase()}/notifications`}>
+            <h4 className="text-lg font-semibold hover:underline">
+              All Notifications ({totalRecords})
+            </h4>
+          </Link>
           {/* Action Buttons */}
           <div className="flex gap-2">
             <Button

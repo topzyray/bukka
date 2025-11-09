@@ -11,6 +11,7 @@ import {
 } from "@/components/ui";
 import { useChangePassword } from "@/data/mutations/auth/use-change-password";
 import { InputComponent } from "@/components/form-ui/base/input-component";
+import { Loader2 } from "lucide-react";
 
 const changePasswordSchema = z.object({
   currentPassword: z
@@ -82,7 +83,13 @@ export function PasswordUpdateForm() {
                 disabled={!form.formState.isValid || isProcessingPasswordChange}
                 type="submit"
               >
-                {isProcessingPasswordChange ? "Updating" : "Update Password"}
+                {isProcessingPasswordChange ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="animate-spin" /> Updating
+                  </span>
+                ) : (
+                  "Update Password"
+                )}
               </Button>
             </div>
           </form>

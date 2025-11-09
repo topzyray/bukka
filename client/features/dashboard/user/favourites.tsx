@@ -26,7 +26,7 @@ export function UserFavorites() {
           </h1>
           <p className="text-muted-foreground mt-1">
             {isLoading ? (
-              <Loader2 />
+              <Loader2 className="animate-spin" />
             ) : userFavourites && userFavourites.length ? (
               userFavourites.length
             ) : isError ? (
