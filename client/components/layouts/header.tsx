@@ -51,14 +51,14 @@ export function Header({ className }: HeaderProps) {
       className={cn("sticky top-0 backdrop-blur", className)}
       style={{ zIndex: 1000 }}
     >
-      <section className="container mx-auto px-4">
+      <section className="lg:container mx-auto px-4">
         <section className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 hover-scale">
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
-              className="w-18 h-14 flex items-center justify-center mx-auto hover:cursor-pointer dark:bg-white/80 dark:p-1 dark:rounded dark:backdrop-blur-2xl"
+              className="w-18 h-14 flex items-center justify-center mx-auto hover:cursor-pointer dark:bg-white/80 dark:p-0.5 dark:rounded dark:backdrop-blur"
               // onClick={() => router.push("/")}
             >
               <Image

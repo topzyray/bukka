@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MenuManager } from "../vendor/components/menu-manager";
 import { ServiceManager } from "../vendor/components/service-manager";
@@ -10,20 +10,22 @@ import {
   Badge,
   Button,
   ErrorBox,
-  SingleFileUploader,
-  LazyImage,
+  BukkaButton,
+  Label,
+  Separator,
+  SmartFileUploader,
 } from "@/components/ui";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { CreateUpdateBusinessModal } from "../vendor/modals/create-update-business-modal";
 import { useQueryClient } from "@tanstack/react-query";
 import { Business } from "@/data/interfaces/Business";
 import {
-  Camera,
   Clock,
   Facebook,
   Globe,
   Instagram,
   Linkedin,
+  Loader2,
   MapPin,
   Music2,
   Phone,
@@ -33,17 +35,19 @@ import {
 import { LazyMapObserver } from "@/features/business/components/lazy-map-observer";
 import Link from "next/link";
 import { BusinessReviews } from "@/features/business/components/business-reviews";
-import { FileCategoryEnum } from "@/data/enums";
+import { FileCategoryEnum, FileReferenceTypeEnum } from "@/data/enums";
 import { useBusinessFiles } from "@/data/queries/use-business-files";
 import { BusinessHelper } from "@/features/business/helper/bussiness-helper";
 import { File } from "@/data/interfaces/File";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { TextHelper } from "@/helpers";
+import { FileApiService } from "@/data/services";
+import { BusinessPhotoGallery } from "@/features/business/components/business-photo-gallery";
 
 export const BusinessDetails: React.FC = () => {
   const { id } = useParams() as unknown as { id: number };
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   const [mode, setMode] = useState<"create" | "edit">("edit");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,29 +58,28 @@ export const BusinessDetails: React.FC = () => {
   const { data, isLoading, isError, error } = useBusinessById({
     businessId: id,
   });
-
   const business = data?.responseData;
 
-  const { data: businessFiles, isLoading: isLoadingFiles } = useBusinessFiles({
-    businessId: Number(id),
-  });
+  const { data: businessFilesApiData, isLoading: isLoadingFiles } =
+    useBusinessFiles({
+      businessId: Number(id),
+    });
+  const businessFiles = businessFilesApiData?.responseData;
 
-  // pick cover and other photos
-  const cover: File | null | undefined =
+  const coverImage: File | null | undefined =
     !isLoadingFiles && businessFiles && businessFiles.length
-      ? businessFiles.find(
+      ? businessFiles?.find(
           (file: File) => file.category === FileCategoryEnum.BUSINESS_COVER
         ) ?? null
       : null;
 
-  const photos: File[] =
-    !isLoadingFiles && businessFiles
-      ? businessFiles.filter(
-          (file: File) => file.category === FileCategoryEnum.BUSINESS_IMAGE
+  const businessImages: File[] =
+    !isLoadingFiles && businessFiles?.length
+      ? businessFiles?.filter(
+          (file: File) => file.category === FileCategoryEnum.BUSINESS_IMAGES
         )
       : [];
 
-  // compute open now robustly
   const openNow = useMemo(
     () => BusinessHelper.isOpenNow(business?.openingHours),
     [business?.openingHours]
@@ -100,14 +103,14 @@ export const BusinessDetails: React.FC = () => {
     <div className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Details of {business?.name}</h1>
-          {/* <p className="text-sm text-muted-foreground">
-                  My business manage page
-                </p> */}
+          <h1 className="text-2xl font-bold">Business Details</h1>
+          <p className="text-sm text-muted-foreground capitalize">
+            {business?.name} management page
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button onClick={handleEdit}>Edit</Button>
+          <BukkaButton onClick={handleEdit}>Edit</BukkaButton>
           <CreateUpdateBusinessModal
             open={isModalOpen}
             onOpenChange={handleOpenChange}
@@ -156,30 +159,61 @@ export const BusinessDetails: React.FC = () => {
                     >
                       {/* HERO */}
                       <div className="relative h-64 md:h-80 rounded-xl overflow-hidden">
-                        <Image
-                          src={cover?.fullPath || "/images/placeholder.jpg"}
-                          alt={business.name || "business cover"}
-                          fill
-                          className="object-cover"
-                          priority={!!cover} // prioritize if there is a cover
-                        />
+                        {isLoadingFiles ? (
+                          <Loader2 className="animate-spin h-32 w-32" />
+                        ) : coverImage ? (
+                          <Image
+                            src={coverImage?.fullPath}
+                            alt={business?.name}
+                            fill
+                            className="object-cover"
+                            priority={!!coverImage?.fullPath}
+                          />
+                        ) : (
+                          <Image
+                            src={"/images/placeholder.jpg"}
+                            alt={"business coverImage"}
+                            fill
+                            className="object-cover"
+                          />
+                        )}
                         <div className="absolute inset-0 bg-black/28" />
                         <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
                           <div>
                             <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">
-                              {business.name}
+                              {business?.name}
                             </h1>
                             <div className="flex items-center gap-3 text-white">
                               <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                               <span className="font-semibold">
-                                {business.rating?.toFixed(1) ?? "0.0"}
+                                {business?.rating?.toFixed(1) ?? "0.0"}
                               </span>
                               <span className="opacity-80">
-                                ({business.totalReviews ?? 0} reviews)
+                                ({business?.totalReviews ?? 0} reviews)
                               </span>
                             </div>
                           </div>
                         </div>
+
+                        <SmartFileUploader
+                          title="Add Cover Image"
+                          useCameraModal
+                          uploadFn={FileApiService.uploadFile}
+                          extraParams={{
+                            referenceType: FileReferenceTypeEnum.BUSINESS,
+                            category: FileCategoryEnum.BUSINESS_COVER,
+                            referenceId: business?.id,
+                            isPublic: true,
+                            metadata: {
+                              altText: `${business?.name} - coverImage image`,
+                            },
+                          }}
+                          onUploadSuccess={() => {
+                            queryClient.invalidateQueries({
+                              queryKey: ["business-files", business?.id],
+                            });
+                          }}
+                        />
                       </div>
 
                       {/* GRID */}
@@ -188,31 +222,60 @@ export const BusinessDetails: React.FC = () => {
                         <div className="lg:col-span-2 space-y-6">
                           {/* Info Card */}
                           <Card>
-                            <CardContent className="p-6">
-                              <div className="flex flex-wrap gap-2 mb-4">
-                                <Badge variant="outline" className="uppercase">
-                                  {business.type}
-                                </Badge>
-                                <Badge
-                                  variant={openNow ? "success" : "destructive"}
-                                >
-                                  {openNow ? "Open Now" : "Closed"}
-                                </Badge>
-                                {business.cuisines?.map((c: string) => (
+                            <CardContent className="p-6 space-y-4">
+                              <div className="flex gap-6 h-16">
+                                <div className="space-y-2">
+                                  <Label>Type/Category</Label>
                                   <Badge
-                                    key={c}
-                                    variant="secondary"
-                                    className="capitalize"
+                                    variant="outline"
+                                    className="uppercase"
                                   >
-                                    {c}
+                                    {TextHelper.normalizeText(business?.type)}
                                   </Badge>
-                                ))}
+                                </div>
+
+                                <Separator orientation="vertical" />
+
+                                <div className="space-y-2">
+                                  <Label>Availability</Label>
+                                  <Badge
+                                    variant={
+                                      openNow ? "success" : "destructive"
+                                    }
+                                  >
+                                    {openNow ? "Open Now" : "Closed"}
+                                  </Badge>
+                                </div>
                               </div>
 
-                              <p className="text-muted-foreground leading-relaxed mb-4">
-                                {business.description ||
-                                  "No description provided."}
-                              </p>
+                              <div className="space-y-2">
+                                <Label>Cuisines</Label>
+                                <div className="flex flex-wrap gap-1">
+                                  {business?.cuisines?.length === 0
+                                    ? "No cusines add yet!"
+                                    : business.cuisines?.map((c: string) => (
+                                        <Badge
+                                          key={c}
+                                          variant="secondary"
+                                          className="capitalize"
+                                        >
+                                          {c}
+                                        </Badge>
+                                      ))}
+                                </div>
+                              </div>
+
+                              <Separator />
+
+                              <div className="space-y-2">
+                                <Label>Description</Label>
+                                <div>
+                                  <p className="text-muted-foreground leading-relaxed mb-4">
+                                    {business?.description ||
+                                      "No description provided."}
+                                  </p>
+                                </div>
+                              </div>
 
                               <div className="flex items-center gap-3">
                                 {business.website && (
@@ -249,34 +312,10 @@ export const BusinessDetails: React.FC = () => {
                           </Card>
 
                           {/* Photos gallery (lazy loaded) */}
-                          {photos.length > 0 && (
-                            <Card>
-                              <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                  <Camera className="w-5 h-5" />
-                                  Photos
-                                </CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                  {photos.map((p, i) => (
-                                    <div
-                                      key={p.id ?? i}
-                                      className="aspect-square rounded-lg overflow-hidden"
-                                    >
-                                      <LazyImage
-                                        src={p.fullPath}
-                                        alt={`${business.name} photo ${i + 1}`}
-                                        width={400}
-                                        height={400}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
-                                  ))}
-                                </div>
-                              </CardContent>
-                            </Card>
-                          )}
+                          <BusinessPhotoGallery
+                            business={business}
+                            businessImages={businessImages}
+                          />
                         </div>
 
                         {/* Sidebar */}
@@ -330,31 +369,31 @@ export const BusinessDetails: React.FC = () => {
                               )}
                             </CardContent>
                           </Card>
+
+                          {/* Lazy map - will only load map JS when near viewport */}
+                          {business.location?.latitude &&
+                            business.location?.longitude && (
+                              <Card>
+                                <CardHeader>
+                                  <CardTitle className="flex items-center gap-2">
+                                    <MapPin className="w-4 h-4" />
+                                    Location
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-0">
+                                  <div className="p-3">
+                                    <LazyMapObserver
+                                      business={business}
+                                      rootMargin="400px"
+                                    />
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )}
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Lazy map - will only load map JS when near viewport */}
-                        {business.location?.latitude &&
-                          business.location?.longitude && (
-                            <Card>
-                              <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                  <MapPin className="w-4 h-4" />
-                                  Location
-                                </CardTitle>
-                              </CardHeader>
-                              <CardContent className="p-0">
-                                <div className="p-3">
-                                  <LazyMapObserver
-                                    business={business}
-                                    rootMargin="400px"
-                                  />
-                                </div>
-                              </CardContent>
-                            </Card>
-                          )}
-
                         {/* Opening Hours */}
                         <Card>
                           <CardHeader>
@@ -443,20 +482,6 @@ export const BusinessDetails: React.FC = () => {
                         )}
                       </div>
                     </motion.div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Media</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {/* <SingleFileUploader
-                      formName=""
-                      uploadFn={(n): Promise<any> => {
-                        return Promise.resolve(n);
-                      }}
-                    /> */}
                   </CardContent>
                 </Card>
               </div>

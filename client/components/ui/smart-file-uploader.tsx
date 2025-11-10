@@ -7,7 +7,14 @@ import { FileHelper } from "@/helpers/file-helper";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFileUpload } from "@/data/mutations/file/use-file-uploader";
 import { Button, Card, CardContent, Label, Input } from "@/components/ui";
-import { FilePenIcon, LoaderCircle, Upload, X, Camera } from "lucide-react";
+import {
+  FilePenIcon,
+  LoaderCircle,
+  Upload,
+  X,
+  Camera,
+  Loader2,
+} from "lucide-react";
 import { useRef, useState, useEffect, useCallback, ReactNode } from "react";
 
 interface ISmartFileUploader<T, P> {
@@ -232,6 +239,19 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
     setPreviews(updated);
   };
 
+  const handleCloseModal = () => {
+    stopCamera();
+    setIsCameraActive(false);
+    setShowModal(false);
+  };
+
+  useEffect(() => {
+    if (!showModal) {
+      stopCamera();
+      setIsCameraActive(false);
+    }
+  }, [showModal]);
+
   if (!useCameraModal) {
     return (
       <div className={cn("absolute right-4 bottom-1.5")}>
@@ -281,7 +301,8 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
       <AnimatePresence>
         {showModal && (
           <motion.div
-            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/70 flex items-center justify-center p-4"
+            style={{ zIndex: 1001 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -291,7 +312,7 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
                 size="icon"
                 variant="ghost"
                 className="absolute top-2 right-2"
-                onClick={() => setShowModal(false)}
+                onClick={handleCloseModal}
               >
                 <X />
               </Button>
@@ -341,7 +362,10 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
                     )}
                     <Button
                       variant="ghost"
-                      onClick={() => setIsCameraActive(false)}
+                      onClick={() => {
+                        setIsCameraActive(false);
+                        stopCamera();
+                      }}
                     >
                       Cancel
                     </Button>
@@ -386,7 +410,14 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
                     onClick={handleUploadFromModal}
                     disabled={isUploading}
                   >
-                    {isUploading ? "Uploading..." : "Upload"}
+                    {isUploading ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="animate-spin" />
+                        Uploading...
+                      </span>
+                    ) : (
+                      "Upload"
+                    )}
                   </Button>
                 </div>
               )}

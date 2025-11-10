@@ -1,6 +1,5 @@
 import { toast } from "sonner";
 import { extractErrorMessage } from "@/utils";
-import { TextHelper } from "@/helpers/text-helper";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
 interface UseCustomMutationOptions<TData, TError, TVariables, TContext>
@@ -52,7 +51,7 @@ export const useCustomMutation = <
         toast.error("Failure", {
           description:
             onErrorMessage ??
-            TextHelper.capitalize(extractErrorMessage(error as any)) ??
+            extractErrorMessage(error as any) ??
             "Something went wrong",
         });
       }

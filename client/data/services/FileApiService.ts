@@ -49,7 +49,7 @@ export class FileApiService {
     const response = await HttpClient.getClient().get(
       `${fileRoutes.getByReferenceIdAndType}/${payload.referenceType}/${payload.referenceId}`
     );
-    return response.data?.responseData;
+    return response.data;
   }
 
   static async getFilesByReferenceId(referenceId: number) {
