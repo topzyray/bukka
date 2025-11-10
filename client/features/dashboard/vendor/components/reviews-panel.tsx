@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Button, Input } from "@/components/ui";
 import { useBusinessReviews } from "@/data/queries/use-reviews";
 import { useReplyReview } from "@/data/mutations/review/use-reply-review";
@@ -8,7 +8,17 @@ import { useReplyReview } from "@/data/mutations/review/use-reply-review";
 export const ReviewsPanel: React.FC<{ businessId: number }> = ({
   businessId,
 }) => {
-  const { data } = useBusinessReviews({ businessId });
+  const { data, isLoading } = useBusinessReviews({
+    businessId,
+  });
+  const reviews = useMemo(() => {
+    return data?.responseData?.data ?? [];
+  }, [data?.responseData?.data]);
+
+  // const alreadyMadeReview = useMemo(() => {
+  //   if (!user?.id) return null;
+  //   return reviews.find((r) => r.userId === user.id) ?? null;
+  // }, [reviews, user?.id]);
 
   const replyMutation = useReplyReview();
 
@@ -17,7 +27,7 @@ export const ReviewsPanel: React.FC<{ businessId: number }> = ({
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Reviews</h3>
-      {data?.map((r: any) => (
+      {reviews?.map((r: any) => (
         <div key={r.id} className="border p-3 rounded-md">
           <div className="flex justify-between items-start">
             <div>
