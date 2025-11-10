@@ -96,7 +96,6 @@ export class FileDataAgent {
     const querySpec: QuerySpec = {
       filter: { field: 'id', op: 'eq', value: fileId },
     };
-
     if (this.db.transaction) {
       return this.db.transaction(async (tx) => {
         const file = tx.getModel<File>('file');

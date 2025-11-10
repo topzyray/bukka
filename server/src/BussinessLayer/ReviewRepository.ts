@@ -91,24 +91,28 @@ export class ReviewRepository {
     );
   }
 
-  async updateReview(id: number, dto: UpdateReviewDto) {
+  async updateReview(dto: UpdateReviewDto) {
     const loggedInUser = await UserHelper.getLoggedInUser();
-    const existing = await this.reviewDataAgent.findById(id);
+
+    const { reviewId, ...otherDto } = dto;
+    const existing = await this.reviewDataAgent.findById(reviewId);
     if (!existing) throw new NotFoundException('Review not found');
     if (existing.userId !== loggedInUser.id)
       throw new ForbiddenException('Unauthorized');
 
-    // If rating changes, update business aggregates accordingly
     const oldRating = existing.rating;
-    const updated = await this.reviewDataAgent.updateReview(id, dto as any);
+    const updated = await this.reviewDataAgent.updateReview(
+      reviewId,
+      otherDto as any,
+    );
 
     if (dto.rating && dto.rating !== oldRating) {
       const business = await this.businessDataAgent.findById(
         existing.businessId,
       );
       if (business) {
-        const prevAvg = business.averageRating ?? 0;
-        const prevCount = business.reviewCount ?? 1;
+        const prevAvg = business.averageRating;
+        const prevCount = business.reviewCount;
         // recompute average: (prevAvg*prevCount - oldRating + newRating)/prevCount
         const newAvg =
           (prevAvg * prevCount - oldRating + dto.rating) / prevCount;
@@ -117,6 +121,10 @@ export class ReviewRepository {
         } as any);
       }
     }
+
+    await invalidateCache('reviews', {});
+    await invalidateCache('reviews', { businessId: dto.businessId });
+    await invalidateCache('business', { id: dto.businessId });
 
     return BukkaResponse.UpdateResponse('Review', updated);
   }

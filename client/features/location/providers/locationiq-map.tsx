@@ -35,7 +35,7 @@ import { TextHelper } from "@/helpers";
 import { Separator } from "@/components/ui/separator";
 import { FavoriteButton } from "../../business/components/favorite-button";
 import { BukkaButton } from "@/components/ui/button-variants";
-import { View } from "lucide-react";
+import { Star, View } from "lucide-react";
 import { RecenterButton } from "../components/recenter-button";
 
 const ICONS: Record<BusinessTypeEnum, L.Icon> = {
@@ -370,6 +370,16 @@ export function LocationIQMap({
                         {b.location.address}
                       </div>
                     )}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    <span className="font-semibold">
+                      {b?.averageRating?.toFixed(1) ?? "0.0"}
+                    </span>
+                    <span className="opacity-80">
+                      ({b?.reviewCount ?? "0"} reviews)
+                    </span>
                   </div>
                   <Separator />
 

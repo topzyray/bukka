@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
 
 type FormatDateOptions = {
   useLocalTime?: boolean;
@@ -350,8 +351,13 @@ export class TextHelper {
         return rtf.format(Math.round(delta), unit);
       }
     }
-
     return "just now";
+  }
+
+  static formatDistanceNow(date: Date | string | number) {
+    return formatDistanceToNow(new Date(date), {
+      addSuffix: true,
+    });
   }
 
   static isOPenNow(periods: any[]) {

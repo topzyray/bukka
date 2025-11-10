@@ -186,10 +186,10 @@ export const BusinessDetails: React.FC = () => {
                             <div className="flex items-center gap-3 text-white">
                               <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                               <span className="font-semibold">
-                                {business?.rating?.toFixed(1) ?? "0.0"}
+                                {business?.averageRating?.toFixed(1) ?? "0.0"}
                               </span>
                               <span className="opacity-80">
-                                ({business?.totalReviews ?? 0} reviews)
+                                ({business?.reviewCount} reviews)
                               </span>
                             </div>
                           </div>

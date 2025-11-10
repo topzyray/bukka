@@ -49,7 +49,7 @@ export function Header({ className }: HeaderProps) {
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={cn("sticky top-0 backdrop-blur", className)}
-      style={{ zIndex: 1000 }}
+      style={{ zIndex: 1001 }}
     >
       <section className="lg:container mx-auto px-4">
         <section className="flex items-center justify-between h-16">

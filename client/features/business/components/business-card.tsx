@@ -17,7 +17,7 @@ import { File } from "@/data/interfaces/File";
 import { useDistance } from "@/hooks/use-distance";
 import { FavoriteButton } from "./favorite-button";
 import { BusinessHelper } from "../helper/bussiness-helper";
-import { PlanMyJourneyButton } from "./ui/plan-my-journey";
+import { PlanMyJourneyButton } from "../ui/plan-my-journey";
 import { useAuth } from "@/providers";
 
 interface IBusinessCard {
@@ -63,18 +63,18 @@ export const BusinessCard = memo(function BusinessCard({
   );
 
   const renderRating = () =>
-    business?.rating ? (
+    business?.averageRating ? (
       <div className="flex items-center gap-1">
         <Star className="w-4 h-4 fill-accent text-accent" />
         <span className="text-sm font-medium">
-          {business?.rating.toFixed(1)}
+          {business?.averageRating?.toFixed(1)}
         </span>
       </div>
     ) : (
       <div className="flex items-center gap-1">
         <Star className="w-4 h-4 fill-accent text-accent" />
         <span className="text-sm font-medium">
-          {business?.rating.toFixed(1)}
+          {business?.averageRating?.toFixed(1) ?? "0.0"}
         </span>
       </div>
     );
