@@ -129,29 +129,29 @@ export function BukkaWaitList() {
             <TypeAnimation
               sequence={[
                 TextHelper.normalizeText(BusinessTypeEnum.RESTAURANT),
-                1500,
+                5000,
                 TextHelper.normalizeText(BusinessTypeEnum.FAST_FOOD),
-                1500,
+                5000,
                 TextHelper.normalizeText(BusinessTypeEnum.FOOD_VENDOR),
-                1500,
+                5000,
                 TextHelper.normalizeText(BusinessTypeEnum.BAR),
-                1500,
+                5000,
                 TextHelper.normalizeText(BusinessTypeEnum.LOUNGE),
-                1500,
+                5000,
                 TextHelper.normalizeText(BusinessTypeEnum.BAKERY),
-                1500,
+                5000,
                 TextHelper.normalizeText(BusinessTypeEnum.STREET_EATRY),
-                1500,
+                5000,
                 TextHelper.normalizeText(BusinessTypeEnum.GROCERY),
-                1500,
+                5000,
                 TextHelper.normalizeText(BusinessTypeEnum.CATERING),
-                1500,
+                5000,
                 TextHelper.normalizeText(BusinessTypeEnum.DELIVERY_SERVICE),
-                1500,
+                5000,
                 TextHelper.normalizeText(BusinessTypeEnum.OTHER) +
                   " " +
                   "Services",
-                1500,
+                5000,
               ]}
               wrapper="span"
               repeat={Infinity}
