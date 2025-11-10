@@ -6,8 +6,9 @@ export type CreateReviewDto = {
 };
 
 export type UpdateReviewDto = {
+  reviewId: number;
   userId: number;
   businessId: number;
-  rating: number;
+  rating?: number;
   comment?: string;
 };

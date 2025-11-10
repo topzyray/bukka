@@ -39,7 +39,13 @@ export class CreateReviewDto {
   comment?: string;
 }
 
-export class UpdateReviewDto extends PartialType(CreateReviewDto) {}
+export class UpdateReviewDto extends PartialType(CreateReviewDto) {
+  @ApiProperty({ example: 1, required: false })
+  @IsNotEmpty()
+  @IsNumber()
+  @Transform(({ value }) => Number.parseInt(value, 10))
+  reviewId: number;
+}
 
 export class ReviewFilterDto extends PaginationDto {
   @ApiProperty({ example: 1, required: false })

@@ -135,15 +135,15 @@ export function BusinessDetails(): JSX.Element {
             <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">
-                  {business.name}
+                  {business?.name}
                 </h1>
                 <div className="flex items-center gap-3 text-white">
                   <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                   <span className="font-semibold">
-                    {business.rating?.toFixed(1) ?? "0.0"}
+                    {business?.averageRating?.toFixed(1) ?? "0.0"}
                   </span>
                   <span className="opacity-80">
-                    ({business.totalReviews ?? 0} reviews)
+                    ({business?.reviewCount} reviews)
                   </span>
                 </div>
               </div>

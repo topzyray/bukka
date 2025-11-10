@@ -78,19 +78,14 @@ export class ReviewController {
     return BukkaResponse.GetStatusResponse(data, res);
   }
 
-  @Put(':reviewId')
+  @Put()
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
   @ApiSecurity('device-id')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Update a review' })
-  @ApiParam({ name: 'reviewId', example: 1 })
   @ApiBody({ type: UpdateReviewDto })
-  async updateReview(
-    @Param('reviewId', ParseIntPipe) reviewId: number,
-    @Body() dto: UpdateReviewDto,
-    @Res() res: Response,
-  ) {
-    const response = await this.reviewRepository.updateReview(reviewId, dto);
+  async updateReview(@Body() dto: UpdateReviewDto, @Res() res: Response) {
+    const response = await this.reviewRepository.updateReview(dto);
     return BukkaResponse.GetStatusResponse(response, res);
   }
 

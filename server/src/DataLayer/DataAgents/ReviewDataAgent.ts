@@ -39,6 +39,24 @@ export class ReviewDataAgent {
           { field: 'businessId', op: 'eq', value: businessId },
         ],
       },
+      extras: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          business: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
     };
     return this.model.findOne(spec);
   }
@@ -57,6 +75,24 @@ export class ReviewDataAgent {
       filter,
       sort: [{ field: 'createdAt', direction: 'desc' }],
       pagination: { page: pageNumber, pageSize },
+      extras: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          business: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
     };
 
     const total = await this.model.count({ filter });

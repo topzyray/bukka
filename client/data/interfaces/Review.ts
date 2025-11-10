@@ -11,8 +11,4 @@ export interface Review {
   user: User;
   createdAt: Date;
   updatedAt: Date;
-
-  // mediaUrls: string[];
-  // reply: string;
-  // likesCount: number;
 }

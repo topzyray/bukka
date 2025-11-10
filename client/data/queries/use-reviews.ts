@@ -1,8 +1,9 @@
+import { Review } from "../interfaces/Review";
 import { ReviewApiService } from "../services";
-import { useCustomQuery } from "./base";
+import { BukkaResponse, PagedResponse, useCustomQuery } from "./base";
 
 export const useBusinessReviews = ({ businessId }: { businessId: number }) => {
-  return useCustomQuery(
+  return useCustomQuery<BukkaResponse<PagedResponse<Review[]>>>(
     ["business-reviews"],
     () => ReviewApiService.getReviewByBusinessId(businessId),
     { enabled: !!businessId }
@@ -10,7 +11,7 @@ export const useBusinessReviews = ({ businessId }: { businessId: number }) => {
 };
 
 export const useUserReviews = ({ businessId }: { businessId: number }) => {
-  return useCustomQuery(
+  return useCustomQuery<BukkaResponse<PagedResponse<Review[]>>>(
     ["user-reviews"],
     () => ReviewApiService.getReviewByBusinessId(businessId),
     { enabled: !!businessId }
