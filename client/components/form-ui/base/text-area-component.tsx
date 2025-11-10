@@ -78,7 +78,7 @@ export function TextAreaComponent({
                     Icon && "pl-8",
                     inputClassName,
                     isError &&
-                      "border-[0.5px] border-red-600 focus-visible:ring-red-600 text-red-700",
+                      "border-red-600 focus-visible:ring-red-600 text-red-700",
                     isValid &&
                       "border-green-600 focus-visible:ring-green-600 text-green-700",
                     "pr-8 focus:outline-none focus:ring-1 focus:border-green-600"

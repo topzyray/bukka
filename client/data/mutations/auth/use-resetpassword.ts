@@ -8,7 +8,6 @@ export const useResetPassword = ({
 }: {
   resetForm: UseFormReset<{
     token: string;
-    email: string;
     newPassword: string;
   }>;
 }) => {

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { uploadFile } from "@/utils/upload-utils";
 import { toast } from "sonner";
 import { Form } from "@/components/ui/form";
+import { Loader2 } from "lucide-react";
 
 export default function RiderVehicleStep({ onNext, onBack, finalize }: any) {
   const { state, actions } = useOnboarding();
@@ -83,7 +84,15 @@ export default function RiderVehicleStep({ onNext, onBack, finalize }: any) {
             Back
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? "Saving..." : finalize ? "Finish" : "Continue"}
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="animate-spin" /> Saving
+              </span>
+            ) : finalize ? (
+              "Finish"
+            ) : (
+              "Continue"
+            )}
           </Button>
         </div>
       </form>

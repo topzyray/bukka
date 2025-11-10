@@ -23,7 +23,7 @@ import { TypeSafeMapper } from 'src/MiddlewareLayer/Mappings/TypeSafeMapper';
 import { UserWithCounts } from 'src/DomainLayer/Models/UserWithCounts';
 import { AuthNotificationService } from 'src/InfrastructureLayer/Services/notification/services/AuthNotificationService';
 import { NotificationSettingsDataAgent } from 'src/DataLayer/DataAgents/NotificationSettingsDataAgent';
-import { AuthQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/AuthQueueEnum';
+import { AuthQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/AuthQueueMessageTypeEnum';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
 import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
 import { AppUrlTypeEnum } from 'src/DomainLayer/Enums/AppUrlTypeEnum';
@@ -32,6 +32,9 @@ import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { UserSessionRepository } from './UserSessionRepository';
 import { UserSession } from 'src/DomainLayer/Models/UserSession';
 import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
+import { QueueService } from 'src/InfrastructureLayer/Services/queue/QueueService';
+import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
+import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
 
 @Injectable()
 export class AuthRepository {
@@ -39,7 +42,7 @@ export class AuthRepository {
     private readonly _userRepository: UserRepository,
     private readonly _userSessionRepository: UserSessionRepository,
     private readonly _tokenRepository: TokenRepository,
-    private readonly _notif: AuthNotificationService,
+    private readonly _queue: QueueService,
     private readonly _notifSetting: NotificationSettingsDataAgent,
     private readonly _configService: AppConfigurationService,
   ) {}
@@ -60,15 +63,22 @@ export class AuthRepository {
       };
       await this._notifSetting.createNotificationSetting(newSettings);
 
-      this._notif.processAccountConfirmation(
+      this._queue.publishToQueue(
+        QueueEnum.AUTH_NOTIFICATION,
         {
-          userId: data?.responseData?.id,
-          email: data?.responseData?.email,
-          firstName: data?.responseData?.firstName,
-          confirmationCode: data?.responseData?.confirmationCode,
-          confirmationCodeExpires: data?.responseData?.confirmationCodeExpires,
+          messageType: AuthQueueMessageTypeEnum.SIGNUP,
+          payload: {
+            userId: data?.responseData?.id,
+            email: data?.responseData?.email,
+            firstName: data?.responseData?.firstName,
+            confirmationCode: data?.responseData?.confirmationCode,
+            confirmationCodeExpires:
+              data?.responseData?.confirmationCodeExpires,
+          },
         },
-        AuthQueueMessageTypeEnum.SIGNUP,
+        {
+          provider: QueueProviderEnum.BULLMQ,
+        },
       );
     }
     const mappedData = TypeSafeMapper.mapObject(data?.responseData, {
@@ -162,7 +172,14 @@ export class AuthRepository {
     LoginResponse.refreshToken = refreshToken;
     LoginResponse.deviceId = deviceId;
 
-    return BukkaResponse.LoginResponse('User', LoginResponse, true);
+    const firstName = TextHelper.capitalize(user?.firstName);
+
+    return BukkaResponse.LoginResponse(
+      'User',
+      LoginResponse,
+      true,
+      `Welcome back, ${firstName} 👋`,
+    );
   }
 
   async signOut(
@@ -179,7 +196,7 @@ export class AuthRepository {
       );
     }
 
-    if (new Date(session.expiresAt) < new Date()) {
+    if (new Date(session?.expiresAt) < new Date()) {
       await this._userSessionRepository.deleteSessionById(session.id);
       return BukkaResponse.ErrorResponse(
         'Invalid or expired refresh token',
@@ -242,31 +259,36 @@ export class AuthRepository {
   async forgotPassword(
     forgotPassword: ForgotPasswordDto,
   ): Promise<BukkaResponse<User>> {
-    const response = await this._userRepository.findUserByEmail(
+    const user = await this._userRepository.findUserByEmail(
       forgotPassword.email,
     );
 
-    if (!response) {
-      return BukkaResponse.GetSingleDataResponse('User', response);
+    if (!user) {
+      return BukkaResponse.GetSingleDataResponse('User', user);
     }
 
-    if (!response?.emailConfirmed) {
-      return BukkaResponse.LoginResponse(
-        'user',
-        response,
-        false,
-        'You have not verified your email!',
-      );
+    if (!user?.emailConfirmed) {
+      return BukkaResponse.ErrorResponse('Email not verified!');
     }
 
-    response.passwordResetToken =
-      await this._tokenRepository.generatePasswordResetTokenAsync();
+    const stillValid =
+      user.passwordResetToken &&
+      user.passwordResetExpires &&
+      new Date() < new Date(user.passwordResetExpires);
+
+    const passwordResetToken = stillValid
+      ? user.passwordResetToken
+      : await this._tokenRepository.generatePasswordResetTokenAsync();
+
+    const expiresAt = stillValid
+      ? user.passwordResetExpires
+      : Generator.CalculateExpirationTime(10);
 
     const result = await this._userRepository.updateOtherUserAsync(
-      response.id as number,
+      user.id as number,
       {
-        passwordResetToken: response.passwordResetToken,
-        passwordResetExpires: new Date(),
+        passwordResetToken,
+        passwordResetExpires: Generator.CalculateExpirationTime(10),
       },
     );
 
@@ -277,16 +299,21 @@ export class AuthRepository {
       );
     }
 
-    await this._notif.processPasswordReset(
+    this._queue.publishToQueue(
+      QueueEnum.AUTH_NOTIFICATION,
       {
-        userId: result?.responseData?.id,
-        email: result?.responseData?.email,
-        firstName: result?.responseData?.firstName,
-        passwordResetToken: result?.responseData?.passwordResetToken,
-        passwordResetExpires:
-          `${TextHelper.getFormattedDate(result?.responseData?.passwordResetExpires)} at ${TextHelper.getFormattedTime(result?.responseData?.passwordResetExpires)}` as unknown as Date,
+        messageType: AuthQueueMessageTypeEnum.FORGOT_PASSWORD,
+        payload: {
+          userId: result?.responseData?.id,
+          email: result?.responseData?.email,
+          firstName: result?.responseData?.firstName,
+          passwordResetToken: result?.responseData?.passwordResetToken,
+          passwordResetExpires: `${TextHelper.getFormattedDate(expiresAt?.toString() as string)} at ${TextHelper.getFormattedTime(expiresAt?.toString() as string)}`,
+        },
       },
-      AuthQueueMessageTypeEnum.FORGOT_PASSWORD,
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
     );
 
     const mappedData = TypeSafeMapper.mapObject(result?.responseData, {
@@ -294,7 +321,7 @@ export class AuthRepository {
     });
 
     return BukkaResponse.CustomResponse(
-      `We've sent a password reset link to ${result.responseData.email}. Check your Inbox or Spam for further actions.`,
+      `We've sent a password reset token to ${result.responseData.email}. Check your Inbox or Spam for further instructions.`,
       HttpStatus.OK,
       true,
       mappedData,
@@ -302,36 +329,31 @@ export class AuthRepository {
   }
 
   async resetPassword(data: ResetPasswordDto): Promise<BukkaResponse<User>> {
-    const response = await this._userRepository.findUserByToken(
+    const user = await this._userRepository.findUserByToken(
       data.token,
       TokenTypeEnum.PASSWORD_RESET,
     );
 
-    if (!response) {
+    if (!user) {
       return BukkaResponse.ErrorResponse(
         'Token not found. Please request a new one!',
         HttpStatus.NOT_FOUND,
       );
     }
 
-    if (response.passwordResetToken !== data.token) {
-      return BukkaResponse.ErrorResponse(
-        'Token not found. Please request a new one!',
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    const expiresAt =
+      user?.passwordResetExpires instanceof Date
+        ? user?.passwordResetExpires.getTime()
+        : Number(user?.passwordResetExpires);
 
-    if (
-      !response.passwordResetExpires ||
-      Date.now() > Number(response.passwordResetExpires)
-    ) {
+    if (!expiresAt || Date.now() > expiresAt) {
       return BukkaResponse.CustomResponse(
         'This token has expired. Please request a new one.',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    return await this.updatePassword(response, data.newPassword);
+    return await this.updatePassword(user, data.newPassword);
   }
 
   async changePassword(
@@ -402,15 +424,22 @@ export class AuthRepository {
     );
 
     if (data.status) {
-      this._notif.processResendConfirmation(
+      this._queue.publishToQueue(
+        QueueEnum.AUTH_NOTIFICATION,
         {
-          userId: data?.responseData?.id,
-          email: data?.responseData?.email,
-          firstName: data?.responseData?.firstName,
-          confirmationCode: data?.responseData?.confirmationCode,
-          confirmationCodeExpires: data?.responseData?.confirmationCodeExpires,
+          messageType: AuthQueueMessageTypeEnum.RESEND_CONFIRMATION_EMAIL,
+          payload: {
+            userId: data?.responseData?.id,
+            email: data?.responseData?.email,
+            firstName: data?.responseData?.firstName,
+            confirmationCode: data?.responseData?.confirmationCode,
+            confirmationCodeExpires:
+              data?.responseData?.confirmationCodeExpires,
+          },
         },
-        AuthQueueMessageTypeEnum.RESEND_CONFIRMATION_EMAIL,
+        {
+          provider: QueueProviderEnum.BULLMQ,
+        },
       );
     }
 
@@ -485,18 +514,24 @@ export class AuthRepository {
       );
     }
 
-    this._notif.processSignupWelcome(
+    this._queue.publishToQueue(
+      QueueEnum.AUTH_NOTIFICATION,
       {
-        userId: result?.responseData?.id,
-        email: result?.responseData?.email,
-        firstName: result?.responseData?.firstName,
-        getStartedLink:
-          this._configService.nodeEnv === EnvironmentTypeEnum.DEV
-            ? AppUrlTypeEnum.LOCAL
-            : AppUrlTypeEnum.PROD,
-        userType: result?.responseData?.userType,
+        messageType: AuthQueueMessageTypeEnum.SIGNUP,
+        payload: {
+          userId: result?.responseData?.id,
+          email: result?.responseData?.email,
+          firstName: result?.responseData?.firstName,
+          getStartedLink:
+            this._configService.nodeEnv === EnvironmentTypeEnum.DEV
+              ? AppUrlTypeEnum.LOCAL
+              : AppUrlTypeEnum.PROD,
+          userType: result?.responseData?.userType,
+        },
       },
-      AuthQueueMessageTypeEnum.SIGNUP,
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
     );
 
     return BukkaResponse.CustomResponse(

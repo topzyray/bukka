@@ -16,6 +16,7 @@ import { useAuth } from "@/providers";
 import { useCreateUserPersonalization } from "@/data/mutations/userPersonalizaton/use-create-user-personalization";
 import { toast } from "sonner";
 import { useUpdateUserPersonalization } from "@/data/mutations/userPersonalizaton/use-update-user-personalization";
+import { Loader2 } from "lucide-react";
 
 export const userPersonalizedSchema = z.object({
   preferredCuisines: z
@@ -218,7 +219,13 @@ export function CreateEditPersonalizationForm({
             <Button onClick={() => setEditProfile?.(false)}>Cancel</Button>
           )}
           <Button type="submit" disabled={!form.formState.isValid || busy}>
-            {busy ? "Saving..." : "Save Preferences"}
+            {busy ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="animate-spin" /> Saving
+              </span>
+            ) : (
+              "Save Preferences"
+            )}
           </Button>
         </div>
       </form>

@@ -11,7 +11,7 @@ export interface Support {
   status: SupportStatusEnum;
   assigneeId: number;
   assignee: User;
-  resolvedAt: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  resolvedAt: string;
+  createdAt: string;
+  updatedAt: string;
 }

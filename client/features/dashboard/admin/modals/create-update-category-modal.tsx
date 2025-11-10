@@ -14,11 +14,11 @@ import { CreateEditCategoryForm } from "../forms/create-edit-category-form";
 
 interface ICreateUpdateCategoryModal {
   open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  initialData?: Partial<BusinessCategory>;
   mode?: "create" | "edit";
   trigger?: React.ReactNode;
+  initialData?: Partial<BusinessCategory>;
   onSuccess?: () => void;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function CreateUpdateCategoryModal({

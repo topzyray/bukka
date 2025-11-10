@@ -158,9 +158,9 @@ export class AppConfigurationService {
     );
   }
 
-  // get queueProvider(): string {
-  //   return this.configService.get<string>('QUEUE_PROVIDER')?.trim() as string;
-  // }
+  get queueProvider(): string {
+    return this.configService.get<string>('QUEUE_PROVIDER')?.trim() as string;
+  }
 
   // get storageContainerName(): string {
   //   return this.configService

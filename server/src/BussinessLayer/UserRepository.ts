@@ -147,9 +147,13 @@ export class UserRepository {
     //   locationId: location.id,
     // };
 
+    const cleanData = Object.fromEntries(
+      Object.entries(data).filter(([_, v]) => v !== undefined),
+    );
+
     const updatedUser = await this.userDataAgent.updateUser(
       loggedInUser?.id,
-      data,
+      cleanData,
     );
     await invalidateCache('user:profile', { id: loggedInUser.id });
     await invalidateCache('users:list', {});

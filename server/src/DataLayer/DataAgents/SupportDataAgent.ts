@@ -33,6 +33,19 @@ export class SupportDataAgent {
   async getSupportByTicketId(ticketId: string): Promise<Support | null> {
     const spec: QuerySpec = {
       filter: { field: 'ticketId', op: 'eq', value: ticketId },
+      extras: {
+        include: {
+          assignee: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              role: true,
+            },
+          },
+        },
+      },
     };
     return this.model.findOne(spec);
   }
@@ -50,6 +63,19 @@ export class SupportDataAgent {
       filter,
       sort: [{ field: 'createdAt', direction: 'desc' }],
       pagination: { page: pageNumber, pageSize },
+      extras: {
+        include: {
+          assignee: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              role: true,
+            },
+          },
+        },
+      },
     };
 
     const total = await this.model.count({ filter });

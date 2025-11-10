@@ -1,3 +1,5 @@
 export enum QueueProviderEnum {
-  AZURE = 'azure',
+  SERVICE_BUS = 'SERVICE_BUS',
+  BULLMQ = 'BULLMQ',
+  RABBITMQ = 'RABBITMQ',
 }

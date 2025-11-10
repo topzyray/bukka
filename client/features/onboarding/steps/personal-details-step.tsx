@@ -19,6 +19,7 @@ import { TextHelper } from "@/helpers";
 import { useQueryClient } from "@tanstack/react-query";
 import { useOnboardingProgress } from "@/data/queries/use-onboarding-progress-query";
 import { CircularLoader } from "@/components/loaders/circular-loader";
+import { Loader2 } from "lucide-react";
 
 const allowedGenders = Object.values(GenderEnum);
 
@@ -215,7 +216,13 @@ export function PersonalDetailsStep({
                 type="submit"
                 disabled={isUpdatingUserData || !form.formState.isValid}
               >
-                {isUpdatingUserData ? "Saving..." : "Continue"}
+                {isUpdatingUserData ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="animate-spin" /> Saving
+                  </span>
+                ) : (
+                  "Continue"
+                )}
               </Button>
             </div>
           </form>

@@ -27,7 +27,7 @@ export function CircularLoader({
     >
       <div
         className={cn(
-          "border-primary mx-auto h-10 w-10 animate-spin rounded-full border-5 border-dashed",
+          "border-primary mx-auto h-10 w-10 animate-spin rounded-full border-5 border-dashed dark:border-foreground",
           rollerClassName
         )}
         {...props}

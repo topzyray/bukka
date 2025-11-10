@@ -1,39 +1,36 @@
 import { Logger } from '@nestjs/common';
 import { createClient, RedisClientType } from 'redis';
 import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
+import IORedis from 'ioredis';
 
 export class RedisService {
   private static instance: RedisService;
   private readonly client: RedisClientType;
-  private readonly REDIS_PROTOCOL = 'rediss://';
+  private readonly bullConnection: IORedis;
+  private readonly REDIS_SOCKET_PROTOCOL = 'rediss://';
   private readonly config = {
     redisHost: process.env.REDIS_HOST,
     redisPort: Number(process.env.REDIS_PORT),
     redisPassword: process.env.REDIS_PASSWORD,
-    redisUrl: process.env.REDIS_URL,
+    redisUrl: process.env.REDIS_URL as string,
     env: process.env.NODE_ENV as EnvironmentTypeEnum,
   };
-  // private readonly url = `${this.REDIS_PROTOCOL}${this.config.redisHost}:${this.config.redisPort}`;
-  private readonly url = `${this.config.redisUrl}`;
   private readonly logger = new Logger(RedisService.name);
 
   constructor() {
-    // let baseOptions: any = {
-    //   url: this.url,
+    const isTls = this.config.redisUrl?.startsWith(this.REDIS_SOCKET_PROTOCOL);
+
+    // const baseOptions: any = {
+    //   url: this.config.redisUrl,
     //   password: this.config.redisPassword,
-    // };
-    // if (this.config.env.toLowerCase() === EnvironmentTypeEnum.PROD) {
-    //   baseOptions.socket = {
+    //   socket: {
     //     reconnectStrategy: (retries: number) => Math.min(retries * 50, 1000),
     //     timeout: 30000,
-    //     tls: true,
-    //   };
-    // }
-    // this.client = createClient(baseOptions);
+    //     ...(isTls ? { tls: true } : {}),
+    //   },
+    // };
 
-    const isTls = this.config.redisUrl?.startsWith('rediss://');
-
-    const baseOptions: any = {
+    this.client = createClient({
       url: this.config.redisUrl,
       password: this.config.redisPassword,
       socket: {
@@ -41,9 +38,7 @@ export class RedisService {
         timeout: 30000,
         ...(isTls ? { tls: true } : {}),
       },
-    };
-
-    this.client = createClient(baseOptions);
+    });
 
     this.client.on('error', (error) =>
       this.logger.error('Redis Client Error', error),
@@ -54,6 +49,13 @@ export class RedisService {
     this.client.on('ready', () =>
       this.logger.log('Redis Client Connected successfully!'),
     );
+
+    // separate ioredis connection for BullMQ
+    this.bullConnection = new IORedis(this.config.redisUrl, {
+      maxRetriesPerRequest: null,
+      enableReadyCheck: true,
+      tls: isTls ? {} : undefined,
+    });
   }
 
   /**
@@ -80,9 +82,16 @@ export class RedisService {
     return this.client;
   }
 
+  getBullConnection(): IORedis {
+    this.logger.log('BullMQ Connection Initialized');
+    return this.bullConnection;
+  }
+
   async disconnect(): Promise<void> {
     try {
-      await this.client.disconnect();
+      if (this.client.isOpen) await this.client.disconnect();
+      if (this.bullConnection.status !== 'end')
+        await this.bullConnection.quit();
     } catch (error) {
       this.logger.error('Error disconnecting from Redis', error);
     }

@@ -1,8 +1,14 @@
-import { UserNotification } from "../interfaces/Notification";
+import {
+  BukkaResponse,
+  PagedResponse,
+  QueryParams,
+  useCustomInfiniteQuery,
+  useCustomQuery,
+} from "./base";
 import { UserNotificationApiService } from "../services";
-import { useCustomInfiniteQuery, useCustomQuery } from "./base";
+import { UserNotification } from "../interfaces/Notification";
 
-export const useUserNotifications = ({
+export const useInfiniteUserNotifications = ({
   userId,
   isMenuOpen,
   limit,
@@ -16,7 +22,7 @@ export const useUserNotifications = ({
   initialPageParam?: number;
 }) => {
   return useCustomInfiniteQuery<UserNotification>(
-    ["notifications", userId],
+    ["notifications-infinite", userId],
     ({ pageNumber, ...rest }) =>
       UserNotificationApiService.getAllMyNotifications({
         pageNumber: pageNumber,
@@ -33,6 +39,39 @@ export const useUserNotifications = ({
   );
 };
 
+export const useUserNotificationsQuery = ({
+  pageNumber = 1,
+  search = "",
+  filters = {},
+  pageSize = 10,
+  enabled = true,
+}: {
+  pageNumber?: number;
+  search?: string;
+  filters?: Record<string, any>;
+  pageSize?: number;
+  enabled?: boolean;
+}) => {
+  return useCustomQuery<
+    BukkaResponse<PagedResponse<UserNotification[]>>,
+    Error
+  >(
+    ["notifications", search, filters, pageNumber, pageSize],
+    (params?: QueryParams) =>
+      UserNotificationApiService.getAllMyNotifications({
+        pageNumber: params?.pageNumber ?? pageNumber,
+        pageSize: params?.pageSize ?? pageSize,
+        search: params?.search ?? search,
+        ...filters,
+        ...params,
+      }),
+    {
+      params: { pageNumber, pageSize, search, ...filters },
+      enabled,
+    }
+  );
+};
+
 export const useNotificationUnreadCount = ({ userId }: { userId?: number }) => {
   return useCustomQuery(
     ["unread-count", userId],
@@ -41,5 +80,17 @@ export const useNotificationUnreadCount = ({ userId }: { userId?: number }) => {
       enabled: !!userId,
       staleTime: 1000 * 60 * 5,
     }
+  );
+};
+
+export const useNotificationById = ({
+  notificationId,
+}: {
+  notificationId: number;
+}) => {
+  return useCustomQuery<BukkaResponse<UserNotification>>(
+    ["business", notificationId],
+    () => UserNotificationApiService.getNotificationById(notificationId),
+    { enabled: !!notificationId, placeholderData: (prev) => prev }
   );
 };

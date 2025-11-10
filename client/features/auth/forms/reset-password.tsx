@@ -12,10 +12,10 @@ import Link from "next/link";
 import OtpInputComponent from "../../../components/form-ui/base/otp-component";
 import { useResetPassword } from "@/data/mutations/auth/use-resetpassword";
 import { InputComponent } from "../../../components/form-ui/base/input-component";
-import { Lock, Mail } from "lucide-react";
+import { Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const resetPasswordSchema = z.object({
-  email: z.email({ message: "Please enter a valid email address" }),
   token: z
     .string()
     .min(6, {
@@ -39,12 +39,13 @@ const resetPasswordSchema = z.object({
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 export function ResetPasswordForm() {
+  const router = useRouter();
+
   const form = useForm<ResetPasswordFormData>({
-    mode: "all",
+    mode: "onSubmit",
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       token: "",
-      email: "",
       newPassword: "",
     },
   });
@@ -92,16 +93,6 @@ export function ResetPasswordForm() {
                 <>
                   <InputComponent
                     formControl={form.control}
-                    formName="email"
-                    formLabel="Email"
-                    formInputType="email"
-                    formPlaceholder="Enter valid email"
-                    disabled={isProcessingResetPassword}
-                    icon={Mail}
-                  />
-
-                  <InputComponent
-                    formControl={form.control}
                     formName="newPassword"
                     formLabel="New Password"
                     formInputType="password"
@@ -137,27 +128,28 @@ export function ResetPasswordForm() {
               )}
             </form>
           </Form>
-
-          <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">
-              <Link
-                href="/request-email-verification"
-                className="text-primary hover:underline font-medium"
-              >
-                Request new verification token
-              </Link>
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Already verified?{" "}
-              <Link
-                href="/signin"
-                className="text-primary hover:underline font-medium"
-              >
-                Signin
-              </Link>
-            </p>
-          </div>
         </CardContent>
+
+        <div className="text-center space-y-2">
+          <p
+            className="text-sm text-primary hover:underline cursor-pointer font-medium"
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push("/forgot-password");
+            }}
+          >
+            Forgot Password
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Already verified?{" "}
+            <Link
+              href="/signin"
+              className="text-primary hover:underline font-medium"
+            >
+              Signin
+            </Link>
+          </p>
+        </div>
       </section>
     </motion.div>
   );

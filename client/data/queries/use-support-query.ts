@@ -6,19 +6,20 @@ import {
 } from "@/data/queries/base";
 import { SupportApiService } from "../services";
 import { Support } from "../interfaces/Support";
+import { User } from "../interfaces/User";
 
 export const useSupportsQuery = ({
+  user,
   pageNumber = 1,
   search = "",
   filters = {},
   pageSize = 10,
-  enabled = true,
 }: {
+  user: User | null;
   pageNumber?: number;
   search?: string;
   filters?: Record<string, any>;
   pageSize?: number;
-  enabled?: boolean;
 }) => {
   return useCustomQuery<BukkaResponse<PagedResponse<Support[]>>, Error>(
     ["supports", search, filters, pageNumber, pageSize],
@@ -32,15 +33,21 @@ export const useSupportsQuery = ({
       }),
     {
       params: { pageNumber, pageSize, search, ...filters },
-      enabled,
+      enabled: !!user,
     }
   );
 };
 
-export const useSupportById = ({ supportId }: { supportId: number }) => {
+export const useSupportById = ({
+  ticketId,
+  user,
+}: {
+  ticketId: string;
+  user: User;
+}) => {
   return useCustomQuery<BukkaResponse<Support>>(
-    ["support", supportId],
-    () => SupportApiService.getSupportByTicketId(supportId),
-    { enabled: !!supportId, placeholderData: (prev) => prev }
+    ["support", ticketId],
+    () => SupportApiService.getSupportByTicketId(ticketId),
+    { enabled: !!ticketId && !!user, placeholderData: (prev) => prev }
   );
 };

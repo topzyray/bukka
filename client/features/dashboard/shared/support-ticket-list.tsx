@@ -1,18 +1,23 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { DataTable } from "@/components/ui/data-table";
-import { useDeleteBusiness } from "@/data/mutations/business/use-business-mutation";
-import { PaginationHelper } from "@/helpers/pagination-helper";
-import { useSupportsQuery } from "@/data/queries/use-support-query";
+import { useAuth } from "@/providers";
+import { BukkaButton } from "@/components/ui";
+import { UserRoleEnum } from "@/data/enums";
 import { Support } from "@/data/interfaces/Support";
-import { supportColumns } from "../shared/components/support-columns";
+import { DataTable } from "@/components/ui/data-table";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
+import { supportColumns } from "./components/support-columns";
+import { PaginationHelper } from "@/helpers/pagination-helper";
 import { SupportStatusEnum } from "@/data/enums/SupportStatusEnum";
+import { useSupportsQuery } from "@/data/queries/use-support-query";
+import { CreateUpdateTicketModal } from "./modals/create-update-ticket-modal";
+import { useDeleteTicket } from "@/data/mutations/support/use-support-ticket-mutation";
 
-export function AdminSupportTicketList() {
+export function SupportTicketList() {
   const PAGE_SIZE = 10;
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,26 +28,34 @@ export function AdminSupportTicketList() {
     null
   );
 
-  const [page, setPage] = React.useState<number>(1);
-  const [search, setSearch] = React.useState<string>("");
-  const [filters, setFilters] = React.useState<Record<string, any>>({});
+  const [page, setPage] = useState<number>(1);
+  const [search, setSearch] = useState<string>("");
+  const [filters, setFilters] = useState<Record<string, any>>({});
 
-  const deleteBusinessMutation = useDeleteBusiness({
+  const deleteTicketMutation = useDeleteTicket({
     onSuccess: () => {
       setCurrentItemDeleting(null);
     },
   });
 
+  const effectiveFilters = useMemo(() => {
+    const baseFilters = { ...filters };
+    if (user?.role !== UserRoleEnum.ADMIN) {
+      baseFilters.email = user?.email;
+    }
+    return baseFilters;
+  }, [filters, user]);
+
   const { data: supportData, isLoading } = useSupportsQuery({
     search,
-    filters,
+    filters: effectiveFilters,
     pageNumber: page,
     pageSize: PAGE_SIZE,
-    enabled: true,
+    user: user ?? null,
   });
 
   const total = supportData?.responseData?.total ?? 0;
-  const currentPagedData = React.useMemo(() => {
+  const currentPagedData = useMemo(() => {
     return supportData?.responseData?.data ?? [];
   }, [supportData]);
 
@@ -93,9 +106,9 @@ export function AdminSupportTicketList() {
   const handleDelete = useCallback(
     async (id: number) => {
       setCurrentItemDeleting(id);
-      deleteBusinessMutation.mutate(id);
+      deleteTicketMutation.mutate(id);
     },
-    [deleteBusinessMutation]
+    [deleteTicketMutation]
   );
 
   const handleOpenChange = (open: boolean) => {
@@ -106,15 +119,15 @@ export function AdminSupportTicketList() {
     }
   };
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () =>
       supportColumns(
         handleEdit,
         handleDelete,
-        deleteBusinessMutation.isPending,
+        deleteTicketMutation.isPending,
         currentItemDeleting
       ),
-    [currentItemDeleting, deleteBusinessMutation.isPending, handleDelete]
+    [currentItemDeleting, deleteTicketMutation.isPending, handleDelete]
   );
 
   return (
@@ -127,20 +140,23 @@ export function AdminSupportTicketList() {
           </p>
         </div>
 
-        {/* <div className="flex items-center gap-2">
-                <Button onClick={handleCreate}>Add Support</Button>
-                <CreateUpdateBusinessModal
-                  open={isModalOpen}
-                  onOpenChange={handleOpenChange}
-                  mode={mode}
-                  initialData={mode === "edit" ? initialData : undefined}
-                  onSuccess={() => {
-                    queryClient.removeQueries({ queryKey: ["businesses"] });
-                    setPage(1);
-                    setIsModalOpen(false);
-                  }}
-                />
-              </div> */}
+        <div className="flex items-center gap-2">
+          <BukkaButton variant="hero" onClick={handleCreate}>
+            Create Ticket
+          </BukkaButton>
+          <CreateUpdateTicketModal
+            open={isModalOpen}
+            onOpenChange={handleOpenChange}
+            mode={mode}
+            user={user}
+            initialData={mode === "edit" ? initialData : undefined}
+            onSuccess={() => {
+              queryClient.removeQueries({ queryKey: ["supports"] });
+              setPage(1);
+              setIsModalOpen(false);
+            }}
+          />
+        </div>
       </header>
 
       <div>

@@ -2,20 +2,16 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Instagram,
-  Twitter,
-  Facebook,
-} from "lucide-react";
+import { Mail, Phone, Instagram, Twitter, Facebook } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "@/providers";
+import { UserRoleEnum } from "@/data/enums";
 
 export function Footer() {
+  const { user } = useAuth();
   const [email, setEmail] = React.useState("");
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
@@ -45,8 +41,8 @@ export function Footer() {
               />
             </motion.div>
             <p className="text-muted-foreground max-w-sm">
-              Discover amazing restaurants and cuisines in your area. Join
-              thousands of food lovers finding their next favorite meal.
+              Discover amazing bukkans and cuisines in your area. Join thousands
+              of food lovers finding their next favorite meal.
             </p>
             <section className="flex space-x-3">
               <BukkaButton
@@ -82,7 +78,7 @@ export function Footer() {
                   href="/businesses"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Find Restaurants
+                  Find Bukkans
                 </Link>
               </li>
               <li>
@@ -93,14 +89,29 @@ export function Footer() {
                   Browse Categories
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/add-restaurant"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Add Your Restaurant
-                </Link>
-              </li>
+              {!user ? (
+                <li>
+                  <Link
+                    href="/signup"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Add Your Business
+                  </Link>
+                </li>
+              ) : (
+                <>
+                  {user?.role === UserRoleEnum.VENDOR && (
+                    <li>
+                      <Link
+                        href={`/dashboard/${user?.role?.toLowerCase()}/businesses`}
+                        className="text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        Add Your Business
+                      </Link>
+                    </li>
+                  )}
+                </>
+              )}
               <li>
                 <Link
                   href="/about"
@@ -155,8 +166,8 @@ export function Footer() {
           <section className="space-y-4">
             <h3 className="font-semibold text-lg">Stay Updated</h3>
             <p className="text-muted-foreground text-sm">
-              Get the latest restaurant recommendations and food trends
-              delivered to your inbox.
+              Get the latest bukkan recommendations and food trends delivered to
+              your inbox.
             </p>
             <form onSubmit={handleNewsletterSubmit} className="space-y-3">
               <Input

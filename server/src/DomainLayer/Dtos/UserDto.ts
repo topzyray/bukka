@@ -140,9 +140,9 @@ export class UpdateUserDto {
   @IsString()
   bio?: string;
 
-  @ApiProperty({ example: 0 })
+  @ApiProperty({ example: 0, required: false })
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   @Transform(({ value }) => Number.parseInt(value, 10))
   onboardingProgress: number;
 }

@@ -17,6 +17,7 @@ import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
 import { TextAreaComponent } from "@/components/form-ui/base/text-area-component";
 import { PhoneNumberInput } from "@/components/form-ui/base/phone-number-component";
 import parsePhoneNumberFromString from "libphonenumber-js";
+import { Loader2 } from "lucide-react";
 
 const allowedGenders = Object.values(GenderEnum);
 
@@ -96,6 +97,7 @@ export function ProfileUpdateForm({
     useUpdateUserData({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["current-user"] });
+        setEditProfile(false);
       },
     });
 
@@ -106,8 +108,6 @@ export function ProfileUpdateForm({
     }
     const payload = {
       phoneNumber: data?.phoneNumber,
-      gender: data?.gender,
-      username: data?.username,
       bio: data?.bio,
     };
     updateUserData(payload);
@@ -200,7 +200,13 @@ export function ProfileUpdateForm({
                 type="submit"
                 disabled={isUpdatingUserData || !form.formState.isValid}
               >
-                {isUpdatingUserData ? "Saving..." : "Save"}
+                {isUpdatingUserData ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="animate-spin" /> Saving
+                  </span>
+                ) : (
+                  "Save"
+                )}
               </Button>
             </div>
           </form>

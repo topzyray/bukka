@@ -5,7 +5,7 @@ import { useAuth } from "@/providers";
 import { motion } from "framer-motion";
 import { UserProfileCard } from "../components/profile-card";
 import { User } from "@/data/interfaces/User";
-import { ProfileUpdateForm } from "../components/profile-update-form";
+import { ProfileUpdateForm } from "../forms/profile-update-form";
 import { File } from "@/data/interfaces/File";
 import { FileCategoryEnum } from "@/data/enums";
 import { ProfileAvatar } from "../components/profile-avatar";

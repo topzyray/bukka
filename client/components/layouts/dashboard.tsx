@@ -30,7 +30,7 @@ export function DashboardLayout({
   const { navItems, title } = getDashboardConfig(user?.role as UserRoleEnum);
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
+    <SidebarProvider defaultOpen={defaultOpen} className="dark:bg-card">
       <DashBoardSidebar navItems={navItems} />
       <main className="relative max-h-screen w-full">
         <DashboardHeader dashboardTitle={title} userData={user as User} />
