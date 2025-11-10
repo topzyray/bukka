@@ -39,10 +39,18 @@ export const BusinessCard = memo(function BusinessCard({
   const router = useRouter();
 
   const { user } = useAuth();
-  const { data: businessFiles, isLoading: isLoadingBusinessFiles } =
+  const { data: businessFilesApiData, isLoading: isLoadingFiles } =
     useBusinessFiles({
-      businessId: business?.id,
+      businessId: Number(business?.id),
     });
+  const businessFiles = businessFilesApiData?.responseData;
+
+  const coverImage: File | null | undefined =
+    !isLoadingFiles && businessFiles && businessFiles.length
+      ? businessFiles?.find(
+          (file: File) => file.category === FileCategoryEnum.BUSINESS_COVER
+        ) ?? null
+      : null;
 
   const { formatted } = useDistance({
     targetLat: business?.location?.latitude,
@@ -80,13 +88,6 @@ export const BusinessCard = memo(function BusinessCard({
     );
   };
 
-  const cover: File | null | undefined =
-    !isLoadingBusinessFiles && businessFiles && businessFiles.length
-      ? businessFiles.find(
-          (file: File) => file.category === FileCategoryEnum.BUSINESS_COVER
-        )
-      : null;
-
   if (variant === "compact") {
     return (
       <motion.div
@@ -98,13 +99,14 @@ export const BusinessCard = memo(function BusinessCard({
         <Card className="overflow-hidden shadow-card hover:shadow-elegant h-full transition-smooth py-0">
           <CardContent className="p-3 flex items-center gap-3">
             <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-              {!imageError ? (
+              {!imageError && coverImage ? (
                 <Image
-                  src={cover?.fullPath ?? "/images/placeholder.jpg"}
-                  alt={business?.name + "cover image"}
+                  src={coverImage?.fullPath}
+                  alt={business?.name}
                   width={100}
                   height={100}
                   className="w-full h-full object-cover"
+                  priority={!!coverImage?.fullPath}
                   onError={() => setImageError(true)}
                 />
               ) : (
@@ -150,22 +152,23 @@ export const BusinessCard = memo(function BusinessCard({
     >
       <Card className="py-0 overflow-hidden shadow-card hover:shadow-elegant h-full transition-smooth group gap-0">
         <div className="relative overflow-hidden">
-          {!imageError ? (
-            <Image
-              src={cover?.fullPath ?? "/images/placeholder.jpg"}
-              alt={business?.name + "cover image"}
-              width={100}
-              height={100}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <div className="w-full h-full warm-gradient flex items-center justify-center">
-              <span className="text-white text-4xl font-bold">
-                {business?.name.charAt(0)}
-              </span>
-            </div>
-          )}
+          <div className="relative overflow-hidden w-full aspect-[16/9]">
+            {!imageError && coverImage ? (
+              <Image
+                src={coverImage?.fullPath}
+                alt={business?.name}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="w-full h-full warm-gradient flex items-center justify-center">
+                <span className="text-white text-4xl font-bold">
+                  {business?.name.charAt(0)}
+                </span>
+              </div>
+            )}
+          </div>
 
           <FavoriteButton
             businessId={business?.id}

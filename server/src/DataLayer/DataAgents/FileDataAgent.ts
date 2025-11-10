@@ -85,11 +85,26 @@ export class FileDataAgent {
     return await this.model.findOne(querySpec);
   }
 
+  // async deleteFile(fileId: number): Promise<void> {
+  //   const querySpec: QuerySpec = {
+  //     filter: { field: 'id', op: 'eq', value: fileId },
+  //   };
+  //   return await this.model.deleteOne(querySpec);
+  // }
+
   async deleteFile(fileId: number): Promise<void> {
     const querySpec: QuerySpec = {
       filter: { field: 'id', op: 'eq', value: fileId },
     };
-    return await this.model.deleteOne(querySpec);
+
+    if (this.db.transaction) {
+      return this.db.transaction(async (tx) => {
+        const file = tx.getModel<File>('file');
+        return await file.deleteOne(querySpec);
+      });
+    } else {
+      return await this.model.deleteOne(querySpec);
+    }
   }
 
   async deleteAllUserFiles(userId: number): Promise<{ count: number }> {

@@ -1,10 +1,11 @@
-import { FileApiService } from "@/data/services/FileApiService";
-import { useCustomQuery } from "./base";
+import { File } from "../interfaces/File";
 import { FileReferenceTypeEnum } from "../enums";
+import { BukkaResponse, useCustomQuery } from "./base";
+import { FileApiService } from "@/data/services/FileApiService";
 
 export const useBusinessFiles = ({ businessId }: { businessId: number }) => {
-  return useCustomQuery(
-    ["businessFiles", businessId],
+  return useCustomQuery<BukkaResponse<File[]>>(
+    ["business-files", businessId],
     () =>
       FileApiService.getByReferenceIdAndType({
         referenceType: FileReferenceTypeEnum.BUSINESS,

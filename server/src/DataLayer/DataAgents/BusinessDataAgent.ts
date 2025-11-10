@@ -38,6 +38,10 @@ export class BusinessDataAgent {
     return this.model.findOne(spec);
   }
 
+  async getById(id: number) {
+    return this.findById(id);
+  }
+
   async findByLocation(locationId: number): Promise<Business | null> {
     const spec: QuerySpec = {
       filter: { field: 'locationId', op: 'eq', value: locationId },

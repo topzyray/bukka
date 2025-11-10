@@ -121,9 +121,14 @@ export const supportColumns = (
               : "Not resolved"
           }
         >
-          {r.resolvedAt
-            ? TextHelper.getFormattedDate(r.resolvedAt)
-            : "Not resolved"}
+          {r.resolvedAt ? (
+            <span>
+              {TextHelper.getFormattedDate(r.resolvedAt)} <br />
+              {TextHelper.getFormattedTime(r.resolvedAt)}
+            </span>
+          ) : (
+            "Not resolved"
+          )}
         </div>
       );
     },

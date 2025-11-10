@@ -13,36 +13,32 @@ import { useState } from "react";
  *  - className: string (applies to image)
  *  - rounded: boolean
  */
-export const LazyImage: React.FC<{
-  src: string;
-  alt: string;
-  width?: number;
-  height?: number;
-  className?: string;
-  rounded?: boolean;
-}> = ({
+export const LazyImage = ({
   src,
   alt,
-  width = 600,
-  height = 400,
-  className = "",
+  className,
   rounded = true,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  rounded?: boolean;
 }) => {
   const [loaded, setLoaded] = useState(false);
+
   return (
-    <div className={`relative overflow-hidden ${rounded ? "rounded-lg" : ""}`}>
+    // <div className={`relative overflow-hidden ${rounded ? "rounded-lg" : ""}`}>
+    <>
       {!loaded && (
         <div
           aria-hidden
           className="absolute inset-0 bg-gray-100 dark:bg-neutral-800 animate-pulse"
         />
       )}
-
       <Image
         src={src}
         alt={alt}
-        width={width}
-        height={height}
+        fill
         onLoadingComplete={() => setLoaded(true)}
         loading="lazy"
         className={cn(
@@ -50,9 +46,9 @@ export const LazyImage: React.FC<{
           "transition-opacity duration-500",
           loaded ? "opacity-100" : "opacity-0"
         )}
-        // Note: placeholder="blur" requires blurDataURL. We prefer skeleton approach for flexibility
       />
-    </div>
+    </>
+    // </div>
   );
 };
 

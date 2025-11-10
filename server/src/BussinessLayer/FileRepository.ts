@@ -3,6 +3,8 @@ import {
   BadRequestException,
   NotFoundException,
   HttpStatus,
+  Logger,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import axios from 'axios';
 import { FileDataAgent } from 'src/DataLayer/DataAgents/FileDataAgent';
@@ -23,6 +25,8 @@ import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHe
 import { FileUploadService } from 'src/InfrastructureLayer/Services/upload/FileUploadService';
 import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
 import { FileValidationHelper } from 'src/InfrastructureLayer/Helpers/FileValidationHelper';
+
+const logger = new Logger('FileRepository');
 
 @Injectable()
 export class FileRepository {
@@ -65,7 +69,7 @@ export class FileRepository {
       await this.handleExistingFileDeletion(
         FileCategoryEnum.BUSINESS_COVER,
         createFileDto.referenceId as number,
-        FileReferenceTypeEnum.VENDOR,
+        FileReferenceTypeEnum.BUSINESS,
       );
     }
 
@@ -329,27 +333,72 @@ export class FileRepository {
     );
   }
 
-  async deleteFile(fileId: number, filePath: string) {
+  // async deleteFile(fileId: number, filePath: string) {
+  //   if (!fileId) {
+  //     throw new BadRequestException('File ID is required.');
+  //   }
+  //   if (!filePath) {
+  //     throw new BadRequestException('File path is required.');
+  //   }
+  //   const existingFile = await this.fileDataAgent.getFileById(fileId);
+
+  //   if (!existingFile) {
+  //     return BukkaResponse.ErrorResponse(
+  //       `File with ID ${fileId} not found in the database.`,
+  //       HttpStatus.NOT_FOUND,
+  //     );
+  //   }
+
+  //   await this.fileUploadService.deleteFile(filePath);
+  //   await this.fileDataAgent.deleteFile(fileId);
+
+  //   return BukkaResponse.DeleteResponse('File', true);
+  // }
+
+  async deleteFile(fileId: number) {
     if (!fileId) {
       throw new BadRequestException('File ID is required.');
     }
-    if (!filePath) {
-      throw new BadRequestException('File path is required.');
-    }
-    const existingFile = await this.fileDataAgent.getFileById(fileId);
 
+    const existingFile = await this.fileDataAgent.getFileById(fileId);
     if (!existingFile) {
-      return BukkaResponse.ErrorResponse(
-        `File with ID ${fileId} not found in the database.`,
-        HttpStatus.NOT_FOUND,
+      throw new NotFoundException(`File with ID ${fileId} not found.`);
+    }
+
+    try {
+      await this.fileUploadService.deleteFile(existingFile.relativePath);
+      await this.fileDataAgent.deleteFile(fileId);
+      return BukkaResponse.DeleteResponse('File', true);
+    } catch (error) {
+      logger.error('Error deleting file', {
+        fileId,
+        filePath: existingFile.relativePath,
+        error: error.message,
+      });
+
+      throw new InternalServerErrorException(
+        `Failed to delete file: ${error.message}`,
       );
     }
-
-    await this.fileUploadService.deleteFile(filePath);
-    await this.fileDataAgent.deleteFile(fileId);
-
-    return BukkaResponse.DeleteResponse('File', true);
   }
+
+  // private async handleExistingFileDeletion(
+  //   category: FileCategoryEnum,
+  //   referenceId: number,
+  //   referenceType: FileReferenceTypeEnum,
+  // ) {
+  //   const existingFile = await this.fileDataAgent.findOneByCategoryAndReference(
+  //     referenceId,
+  //     category as any,
+  //     referenceType as any,
+  //   );
+  //   if (existingFile) {
+  //     await this.deleteFile(
+  //       existingFile.id as number,
+  //       existingFile.relativePath,
+  //     );
+  //   }
+  // }
 
   private async handleExistingFileDeletion(
     category: FileCategoryEnum,
@@ -361,13 +410,8 @@ export class FileRepository {
       category as any,
       referenceType as any,
     );
-    console.log('EXISTING FILE: ', existingFile);
-
     if (existingFile) {
-      await this.deleteFile(
-        existingFile.id as number,
-        existingFile.relativePath,
-      );
+      await this.deleteFile(existingFile.id as number);
     }
   }
 

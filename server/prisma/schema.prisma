@@ -35,8 +35,10 @@ enum UserStatus {
 enum FileCategory {
   GENERAL
   BUSINESS_COVER
+  BUSINESS_IMAGES
   USER_PROFILE_IMAGE
   EMAIL_TEMPLATE
+  GALLERY
 }
 
 enum FileReferenceType {

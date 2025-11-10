@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { FileReferenceTypeEnum } from 'src/DomainLayer/Enums/FileReferenceTypeEnum';
 import { UserDataAgent } from 'src/DataLayer/DataAgents/UserDataAgent';
+import { BusinessDataAgent } from 'src/DataLayer/DataAgents/BusinessDataAgent';
+import { FileReferenceTypeEnum } from 'src/DomainLayer/Enums/FileReferenceTypeEnum';
 
 @Injectable()
 export class FileReferenceHelper {
@@ -8,9 +9,13 @@ export class FileReferenceHelper {
     Record<FileReferenceTypeEnum, { getById: (id: number) => Promise<any> }>
   >;
 
-  constructor(private readonly userDataAgent: UserDataAgent) {
+  constructor(
+    private readonly userDataAgent: UserDataAgent,
+    private readonly businessDataAgent: BusinessDataAgent,
+  ) {
     this.referenceAgentMap = {
       [FileReferenceTypeEnum.USER]: this.userDataAgent,
+      [FileReferenceTypeEnum.BUSINESS]: this.businessDataAgent,
     };
   }
 

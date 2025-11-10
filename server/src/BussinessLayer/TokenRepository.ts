@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { TokenClaims } from 'src/DomainLayer/Models/TokenClaims';
 import { Generator } from 'src/InfrastructureLayer/Services/Generator';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
@@ -37,7 +37,7 @@ export class TokenRepository {
 
   async generateEmailConfirmationTokenAsync(email: string): Promise<string> {
     const payload = { email, type: 'emailConfirmation' };
-    const options = {
+    const options: JwtSignOptions = {
       expiresIn: '24h',
       secret: this.configService.tokenSecret,
     }; // Token will expire in 24 hours

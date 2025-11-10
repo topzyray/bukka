@@ -11,13 +11,13 @@ import {
   Phone,
   Globe,
   Share2,
-  Camera,
   Clock,
   Facebook,
   Twitter,
   Instagram,
   Linkedin,
   Music2,
+  Loader2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,12 +32,14 @@ import { FileCategoryEnum } from "@/data/enums";
 import { File } from "@/data/interfaces/File";
 import { useBusinessById } from "@/data/queries/use-businesses-query";
 import { useBusinessFiles } from "@/data/queries/use-business-files";
-import { LazyImage } from "@/components/ui/lazy-image";
 import { BusinessHelper } from "./helper/bussiness-helper";
 import { LazyMapObserver } from "./components/lazy-map-observer";
 import Link from "next/link";
 import { FavoriteButton } from "./components/favorite-button";
 import { Business } from "@/data/interfaces/Business";
+import { Label, Separator } from "@/components/ui";
+import { TextHelper } from "@/helpers";
+import { BusinessPhotoGallery } from "./components/business-photo-gallery";
 
 export function BusinessDetails(): JSX.Element {
   const { id } = useParams() as { id?: string };
@@ -48,25 +50,25 @@ export function BusinessDetails(): JSX.Element {
 
   const business = data?.responseData as Business;
 
-  const { data: businessFiles, isLoading: isLoadingFiles } = useBusinessFiles({
-    businessId: Number(id),
-  });
+  const { data: businessFilesApiData, isLoading: isLoadingFiles } =
+    useBusinessFiles({
+      businessId: Number(id),
+    });
+  const businessFiles = businessFilesApiData?.responseData;
 
-  // pick cover and other photos
-  const cover: File | null | undefined =
+  const coverImage: File | null | undefined =
     !isLoadingFiles && businessFiles && businessFiles.length
-      ? businessFiles.find(
+      ? businessFiles?.find(
           (file: File) => file.category === FileCategoryEnum.BUSINESS_COVER
         ) ?? null
       : null;
 
-  const photos: File[] =
-    !isLoadingFiles && businessFiles
-      ? businessFiles.filter(
-          (file: File) => file.category === FileCategoryEnum.BUSINESS_IMAGE
+  const businessImages: File[] =
+    !isLoadingFiles && businessFiles?.length
+      ? businessFiles?.filter(
+          (file: File) => file.category === FileCategoryEnum.BUSINESS_IMAGES
         )
       : [];
-
   // compute open now robustly
   const openNow = useMemo(
     () => BusinessHelper.isOpenNow(business?.openingHours),
@@ -111,13 +113,24 @@ export function BusinessDetails(): JSX.Element {
         >
           {/* HERO */}
           <div className="relative h-64 md:h-80 rounded-xl overflow-hidden">
-            <Image
-              src={cover?.fullPath || "/images/placeholder.jpg"}
-              alt={business.name || "business cover"}
-              fill
-              className="object-cover"
-              priority={!!cover} // prioritize if there is a cover
-            />
+            {isLoadingFiles ? (
+              <Loader2 className="animate-spin h-32 w-32" />
+            ) : coverImage ? (
+              <Image
+                src={coverImage?.fullPath}
+                alt={business?.name}
+                fill
+                className="object-cover"
+                priority={!!coverImage?.fullPath}
+              />
+            ) : (
+              <Image
+                src={"/images/placeholder.jpg"}
+                alt={"business coverImage"}
+                fill
+                className="object-cover"
+              />
+            )}
             <div className="absolute inset-0 bg-black/28" />
             <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
               <div>
@@ -161,20 +174,43 @@ export function BusinessDetails(): JSX.Element {
             <div className="lg:col-span-2 space-y-6">
               {/* Info Card */}
               <Card>
-                <CardContent className="p-6">
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <Badge variant="outline" className="uppercase">
-                      {business.type}
-                    </Badge>
-                    <Badge variant={openNow ? "success" : "destructive"}>
-                      {openNow ? "Open Now" : "Closed"}
-                    </Badge>
-                    {business.cuisines?.map((c: string) => (
-                      <Badge key={c} variant="secondary" className="capitalize">
-                        {c}
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex gap-6 h-16">
+                    <div className="space-y-2">
+                      <Label>Type/Category</Label>
+                      <Badge variant="outline" className="uppercase">
+                        {TextHelper.normalizeText(business?.type)}
                       </Badge>
-                    ))}
+                    </div>
+
+                    <Separator orientation="vertical" />
+
+                    <div className="space-y-2">
+                      <Label>Availability</Label>
+                      <Badge variant={openNow ? "success" : "destructive"}>
+                        {openNow ? "Open Now" : "Closed"}
+                      </Badge>
+                    </div>
                   </div>
+
+                  <div className="space-y-2">
+                    <Label>Cuisines</Label>
+                    <div className="flex flex-wrap gap-1">
+                      {business?.cuisines?.length === 0
+                        ? "No cusines add yet!"
+                        : business.cuisines?.map((c: string) => (
+                            <Badge
+                              key={c}
+                              variant="secondary"
+                              className="capitalize"
+                            >
+                              {c}
+                            </Badge>
+                          ))}
+                    </div>
+                  </div>
+
+                  <Separator />
 
                   <p className="text-muted-foreground leading-relaxed mb-4">
                     {business.description || "No description provided."}
@@ -213,34 +249,10 @@ export function BusinessDetails(): JSX.Element {
               </Card>
 
               {/* Photos gallery (lazy loaded) */}
-              {photos.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Camera className="w-5 h-5" />
-                      Photos
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {photos.map((p, i) => (
-                        <div
-                          key={p.id ?? i}
-                          className="aspect-square rounded-lg overflow-hidden"
-                        >
-                          <LazyImage
-                            src={p.fullPath}
-                            alt={`${business.name} photo ${i + 1}`}
-                            width={400}
-                            height={400}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              <BusinessPhotoGallery
+                business={business}
+                businessImages={businessImages}
+              />
 
               {/* Menu & Services placeholder (ready for plugging real data) */}
               <Card>
@@ -266,7 +278,7 @@ export function BusinessDetails(): JSX.Element {
                   <CardTitle>Customer Reviews</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <BusinessReviews businessId={business.id} />
+                  <BusinessReviews businessId={business?.id} />
                 </CardContent>
               </Card>
             </div>

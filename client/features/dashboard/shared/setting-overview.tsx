@@ -27,21 +27,21 @@ import {
   Separator,
   SmartFileUploader,
 } from "@/components/ui";
-import { toast } from "sonner";
-import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import { File } from "@/data/interfaces/File";
-import { useAuth } from "@/providers/auth-provider";
 import {
   FileCategoryEnum,
   FileReferenceTypeEnum,
   UserRoleEnum,
 } from "@/data/enums";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { File } from "@/data/interfaces/File";
+import { FileApiService } from "@/data/services";
+import { useAuth } from "@/providers/auth-provider";
+import { useQueryClient } from "@tanstack/react-query";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { SettingsPageTitleCard } from "./components/setting-title-card";
 import { useUserActivitySummary } from "@/data/queries/use-analytics-query";
-import { FileApiService } from "@/data/services";
-import { useQueryClient } from "@tanstack/react-query";
 
 export function SettingsOverview() {
   const queryClient = useQueryClient();

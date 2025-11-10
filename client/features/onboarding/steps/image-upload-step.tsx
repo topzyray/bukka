@@ -24,6 +24,7 @@ import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
 import { useOnboardingProgress } from "@/data/queries/use-onboarding-progress-query";
 import { UpdateUserDto } from "@/data/dtos";
 import { CircularLoader } from "@/components/loaders/circular-loader";
+import { Loader2 } from "lucide-react";
 
 const imageUploadSchema = z.object({
   profileImage: z.instanceof(File, { message: "Please upload an image file" }),
@@ -134,11 +135,16 @@ export function ImageUploadStep({
                 type="submit"
                 disabled={isUploading || isPending || !form.formState.isValid}
               >
-                {isUploading || isPending
-                  ? "Uploading..."
-                  : isLast
-                  ? "Finish"
-                  : "Upload & Continue"}
+                {isUploading || isPending ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="animate-spin" />
+                    Uploading...
+                  </span>
+                ) : isLast ? (
+                  "Finish"
+                ) : (
+                  "Upload & Continue"
+                )}
               </Button>
             </div>
           </form>
