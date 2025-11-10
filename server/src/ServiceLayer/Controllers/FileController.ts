@@ -228,12 +228,12 @@ export class FileController {
   @ApiOperation({ summary: 'Delete file by ID' })
   async deleteFile(
     @Param('id', ParseIntPipe) id: number,
-    @Body() deleteFileDto: DeleteFileDto,
+    // @Body() deleteFileDto: DeleteFileDto,
     @Res() res: Response,
   ) {
     const response = await this.fileRepository.deleteFile(
       id,
-      deleteFileDto.relativePath,
+      // deleteFileDto.relativePath,
     );
     return BukkaResponse.GetStatusResponse(response, res);
   }

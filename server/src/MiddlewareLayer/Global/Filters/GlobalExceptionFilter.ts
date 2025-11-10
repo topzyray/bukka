@@ -25,14 +25,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let details: any;
 
     if (exception instanceof HttpException) {
+      const errorDetails = exception.getResponse();
       status = exception.getStatus();
-      message = exception.message;
+      // message = exception.message;
+      message = `${exception.message} | ${errorDetails['message'][0]}`;
       details = exception.stack || exception.message;
     } else if (exception instanceof Error) {
       details = exception.stack || exception.message;
       message = exception.message;
     } else {
       details = JSON.stringify(exception);
+      message = details.message;
     }
 
     const majorException = details.split('\n')[0];
