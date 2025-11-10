@@ -5,7 +5,7 @@ export type CreateSupportTicketDto = {
   message: string;
 };
 
-export type AssignupportTicketDto = {
+export type AssignSupportTicketDto = {
   supportId: number;
   assigneeId: number;
 };

@@ -4,6 +4,13 @@ import { useRouter } from "next/navigation";
 import { BukkaButton } from "@/components/ui";
 import { MapSelector } from "@/features/location/map-selector";
 import { MapProviderEnum } from "@/data/enums/MapProviderEnum";
+import {
+  ArrowLeft,
+  Eraser,
+  Heart,
+  LayoutDashboard,
+  ListOrdered,
+} from "lucide-react";
 
 export default function DashboardMapsPage() {
   const router = useRouter();
@@ -22,16 +29,22 @@ export default function DashboardMapsPage() {
 
       <div className="fixed bottom-0 md:bottom-2 left-0 right-0 z-50 flex md:justify-center overflow-hidden">
         <div className="bg-transparent backdrop-blur rounded-lg shadow-md p-2 flex flex-col md:flex-row gap-3">
+          <BukkaButton onClick={() => router.back()}>
+            <ArrowLeft /> Back
+          </BukkaButton>
           <BukkaButton onClick={() => router.push("overview")}>
+            <LayoutDashboard />
             Dashboard
           </BukkaButton>
           <BukkaButton onClick={() => router.push(`favourites`)}>
+            <Heart />
             Favourites
           </BukkaButton>
           <BukkaButton onClick={() => router.push(`orders`)}>
-            My Orders
+            <ListOrdered /> My Orders
           </BukkaButton>
           <BukkaButton onClick={() => router.replace(`maps`)}>
+            <Eraser />
             Reset
           </BukkaButton>
         </div>

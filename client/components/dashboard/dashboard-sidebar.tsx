@@ -194,7 +194,7 @@ export function DashBoardSidebar({ navItems }: DashBoardSidebarInterface) {
         })}
       </SidebarContent>
       <Separator />
-      <SidebarFooter className="bg-card">
+      <SidebarFooter className="bg-card" style={{ zIndex: 50 }}>
         <SidebarMenu>
           <Link href="/">
             <SidebarMenuItem className="flex items-center gap-2 overflow-hidden py-2 text-sm text-ellipsis capitalize hover:bg-accent hover:text-black rounded-lg">

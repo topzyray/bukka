@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Badge, Button, Card, CardContent } from "@/components/ui";
@@ -11,10 +10,8 @@ import { UserNotification } from "@/data/interfaces/Notification";
 
 export function NotificationCard({
   notification,
-  onUpdate,
 }: {
   notification: UserNotification;
-  onUpdate?: () => void;
 }) {
   const { user } = useAuth();
   const readNotificationMutation = useReadNotificaiton({ userId: user?.id });

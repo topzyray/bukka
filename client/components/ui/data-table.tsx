@@ -43,6 +43,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { SearchBox } from "@/components/ui/search-box";
+import { BukkaButton } from "./button-variants";
 
 export type FilterOption = {
   key: string;
@@ -258,7 +259,7 @@ export function DataTable<TData>({
             <FileText className="mr-2 h-4 w-4" /> Export CSV
           </Button>
 
-          <Button
+          <BukkaButton
             variant="ghost"
             onClick={() => {
               setSearchTerm("");
@@ -269,7 +270,7 @@ export function DataTable<TData>({
             }}
           >
             Reset
-          </Button>
+          </BukkaButton>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">

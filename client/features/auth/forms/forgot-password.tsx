@@ -89,7 +89,7 @@ export function ForgotPasswordForm() {
           {/* Footer Links */}
           <div className="text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              Already received reset email, click{" "}
+              Already received password reset token, click{" "}
               <Link
                 href="/reset-password"
                 className="text-primary hover:underline font-medium"

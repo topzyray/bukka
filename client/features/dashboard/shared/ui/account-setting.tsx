@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { SettingsPageTitleCard } from "../components/setting-title-card";
-import { PasswordUpdateForm } from "../components/password-update-form";
+import { PasswordUpdateForm } from "../forms/password-update-form";
 import { AccountDeletionCard } from "../components/account-deletion-card";
 
 export function AccountSettings() {

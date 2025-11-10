@@ -51,7 +51,7 @@ export default function NotFound() {
               className="flex items-center justify-center gap-2"
             >
               <Search className="w-5 h-5" />
-              Search Restaurants
+              Search Businesses
             </Link>
           </BukkaButton>
 

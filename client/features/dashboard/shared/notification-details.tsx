@@ -1,13 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { UserNotification } from "@/data/interfaces/Notification";
-import { Badge, Card, CardContent, Skeleton } from "@/components/ui";
 import { useNotificationById } from "@/data/queries";
+import { Badge, Card, CardContent, Skeleton } from "@/components/ui";
 
 export function NotificationDetails() {
   const { id } = useParams() as { id: string };

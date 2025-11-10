@@ -39,7 +39,7 @@ export const useCustomMutation = <
         toast.success("Success", {
           description:
             onSuccessMessage ??
-            TextHelper.capitalize((data as any)?.responseMessage) ??
+            (data as any)?.responseMessage ??
             "Operation successful",
         });
       }

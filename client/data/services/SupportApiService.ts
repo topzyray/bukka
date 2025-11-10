@@ -1,5 +1,5 @@
 import { HttpClient } from "@/configs";
-import { AssignupportTicketDto, CreateSupportTicketDto } from "../dtos";
+import { AssignSupportTicketDto, CreateSupportTicketDto } from "../dtos";
 import { supportRoutes } from "@/constants/routes";
 
 export class SupportApiService {
@@ -11,9 +11,9 @@ export class SupportApiService {
     return response?.data;
   }
 
-  static async getSupportByTicketId(supportId: number) {
+  static async getSupportByTicketId(ticketId: string) {
     const response = await HttpClient.getClient().get(
-      `${supportRoutes.getSupportByTicketId}/${supportId}`
+      `${supportRoutes.getSupportByTicketId}/${ticketId}`
     );
     return response?.data;
   }
@@ -21,12 +21,12 @@ export class SupportApiService {
   static async getSupports(params: Record<string, any> = {}) {
     const response = await HttpClient.getClient().get(
       `${supportRoutes.getSupport}`,
-      params
+      { params }
     );
     return response?.data;
   }
 
-  static async assignTicket(requestBody: AssignupportTicketDto) {
+  static async assignTicket(requestBody: AssignSupportTicketDto) {
     const response = await HttpClient.getClient().put(
       `${supportRoutes.assignTicket}`,
       requestBody

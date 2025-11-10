@@ -1,10 +1,14 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+import { TextHelper } from "@/helpers";
+import { Loader2, Trash, View } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import { Support } from "@/data/interfaces/Support";
-import { Button } from "@/components/ui/button";
-import { Edit, Loader2, Trash, View } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { SupportTicketDetailsModal } from "../modals/support-ticket-details-modal";
+import { useAuth } from "@/providers";
+import { UserRoleEnum } from "@/data/enums";
 
 export const supportColumns = (
   onEdit: (data: Support) => void,
@@ -32,11 +36,12 @@ export const supportColumns = (
       return (
         <div
           className={cn(
-            statusColor.light[r.status],
-            `dark:${statusColor.dark[r.status]}`
+            statusColor.light[r?.status],
+            `dark:${statusColor.dark[r?.status]}`,
+            "font-bold uppercase"
           )}
         >
-          {r.status}
+          {TextHelper.capitalize(r?.status)}
         </div>
       );
     },
@@ -50,11 +55,7 @@ export const supportColumns = (
     header: "Name",
     cell: ({ row }) => {
       const r = row.original;
-      return (
-        <div className="flex flex-col">
-          <div className="font-semibold">{r.name}</div>
-        </div>
-      );
+      return <div>{r.name}</div>;
     },
   },
   {
@@ -79,7 +80,7 @@ export const supportColumns = (
     cell: ({ row }) => {
       const r = row.original;
       return (
-        <div className="text-ellipsis" title={r.message}>
+        <div className="max-w-[10rem] truncate" title={r.message}>
           {r.message}
         </div>
       );
@@ -88,44 +89,136 @@ export const supportColumns = (
   {
     accessorKey: "assignee.firstName",
     header: "Assigned To",
+    cell: ({ row }) => {
+      const r = row.original;
+      return (
+        <div
+          className="max-w-[10rem] truncate"
+          title={
+            r.assignee
+              ? `${r.assignee?.firstName} ${r.assignee?.lastName}`
+              : "Not assinged"
+          }
+        >
+          {r.assignee
+            ? `${r.assignee?.firstName} ${r.assignee?.lastName}`
+            : "Not assinged"}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "resolvedAt",
     header: "Resoved At",
+    cell: ({ row }) => {
+      const r = row.original;
+      return (
+        <div
+          className="max-w-[10rem] truncate"
+          title={
+            r.resolvedAt
+              ? TextHelper.getFormattedDate(r.resolvedAt)
+              : "Not resolved"
+          }
+        >
+          {r.resolvedAt
+            ? TextHelper.getFormattedDate(r.resolvedAt)
+            : "Not resolved"}
+        </div>
+      );
+    },
   },
   {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const business = row.original;
+      const support = row.original;
       return (
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" title="View Details">
-            <View size={16} />
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(business)}
-            title="Edit"
-          >
-            <Edit size={16} />
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => onDelete(business.id)}
-            title="Delete"
-          >
-            {isdeleting && currentItemDeleting === business.id ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <Trash size={16} />
-            )}
-          </Button>
-        </div>
+        <ActionCell
+          isdeleting={isdeleting}
+          currentItemDeleting={currentItemDeleting}
+          support={support}
+          onDelete={onDelete}
+        />
       );
     },
   },
 ];
+
+function ActionCell({
+  support,
+  isdeleting,
+  onDelete,
+  currentItemDeleting,
+}: {
+  support: Support;
+  isdeleting: boolean;
+  currentItemDeleting: number | null;
+  onDelete: (id: number) => void;
+}) {
+  const { user } = useAuth();
+  return (
+    <div className="flex gap-2">
+      <SupportTicketDetailsModal
+        ticketId={support?.ticketId}
+        trigger={
+          <Button variant="outline" size="sm" title="View Details">
+            <View size={16} />
+          </Button>
+        }
+      />
+
+      {/* <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onEdit(support)}
+            title="Edit"
+          >
+            <Edit size={16} />
+          </Button> */}
+      {user?.role === UserRoleEnum.ADMIN && (
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={() => onDelete(support?.id)}
+          title="Delete"
+        >
+          {isdeleting && currentItemDeleting === support.id ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <Trash size={16} />
+          )}
+        </Button>
+      )}
+
+      {/* <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <BukkaButton
+                variant="ghost"
+                className="h-8 w-8 p-0"
+                title="More Actions"
+              >
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal />
+              </BukkaButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(support.ticketId)}
+                className="cursor-copy"
+              >
+                Copy ID
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => {}} className="cursor-pointer">
+                Assign to Staff
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
+                Mark as Resolved
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu> */}
+    </div>
+  );
+}
