@@ -67,23 +67,27 @@ import { NotificationSettingsDataAgent } from './DataLayer/DataAgents/Notificati
 import { JwtService } from '@nestjs/jwt';
 import { AppService } from './app.service';
 import { RedisService } from './InfrastructureLayer/Services/redis/RedisService';
+import { QueueService } from './InfrastructureLayer/Services/queue/QueueService';
 import { EmailService } from './InfrastructureLayer/Services/email/EmailService';
 import { KeepAliveService } from './InfrastructureLayer/Services/KeepAliveService';
 import { HttpServiceWrapper } from './InfrastructureLayer/Services/HttpServiceWrapper';
+import { AdminControlService } from './InfrastructureLayer/Services/AdminControlService';
 import { FileUploadService } from './InfrastructureLayer/Services/upload/FileUploadService';
 import { AppConfigurationService } from './UtilityLayer/Configuration/AppConfiguration.service';
 import { RestaurantSearchService } from './InfrastructureLayer/Services/RestaurantSearchService';
 import { NotificationService } from './InfrastructureLayer/Services/notification/NotificationService';
 import { AuthNotificationService } from './InfrastructureLayer/Services/notification/services/AuthNotificationService';
-import { AdminControlService } from './InfrastructureLayer/Services/AdminControlService';
+import { AuthNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/AuthNotificationConsumerService';
 
 // FACTORIES
 import { FileRepository } from './BussinessLayer/FileRepository';
 import { FileFactory } from './InfrastructureLayer/Services/upload/FileFactory';
+import { QueueFactory } from './InfrastructureLayer/Services/queue/QueueFactory';
 import { EmailFactory } from './InfrastructureLayer/Services/email/EmailFactory';
 import { EmailTemplateFactory } from './InfrastructureLayer/Services/email/EmailTemplateFactory';
 
 // PROVIDERS
+import { BullMQProvider } from './InfrastructureLayer/Services/queue/providers/BullMQProvider';
 import { MailgunProvider } from './InfrastructureLayer/Services/email/providers/MailgunProvider';
 import { MailjetProvider } from './InfrastructureLayer/Services/email/providers/MailjetProvider';
 import { LocalDiskProvider } from './InfrastructureLayer/Services/upload/providers/LocalDiskProvider';
@@ -149,6 +153,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     JwtService,
     AppService,
     EmailService,
+    QueueService,
     KeepAliveService,
     FileUploadService,
     NotificationService,
@@ -156,8 +161,10 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     AppConfigurationService,
     AuthNotificationService,
     RestaurantSearchService,
+    AuthNotificationConsumerService,
 
     FileFactory,
+    QueueFactory,
     EmailFactory,
     UserRepository,
     AuthRepository,
@@ -193,6 +200,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     FileReferenceHelper,
     AuthNotificationHelper,
 
+    BullMQProvider,
     MailjetProvider,
     MailgunProvider,
     LocalDiskProvider,

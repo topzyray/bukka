@@ -5,9 +5,11 @@ import {
   IsString,
   IsOptional,
   IsNumber,
+  IsEnum,
 } from 'class-validator';
 import { PaginationDto } from './Base/PaginationDto';
 import { Transform } from 'class-transformer';
+import { SupportStatusEnum } from '../Enums/SupportStatusEnum';
 
 export class CreateSupportDto {
   @ApiProperty({ example: 'Tope Taiwo', required: true })
@@ -65,8 +67,18 @@ export class SupportFilterDto extends PaginationDto {
   @IsString()
   ticketId?: string;
 
+  @ApiProperty({ example: SupportStatusEnum.RESOLVED, required: false })
+  @IsOptional()
+  @IsEnum(SupportStatusEnum)
+  status?: SupportStatusEnum;
+
   @ApiProperty({ example: 'Search by name and email', required: false })
   @IsOptional()
   @IsString()
-  search: string;
+  search?: string;
+
+  @ApiProperty({ example: 'test@gmail.com', required: false })
+  @IsOptional()
+  @IsEmail()
+  email?: string;
 }

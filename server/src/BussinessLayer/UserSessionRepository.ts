@@ -87,8 +87,8 @@ export class UserSessionRepository {
     userId: number,
     deviceId: string,
   ): Promise<BukkaResponse<UserSession>> {
-    const loggedInUser = await UserHelper.getLoggedInUser();
-    await UserHelper.hasAccess(loggedInUser.id);
+    // const loggedInUser = await UserHelper.getLoggedInUser();
+    await UserHelper.hasAccess(userId);
 
     const userSession =
       await this._userSessionDataAgent.getSessionByUserIdAndDeviceId(
@@ -101,7 +101,7 @@ export class UserSessionRepository {
     }
 
     const deletedSession = this._userSessionDataAgent.deleteSessionById(
-      userSession.id,
+      userSession?.id,
     );
 
     return BukkaResponse.DeleteResponse(
