@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Edit, Loader2, Trash } from "lucide-react";
+import { Edit, Loader2, Trash } from "lucide-react";
 import { BusinessCategory } from "@/data/interfaces/BusinessCategory";
 import { TextHelper } from "@/helpers";
 
@@ -14,14 +14,7 @@ export const categoryColumns = (
 ): ColumnDef<BusinessCategory>[] => [
   {
     accessorKey: "name",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Name <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Name",
     cell: ({ row }) => {
       const r = row.original;
       return (
@@ -34,14 +27,7 @@ export const categoryColumns = (
 
   {
     accessorKey: "slug",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Category Slug <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Category Slug",
     cell: ({ row }) => {
       const r = row.original;
       return (
@@ -53,14 +39,7 @@ export const categoryColumns = (
   },
   {
     accessorKey: "type",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Category Type <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Category Type",
     cell: ({ row }) => {
       const r = row.original;
       return (
@@ -76,14 +55,7 @@ export const categoryColumns = (
   {
     id: "dateCreated",
     accessorFn: (row) => row.createdAt,
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Date Created <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Date Created",
     cell: ({ row }) => {
       return (
         <div className="flex flex-col">
@@ -97,14 +69,7 @@ export const categoryColumns = (
   {
     id: "timeCreated",
     accessorFn: (row) => row.createdAt,
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Time Created <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Time Created",
     cell: ({ row }) => {
       return (
         <div className="flex flex-col">
