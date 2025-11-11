@@ -8,14 +8,6 @@ import {
   useCustomQuery,
 } from "./base";
 
-// export const useReviews = ({ businessId }: { businessId: number }) => {
-//   return useCustomQuery<BukkaResponse<PagedResponse<Review[]>>>(
-//     ["business-reviews", businessId],
-//     () => ReviewApiService.getReviews(businessId),
-//     { enabled: !!businessId }
-//   );
-// };
-
 export const useInfiniteReviewsQuery = ({
   businessId,
   filters,
@@ -28,7 +20,7 @@ export const useInfiniteReviewsQuery = ({
   enabled?: boolean;
 }) => {
   return useCustomInfiniteQuery<Review>(
-    ["business-reviews", businessId, JSON.stringify(filters)], // serialize filters
+    ["business-reviews", businessId, JSON.stringify(filters)],
     ({ pageNumber }) =>
       ReviewApiService.getReviews({
         pageNumber,

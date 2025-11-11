@@ -37,7 +37,7 @@ import { LazyMapObserver } from "./components/lazy-map-observer";
 import Link from "next/link";
 import { FavoriteButton } from "./components/favorite-button";
 import { Business } from "@/data/interfaces/Business";
-import { Label, ScrollArea, Separator } from "@/components/ui";
+import { Label, Separator } from "@/components/ui";
 import { TextHelper } from "@/helpers";
 import { BusinessPhotoGallery } from "./components/business-photo-gallery";
 
