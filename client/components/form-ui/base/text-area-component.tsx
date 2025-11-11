@@ -53,7 +53,7 @@ export function TextAreaComponent({
             {formLabel && (
               <FormLabel
                 className={cn(
-                  "-mb-0.5",
+                  "-mb-0.5 dark:border-muted-foreground",
                   isError && "text-red-600",
                   isValid && "text-green-600"
                 )}
@@ -74,14 +74,14 @@ export function TextAreaComponent({
                   disabled={disabled}
                   rows={rows}
                   className={cn(
-                    "w-full resize-none overflow-y-auto",
+                    "w-full resize-none overflow-y-auto dark:border-muted-foreground",
                     Icon && "pl-8",
-                    inputClassName,
                     isError &&
                       "border-red-600 focus-visible:ring-red-600 text-red-700",
                     isValid &&
                       "border-green-600 focus-visible:ring-green-600 text-green-700",
-                    "pr-8 focus:outline-none focus:ring-1 focus:border-green-600"
+                    "pr-8 focus:outline-none focus:ring-1 focus:border-green-600",
+                    inputClassName
                   )}
                   maxLength={maxLength}
                   readOnly={readOnly}

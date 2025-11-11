@@ -124,12 +124,11 @@ export function BusinessDetails(): JSX.Element {
                 priority={!!coverImage?.fullPath}
               />
             ) : (
-              <Image
-                src={"/images/placeholder.jpg"}
-                alt={"business coverImage"}
-                fill
-                className="object-cover"
-              />
+              <div className="w-full h-full warm-gradient flex items-center justify-center">
+                <span className="text-white text-4xl lg:text-6xl font-bold">
+                  {business?.name.charAt(0)}
+                </span>
+              </div>
             )}
             <div className="absolute inset-0 bg-black/28" />
             <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
@@ -212,7 +211,7 @@ export function BusinessDetails(): JSX.Element {
 
                   <Separator />
 
-                  <p className="text-muted-foreground leading-relaxed mb-4">
+                  <p className="text-muted-foreground leading-relaxed">
                     {business.description || "No description provided."}
                   </p>
 
@@ -264,8 +263,8 @@ export function BusinessDetails(): JSX.Element {
                     This business hasn’t uploaded its menu or services yet.
                   </p>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <BukkaButton>Order Menu</BukkaButton>
-                    <BukkaButton variant="secondary">
+                    <BukkaButton size="sm">Order Menu</BukkaButton>
+                    <BukkaButton size="sm" variant="secondary">
                       Request Service
                     </BukkaButton>
                   </div>
@@ -278,7 +277,9 @@ export function BusinessDetails(): JSX.Element {
                   <CardTitle>Customer Reviews</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <BusinessReviews businessId={business?.id} />
+                  <div className="w-full max-h-[35rem] h-full overflow-y-auto">
+                    <BusinessReviews business={business} />
+                  </div>
                 </CardContent>
               </Card>
             </div>

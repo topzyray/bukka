@@ -61,16 +61,14 @@ export class ReviewDataAgent {
     return this.model.findOne(spec);
   }
 
-  async findByBusinessId(
-    businessId: number,
+  async findByReviewByFilters(
+    filter: any,
     pageSize: number,
     pageNumber: number,
   ): Promise<PagedData<Review[]>> {
     const pageData = new PagedData<Review[]>();
     pageData.page = pageNumber;
     pageData.pageSize = pageSize;
-
-    const filter = { field: 'businessId', op: 'eq', value: businessId };
     const spec: QuerySpec = {
       filter,
       sort: [{ field: 'createdAt', direction: 'desc' }],
@@ -89,6 +87,7 @@ export class ReviewDataAgent {
             select: {
               id: true,
               name: true,
+              type: true,
             },
           },
         },

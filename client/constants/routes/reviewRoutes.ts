@@ -8,14 +8,14 @@ type IReviewApi =
   | "getReviewById"
   | "updateReview"
   | "deleteReview"
-  | "getReviewByBusinessId";
+  | "getReviews";
 
 const rawReviewRoutes: Record<IReviewApi, string> = {
   addReview: "/reviews",
   getReviewById: "/reviews",
   updateReview: "/reviews",
   deleteReview: "/reviews",
-  getReviewByBusinessId: "/reviews/business",
+  getReviews: "/reviews",
 };
 
 export const reviewRoutes: Record<IReviewApi, string> =

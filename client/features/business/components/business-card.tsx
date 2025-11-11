@@ -63,19 +63,21 @@ export const BusinessCard = memo(function BusinessCard({
   );
 
   const renderRating = () =>
-    business?.averageRating ? (
-      <div className="flex items-center gap-1">
-        <Star className="w-4 h-4 fill-accent text-accent" />
-        <span className="text-sm font-medium">
-          {business?.averageRating?.toFixed(1)}
-        </span>
+    business?.averageRating || business?.reviewCount ? (
+      <div className="flex items-center gap-3 text-sm font-medium">
+        <div className="flex items-center gap-1">
+          <Star className="w-4 h-4 fill-accent text-accent" />
+          <span>{business?.averageRating?.toFixed(1)}</span>
+        </div>
+        <span>({business?.reviewCount ?? "0"} reviews)</span>
       </div>
     ) : (
-      <div className="flex items-center gap-1">
-        <Star className="w-4 h-4 fill-accent text-accent" />
-        <span className="text-sm font-medium">
-          {business?.averageRating?.toFixed(1) ?? "0.0"}
-        </span>
+      <div className="flex items-center gap-3 text-sm font-medium">
+        <div className="flex items-center gap-1">
+          <Star className="w-4 h-4 fill-accent text-accent" />
+          <span>{business?.averageRating?.toFixed(1) ?? "0.0"}</span>
+        </div>
+        <span>({business?.reviewCount ?? "0"} reviews)</span>
       </div>
     );
 

@@ -74,7 +74,7 @@ export function InputComponent({
             {formLabel && (
               <FormLabel
                 className={cn(
-                  "-mb-0.5",
+                  "-mb-0.5 dark:border-muted-foreground",
                   isError && "text-red-600",
                   isValid && "text-green-600",
                   isPassword && "flex items-center justify-between"
@@ -115,6 +115,7 @@ export function InputComponent({
                       : field.value ?? ""
                   }
                   className={cn(
+                    "dark:border-muted-foreground",
                     Icon && "pl-8",
                     inputClassName,
                     isError &&

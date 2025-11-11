@@ -52,7 +52,7 @@ async function bootstrap() {
     res.status(HttpStatus.NO_CONTENT).send();
   });
 
-  // app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalFilters(new GlobalExceptionFilter());
   app.use(cookieParser());
   app.enableCors({
     origin: [

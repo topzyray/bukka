@@ -10,8 +10,7 @@ const bukkaButtonVariants = cva(
       variant: {
         default:
           "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-accent-foreground dark:hover:bg-accent-foreground/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        destructive: "bg-destructive text-white hover:bg-destructive/90",
         outline:
           "border border-input bg-background text-primary dark:text-white hover:bg-accent hover:text-accent-foreground hover:dark:text-foreground",
         secondary:

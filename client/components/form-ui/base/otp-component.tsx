@@ -46,7 +46,7 @@ export default function OtpInputComponent({
           <FormItem>
             <FormLabel
               className={cn(
-                "-mb-0.5",
+                "-mb-0.5 dark:border-muted-foreground",
                 isError && "text-red-600",
                 isValid && "text-green-600"
               )}
@@ -61,9 +61,13 @@ export default function OtpInputComponent({
                 disabled={disabled}
                 autoFocus={autoFocus}
               >
-                <InputOTPGroup className="w-full">
+                <InputOTPGroup className="w-full dark:border-muted-foreground">
                   {Array.from({ length }).map((_, index) => (
-                    <InputOTPSlot key={index} index={index} className="w-1/6" />
+                    <InputOTPSlot
+                      key={index}
+                      index={index}
+                      className="w-1/6 dark:border-muted-foreground"
+                    />
                   ))}
                 </InputOTPGroup>
               </InputOTP>

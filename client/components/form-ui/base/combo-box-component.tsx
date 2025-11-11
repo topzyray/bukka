@@ -62,7 +62,7 @@ export function ComboboxComponent({
           <FormItem className="flex flex-col space-y-0.5">
             <FormLabel
               className={cn(
-                "-mb-0.5",
+                "-mb-0.5 dark:border-muted-foreground",
                 isError && "text-red-600",
                 isValid && "text-green-600"
               )}
@@ -70,7 +70,10 @@ export function ComboboxComponent({
               {formLabel}
             </FormLabel>
             <Popover>
-              <PopoverTrigger asChild className="py-5 lg:py-6">
+              <PopoverTrigger
+                asChild
+                className="py-5 lg:py-6 dark:border-muted-foreground"
+              >
                 <FormControl>
                   <Button
                     variant="outline"
