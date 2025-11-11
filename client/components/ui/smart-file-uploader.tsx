@@ -6,7 +6,14 @@ import { cn } from "@/lib/utils";
 import { FileHelper } from "@/helpers/file-helper";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFileUpload } from "@/data/mutations/file/use-file-uploader";
-import { Button, Card, CardContent, Label, Input } from "@/components/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  Label,
+  Input,
+  Separator,
+} from "@/components/ui";
 import {
   FilePenIcon,
   LoaderCircle,
@@ -28,6 +35,7 @@ interface ISmartFileUploader<T, P> {
   isMultiple?: boolean;
   useRearCamera?: boolean;
   cameraModalTrigger?: ReactNode;
+  maxFiles?: number;
 }
 
 export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
@@ -41,6 +49,7 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
   isMultiple = false,
   useRearCamera = false,
   cameraModalTrigger,
+  maxFiles,
 }) => {
   const { handleFileInputChange, isUploading } = useFileUpload({
     uploadFn,
@@ -67,6 +76,8 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
   const streamRef = useRef<MediaStream | null>(null);
 
   const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+  const limitReached = maxFiles ? previews.length >= maxFiles : false;
 
   useEffect(() => {
     return () => {
@@ -114,6 +125,27 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
     []
   );
 
+  // const handleFiles = async (filesArg: File[] | FileList | null) => {
+  //   const files = filesArg ? Array.from(filesArg) : [];
+  //   if (!files.length) return;
+
+  //   const validFiles = await FileHelper.validateFile(files);
+  //   const resizedFiles = await Promise.all(
+  //     validFiles.map(async (file) => {
+  //       if (file.size > 2 * 1024 * 1024) {
+  //         return await resizeImage(file, 1024, 1024);
+  //       }
+  //       return file;
+  //     })
+  //   );
+  //   const mapped = resizedFiles.map((file) => ({
+  //     file,
+  //     url: URL.createObjectURL(file),
+  //   }));
+  //   const updated = isMultiple ? [...previews, ...mapped] : mapped;
+  //   setPreviews(updated);
+  // };
+
   const handleFiles = async (filesArg: File[] | FileList | null) => {
     const files = filesArg ? Array.from(filesArg) : [];
     if (!files.length) return;
@@ -127,11 +159,24 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
         return file;
       })
     );
+
     const mapped = resizedFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
     }));
-    const updated = isMultiple ? [...previews, ...mapped] : mapped;
+
+    const maxAllowed = maxFiles ?? Infinity;
+    let updated = isMultiple ? [...previews, ...mapped] : mapped;
+
+    if (updated.length > maxAllowed) {
+      toast.warning("File limit reached", {
+        description: `You can only upload up to ${maxAllowed} file${
+          maxAllowed > 1 ? "s" : ""
+        }.`,
+      });
+      updated = updated.slice(0, maxAllowed);
+    }
+
     setPreviews(updated);
   };
 
@@ -252,7 +297,145 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
     }
   }, [showModal]);
 
-  if (!useCameraModal) {
+  if (isMultiple && !useCameraModal) {
+    return (
+      <Card>
+        <CardContent>
+          <div className="relative">
+            <Card className="p-4">
+              <CardContent>
+                <div className="flex justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={limitReached}
+                  >
+                    <Upload className="w-4 h-4 mr-2" /> Upload
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCameraClick}
+                    disabled={loadingCamera || limitReached}
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    {loadingCamera ? "Opening..." : "Use Camera"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => handleFiles(e.target.files)}
+              className="hidden"
+            />
+
+            {isCameraActive ? (
+              <div className="relative">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="rounded-lg w-full"
+                />
+                <div className="flex justify-center gap-2 mt-2">
+                  <Button size="sm" onClick={handleCapture}>
+                    Capture
+                  </Button>
+                  {isMobile && (
+                    <Button onClick={handleSwitchCamera} variant="outline">
+                      Switch
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setIsCameraActive(false);
+                      stopCamera();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : previews.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3">
+                {previews.map((item, i) => (
+                  <div
+                    key={i}
+                    className="relative group rounded-xl overflow-hidden border"
+                  >
+                    <Image
+                      src={item.url}
+                      alt="preview"
+                      width={200}
+                      height={200}
+                      className="object-cover w-full h-26"
+                    />
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="absolute top-2 right-2 bg-white/60 rounded-full opacity-0 group-hover:opacity-100 transition"
+                      onClick={() => handleRemove(i)}
+                    >
+                      <X className="w-4 h-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <Card className="border-dashed border text-center py-4 min-h-26 flex items-center justify-center mt-4">
+                <CardContent className="text-muted-foreground text-sm">
+                  No image selected yet.
+                </CardContent>
+              </Card>
+            )}
+
+            {!isCameraActive && previews.length > 0 && (
+              <div className=" mt-2 space-y-1">
+                <Separator />
+                <div className="flex justify-end">
+                  <Button
+                    size="sm"
+                    onClick={handleUploadFromModal}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="animate-spin" />
+                        Uploading...
+                      </span>
+                    ) : (
+                      "Upload"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {flash && (
+              <motion.div
+                className="absolute inset-0 bg-primary"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 1, 0] }}
+                transition={{ duration: 0.3 }}
+              />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!useCameraModal && !isMultiple) {
     return (
       <div className={cn("absolute right-4 bottom-1.5")}>
         <Label

@@ -69,10 +69,10 @@ export function ProfileAvatar({
       </Avatar>
       <div className="text-center sm:text-left">
         <h2 className="text-xl font-semibold text-foreground">{fullName}</h2>
-        <p className="text-muted-foreground">@{user?.username}</p>
-        <div className="flex items-center gap-2 mt-2 text-sm text-gray-500 dark:text-foreground">
-          <Shield className="w-4 h-4" />
-          <span>{user.role}</span>
+        <p className="text-muted-foreground font-semibold">@{user?.username}</p>
+        <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground dark:text-foreground font-semibold">
+          <Shield className="w-4 h-4 fill-muted-foreground dark:fill-foreground" />
+          <span className="capitalize">{user?.role}</span>
         </div>
       </div>
     </Card>

@@ -1,4 +1,3 @@
-// components/vendor/services/ServiceManager.tsx
 "use client";
 
 import { useState } from "react";
@@ -12,15 +11,22 @@ import {
   useDeleteService,
   Service,
 } from "@/data/temp/use-services";
-import { Loader2, Plus } from "lucide-react";
+import { Captions, Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
+import {
+  BukkaButton,
+  Separator,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui";
+import { Business } from "@/data/interfaces/Business";
 
-interface Props {
-  businessId: number;
-}
-
-export function ServiceManager({ businessId }: Props) {
-  const { data: services, isLoading } = useGetServices(businessId);
+export function ServiceManager({ business }: { business: Business }) {
+  const { data: services, isLoading } = useGetServices(business.id);
   const createService = useCreateService();
   const updateService = useUpdateService();
   const deleteService = useDeleteService();
@@ -38,7 +44,7 @@ export function ServiceManager({ businessId }: Props) {
         // });
         toast.success("Service updated successfully");
       } else {
-        await createService.mutateAsync({ ...data, businessId });
+        await createService.mutateAsync({ ...data, businessId: business.id });
         toast.success("Service created successfully");
       }
       setOpenForm(false);
@@ -61,32 +67,55 @@ export function ServiceManager({ businessId }: Props) {
   if (isLoading) return <Loader2 className="h-6 w-6 animate-spin" />;
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Services</h2>
-        <Button onClick={() => setOpenForm(true)}>
-          <Plus className="w-4 h-4 mr-2" /> Add Service
-        </Button>
-      </div>
+    <Sheet>
+      <SheetTrigger asChild>
+        <BukkaButton>
+          <Captions /> Service
+        </BukkaButton>
+      </SheetTrigger>
 
-      <ServiceList
-        services={services || []}
-        onEdit={(service) => {
-          setEditData(service);
-          setOpenForm(true);
-        }}
-        onDelete={handleDelete}
-      />
+      <SheetContent className="w-[400px] sm:w-[540px]" style={{ zIndex: 1002 }}>
+        <SheetHeader>
+          <SheetTitle>Menu Management</SheetTitle>
+          <SheetDescription>
+            Manage all business menu for{" "}
+            <span className="capitalize">{business?.name}</span>
+          </SheetDescription>
+        </SheetHeader>
 
-      <ServiceForm
-        open={openForm}
-        onClose={() => {
-          setOpenForm(false);
-          setEditData(null);
-        }}
-        initialData={editData || undefined}
-        onSubmit={handleCreateOrUpdate}
-      />
-    </div>
+        <Separator />
+        <div className="px-4">
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Services</h2>
+              <Button onClick={() => setOpenForm(true)}>
+                <Plus className="w-4 h-4 mr-2" /> Add Service
+              </Button>
+            </div>
+
+            <ServiceForm
+              open={openForm}
+              onClose={() => {
+                setOpenForm(false);
+                setEditData(null);
+              }}
+              initialData={editData || undefined}
+              onSubmit={handleCreateOrUpdate}
+            />
+
+            <Separator />
+
+            <ServiceList
+              services={services || []}
+              onEdit={(service) => {
+                setEditData(service);
+                setOpenForm(true);
+              }}
+              onDelete={handleDelete}
+            />
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }

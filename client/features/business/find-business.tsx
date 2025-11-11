@@ -171,10 +171,10 @@ export function FindBusinessPage() {
                   3000,
                   TextHelper.normalizeText(BusinessTypeEnum.DELIVERY_SERVICE),
                   3000,
-                  TextHelper.normalizeText(BusinessTypeEnum.OTHER) +
-                    " " +
-                    "Services",
-                  3000,
+                  // TextHelper.normalizeText(BusinessTypeEnum.OTHER) +
+                  //   " " +
+                  //   "Services",
+                  // 3000,
                 ]}
                 wrapper="span"
                 repeat={Infinity}

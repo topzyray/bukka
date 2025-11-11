@@ -2,6 +2,23 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import {
+  BukkaButton,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Separator,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui";
+import { Business } from "@/data/interfaces/Business";
+import { AddEditMenuForm } from "../forms/add-edit-menu-form";
+import { Menu, Plus } from "lucide-react";
 
 const data: { items: { id: number; name: string; description: string }[] } = {
   items: [
@@ -13,9 +30,7 @@ const data: { items: { id: number; name: string; description: string }[] } = {
   ],
 };
 
-export const MenuManager: React.FC<{ businessId: string | number }> = ({
-  businessId,
-}) => {
+export const MenuManager: React.FC<{ business: Business }> = ({ business }) => {
   // const qc = useQueryClient();
   // const { data } = useQuery(["menu", businessId], async () => {
   //   const { data } = await axiosClient.get(
@@ -83,55 +98,61 @@ export const MenuManager: React.FC<{ businessId: string | number }> = ({
   // };
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Menu</h3>
-      </div>
+    <Sheet>
+      <SheetTrigger asChild>
+        <BukkaButton>
+          <Menu /> Menu
+        </BukkaButton>
+      </SheetTrigger>
 
-      <div className="space-y-2">
-        {data?.items?.map((item: any) => (
-          <div
-            key={item.id}
-            className="flex items-center justify-between border p-2 rounded-md"
-          >
-            <div>
-              <div className="font-medium">{item.name}</div>
-              <div className="text-sm text-muted-foreground">
-                {item.description}
-              </div>
-            </div>
-            <div>₦{item.price}</div>
+      <SheetContent className="w-[400px] sm:w-[540px]">
+        <SheetHeader>
+          <SheetTitle>Menu Management</SheetTitle>
+          <SheetDescription>
+            Manage all business menu for{" "}
+            <span className="capitalize">{business?.name}</span>
+          </SheetDescription>
+        </SheetHeader>
+
+        <Separator />
+
+        <div className="px-4">
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Add Menu Form</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AddEditMenuForm business={business} isEdit={false} />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>All Menu</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {data?.items?.map((item: any) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between border p-2 rounded-md"
+                    >
+                      <div>
+                        <div className="font-medium">{item.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {item.description}
+                        </div>
+                      </div>
+                      <div>₦{item.price}</div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        ))}
-      </div>
-
-      <div className="pt-4">
-        <h4 className="font-medium">Add item</h4>
-        <input
-          type="text"
-          placeholder="Name"
-          value={form.name}
-          onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
-        />
-        <input
-          type="number"
-          placeholder="Price"
-          value={form.price}
-          onChange={(e) =>
-            setForm((s) => ({ ...s, price: Number(e.target.value) }))
-          }
-        />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) =>
-            setForm((s) => ({ ...s, image: e.target.files?.[0] ?? null }))
-          }
-        />
-        <div className="mt-2">
-          <Button disabled={creating}>Add</Button>
         </div>
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 };

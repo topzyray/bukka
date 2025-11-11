@@ -79,7 +79,7 @@ export function SessionsSettings() {
       />
 
       <div className="flex flex-col lg:flex-row w-full">
-        <div className="w-full rounded-xl shadow-md border dark:border-sidebar-accent overflow-hidden transition-all hover:shadow-lg">
+        <div className="w-full rounded-xl shadow-md border dark:border-muted-foreground overflow-hidden transition-all hover:shadow-lg">
           <div className="">
             {(isLoadingUserSessions || isLoadingActiveSessions) && (
               <div className="flex justify-center items-center py-16 text-muted-foreground">
@@ -116,7 +116,7 @@ export function SessionsSettings() {
               currentSession !== undefined &&
               userSessions &&
               userSessions.length > 0 && (
-                <ul className="divide-y divide-border">
+                <ul className="divide-y divide-muted-foreground">
                   {userSessions.map((session) => {
                     const isExpired =
                       new Date(session.expiresAt).getTime() < Date.now();
@@ -131,7 +131,7 @@ export function SessionsSettings() {
                         )}
                       >
                         <div className="flex flex-col gap-1 min-w-0">
-                          <div className="flex flex-wrap items-center gap-2 text-lg font-medium text-foreground">
+                          <div className="flex flex-wrap items-center gap-2 font-medium text-foreground">
                             <MonitorSmartphone className="w-4 h-4 text-muted-foreground" />
                             <span className="truncate max-w-[230px] sm:max-w-[400px]">
                               {TextHelper.parseUserAgent(session.userAgent)}
@@ -143,13 +143,13 @@ export function SessionsSettings() {
                               </span>
                             )}
                             {isExpired && (
-                              <span className="px-2 py-0.5 text-xs rounded-full bg-destructive/10 text-destructive">
+                              <span className="px-2 py-0.5 text-xs rounded-full bg-destructive/10 text-destructive dark:bg-foreground">
                                 Expired
                               </span>
                             )}
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-3 text-sm sm:text-base text-muted-foreground">
+                          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                             {session.ipAddress && (
                               <span className="flex items-center gap-1">
                                 <Globe className="w-3.5 h-3.5" />
@@ -173,9 +173,9 @@ export function SessionsSettings() {
                         <div className="flex items-center gap-2">
                           <div
                             className={cn(
-                              "text-sm sm:text-base font-medium",
+                              "text-sm font-medium",
                               isExpired
-                                ? "text-destructive"
+                                ? "text-destructive dark:bg-foreground p-1.5 rounded-md"
                                 : "text-green-600 dark:text-green-400"
                             )}
                           >
