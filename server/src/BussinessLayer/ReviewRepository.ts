@@ -62,6 +62,7 @@ export class ReviewRepository {
       reviewCount: newCount,
     } as any);
 
+    await invalidateCache('reviews', {});
     await invalidateCache('reviews', { businessId: dto.businessId });
     await invalidateCache('business', { id: dto.businessId });
 
@@ -74,15 +75,24 @@ export class ReviewRepository {
     return BukkaResponse.GetSingleDataResponse('Review', review);
   }
 
-  async listReviewsByBusiness(businessId: number, filterDto: ReviewFilterDto) {
+  async getReviewsByFilters(filterDto: ReviewFilterDto) {
     return handleCache(
       'reviews',
-      { businessId, ...filterDto },
+      filterDto as Record<string, any>,
       () => {
+        const query = FilterQueryHelper.buildQuery({
+          dto: filterDto,
+          rules: [
+            { field: 'businessId' },
+            { field: 'userId' },
+            { field: 'rating' },
+          ],
+        });
+
         const { pageSize, pageNumber } =
           FilterQueryHelper.extractPagination(filterDto);
-        return this.reviewDataAgent.findByBusinessId(
-          businessId,
+        return this.reviewDataAgent.findByReviewByFilters(
+          query,
           pageSize,
           pageNumber,
         );
@@ -122,7 +132,6 @@ export class ReviewRepository {
       }
     }
 
-    await invalidateCache('reviews', {});
     await invalidateCache('reviews', { businessId: dto.businessId });
     await invalidateCache('business', { id: dto.businessId });
 
@@ -154,6 +163,9 @@ export class ReviewRepository {
         averageRating: Number(newAvg.toFixed(2)),
         reviewCount: newCount,
       } as any);
+
+      await invalidateCache('reviews', { businessId: business.id });
+      await invalidateCache('business', { id: business.id });
     }
 
     return BukkaResponse.DeleteResponse('Review', true);

@@ -96,7 +96,7 @@ export function TagInputComponent<T extends FieldValues>({
             {formLabel && (
               <FormLabel
                 className={cn(
-                  "-mb-0.5",
+                  "-mb-0.5 dark:border-muted-foreground",
                   isError && "text-red-600",
                   isValid && "text-green-600"
                 )}
@@ -109,7 +109,7 @@ export function TagInputComponent<T extends FieldValues>({
               <FormControl>
                 <div
                   className={cn(
-                    "w-full",
+                    "w-full dark:border-muted-foreground",
                     Icon && "pl-8",
                     "focus-within:ring-primary/50 flex flex-wrap items-center gap-1 rounded-md border px-3 focus-within:ring-1 cursor-text",
                     "pr-8",

@@ -372,11 +372,13 @@ export function LocationIQMap({
                     )}
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold">
-                      {b?.averageRating?.toFixed(1) ?? "0.0"}
-                    </span>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                      <span className="font-semibold">
+                        {b?.averageRating?.toFixed(1) ?? "0.0"}
+                      </span>
+                    </div>
                     <span className="opacity-80">
                       ({b?.reviewCount ?? "0"} reviews)
                     </span>

@@ -127,31 +127,32 @@ export function BukkaWaitList() {
           <span className="text-shine">
             Favorite{" "}
             <TypeAnimation
+              speed={{ type: "keyStrokeDelayInMs", value: 150 }}
               sequence={[
                 TextHelper.normalizeText(BusinessTypeEnum.RESTAURANT),
-                5000,
+                3000,
                 TextHelper.normalizeText(BusinessTypeEnum.FAST_FOOD),
-                5000,
+                3000,
                 TextHelper.normalizeText(BusinessTypeEnum.FOOD_VENDOR),
-                5000,
+                3000,
                 TextHelper.normalizeText(BusinessTypeEnum.BAR),
-                5000,
+                3000,
                 TextHelper.normalizeText(BusinessTypeEnum.LOUNGE),
-                5000,
+                3000,
                 TextHelper.normalizeText(BusinessTypeEnum.BAKERY),
-                5000,
+                3000,
                 TextHelper.normalizeText(BusinessTypeEnum.STREET_EATRY),
-                5000,
+                3000,
                 TextHelper.normalizeText(BusinessTypeEnum.GROCERY),
-                5000,
+                3000,
                 TextHelper.normalizeText(BusinessTypeEnum.CATERING),
-                5000,
+                3000,
                 TextHelper.normalizeText(BusinessTypeEnum.DELIVERY_SERVICE),
-                5000,
+                3000,
                 TextHelper.normalizeText(BusinessTypeEnum.OTHER) +
                   " " +
                   "Services",
-                5000,
+                3000,
               ]}
               wrapper="span"
               repeat={Infinity}

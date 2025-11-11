@@ -496,7 +496,7 @@ export const BusinessDetails: React.FC = () => {
                     <CardTitle>Customer Reviews</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <BusinessReviews businessId={business.id} />
+                    <BusinessReviews business={business} />
                   </CardContent>
                 </Card>
               </div>

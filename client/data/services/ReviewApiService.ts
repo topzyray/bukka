@@ -18,9 +18,10 @@ export class ReviewApiService {
     return response?.data;
   }
 
-  static async getReviewByBusinessId(businessId: number) {
+  static async getReviews(params: Record<string, any>) {
     const response = await HttpClient.getClient().get(
-      `${reviewRoutes.getReviewByBusinessId}/${businessId}`
+      `${reviewRoutes.getReviews}`,
+      { params }
     );
     return response?.data;
   }

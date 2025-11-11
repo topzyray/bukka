@@ -7,6 +7,7 @@ export interface Review {
   businessId: number;
   rating: number;
   comment: string;
+  reply: any;
   business: Business;
   user: User;
   createdAt: Date;

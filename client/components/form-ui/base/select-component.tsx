@@ -75,7 +75,7 @@ export function SelectComponent({
             {formLabel && (
               <FormLabel
                 className={cn(
-                  "-mb-0.5",
+                  "-mb-0.5 dark:border-muted-foreground",
                   isError && "text-red-600",
                   isValid && "text-green-600"
                 )}
@@ -115,7 +115,7 @@ export function SelectComponent({
                 <FormControl>
                   <SelectTrigger
                     className={cn(
-                      "w-full pr-8",
+                      "w-full pr-8 dark:border-muted-foreground",
                       "items-center py-2 px-3",
                       Icon && "pl-8",
                       "max-h-24 scrollbar-thin",

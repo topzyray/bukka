@@ -83,7 +83,7 @@ export function BusinessPhotoGallery({
 
                 {/* Overlay for hover (desktop) */}
                 {hasAccessToUpdate && (
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 text-white">
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity hidden lg:flex flex-col items-center justify-center gap-2 text-white">
                     <BukkaButton size="sm" onClick={() => handleMakeCover(p)}>
                       Make Cover
                     </BukkaButton>
@@ -119,7 +119,7 @@ export function BusinessPhotoGallery({
                       size="sm"
                       variant="destructive"
                       onClick={() => handleDelete(p)}
-                      className="p-1 rounded text-xs"
+                      className="p-1 text-xs"
                       disabled={deleteFileMutation.isPending}
                     >
                       {deleteFileMutation.isPending ? (
@@ -140,9 +140,8 @@ export function BusinessPhotoGallery({
 
         {businessImages.length === 0 && (
           <div>
-            <p>
-              No photo yet. You can upload using the <code>Upload Button</code>{" "}
-              below.
+            <p className="text-muted-foreground leading-relaxed">
+              No photo yet.
             </p>
           </div>
         )}

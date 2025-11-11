@@ -15,6 +15,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RatingComponent } from "@/components/form-ui/custom/rating-comonent";
 import { TextAreaComponent } from "@/components/form-ui/base/text-area-component";
+import { useQueryClient } from "@tanstack/react-query";
 
 const reviewSchema = z.object({
   rating: z.number().min(1).max(5),
@@ -40,6 +41,7 @@ export function AddEditReviewForm({
   onSuccess,
   onClose,
 }: IAddEditReviewForm) {
+  const queryClient = useQueryClient();
   const { user } = useAuth();
 
   const form = useForm<ReviewFormValues>({
@@ -60,6 +62,7 @@ export function AddEditReviewForm({
   const updateReview = useUpdateReview({
     onSuccess: () => {
       onSuccess?.();
+      queryClient.invalidateQueries({ queryKey: ["business", businessId] });
     },
   });
 

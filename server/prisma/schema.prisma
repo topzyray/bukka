@@ -159,13 +159,11 @@ model Business {
   cuisines       Json[]
   isVerified     Boolean           @default(false)
   isActive       Boolean           @default(false)
-  rating         Float?            @default(0)
-  totalReviews   Int?              @default(0)
   openingHours   Json?
   socialLinks    Json?
   locationId     Int?
-  averageRating  Int?
-  reviewCount    Int?
+  averageRating  Float?            @default(0)
+  reviewCount    Int?              @default(0)
   location       Location?         @relation(fields: [locationId], references: [id], onDelete: Cascade)
   category       BusinessCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   owner          User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
