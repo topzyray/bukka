@@ -5,12 +5,6 @@ import { useForm, SubmitHandler, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -102,52 +96,45 @@ export function ServiceForm({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {initialData ? "Edit Service" : "Add Service"}
-          </DialogTitle>
-        </DialogHeader>
+    // <Dialog open={open} onOpenChange={onClose}>
+    //   <DialogContent className="max-w-md">
+    //     <DialogHeader>
+    //       <DialogTitle>
+    //         {initialData ? "Edit Service" : "Add Service"}
+    //       </DialogTitle>
+    //     </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <div>
-            <Input
-              placeholder="Service Name"
-              {...form.register("name")}
-              required
-            />
-          </div>
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <div>
+        <Input placeholder="Service Name" {...form.register("name")} required />
+      </div>
 
-          <div>
-            <Textarea
-              placeholder="Description"
-              {...form.register("description")}
-            />
-          </div>
+      <div>
+        <Textarea placeholder="Description" {...form.register("description")} />
+      </div>
 
-          <div>
-            <Input
-              type="number"
-              step="0.01"
-              placeholder="Price (optional)"
-              {...form.register("price")}
-            />
-          </div>
+      <div>
+        <Input
+          type="number"
+          step="0.01"
+          placeholder="Price (optional)"
+          {...form.register("price")}
+        />
+      </div>
 
-          <div className="flex items-center space-x-2">
-            <Switch
-              checked={!!form.watch("isActive")}
-              onCheckedChange={(v) => form.setValue("isActive", !!v)}
-            />
-            <span>Active</span>
-          </div>
+      <div className="flex items-center space-x-2">
+        <Switch
+          checked={!!form.watch("isActive")}
+          onCheckedChange={(v) => form.setValue("isActive", !!v)}
+        />
+        <span>Active</span>
+      </div>
 
-          <Button type="submit" className="w-full">
-            {initialData ? "Update" : "Create"}
-          </Button>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <Button type="submit" className="w-full">
+        {initialData ? "Update" : "Create"}
+      </Button>
+    </form>
+    //   </DialogContent>
+    // </Dialog>
   );
 }

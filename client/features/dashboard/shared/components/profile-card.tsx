@@ -8,12 +8,12 @@ import {
   UserIcon,
   Loader2,
 } from "lucide-react";
-import type { User } from "@/data/interfaces/User";
-import { Coordinate, useUserLocation } from "@/providers";
-import { useEffect, useState } from "react";
-import { Button, Card, Separator } from "@/components/ui";
 import { toast } from "sonner";
 import { TextHelper } from "@/helpers";
+import { useEffect, useState } from "react";
+import type { User } from "@/data/interfaces/User";
+import { Coordinate, useUserLocation } from "@/providers";
+import { Button, Card, Separator } from "@/components/ui";
 
 interface IUserProfileCard {
   user: User;
@@ -59,8 +59,8 @@ export function UserProfileCard({ user, setEditProfile }: IUserProfileCard) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex items-center gap-2">
           <Mail className="w-5 h-5 text-muted-foreground" />
-          <span className="truncate">{user.email}</span>
-          {user.emailConfirmed ? (
+          <span className="truncate">{user?.email}</span>
+          {user?.emailConfirmed ? (
             <CheckCircle className="w-4 h-4 text-green-600" />
           ) : (
             <XCircle className="w-4 h-4 text-red-600" />
@@ -68,8 +68,8 @@ export function UserProfileCard({ user, setEditProfile }: IUserProfileCard) {
         </div>
         <div className="flex items-center gap-2">
           <Phone className="w-5 h-5 text-muted-foreground" />
-          <span>{user.phoneNumber || "N/A"}</span>
-          {user.phoneNumberConfirmed ? (
+          <span>{user?.phoneNumber || "N/A"}</span>
+          {user?.phoneNumberConfirmed ? (
             <CheckCircle className="w-4 h-4 text-green-600" />
           ) : (
             <XCircle className="w-4 h-4 text-red-600" />
@@ -77,10 +77,10 @@ export function UserProfileCard({ user, setEditProfile }: IUserProfileCard) {
         </div>
       </div>
 
-      {user.bio && (
+      {user?.bio && (
         <div>
           <h4 className="font-medium text-foreground mb-1">Bio</h4>
-          <p className="text-sm text-muted-foreground">{user.bio}</p>
+          <p className="text-sm text-muted-foreground">{user?.bio}</p>
         </div>
       )}
 
@@ -96,7 +96,9 @@ export function UserProfileCard({ user, setEditProfile }: IUserProfileCard) {
             className="flex items-center gap-2 hover:cursor-pointer hover:underline"
             onClick={() => {
               window.location.href = userLocation
-                ? `/maps?q=${userLocation?.lat},${userLocation?.lng}`
+                ? `/dashboard/${user?.role?.toLowerCase()}/maps?q=${
+                    userLocation?.lat
+                  },${userLocation?.lng}`
                 : "#";
             }}
           >
@@ -115,11 +117,11 @@ export function UserProfileCard({ user, setEditProfile }: IUserProfileCard) {
         <div className="w-full bg-gray-200 dark:bg-neutral-800 rounded-full h-3">
           <div
             className="bg-primary h-3 rounded-full transition-all"
-            style={{ width: `${(user.onboardingProgress / 3) * 100 || 0}%` }}
+            style={{ width: `${(user?.onboardingProgress / 3) * 100 || 0}%` }}
           ></div>
         </div>
         <p className="text-xs text-muted-foreground mt-1">
-          {(user.onboardingProgress / 3) * 100 || 0}% completed
+          {(user?.onboardingProgress / 3) * 100 || 0}% completed
         </p>
       </div>
 
@@ -134,7 +136,7 @@ export function UserProfileCard({ user, setEditProfile }: IUserProfileCard) {
         </div>
         <div className="flex items-center gap-2">
           <UserIcon className="w-5 h-5 text-muted-foreground" />
-          <span>Joined: {TextHelper.getFormattedDate(user.createdAt)}</span>
+          <span>Joined: {TextHelper.getFormattedDate(user?.createdAt)}</span>
         </div>
       </div>
       <Separator className="border dark:border-sidebar-accent" />
