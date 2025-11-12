@@ -33,6 +33,7 @@ import { NotificationSettingsDataAgent } from 'src/DataLayer/DataAgents/Notifica
 import { UserPersonalizationDataAgent } from 'src/DataLayer/DataAgents/UserPersonalizationDataAgent';
 import { FileRepository } from './FileRepository';
 import { IAdminOverview } from 'src/DataLayer/Abstracts/Interfaces/IAdminOverview';
+import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
 @Injectable()
 export class UserRepository {
   constructor(
@@ -260,6 +261,12 @@ export class UserRepository {
     if (!user) {
       throw new NotFoundException('User not found!');
     }
+    if (user.role === UserRoleEnum.ADMIN) {
+      throw new ConflictException(
+        'Cannot delete the administrator account. Only super admin can perform this action!',
+      );
+    }
+
     await this.userSessionDataAgent.deleteAllUserSessions(userId);
     await this.favoriteDataAgent.deleteAllUserFavorites(userId);
     await this.reviewDataAgent.deleteAllUserReviews(userId);
