@@ -1,3 +1,5 @@
+import { UserReviewsList } from "@/features/dashboard/shared/user-reviews-list";
+
 export default function ReviewsPage() {
-  return <div>All My Reviews</div>;
+  return <UserReviewsList />;
 }

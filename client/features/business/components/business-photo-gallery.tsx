@@ -153,7 +153,9 @@ export function BusinessPhotoGallery({
               useCameraModal
               isMultiple
               uploadFn={FileApiService.uploadFile}
-              cameraModalTrigger={<BukkaButton>Upload Photos</BukkaButton>}
+              cameraModalTrigger={
+                <BukkaButton size="sm">Upload Photos</BukkaButton>
+              }
               extraParams={{
                 referenceType: FileReferenceTypeEnum.BUSINESS,
                 category: FileCategoryEnum.BUSINESS_IMAGES,

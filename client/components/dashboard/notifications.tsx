@@ -191,6 +191,7 @@ export function Notifications() {
       <DropdownMenuContent
         align="start"
         className="max-w-sm w-full p-0 shadow-lg border border-gray-100 dark:border-gray-800"
+        style={{ zIndex: 1000 }}
       >
         {/* Header Section */}
         <div className="flex justify-between items-center p-4">

@@ -59,7 +59,11 @@ export function UserProfileDropdown({ userData }: IUserProfileDropdown) {
           <ChevronDown className="ml-auto" />
         </SidebarMenuButton>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="top" className="w-full min-w-sm space-y-2 p-4">
+      <DropdownMenuContent
+        side="top"
+        className="w-full min-w-sm space-y-2 p-4"
+        style={{ zIndex: 1000 }}
+      >
         <DropdownMenuItem className="text-sm">
           {userData && userData !== null && userData?.avatar ? (
             <Image
