@@ -67,6 +67,16 @@ enum SupportStatus {
   RESOLVED
 }
 
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  FAILED
+}
+
 model File {
   id            Int               @id @default(autoincrement())
   referenceId   Int?
@@ -136,8 +146,11 @@ model User {
   business                Business[]
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
-  location                Location?          @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  location                Location?          @relation(fields: [locationId], references: [id], onDelete: SetNull)
   Support                 Support[]
+  userOrders              Order[]            @relation("UserOrders")
+  vendorOrders            Order[]            @relation("VendorOrders")
+  riderOrders             Order[]            @relation("RiderOrders")
 
   @@index([email])
   @@index([username])
@@ -164,13 +177,16 @@ model Business {
   locationId     Int?
   averageRating  Float?            @default(0)
   reviewCount    Int?              @default(0)
-  location       Location?         @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  category       BusinessCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  location       Location?         @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  category       BusinessCategory? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   owner          User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   reviews        Review[]
   favorites      Favorite[]
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
+  orders         Order[]
+  menus          Menu[]
+  services       Service[]
 
   @@index([ownerId])
   @@index([categoryId])
@@ -312,7 +328,7 @@ model Support {
   message    String
   status     SupportStatus @default(SUBMITTED)
   assigneeId Int?
-  assignee   User?         @relation(fields: [assigneeId], references: [id])
+  assignee   User?         @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
   resolvedAt DateTime?
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
@@ -322,12 +338,8 @@ model Support {
   @@index([assigneeId])
 }
 
-
-
-
-
 model Order {
-  id           Int       @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   userId       Int
   vendorId     Int
   riderId      Int?
@@ -337,13 +349,13 @@ model Order {
   items        Json
   deliveryTime DateTime?
   address      String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
-  user     User     @relation(fields: [userId], references: [id])
-  vendor   User     @relation(fields: [vendorId], references: [id])
-  rider    User?    @relation(fields: [riderId], references: [id])
-  business Business @relation(fields: [businessId], references: [id])
+  user     User     @relation("UserOrders", fields: [userId], references: [id], onDelete: Cascade)
+  vendor   User     @relation("VendorOrders", fields: [vendorId], references: [id], onDelete: Cascade)
+  rider    User?    @relation("RiderOrders", fields: [riderId], references: [id], onDelete: SetNull)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([vendorId])
@@ -351,46 +363,34 @@ model Order {
   @@index([status])
 }
 
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  IN_PROGRESS
-  OUT_FOR_DELIVERY
-  DELIVERED
-  CANCELLED
-  FAILED
-}
-
-
 model Menu {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   businessId  Int
   name        String
   description String?
   price       Float
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  business    Business  @relation(fields: [businessId], references: [id])
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@index([isActive])
 }
 
-
 model Service {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   businessId  Int
   name        String
   description String?
   price       Float
-  duration    Int?      // Duration in minutes
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  duration    Int? // Duration in minutes
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  business    Business  @relation(fields: [businessId], references: [id])
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@index([isActive])
