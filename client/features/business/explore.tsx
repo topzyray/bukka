@@ -186,7 +186,7 @@ export function ExplorePage() {
   };
   return (
     <PageWrapper>
-      <PageWrapperHeader>
+      <PageWrapperHeader className="sticky top-0 backdrop-blur z-50">
         <Header />
       </PageWrapperHeader>
       <PageWrapperContent className="bg-gradient-subtle">

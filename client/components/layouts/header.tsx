@@ -48,8 +48,7 @@ export function Header({ className }: HeaderProps) {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className={cn("sticky top-0 backdrop-blur", className)}
-      style={{ zIndex: 1001 }}
+      className={cn("sticky top-0 backdrop-blur z-50", className)}
     >
       <section className="lg:container mx-auto px-4">
         <section className="flex items-center justify-between h-16">
@@ -109,18 +108,6 @@ export function Header({ className }: HeaderProps) {
                 Map View
               </Link>
             </BukkaButton>
-            {/* <BukkaButton variant="ghost" size="sm" asChild>
-              <Link href="/favorites" className="flex items-center gap-2">
-                <Heart className="w-4 h-4" />
-                Favorites
-              </Link>
-            </BukkaButton> */}
-            {/* <BukkaButton variant="ghost" size="sm" asChild>
-              <Link href="/profile" className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Profile
-              </Link>
-            </BukkaButton> */}
             <BukkaButton
               variant="hero"
               size="sm"
@@ -175,50 +162,27 @@ export function Header({ className }: HeaderProps) {
           className="md:hidden overflow-hidden"
         >
           <section className="py-4 space-y-2">
-            <BukkaButton variant="ghost" size="sm" className="w-full" asChild>
+            <BukkaButton variant="ghost" className="w-full" asChild>
               <Link href="/businesses" className="flex items-center gap-2">
                 <BriefcaseBusiness className="w-4 h-4" />
                 Businesses
               </Link>
             </BukkaButton>
-            <BukkaButton variant="ghost" size="sm" className="w-full" asChild>
+            <BukkaButton variant="ghost" className="w-full" asChild>
               <Link href="/explore" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Explore
               </Link>
             </BukkaButton>
-            <BukkaButton variant="ghost" size="sm" asChild className="w-full ">
+            <BukkaButton variant="ghost" asChild className="w-full ">
               <Link href="/maps" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Map View
               </Link>
             </BukkaButton>
-            {/* <BukkaButton
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start"
-              asChild
-            >
-              <Link href="/favorites" className="flex items-center gap-2">
-                <Heart className="w-4 h-4" />
-                Favorites
-              </Link>
-            </BukkaButton> */}
-            {/* <BukkaButton
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start"
-              asChild
-            >
-              <Link href="/profile" className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Profile
-              </Link>
-            </BukkaButton> */}
             <section className="pt-2">
               <BukkaButton
                 variant="hero"
-                size="sm"
                 className="w-full"
                 asChild
                 onClick={() => router.push(route)}

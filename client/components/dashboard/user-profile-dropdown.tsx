@@ -7,11 +7,10 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { SidebarMenuButton } from "../ui/sidebar";
-import Image from "next/image";
 import {
   ChevronDown,
-  CircleUserRound,
   HelpCircle,
+  Loader2,
   LogOutIcon,
   LucideMail,
   Settings,
@@ -23,59 +22,81 @@ import { useRouter } from "next/navigation";
 import { User } from "@/data/interfaces/User";
 import { useAuth } from "@/providers/auth-provider";
 import TooltipComponent from "../ui/tooltip-component";
+import { FileCategoryEnum } from "@/data/enums";
+import { File } from "@/data/interfaces/File";
+import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar } from "../ui";
 
 interface IUserProfileDropdown {
   userData: User;
 }
 
 export function UserProfileDropdown({ userData }: IUserProfileDropdown) {
-  const { logout } = useAuth();
+  const { logout, userFiles, isLoadingUserFiles } = useAuth();
+  const profileAvatar: File | null | undefined =
+    !isLoadingUserFiles && userFiles && userFiles.length
+      ? userFiles.find(
+          (file) => file.category === FileCategoryEnum.USER_PROFILE_IMAGE
+        )
+      : null;
   const router = useRouter();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <SidebarMenuButton
-          variant="default"
-          size="default"
-          // className="py-4 hover:bg-accent"
-        >
-          {userData && userData !== null && userData?.avatar ? (
-            <Image
-              src={userData?.avatar?.url as string}
-              alt={userData?.firstName}
-              width={30}
-              height={30}
-              className="h-6 w-6 rounded-full"
-            />
-          ) : (
-            <CircleUserRound
-              size={35}
-              // className="text-primary dark:text-white"
-            />
-          )}
+        <SidebarMenuButton variant="default" size="default">
+          <Avatar className="w-6 h-6 border border-primary dark:border-foreground flex justify-center items-center">
+            {isLoadingUserFiles ? (
+              <div>
+                <span>
+                  <Loader2 className="animate-spin" />
+                </span>
+              </div>
+            ) : userFiles ? (
+              <AvatarImage
+                src={profileAvatar?.fullPath as string}
+                alt={userData?.firstName + "profile"}
+                width={30}
+                height={30}
+                className="bg-center"
+              />
+            ) : (
+              <AvatarFallback className="text-xs text-foreground dark:text-foreground">
+                {userData?.firstName?.[0].toUpperCase()}
+                {userData?.lastName?.[0].toUpperCase()}
+              </AvatarFallback>
+            )}
+          </Avatar>
+
           <span className="hidden sm:block">
             {TextHelper.capitalize(userData?.firstName as string)}
           </span>
           <ChevronDown className="ml-auto" />
         </SidebarMenuButton>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        side="top"
-        className="w-full min-w-sm space-y-2 p-4"
-        style={{ zIndex: 1000 }}
-      >
+      <DropdownMenuContent side="top" className="w-full min-w-sm space-y-2 p-4">
         <DropdownMenuItem className="text-sm">
-          {userData && userData !== null && userData?.avatar ? (
-            <Image
-              src={userData?.avatar?.url}
-              alt={userData?.firstName}
-              width={35}
-              height={35}
-              className="h-6 w-6 rounded-full"
-            />
-          ) : (
-            <CircleUserRound size={35} />
-          )}{" "}
+          <Avatar className="w-5 h-5 border border-primary dark:border-muted-foreground flex justify-center items-center">
+            {isLoadingUserFiles ? (
+              <div>
+                <span>
+                  <Loader2 className="animate-spin" />
+                </span>
+              </div>
+            ) : !userFiles ? (
+              <AvatarImage
+                src={profileAvatar?.fullPath as string}
+                alt={userData?.firstName + "profile"}
+                width={35}
+                height={35}
+                className="bg-center"
+              />
+            ) : (
+              <AvatarFallback className="text-[10px] text-foreground dark:text-muted-foreground">
+                {userData?.firstName?.[0].toUpperCase()}
+                {userData?.lastName?.[0].toUpperCase()}
+              </AvatarFallback>
+            )}
+          </Avatar>
           {userData &&
             userData !== null &&
             `${TextHelper.capitalize(
@@ -94,7 +115,9 @@ export function UserProfileDropdown({ userData }: IUserProfileDropdown) {
         />
         <DropdownMenuItem
           onClick={() =>
-            router.push(`/dashboard/${userData?.role.toLowerCase()}/profile`)
+            router.push(
+              `/dashboard/${userData?.role.toLowerCase()}/settings/profile`
+            )
           }
           className="py-2 text-sm"
         >

@@ -39,7 +39,6 @@ function SheetOverlay({
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
         className
       )}
-      style={{ zIndex: 1001 }}
       {...props}
     />
   );
@@ -70,7 +69,6 @@ function SheetContent({
             "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t",
           className
         )}
-        style={{ zIndex: 1002 }}
         {...props}
       >
         {children}

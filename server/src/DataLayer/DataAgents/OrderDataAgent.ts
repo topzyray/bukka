@@ -1,3 +1,9 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { Order } from 'src/DomainLayer/Models/Order';
+import { PagedData } from 'src/DomainLayer/Models/PagedData';
+import { DatabaseConstant } from 'src/DomainLayer/Constants/DatabaseConstant';
+import type { IDatabaseAdapter, ModelProxy } from '../Adapters/DatabaseAdapter';
+
 @Injectable()
 export class OrderDataAgent {
   private readonly model: ModelProxy<Order>;
@@ -13,7 +19,51 @@ export class OrderDataAgent {
   }
 
   async findById(id: number): Promise<Order | null> {
-    return this.model.findOne({ filter: { field: 'id', op: 'eq', value: id } });
+    return this.model.findOne({
+      filter: { field: 'id', op: 'eq', value: id },
+      extras: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              phoneNumber: true,
+            },
+          },
+          vendor: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              phoneNumber: true,
+            },
+          },
+          rider: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              phoneNumber: true,
+            },
+          },
+          business: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getById(id: number) {
+    return this.findById(id);
   }
 
   async findByFilters(
@@ -32,6 +82,44 @@ export class OrderDataAgent {
       filter,
       sort: [{ field: 'createdAt', direction: 'desc' }],
       pagination: { page: pageNumber, pageSize },
+      extras: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              phoneNumber: true,
+            },
+          },
+          vendor: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              phoneNumber: true,
+            },
+          },
+          rider: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              phoneNumber: true,
+            },
+          },
+          business: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+            },
+          },
+        },
+      },
     });
 
     return pageData;

@@ -16,8 +16,11 @@ import { AppController } from './app.controller';
 import { UserController } from './ServiceLayer/Controllers/UserController';
 import { AuthController } from './ServiceLayer/Controllers/AuthController';
 import { FileController } from './ServiceLayer/Controllers/FileController';
+import { MenuController } from './ServiceLayer/Controllers/MenuController';
+import { OrderController } from './ServiceLayer/Controllers/OrderController';
 import { ReviewController } from './ServiceLayer/Controllers/ReviewController';
 import { HealthController } from './ServiceLayer/Controllers/HealthController';
+import { ServiceController } from './ServiceLayer/Controllers/ServiceController';
 import { SupportController } from './ServiceLayer/Controllers/SupportController';
 import { BusinessController } from './ServiceLayer/Controllers/BusinessController';
 import { LocationController } from './ServiceLayer/Controllers/LocationController';
@@ -36,6 +39,9 @@ import { NotificationSettingsController } from './ServiceLayer/Controllers/Notif
 import { UserRepository } from './BussinessLayer/UserRepository';
 import { AuthRepository } from './BussinessLayer/AuthRepository';
 import { TokenRepository } from './BussinessLayer/TokenRepository';
+import { ServiceRepository } from './BussinessLayer/ServiceRepository';
+import { MenuRepository } from './BussinessLayer/MenuRepository';
+import { OrderRepository } from './BussinessLayer/OrderRepository';
 import { ReviewRepository } from './BussinessLayer/ReviewRepository';
 import { SupportRepository } from './BussinessLayer/SupportRepository';
 import { FavoriteRepository } from './BussinessLayer/FavoriteRepository';
@@ -51,7 +57,10 @@ import { NotificationSettingsRepository } from './BussinessLayer/NotificationSet
 // DATA AGENTS
 import { FileDataAgent } from './DataLayer/DataAgents/FileDataAgent';
 import { UserDataAgent } from './DataLayer/DataAgents/UserDataAgent';
+import { MenuDataAgent } from './DataLayer/DataAgents/MenuDataAgent';
+import { OrderDataAgent } from './DataLayer/DataAgents/OrderDataAgent';
 import { ReviewDataAgent } from './DataLayer/DataAgents/ReviewDataAgent';
+import { ServiceDataAgent } from './DataLayer/DataAgents/ServiceDataAgent';
 import { SupportDataAgent } from './DataLayer/DataAgents/SupportDataAgent';
 import { LocationDataAgent } from './DataLayer/DataAgents/LocationDataAgent';
 import { WaitlistDataAgent } from './DataLayer/DataAgents/WaitlistDataAgent';
@@ -138,6 +147,9 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     FavoriteController,
     BusinessCategoryController,
     BusinessController,
+    MenuController,
+    ServiceController,
+    OrderController,
     LocationController,
     ReviewController,
     UserManagementController,
@@ -169,8 +181,11 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     UserRepository,
     AuthRepository,
     FileRepository,
+    MenuRepository,
     TokenRepository,
+    OrderRepository,
     ReviewRepository,
+    ServiceRepository,
     SupportRepository,
     WaitlistRepository,
     BusinessRepository,
@@ -185,7 +200,10 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
 
     UserDataAgent,
     FileDataAgent,
+    MenuDataAgent,
+    OrderDataAgent,
     ReviewDataAgent,
+    ServiceDataAgent,
     SupportDataAgent,
     WaitlistDataAgent,
     LocationDataAgent,

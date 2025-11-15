@@ -273,6 +273,10 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
       }
     } catch (err) {
       console.error("Camera switch error:", err);
+      toast.error("Camera switch error", {
+        description:
+          "Unable to switch camera. Please grant permission to use camera!",
+      });
     } finally {
       setSwitching(false);
     }
@@ -485,7 +489,6 @@ export const SmartFileUploader: React.FC<ISmartFileUploader<any, any>> = ({
         {showModal && (
           <motion.div
             className="fixed inset-0 bg-black/70 flex items-center justify-center p-4"
-            style={{ zIndex: 1001 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

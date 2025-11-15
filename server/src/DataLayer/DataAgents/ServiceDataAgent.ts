@@ -1,3 +1,9 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { Service } from 'src/DomainLayer/Models/Service';
+import { PagedData } from 'src/DomainLayer/Models/PagedData';
+import { DatabaseConstant } from 'src/DomainLayer/Constants/DatabaseConstant';
+import type { IDatabaseAdapter, ModelProxy } from '../Adapters/DatabaseAdapter';
+
 @Injectable()
 export class ServiceDataAgent {
   private readonly model: ModelProxy<Service>;
@@ -13,7 +19,20 @@ export class ServiceDataAgent {
   }
 
   async findById(id: number): Promise<Service | null> {
-    return this.model.findOne({ filter: { field: 'id', op: 'eq', value: id } });
+    return this.model.findOne({
+      filter: { field: 'id', op: 'eq', value: id },
+      extras: {
+        include: {
+          business: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+            },
+          },
+        },
+      },
+    });
   }
 
   async findByFilters(
@@ -32,6 +51,17 @@ export class ServiceDataAgent {
       filter,
       sort: [{ field: 'createdAt', direction: 'desc' }],
       pagination: { page: pageNumber, pageSize },
+      extras: {
+        include: {
+          business: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+            },
+          },
+        },
+      },
     });
 
     return pageData;

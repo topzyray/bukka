@@ -1,3 +1,13 @@
+import { Menu } from 'src/DomainLayer/Models/Menu';
+import { Inject, Injectable } from '@nestjs/common';
+import { PagedData } from 'src/DomainLayer/Models/PagedData';
+import { DatabaseConstant } from 'src/DomainLayer/Constants/DatabaseConstant';
+import {
+  type IDatabaseAdapter,
+  ModelProxy,
+  QuerySpec,
+} from '../Adapters/DatabaseAdapter';
+
 @Injectable()
 export class MenuDataAgent {
   private readonly model: ModelProxy<Menu>;
@@ -16,6 +26,10 @@ export class MenuDataAgent {
     return this.model.findOne({ filter: { field: 'id', op: 'eq', value: id } });
   }
 
+  async getById(id: number) {
+    return this.findById(id);
+  }
+
   async findByFilters(
     filter: any,
     pageSize: number,
@@ -32,6 +46,16 @@ export class MenuDataAgent {
       filter,
       sort: [{ field: 'createdAt', direction: 'desc' }],
       pagination: { page: pageNumber, pageSize },
+      extras: {
+        include: {
+          business: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
     });
 
     return pageData;
