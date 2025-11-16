@@ -86,7 +86,7 @@ export function PhoneNumberInput({
               <FormLabel
                 className={cn(
                   "-mb-0.5 dark:border-muted-foreground",
-                  isError && "text-red-600",
+                  isError && "text-red-600 dark:text-red-400",
                   isValid && "text-green-600"
                 )}
               >
@@ -125,7 +125,7 @@ export function PhoneNumberInput({
                     "focus-visible:border-ring focus-visible:ring-primary/50 focus-visible:ring-[1px]",
                     "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
                     isError &&
-                      "border-red-600 focus-visible:ring-red-600 text-red-700",
+                      "border-red-600 dark:border-red-400 focus-visible:ring-red-600 dark:focus-visible:ring-red-400 text-red-600 dark:text-red-400",
                     isValid &&
                       "border-green-600 focus-visible:ring-green-600 text-green-700",
                     "pr-8 focus:outline-none focus:ring-0 focus:border-none",
@@ -156,14 +156,14 @@ export function PhoneNumberInput({
 
               {/* Right validation icons */}
               {isError && (
-                <XCircle className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-red-600 pointer-events-none" />
+                <XCircle className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-red-600 dark:text-red-400 pointer-events-none" />
               )}
               {isValid && (
                 <CheckCircle2 className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600 pointer-events-none" />
               )}
             </section>
             {isError && (
-              <FormMessage className="-mt-2 text-left">
+              <FormMessage className="-mt-2 text-left dark:text-red-400">
                 {errors[formName as string]?.message}
               </FormMessage>
             )}

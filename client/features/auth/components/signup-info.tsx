@@ -31,11 +31,7 @@ const roles: {
   },
 ];
 
-export default function SignUpInfo({
-  setOpenForm,
-}: {
-  setOpenForm: () => any;
-}) {
+export function SignUpInfo({ setOpenForm }: { setOpenForm: () => any }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}

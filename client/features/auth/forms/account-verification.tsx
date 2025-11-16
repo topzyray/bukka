@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useCallback, useEffect } from "react";
+import Link from "next/link";
+import { z } from "zod";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
+import { useCallback, useEffect } from "react";
+import { Form } from "../../../components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { Form } from "../../../components/ui/form";
-import Link from "next/link";
+import { OtpInputComponent } from "../../../components/form-ui/base/otp-component";
 import { useAccountVerification } from "@/data/mutations/auth/use-accountverification";
-import OtpInputComponent from "../../../components/form-ui/base/otp-component";
 
 const accountVerificationSchema = z.object({
   token: z
@@ -28,7 +28,7 @@ type AccountVerificationFormData = z.infer<typeof accountVerificationSchema>;
 
 export function AccountVerificationForm() {
   const form = useForm<AccountVerificationFormData>({
-    mode: "all",
+    mode: "onSubmit",
     resolver: zodResolver(accountVerificationSchema),
     defaultValues: {
       token: "",
@@ -119,18 +119,21 @@ export function AccountVerificationForm() {
 
           <div className="text-center space-y-2">
             <p className="text-sm text-muted-foreground">
+              Request new email verification token{" "}
               <Link
                 href="/request-email-verification"
-                className="text-primary hover:underline font-medium"
+                className="text-primary dark:text-foreground hover:underline font-medium"
+                onClick={(e) => e.stopPropagation()}
               >
-                Request new verification token
+                Here
               </Link>
             </p>
             <p className="text-sm text-muted-foreground">
               Already verified?{" "}
               <Link
                 href="/signin"
-                className="text-primary hover:underline font-medium"
+                className="text-primary dark:text-foreground hover:underline font-medium"
+                onClick={(e) => e.stopPropagation()}
               >
                 Signin
               </Link>

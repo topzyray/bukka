@@ -135,7 +135,7 @@ export function UserReviewsList() {
           <Star className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-semibold">No reviews yet</h3>
           <p className="text-muted-foreground mb-6">
-            You haven’t reviewed any businesses yet.
+            You haven’t reviewed any businesses yet or no filter matched.
           </p>
           <BukkaButton asChild>
             <Link href="/businesses">Explore Businesses</Link>

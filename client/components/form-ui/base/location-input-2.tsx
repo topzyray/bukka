@@ -108,7 +108,7 @@ export default function LocationInput2({
             <FormLabel
               className={cn(
                 "-mb-0.5 dark:border-muted-foreground",
-                isError && "text-red-600",
+                isError && "text-red-600 dark:text-red-400",
                 isValid && "text-green-600"
               )}
             >
@@ -151,7 +151,7 @@ export default function LocationInput2({
                 />
               </FormControl>
             </section>
-            <FormMessage>
+            <FormMessage className="dark:text-red-400">
               {errors?.coordinates?.lat?.message ||
                 errors?.coordinates?.long?.message ||
                 errors?.coordinates?.placeId?.message}

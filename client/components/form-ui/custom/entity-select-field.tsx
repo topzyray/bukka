@@ -67,7 +67,7 @@ export function SelectFieldCustom({
               <FormLabel
                 className={cn(
                   "-mb-0.5",
-                  isError && "text-red-600",
+                  isError && "text-red-600 dark:text-red-400",
                   isValid && "text-green-600"
                 )}
               >
@@ -101,7 +101,7 @@ export function SelectFieldCustom({
                         Icon && "pl-8",
                         "overflow-y-auto max-h-24 scrollbar-thin",
                         inputClassName,
-                        isError && "border-red-600",
+                        isError && "border-red-600 dark:border-red-400",
                         isValid && "border-green-600"
                       )}
                     >
@@ -129,14 +129,14 @@ export function SelectFieldCustom({
               </Select>
 
               {isError && (
-                <XCircle className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-red-600 pointer-events-none" />
+                <XCircle className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-red-600 dark:text-red-400 pointer-events-none" />
               )}
               {isValid && (
                 <CheckCircle2 className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600 pointer-events-none" />
               )}
             </div>
 
-            <FormMessage className="-mt-2 text-left" />
+            <FormMessage className="-mt-2 text-left dark:text-red-400" />
           </FormItem>
         );
       }}

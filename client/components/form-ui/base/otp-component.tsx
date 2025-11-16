@@ -24,7 +24,7 @@ interface IOtpInputComponentProps {
   description?: string;
 }
 
-export default function OtpInputComponent({
+export function OtpInputComponent({
   formControl,
   formName,
   formLabel,
@@ -47,7 +47,7 @@ export default function OtpInputComponent({
             <FormLabel
               className={cn(
                 "-mb-0.5 dark:border-muted-foreground",
-                isError && "text-red-600",
+                isError && "text-red-600 dark:text-red-400",
                 isValid && "text-green-600"
               )}
             >
@@ -78,7 +78,7 @@ export default function OtpInputComponent({
               <FormDescription>{description}</FormDescription>
             )}
 
-            <FormMessage />
+            <FormMessage className="dark:text-red-400" />
           </FormItem>
         );
       }}
