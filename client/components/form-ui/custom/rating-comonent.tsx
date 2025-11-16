@@ -34,7 +34,7 @@ export function RatingComponent({
                   className={`cursor-pointer transition-colors ${
                     star <= field.value
                       ? "text-yellow-500 fill-yellow-500"
-                      : "text-primary"
+                      : "text-primary dark:text-muted-foreground"
                   }`}
                   onClick={() => !readOnly && !disabled && field.onChange(star)}
                 />

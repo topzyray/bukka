@@ -24,7 +24,6 @@ import { BusinessSocialLinks } from "@/features/business/components/business-soc
 import { BusinessInfoCard } from "@/features/business/components/business-info-card";
 import { BusinessMenuAndServices } from "@/features/business/components/business-menu-and-service";
 import { BusinessHero } from "@/features/business/components/business-hero";
-import { OrdersTable } from "../vendor/components/order-table";
 import { Edit } from "lucide-react";
 import { useAuth } from "@/providers";
 

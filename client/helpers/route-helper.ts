@@ -40,4 +40,30 @@ export class RouteHelper {
         throw new Error("Invalid role!");
     }
   }
+
+  static businessDetailsLink(
+    pathname: string,
+    userRole: string,
+    businessId: number
+  ) {
+    if (!businessId) return "#";
+
+    const businessIdSegment = `/${businessId}`;
+    const isDashboard = pathname.startsWith("/dashboard");
+
+    if (userRole === UserRoleEnum.USER && isDashboard) {
+      return `/dashboard/user/favourites${businessIdSegment}`;
+    }
+
+    if (
+      (userRole === UserRoleEnum.ADMIN ||
+        userRole === UserRoleEnum.VENDOR ||
+        userRole === UserRoleEnum.VENDOR) &&
+      isDashboard
+    ) {
+      return `/dashboard/${userRole.toLowerCase()}/businesses${businessIdSegment}`;
+    }
+
+    return `/businesses${businessIdSegment}`;
+  }
 }

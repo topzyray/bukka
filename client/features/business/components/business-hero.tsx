@@ -1,11 +1,18 @@
-import { Button } from "@/components/ui";
+import Image from "next/image";
+import { Button, SmartFileUploader } from "@/components/ui";
 import { Business } from "@/data/interfaces/Business";
 import { File } from "@/data/interfaces/File";
 import { Loader2, Share2, Star } from "lucide-react";
-import Image from "next/image";
-import React from "react";
 import { FavoriteButton } from "./favorite-button";
 import { toast } from "sonner";
+import { FileApiService } from "@/data/services";
+import {
+  FileCategoryEnum,
+  FileReferenceTypeEnum,
+  UserRoleEnum,
+} from "@/data/enums";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/providers";
 
 export function BusinessHero({
   isLoadingFiles,
@@ -16,6 +23,9 @@ export function BusinessHero({
   isLoadingFiles: boolean;
   coverImage: File | null | undefined;
 }) {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
   const handleShare = async () => {
     try {
       if (!business) return;
@@ -92,6 +102,40 @@ export function BusinessHero({
           />
         </div>
       </div>
+
+      {user &&
+        [UserRoleEnum.ADMIN, UserRoleEnum.VENDOR].includes(
+          user?.role as UserRoleEnum
+        ) && (
+          <div className="absolute top-12 right-0">
+            <div className="relative">
+              <SmartFileUploader
+                title="Add Business Images"
+                isMultiple={true}
+                maxFiles={1}
+                useCameraModal
+                uploadFn={FileApiService.uploadFile}
+                // cameraModalTrigger={
+                //   <BukkaButton size="sm">Upload Photos</BukkaButton>
+                // }
+                extraParams={{
+                  referenceType: FileReferenceTypeEnum.BUSINESS,
+                  category: FileCategoryEnum.BUSINESS_COVER,
+                  referenceId: business?.id,
+                  isPublic: true,
+                  metadata: {
+                    altText: `${business?.name} - cover image`,
+                  },
+                }}
+                onUploadSuccess={() => {
+                  queryClient.invalidateQueries({
+                    queryKey: ["business-files", business?.id],
+                  });
+                }}
+              />
+            </div>
+          </div>
+        )}
     </div>
   );
 }

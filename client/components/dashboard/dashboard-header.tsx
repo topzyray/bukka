@@ -13,10 +13,7 @@ interface DashboardHeader {
 
 export function DashboardHeader({ dashboardTitle, userData }: DashboardHeader) {
   return (
-    <header
-      className="bg-card text-sidebar-foreground fixed top-0 z-50 flex w-full items-center justify-between border-2 px-2 py-2 sm:px-4 rounded"
-      style={{ zIndex: 1001 }}
-    >
+    <header className="bg-card text-sidebar-foreground fixed top-0 z-50 flex w-full items-center justify-between border-2 px-2 py-2 sm:px-4 rounded">
       <section className="flex items-center gap-2">
         <CustomTrigger />
         <section className="flex items-center gap-2">

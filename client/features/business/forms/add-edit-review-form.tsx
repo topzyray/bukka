@@ -3,10 +3,9 @@
 import { z } from "zod";
 import { useEffect } from "react";
 import { useAuth } from "@/providers";
-import { Form } from "@/components/ui";
+import { BukkaButton, Form } from "@/components/ui";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
 import { Review } from "@/data/interfaces/Review";
 import {
   useCreateReview,
@@ -15,7 +14,6 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RatingComponent } from "@/components/form-ui/custom/rating-comonent";
 import { TextAreaComponent } from "@/components/form-ui/base/text-area-component";
-import { useQueryClient } from "@tanstack/react-query";
 
 const reviewSchema = z.object({
   rating: z.number().min(1).max(5),
@@ -41,7 +39,6 @@ export function AddEditReviewForm({
   onSuccess,
   onClose,
 }: IAddEditReviewForm) {
-  const queryClient = useQueryClient();
   const { user } = useAuth();
 
   const form = useForm<ReviewFormValues>({
@@ -62,7 +59,6 @@ export function AddEditReviewForm({
   const updateReview = useUpdateReview({
     onSuccess: () => {
       onSuccess?.();
-      queryClient.invalidateQueries({ queryKey: ["business", businessId] });
     },
   });
 
@@ -118,7 +114,7 @@ export function AddEditReviewForm({
           />
 
           <div className="flex justify-end gap-2 w-full">
-            <Button
+            <BukkaButton
               size="sm"
               type="submit"
               disabled={busy || !form.formState.isValid}
@@ -130,24 +126,24 @@ export function AddEditReviewForm({
               ) : (
                 "Submit Review"
               )}
-            </Button>
+            </BukkaButton>
 
-            <Button
+            <BukkaButton
               size="sm"
               variant="ghost"
               onClick={() => form.reset()}
               type="button"
             >
               Reset
-            </Button>
-            <Button
+            </BukkaButton>
+            <BukkaButton
               size="sm"
               variant="outline"
               onClick={() => onClose?.()}
               type="button"
             >
               Cancel
-            </Button>
+            </BukkaButton>
           </div>
         </div>
       </form>

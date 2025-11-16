@@ -1,14 +1,25 @@
 export enum CacheTTLPolicyEnum {
-  BUSINESS_DETAIL = 1800,
-  BUSINESS_LIST = 900,
-  CATEGORY = 86400,
-  REVIEW = 300,
-  LOCATION = 600,
-  NOTIFICATION_SETTING = 86400,
-  PROFILE = 120,
-  USER_LIST = 300,
-  NOTIFICATION = 60,
-  FILE = 3600,
-  ANALYTICS = 300,
-  USER_FAVORITE = 300,
+  BUSINESS_DETAIL = 1800, // 30 min
+  BUSINESS_LIST = 900, // 15 min
+  CATEGORY = 86400, // 24 hours
+  REVIEW = 300, // 5 min
+  LOCATION = 600, // 10 min
+  NOTIFICATION_SETTING = 86400, // 24 hours
+  PROFILE = 120, // 2 min
+  USER_LIST = 300, // 5 min
+  NOTIFICATION = 60, // 1 min
+  FILE = 3600, // 1 hour
+  ANALYTICS = 300, // 5 min
+  USER_FAVORITE = 300, // 5 min
+  ORDERS = 5, // 5 seconds
+  ORDER_DETAILS = 5, // 5 seconds
+  ORDER_HISTORY = 300, // 5 min;
+  MENU = 900, // 15 minutes
+  MENU_DETAILS = 300, // 5 min;
+  MENU_AVAILABILITY = 60, // 1 min;
+  SERVICES = 3600, // 1 hour
+  SERVICE_DETAILS = 1800, // 30 min
+  SERVICE_HOURS = 300, // 5 min;
+  SERVICE_AVAILABILITY = 60, // 1 min;
+  SWR_BUFFER = 10, // buffer time in seconds for stale-while-revalidate
 }

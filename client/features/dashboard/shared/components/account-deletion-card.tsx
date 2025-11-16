@@ -66,11 +66,12 @@ export function AccountDeletionCard() {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
-              <AlertDialogAction>
+              <AlertDialogAction asChild>
                 <Button
                   variant="destructive"
                   disabled={busy}
                   onClick={handleDeleteAccount}
+                  className="bg-destructive dark:bg-destructive"
                 >
                   {busy ? "Deleting..." : "Yes, Delete My Account"}
                 </Button>

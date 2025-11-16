@@ -6,8 +6,8 @@ export class OrderApiService {
     return response?.data;
   }
 
-  static async getOrders() {
-    const response = await HttpClient.getClient().get(`${""}`);
+  static async getOrders(params: Record<string, any>) {
+    const response = await HttpClient.getClient().get(`${""}`, { params });
     return response?.data;
   }
 

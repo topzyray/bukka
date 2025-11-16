@@ -29,9 +29,6 @@ export interface User {
   favorites: any;
   createdAt: string;
   updatedAt: string;
-  avatar: {
-    url: string;
-  };
   preferences: {
     cuisines: string[];
     priceRange: [number, number];

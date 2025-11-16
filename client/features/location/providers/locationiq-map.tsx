@@ -37,6 +37,7 @@ import { FavoriteButton } from "../../business/components/favorite-button";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Star, View } from "lucide-react";
 import { RecenterButton } from "../components/recenter-button";
+import { CustomZoomControl } from "../components/custom-zoom";
 
 const ICONS: Record<BusinessTypeEnum, L.Icon> = {
   [BusinessTypeEnum.RESTAURANT]: IconHelper.createColoredIcon(
@@ -281,10 +282,12 @@ export function LocationIQMap({
     >
       <MapContainer
         center={[marker.lat, marker.lng]}
+        zoomControl={false}
         zoom={zoom}
         scrollWheelZoom
         style={{ height: "100%", width: "100%" }}
       >
+        <CustomZoomControl />
         <TileLayer
           url={tileUrl}
           attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
@@ -428,22 +431,12 @@ export function LocationIQMap({
       </MapContainer>
 
       {showSearchPlaces && (
-        <div
-          style={{
-            zIndex: 499,
-          }}
-          className="absolute top-2.5 left-1/2 transform -translate-x-1/2 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-[14rem] sm:max-w-[18rem] w-full"
-        >
+        <div className="absolute top-2.5 left-1/2 transform -translate-x-1/2 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-[14rem] sm:max-w-[18rem] w-full">
           <SearchPlacesWithAutocomplete />
         </div>
       )}
       {showLegend && (
-        <div
-          style={{
-            zIndex: 499,
-          }}
-          className="absolute bottom-4.5 right-0.5 bg-background backdrop-blur-md p-2 rounded shadow-md text-xs space-y-2 max-h-60 sm:max-h-max overflow-auto"
-        >
+        <div className="absolute bottom-4.5 right-0.5 bg-background backdrop-blur-md p-2 rounded shadow-md text-xs space-y-2 max-h-60 sm:max-h-max overflow-auto">
           {Object.entries(icons).map(([key]) => {
             let icon: string = `/icons/pin/${key.toLowerCase()}.svg`;
             switch (key) {

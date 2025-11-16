@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
-import { Store, Users, Star, TrendingUp, Eye, DollarSign } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -21,8 +19,11 @@ import {
   LineChart,
   Line,
 } from "recharts";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { BukkaButton } from "@/components/ui/button-variants";
+import { Store, Users, Star, TrendingUp, Eye, DollarSign } from "lucide-react";
 
 // Mock data for restaurant metrics
 const weeklyVisitors = [
@@ -45,6 +46,8 @@ const monthlyRevenue = [
 ];
 
 export function VendorOverview() {
+  const router = useRouter();
+
   const stats = [
     {
       title: "Monthly Visitors",
@@ -110,8 +113,18 @@ export function VendorOverview() {
           </p>
         </div>
         <div className="flex gap-2">
-          <BukkaButton variant="outline">Edit Profile</BukkaButton>
-          <BukkaButton variant="hero">View Public Page</BukkaButton>
+          <BukkaButton
+            variant="outline"
+            onClick={() => router.push(`settings/profile`)}
+          >
+            Edit Profile
+          </BukkaButton>
+          <BukkaButton
+            variant="hero"
+            onClick={() => router.push("/businesses")}
+          >
+            View Public Page
+          </BukkaButton>
         </div>
       </div>
 

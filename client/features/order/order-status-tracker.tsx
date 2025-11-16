@@ -1,14 +1,15 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { useOrders } from "@/data/queries";
+import { useOrdersQuery } from "@/data/queries";
 
 interface Props {
   businessId: string;
 }
 
 export const OrderStatusTracker: React.FC<Props> = ({ businessId }) => {
-  const { data: orders } = useOrders();
+  const { data: ordersData } = useOrdersQuery({});
+  const orders = ordersData?.responseData?.data ?? [];
 
   if (!orders || orders.length === 0) {
     return <p className="text-sm text-muted-foreground">No orders yet.</p>;
