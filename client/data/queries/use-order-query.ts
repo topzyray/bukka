@@ -34,6 +34,33 @@ export const useOrdersQuery = ({
   );
 };
 
+export const useVendorsOrder = ({
+  filters = {},
+  pageNumber = 1,
+  pageSize = 10,
+  enabled = true,
+}: {
+  filters?: Record<string, any>;
+  pageNumber?: number;
+  pageSize?: number;
+  enabled?: boolean;
+}) => {
+  return useCustomQuery<BukkaResponse<PagedResponse<Order[]>>, Error>(
+    ["orders", filters, pageNumber, pageSize],
+    (params?: QueryParams) =>
+      OrderApiService.getOrders({
+        pageNumber: params?.pageNumber ?? pageNumber,
+        pageSize: params?.pageSize ?? pageSize,
+        ...filters,
+        ...params,
+      }),
+    {
+      params: { pageNumber, pageSize, ...filters },
+      enabled,
+    }
+  );
+};
+
 export const useOrderDetailsQuery = ({
   orderId,
   enabled = true,
