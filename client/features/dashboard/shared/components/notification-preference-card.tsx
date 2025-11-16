@@ -114,7 +114,7 @@ export function NotificationPreferencesCard() {
         )}
 
         {settings && (
-          <div className="space-y-4">
+          <div className="space-y-4 divide-y dark:divide-muted-foreground">
             <SettingToggle
               label="Email Notificatons"
               name="isEmailTurnedOn"

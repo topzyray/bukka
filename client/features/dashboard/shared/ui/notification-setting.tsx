@@ -36,7 +36,7 @@ export function NotificationSettings() {
       />
 
       <div className="flex flex-col lg:flex-row">
-        <div className="max-w-4xl w-full rounded-xl shadow-md border dark:border-sidebar-accent overflow-hidden transition-all hover:shadow-lg">
+        <div className="w-full rounded-xl shadow-md border dark:border-sidebar-accent overflow-hidden transition-all hover:shadow-lg">
           <div className="">
             {isLoadingSettings && (
               <div className="flex justify-center items-center py-16 text-muted-foreground capitalize">

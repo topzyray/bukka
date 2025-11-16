@@ -15,7 +15,16 @@ export const useOrderMutation = () => {
 
       const prevOrders = queryClient.getQueryData<Order[]>(["orders"]) || [];
 
-      const optimisticOrder: Order = {
+      // const optimisticOrder: Order = {
+      //   id: `temp-${Date.now()}`,
+      //   businessId: newOrder.businessId,
+      //   itemName: newOrder.itemName,
+      //   quantity: newOrder.quantity,
+      //   note: newOrder.note,
+      //   status: "pending",
+      //   createdAt: new Date().toISOString(),
+      // };
+      const optimisticOrder = {
         id: `temp-${Date.now()}`,
         businessId: newOrder.businessId,
         itemName: newOrder.itemName,
@@ -65,7 +74,7 @@ export const useOrderStatusMutation = (businessId: number) => {
 
       const prevOrders = queryClient.getQueryData<Order[]>(["orders"]) || [];
 
-      const optimisticOrder: Order = {
+      const optimisticOrder = {
         id: `temp-${Date.now()}`,
         businessId: newOrder.businessId,
         itemName: newOrder.itemName,
@@ -74,6 +83,15 @@ export const useOrderStatusMutation = (businessId: number) => {
         status: "pending",
         createdAt: new Date().toISOString(),
       };
+      // const optimisticOrder: Order = {
+      //   id: `temp-${Date.now()}`,
+      //   businessId: newOrder.businessId,
+      //   itemName: newOrder.itemName,
+      //   quantity: newOrder.quantity,
+      //   note: newOrder.note,
+      //   status: "pending",
+      //   createdAt: new Date().toISOString(),
+      // };
 
       queryClient.setQueryData(["orders"], [...prevOrders, optimisticOrder]);
 

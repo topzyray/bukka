@@ -74,11 +74,11 @@ export function ServiceManager({ business }: { business: Business }) {
         </BukkaButton>
       </SheetTrigger>
 
-      <SheetContent className="w-[400px] sm:w-[540px]" style={{ zIndex: 1002 }}>
+      <SheetContent className="w-[400px] sm:w-[540px]">
         <SheetHeader>
-          <SheetTitle>Menu Management</SheetTitle>
+          <SheetTitle>Service Management</SheetTitle>
           <SheetDescription>
-            Manage all business menu for{" "}
+            Manage all business services for{" "}
             <span className="capitalize">{business?.name}</span>
           </SheetDescription>
         </SheetHeader>

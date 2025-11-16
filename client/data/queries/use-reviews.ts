@@ -36,32 +36,32 @@ export const useInfiniteReviewsQuery = ({
   );
 };
 
-export const useUserReviews = ({
+export const useUserAllReviewsQuery = ({
+  userId,
   pageNumber = 1,
-  search = "",
   filters = {},
   pageSize = 10,
-  enabled,
+  enabled = true,
 }: {
+  userId: number;
   pageNumber?: number;
-  search?: string;
   filters?: Record<string, any>;
   pageSize?: number;
-  enabled: boolean;
+  enabled?: boolean;
 }) => {
   return useCustomQuery<BukkaResponse<PagedResponse<Review[]>>, Error>(
-    ["user-reviews", search, filters, pageNumber, pageSize],
+    ["user-reviews", userId, filters, pageNumber, pageSize],
     (params?: QueryParams) =>
       ReviewApiService.getReviews({
         pageNumber: params?.pageNumber ?? pageNumber,
         pageSize: params?.pageSize ?? pageSize,
-        search: params?.search ?? search,
+        userId,
         ...filters,
         ...params,
       }),
     {
-      params: { pageNumber, pageSize, search, ...filters },
-      enabled,
+      params: { pageNumber, pageSize, userId, ...filters },
+      enabled: !!userId && enabled,
     }
   );
 };

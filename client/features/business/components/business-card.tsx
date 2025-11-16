@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Business } from "@/data/interfaces/Business";
 import { useBusinessFiles } from "@/data/queries/use-business-files";
 import { FileCategoryEnum } from "@/data/enums";
@@ -19,6 +19,7 @@ import { FavoriteButton } from "./favorite-button";
 import { BusinessHelper } from "../helper/bussiness-helper";
 import { PlanMyJourneyButton } from "../ui/plan-my-journey";
 import { useAuth } from "@/providers";
+import { TextHelper } from "@/helpers";
 
 interface IBusinessCard {
   business: Business;
@@ -37,6 +38,7 @@ export const BusinessCard = memo(function BusinessCard({
 }: IBusinessCard) {
   const [imageError, setImageError] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const { user } = useAuth();
   const { data: businessFilesApiData, isLoading: isLoadingFiles } =
@@ -64,7 +66,7 @@ export const BusinessCard = memo(function BusinessCard({
 
   const renderRating = () =>
     business?.averageRating || business?.reviewCount ? (
-      <div className="flex items-center gap-3 text-sm font-medium">
+      <div className="flex items-center flex-wrap gap-1 text-sm font-medium">
         <div className="flex items-center gap-1">
           <Star className="w-4 h-4 fill-accent text-accent" />
           <span>{business?.averageRating?.toFixed(1)}</span>
@@ -72,7 +74,7 @@ export const BusinessCard = memo(function BusinessCard({
         <span>({business?.reviewCount ?? "0"} reviews)</span>
       </div>
     ) : (
-      <div className="flex items-center gap-3 text-sm font-medium">
+      <div className="flex items-center flex-wrap gap-1 text-sm font-medium">
         <div className="flex items-center gap-1">
           <Star className="w-4 h-4 fill-accent text-accent" />
           <span>{business?.averageRating?.toFixed(1) ?? "0.0"}</span>
@@ -100,7 +102,7 @@ export const BusinessCard = memo(function BusinessCard({
       >
         <Card className="overflow-hidden shadow-card hover:shadow-elegant h-full transition-smooth py-0">
           <CardContent className="p-3 flex items-center gap-3">
-            <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+            <div className="relative w-16 h-16 lg:w-20 lg:h-20 rounded-lg overflow-hidden flex-shrink-0">
               {!imageError && coverImage ? (
                 <Image
                   src={coverImage?.fullPath}
@@ -122,14 +124,17 @@ export const BusinessCard = memo(function BusinessCard({
 
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-sm truncate hover:text-foreground">
-                {business?.name}
+                {business?.name}{" "}
+                <Badge className="capitalize">
+                  {TextHelper.normalizeText(business?.type)}
+                </Badge>
               </h3>
               <p className="text-xs text-muted-foreground truncate">
                 {business?.location?.address ?? business?.description}
               </p>
-              <div className="flex items-center gap-2 mt-1">
-                {renderRating()}
-                {renderDistance()}
+              <div className="flex flex-col gap-2 mt-1">
+                <div className="lg:self-start">{renderRating()}</div>
+                <div className="lg:self-start">{renderDistance()}</div>
               </div>
             </div>
 
@@ -192,7 +197,10 @@ export const BusinessCard = memo(function BusinessCard({
           <div className="space-y-3">
             <div>
               <h3 className="font-semibold text-lg truncate group-hover:text-foreground transition-colors">
-                {business?.name}
+                {business?.name}{" "}
+                <Badge className="uppercase">
+                  {TextHelper.normalizeText(business?.type)}
+                </Badge>
               </h3>
               <p className="text-sm text-muted-foreground truncate">
                 {business?.location?.address ?? business?.description}
@@ -286,7 +294,31 @@ export const BusinessCard = memo(function BusinessCard({
                 size="sm"
                 className="flex-1"
                 type="button"
-                onClick={() => router.push(`/businesses/${business?.id}`)}
+                onClick={() => {
+                  if (
+                    pathname.startsWith(
+                      `/dashboard/${user?.role?.toLowerCase()}/favourites`
+                    )
+                  ) {
+                    router.push(
+                      `/dashboard/${user?.role?.toLowerCase()}/favourites/${
+                        business?.id
+                      }`
+                    );
+                  } else if (
+                    pathname.startsWith(
+                      `/dashboard/${user?.role?.toLowerCase()}/businesses`
+                    )
+                  ) {
+                    router.push(
+                      `/dashboard/${user?.role?.toLowerCase()}/businesses/${
+                        business?.id
+                      }`
+                    );
+                  } else {
+                    router.push(`/businesses/${business?.id}`);
+                  }
+                }}
                 asChild
               >
                 <Info className="w-3 h-3 mr-1" />

@@ -586,7 +586,7 @@ export function CreateEditBusinessForm({
               formName="description"
               formLabel="Business Description (optional)"
               formPlaceholder="Short description about your business"
-              inputClassName="min-h-[120px]"
+              rows={5}
               disabled={busy}
             />
 

@@ -27,15 +27,12 @@ export class ReviewRepository {
     private readonly businessDataAgent: BusinessDataAgent,
   ) {}
 
-  // Create review and incrementally update business aggregated rating
   async createReview(dto: CreateReviewDto) {
     const loggedInUser = await UserHelper.getLoggedInUser();
 
-    // Check business existence
     const business = await this.businessDataAgent.findById(dto.businessId);
     if (!business) throw new NotFoundException('Business not found');
 
-    // Ensure one review per user per business
     const existing = await this.reviewDataAgent.findByUserAndBusiness(
       loggedInUser.id,
       dto.businessId,
@@ -43,7 +40,6 @@ export class ReviewRepository {
     if (existing)
       throw new BadRequestException('You have already reviewed this business');
 
-    // Create review
     const review = await this.reviewDataAgent.createReview({
       userId: loggedInUser.id,
       businessId: dto.businessId,
@@ -51,7 +47,6 @@ export class ReviewRepository {
       comment: dto.comment,
     } as any);
 
-    // Update business aggregates (simple incremental calculation)
     const prevAvg = business.averageRating ?? 0;
     const prevCount = business.reviewCount ?? 0;
     const newCount = prevCount + 1;
@@ -123,7 +118,6 @@ export class ReviewRepository {
       if (business) {
         const prevAvg = business.averageRating;
         const prevCount = business.reviewCount;
-        // recompute average: (prevAvg*prevCount - oldRating + newRating)/prevCount
         const newAvg =
           (prevAvg * prevCount - oldRating + dto.rating) / prevCount;
         await this.businessDataAgent.updateBusiness(existing.businessId, {
@@ -132,6 +126,7 @@ export class ReviewRepository {
       }
     }
 
+    await invalidateCache('reviews', {});
     await invalidateCache('reviews', { businessId: dto.businessId });
     await invalidateCache('business', { id: dto.businessId });
 
@@ -147,7 +142,6 @@ export class ReviewRepository {
 
     await this.reviewDataAgent.deleteReview(id);
 
-    // Update business aggregates: decrement count and recompute average (safe fallback: if count becomes 0 set avg to 0)
     const business = await this.businessDataAgent.findById(existing.businessId);
     if (business) {
       const prevAvg = business.averageRating ?? 0;
@@ -156,7 +150,6 @@ export class ReviewRepository {
       let newAvg = 0;
       if (newCount === 0) newAvg = 0;
       else {
-        // approximate: (prevAvg * prevCount - oldRating) / newCount
         newAvg = (prevAvg * prevCount - existing.rating) / newCount;
       }
       await this.businessDataAgent.updateBusiness(existing.businessId, {
@@ -164,6 +157,7 @@ export class ReviewRepository {
         reviewCount: newCount,
       } as any);
 
+      await invalidateCache('reviews', {});
       await invalidateCache('reviews', { businessId: business.id });
       await invalidateCache('business', { id: business.id });
     }
