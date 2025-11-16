@@ -1,12 +1,5 @@
 "use client";
 
-import { User } from "@/data/interfaces/User";
-import { DashBoardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { getDashboardConfig } from "@/utils";
-import { UserRoleEnum } from "@/data/enums";
-import { useAuth } from "@/providers/auth-provider";
-import { DashboardHeader } from "../dashboard/dashboard-header";
 import {
   BackButton,
   PageWrapper,
@@ -15,6 +8,13 @@ import {
   PageWrapperHeader,
   Separator,
 } from "../ui";
+import { UserRoleEnum } from "@/data/enums";
+import { getDashboardConfig } from "@/utils";
+import { User } from "@/data/interfaces/User";
+import { useAuth } from "@/providers/auth-provider";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { DashboardHeader } from "../dashboard/dashboard-header";
+import { DashBoardSidebar } from "@/components/dashboard/dashboard-sidebar";
 
 interface IDashboardLayout {
   defaultOpen: boolean;

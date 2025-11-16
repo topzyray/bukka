@@ -1,27 +1,27 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { z } from "zod";
-import { BukkaButton } from "@/components/ui/button-variants";
 import {
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Link from "next/link";
-import { InputComponent } from "../../../components/form-ui/base/input-component";
-import { Lock, Mail, ShieldCheck, User } from "lucide-react";
-import { Processing } from "../../../components/loaders/processing";
-import { SelectComponent } from "../../../components/form-ui/base/select-component";
-import { Form } from "../../../components/ui/form";
-import { useSignUp } from "@/data/mutations/auth/use-signup";
-import { UserRoleEnum } from "@/data/enums";
-import { useGlobalState } from "@/providers/global-state-provider";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui";
+import { useForm } from "react-hook-form";
+import { UserRoleEnum } from "@/data/enums";
+import { Form } from "../../../components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useSignUp } from "@/data/mutations/auth/use-signup";
+import { Lock, Mail, ShieldCheck, User } from "lucide-react";
+import { BukkaButton } from "@/components/ui/button-variants";
+import { useGlobalState } from "@/providers/global-state-provider";
+import { Processing } from "../../../components/loaders/processing";
+import { InputComponent } from "../../../components/form-ui/base/input-component";
+import { SelectComponent } from "../../../components/form-ui/base/select-component";
 
 const signUpSchema = z.object({
   role: z.enum(UserRoleEnum),
@@ -47,7 +47,7 @@ export const SignUpForm = ({ onBack }: { onBack: () => void }) => {
   const { signupAs } = useGlobalState();
 
   const form = useForm<SignUpFormData>({
-    mode: "all",
+    mode: "onSubmit",
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       role: signupAs as UserRoleEnum,
@@ -73,10 +73,10 @@ export const SignUpForm = ({ onBack }: { onBack: () => void }) => {
     >
       <section className="space-y-5">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-primary">
+          <CardTitle className="text-2xl font-bold text-primary dark:text-foreground">
             Join Bukka
           </CardTitle>
-          <CardDescription className="text-primary/80">
+          <CardDescription className="text-muted-foreground">
             Create your account to start discovering amazing restaurants
           </CardDescription>
         </CardHeader>
@@ -156,12 +156,17 @@ export const SignUpForm = ({ onBack }: { onBack: () => void }) => {
               Already have an account?{" "}
               <Link
                 href="/signin"
-                className="text-primary hover:underline font-medium"
+                className="text-primary dark:text-foreground hover:underline font-medium"
               >
                 Sign In
               </Link>
             </p>
-            <Button type="button" variant="link" onClick={onBack}>
+            <Button
+              type="button"
+              variant="link"
+              onClick={onBack}
+              className="dark:text-foreground"
+            >
               Back
             </Button>
           </div>

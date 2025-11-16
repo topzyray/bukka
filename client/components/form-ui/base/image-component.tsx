@@ -74,7 +74,7 @@ export default function ImageComponent({
             <FormLabel
               className={cn(
                 "-mb-0.5 dark:border-muted-foreground",
-                isError && "text-red-600",
+                isError && "text-red-600 dark:text-red-400",
                 isValid && "text-green-600"
               )}
             >
@@ -110,7 +110,7 @@ export default function ImageComponent({
                 }}
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="dark:text-red-400" />
 
             {previews.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">

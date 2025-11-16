@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { RouteGuard } from "@/guards/route-guard";
 import { ThemeToggle } from "@/components/ui/mode-toggle";
 import { BackgroundIcons } from "@/components/ui/background-icons";
+import { BackgroundCarousel } from "@/components/animation/bg-carousel";
 
 interface IAuthLayout {
   children: ReactNode;
@@ -18,8 +19,9 @@ export default function AuthLayout({ children }: IAuthLayout) {
   return (
     <RouteGuard isProtected={false}>
       <section className="relative min-h-screen flex flex-col">
+        <BackgroundCarousel />
         <header className="p-4 flex justify-between items-center">
-          <section className="absolute top-2 right-0 bg-white dark:bg-primary rounded-full">
+          <section className="absolute top-2 right-0 bg-white dark:bg-muted-foreground rounded-full">
             <ThemeToggle />
           </section>
         </header>

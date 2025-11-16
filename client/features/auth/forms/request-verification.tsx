@@ -1,16 +1,16 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import { z } from "zod";
+import { cn } from "@/lib/utils";
+import { Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
+import { Form } from "../../../components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Mail } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { Form } from "../../../components/ui/form";
-import Link from "next/link";
 import { InputComponent } from "../../../components/form-ui/base/input-component";
 import { useRequestConfirmationEmail } from "@/data/mutations/auth/use-requestconfirmationemail";
 
@@ -24,7 +24,7 @@ export function RequestAccountVerificationForm() {
   const { submitRequest, submitingRequest } = useRequestConfirmationEmail();
 
   const form = useForm<RequestAccountFormData>({
-    mode: "all",
+    mode: "onSubmit",
     resolver: zodResolver(requestAccountSchema),
     defaultValues: {
       email: "",
@@ -91,19 +91,19 @@ export function RequestAccountVerificationForm() {
 
           <div className="text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              Already have token?{" "}
+              Already receive email verification token?{" "}
               <Link
-                href="/reset-password"
-                className="text-primary hover:underline font-medium"
+                href="/confirm-email"
+                className="text-primary dark:text-foreground hover:underline font-medium"
               >
                 Click here
               </Link>
             </p>
             <p className="text-sm text-muted-foreground">
-              Already have verified?{" "}
+              Already verified?{" "}
               <Link
                 href="/signin"
-                className="text-primary hover:underline font-medium"
+                className="text-primary dark:text-foreground hover:underline font-medium"
               >
                 Signin
               </Link>

@@ -182,13 +182,13 @@ export const USER: TDashboardNavigation = [
     hasSubmenu: false,
     isSidebarNav: true,
   },
-  {
-    title: "Recommendations",
-    url: "/dashboard/user/recommendations",
-    icon: "SquarePen",
-    hasSubmenu: false,
-    isSidebarNav: true,
-  },
+  // {
+  //   title: "Recommendations",
+  //   url: "/dashboard/user/recommendations",
+  //   icon: "SquarePen",
+  //   hasSubmenu: false,
+  //   isSidebarNav: true,
+  // },
   {
     title: "My Activites",
     url: "/dashboard/user/activities",
