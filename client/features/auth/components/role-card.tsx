@@ -26,7 +26,7 @@ export function RoleCard({
       transition={{ type: "spring", stiffness: 300, delay }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-6 bg-muted/30 rounded-xl border hover-lift cursor-pointer"
+      className="p-6 bg-muted/30 rounded-xl border dark:border-muted-foreground hover-lift cursor-pointer"
       onClick={() => {
         setSignUpAs(role as UserRoleEnum);
         action();

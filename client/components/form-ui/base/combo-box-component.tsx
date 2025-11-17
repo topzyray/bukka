@@ -63,7 +63,7 @@ export function ComboboxComponent({
             <FormLabel
               className={cn(
                 "-mb-0.5 dark:border-muted-foreground",
-                isError && "text-red-600",
+                isError && "text-red-600 dark:text-red-400",
                 isValid && "text-green-600"
               )}
             >
@@ -132,7 +132,7 @@ export function ComboboxComponent({
               </PopoverContent>
             </Popover>
             <FormDescription>{formDescription}</FormDescription>
-            <FormMessage />
+            <FormMessage className="dark:text-red-400" />
           </FormItem>
         );
       }}

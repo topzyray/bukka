@@ -2,26 +2,26 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import React, { useState } from "react";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
+  X,
+  Menu,
   Search,
   MapPin,
-  Menu,
-  X,
-  LayoutDashboard,
-  FormInputIcon,
   FormInput,
+  FormInputIcon,
+  LayoutDashboard,
   BriefcaseBusiness,
 } from "lucide-react";
-import { BukkaButton } from "@/components/ui/button-variants";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { RouteHelper } from "@/helpers";
 import { useRouter } from "next/navigation";
+import { User } from "@/data/interfaces/User";
+import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "../ui/mode-toggle";
 import { useAuth } from "@/providers/auth-provider";
-import { RouteHelper } from "@/helpers";
-import { User } from "@/data/interfaces/User";
+import { BukkaButton } from "@/components/ui/button-variants";
 
 interface HeaderProps {
   className?: string;
@@ -57,7 +57,8 @@ export function Header({ className }: HeaderProps) {
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
-              className="w-18 h-14 flex items-center justify-center mx-auto hover:cursor-pointer dark:bg-white/80 dark:p-0.5 dark:rounded dark:backdrop-blur"
+              // className="w-18 h-14 flex items-center justify-center mx-auto hover:cursor-pointer dark:bg-white/80 dark:p-0.5 dark:rounded dark:backdrop-blur"
+              className="w-18 h-14 flex items-center justify-center mx-auto hover:cursor-pointer dark:drop-shadow-[0_0_6px_rgba(255,255,255,0.9)]"
               // onClick={() => router.push("/")}
             >
               <Image

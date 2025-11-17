@@ -75,7 +75,7 @@ export function InputComponent({
               <FormLabel
                 className={cn(
                   "-mb-0.5 dark:border-muted-foreground",
-                  isError && "text-red-600",
+                  isError && "text-red-600 dark:text-red-400",
                   isValid && "text-green-600",
                   isPassword && "flex items-center justify-between"
                 )}
@@ -119,7 +119,7 @@ export function InputComponent({
                     Icon && "pl-8",
                     inputClassName,
                     isError &&
-                      "border-red-600 focus-visible:ring-red-600 text-red-700",
+                      "border-red-600 dark:border-red-400 focus-visible:ring-red-600 dark:focus-visible:ring-red-400 text-red-600 dark:text-red-400",
                     isValid &&
                       "border-green-600 focus-visible:ring-green-600 text-green-700",
                     "pr-8 focus:outline-none focus:ring-0 focus:border-none"
@@ -130,7 +130,7 @@ export function InputComponent({
 
               {/* Right validation icons */}
               {isError && (
-                <XCircle className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-red-600 pointer-events-none" />
+                <XCircle className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-red-600 dark:text-red-400 pointer-events-none" />
               )}
               {isValid && (
                 <CheckCircle2 className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600 pointer-events-none" />
@@ -145,7 +145,8 @@ export function InputComponent({
                 <p
                   className={cn(
                     "text-sm",
-                    passwordStrength === "Weak" && "text-red-600",
+                    passwordStrength === "Weak" &&
+                      "text-red-600 dark:text-red-400",
                     passwordStrength === "Medium" && "text-yellow-600",
                     passwordStrength === "Strong" && "text-green-600"
                   )}
@@ -154,7 +155,7 @@ export function InputComponent({
                 </p>
               )}
 
-            <FormMessage className="-mt-2 text-left" />
+            <FormMessage className="-mt-2 text-left dark:text-red-400" />
           </FormItem>
         );
       }}

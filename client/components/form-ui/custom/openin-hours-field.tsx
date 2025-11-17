@@ -77,10 +77,6 @@ export function OpeningHoursField({
           return (
             <div
               key={field.id}
-              // className={cn(
-              //   "relative flex flex-col gap-3 border rounded-lg bg-muted/30 p-4 transition hover:bg-muted/50",
-              //   "sm:grid sm:grid-cols-2 md:grid-cols-4 md:gap-4"
-              // )}
               className={cn(
                 "w-full relative flex flex-col gap-3 border rounded-lg bg-muted/30 p-4 transition hover:bg-muted/50",
                 "w-full sm:grid sm:grid-cols-2 lg:grid-cols-4 md:gap-4"
@@ -161,7 +157,6 @@ export function OpeningHoursField({
               />
 
               {/* === Remove button === */}
-              {/* <div className="flex "> */}
               <Button
                 type="button"
                 variant="destructive"
@@ -172,7 +167,6 @@ export function OpeningHoursField({
                 <X className="h-4 w-4 mr-1" />
                 <span className="hidden lg:inline">Remove</span>
               </Button>
-              {/* </div> */}
             </div>
           );
         })}

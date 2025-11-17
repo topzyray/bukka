@@ -1,17 +1,17 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import { z } from "zod";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Mail, Lock } from "lucide-react";
+import { Form } from "../../../components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useSignIn } from "@/data/mutations/auth/use-signin";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { Form } from "../../../components/ui/form";
-import { useSignIn } from "@/data/mutations/auth/use-signin";
-import Link from "next/link";
 import { InputComponent } from "../../../components/form-ui/base/input-component";
 
 const signInSchema = z.object({
@@ -25,7 +25,7 @@ export function SignInForm() {
   const { signInUser, isSigningIn } = useSignIn();
 
   const form = useForm<SignInFormData>({
-    mode: "all",
+    mode: "onSubmit",
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
@@ -76,6 +76,15 @@ export function SignInForm() {
                 isPassword
                 showPasswordStrength={false}
               />
+
+              <div>
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-primary dark:text-foreground hover:underline"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
 
               <BukkaButton
                 type="submit"
@@ -139,17 +148,21 @@ export function SignInForm() {
 
           {/* Footer Links */}
           <div className="text-center">
-            <Link
-              href="/forgot-password"
-              className="text-sm text-primary hover:underline"
-            >
-              Forgot your password?
-            </Link>
+            <p className="text-sm text-muted-foreground mt-2">
+              Didn't receive email verification?{" "}
+              <Link
+                href="/request-email-verification"
+                className="text-primary dark:text-foreground hover:underline font-medium"
+              >
+                Click Here
+              </Link>
+            </p>
+
             <p className="text-sm text-muted-foreground mt-2">
               Don&apos;t have an account?{" "}
               <Link
                 href="/signup"
-                className="text-primary hover:underline font-medium"
+                className="text-primary dark:text-foreground hover:underline font-medium"
               >
                 Sign Up
               </Link>

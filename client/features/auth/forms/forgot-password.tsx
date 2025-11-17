@@ -1,18 +1,18 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import { z } from "zod";
+import { cn } from "@/lib/utils";
+import { Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
+import { Form } from "../../../components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Mail } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { Form } from "../../../components/ui/form";
-import Link from "next/link";
-import { InputComponent } from "../../../components/form-ui/base/input-component";
 import { useForgotPassword } from "@/data/mutations/auth/use-forgotpassword";
+import { InputComponent } from "../../../components/form-ui/base/input-component";
 
 const forgotPasswordSchema = z.object({
   email: z.email({ message: "Please enter a valid email address" }),
@@ -24,7 +24,7 @@ export function ForgotPasswordForm() {
   const { submitForgotPassord, submitingRequest } = useForgotPassword();
 
   const form = useForm<ForgotPasswordFormData>({
-    mode: "all",
+    mode: "onSubmit",
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
@@ -89,18 +89,18 @@ export function ForgotPasswordForm() {
           {/* Footer Links */}
           <div className="text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              Already received password reset token, click{" "}
+              Already received password reset token?{" "}
               <Link
                 href="/reset-password"
-                className="text-primary hover:underline font-medium"
+                className="text-primary dark:text-foreground hover:underline font-medium"
               >
-                here
+                Click Here
               </Link>
             </p>
             <p className="text-sm text-muted-foreground">
               <Link
                 href="/signin"
-                className="text-primary hover:underline font-medium"
+                className="text-primary dark:text-foreground hover:underline font-medium"
               >
                 Back to Signin
               </Link>

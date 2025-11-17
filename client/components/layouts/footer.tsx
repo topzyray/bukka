@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
-import { Mail, Phone, Instagram, Twitter, Facebook } from "lucide-react";
-import { BukkaButton } from "@/components/ui/button-variants";
-import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/providers";
+import { motion } from "framer-motion";
 import { UserRoleEnum } from "@/data/enums";
+import { Input } from "@/components/ui/input";
+import { BukkaButton } from "@/components/ui/button-variants";
+import { Mail, Phone, Instagram, Twitter, Facebook } from "lucide-react";
 
 export function Footer() {
   const { user } = useAuth();

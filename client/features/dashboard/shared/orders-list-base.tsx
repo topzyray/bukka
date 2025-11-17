@@ -68,7 +68,7 @@ export function OrdersListBase({
           <p className="text-muted-foreground mb-6">
             You don’t have any orders yet.
           </p>
-          <BukkaButton asChild>
+          <BukkaButton>
             <Link href="/businesses">Start Shopping</Link>
           </BukkaButton>
         </div>

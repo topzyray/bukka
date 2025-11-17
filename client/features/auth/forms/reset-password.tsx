@@ -1,19 +1,18 @@
 "use client";
 
+import Link from "next/link";
+import { z } from "zod";
+import { cn } from "@/lib/utils";
+import { Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
+import { Form } from "../../../components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { Form } from "../../../components/ui/form";
-import Link from "next/link";
-import OtpInputComponent from "../../../components/form-ui/base/otp-component";
 import { useResetPassword } from "@/data/mutations/auth/use-resetpassword";
 import { InputComponent } from "../../../components/form-ui/base/input-component";
-import { Lock } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { OtpInputComponent } from "../../../components/form-ui/base/otp-component";
 
 const resetPasswordSchema = z.object({
   token: z
@@ -39,8 +38,6 @@ const resetPasswordSchema = z.object({
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 export function ResetPasswordForm() {
-  const router = useRouter();
-
   const form = useForm<ResetPasswordFormData>({
     mode: "onSubmit",
     resolver: zodResolver(resetPasswordSchema),
@@ -131,20 +128,21 @@ export function ResetPasswordForm() {
         </CardContent>
 
         <div className="text-center space-y-2">
-          <p
-            className="text-sm text-primary hover:underline cursor-pointer font-medium"
-            onClick={(e) => {
-              e.stopPropagation();
-              router.push("/forgot-password");
-            }}
-          >
-            Forgot Password
-          </p>
           <p className="text-sm text-muted-foreground">
-            Already verified?{" "}
+            Didn't receive password reset token?{" "}
+            <Link
+              href="/forgot-password"
+              className="text-primary dark:text-foreground hover:underline font-medium"
+            >
+              Click Here
+            </Link>
+          </p>
+
+          <p className="text-sm text-muted-foreground">
+            Password reset successful?{" "}
             <Link
               href="/signin"
-              className="text-primary hover:underline font-medium"
+              className="text-primary dark:text-foreground hover:underline font-medium"
             >
               Signin
             </Link>
