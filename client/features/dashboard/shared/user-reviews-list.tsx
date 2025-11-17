@@ -149,9 +149,6 @@ export function UserReviewsList() {
               user?.role as string,
               review?.businessId
             );
-            console.log("BUSINESS DETEAILS LINK: ", {
-              businessDetailsLink,
-            });
 
             return (
               <Card key={review?.id}>
