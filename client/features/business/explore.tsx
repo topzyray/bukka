@@ -36,6 +36,8 @@ import {
   PageWrapperFooter,
   PageWrapperHeader,
 } from "@/components/ui/page-wrapper";
+import { BusinessCardSkeleton } from "./components/business-card-skeleton";
+import { MapSkeleton } from "../location/components/map-skeleton";
 
 const MapSelector = dynamic(
   () => import("@/features/location/map-selector").then((m) => m.MapSelector),
@@ -235,9 +237,13 @@ export function ExplorePage() {
 
                 <div className="space-y-3">
                   {isLoading && (
-                    <div className="h-[50vh] flex justify-center items-center">
-                      <CircularLoader text="Loading Data..." />
-                    </div>
+                    <ScrollArea className="h-[33rem]">
+                      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-0.5">
+                        {Array.from({ length: 6 }).map((_, i) => (
+                          <BusinessCardSkeleton key={i} />
+                        ))}
+                      </div>
+                    </ScrollArea>
                   )}
 
                   {isError && (
@@ -308,13 +314,16 @@ export function ExplorePage() {
             {/* Map area */}
             <section className="flex-1 rounded-lg overflow-hidden ">
               {isLoading && (
-                <div className="h-[80vh] flex justify-center items-center border shadow-glow">
-                  <CircularLoader text="Loading Map..." />
+                <div
+                  style={{ height: "74vh" }}
+                  className="relative shadow-glow"
+                >
+                  <MapSkeleton height="100%" />
                 </div>
               )}
               {!isLoading && !isError && businesses.length && (
                 <div
-                  style={{ height: "72vh" }}
+                  style={{ height: "74vh" }}
                   className="relative shadow-glow"
                 >
                   <MapSelector

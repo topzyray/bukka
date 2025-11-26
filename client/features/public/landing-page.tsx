@@ -24,8 +24,8 @@ import { TextHelper } from "@/helpers";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { useRouter } from "next/navigation";
 import { SearchBox } from "@/components/ui/search-box";
-import { CircularLoader } from "@/components/loaders/circular-loader";
 import { ErrorBox } from "@/components/ui/error-box";
+import { BusinessCardSkeleton } from "../business/components/business-card-skeleton";
 
 const categories = [
   { name: BusinessTypeEnum.RESTAURANT, icon: "🍛", count: "120+" },
@@ -158,6 +158,7 @@ export function Home() {
                       onClick={() =>
                         router.push(`/businesses?search=${searchQuery}`)
                       }
+                      disabled={searchQuery.length < 2}
                     >
                       <Search className="w-5 mr-2" />
                       Search
@@ -243,7 +244,10 @@ export function Home() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div
+            // className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
+            className="flex flex-wrap justify-center items-center gap-4"
+          >
             {categories.map((category, index) => (
               <motion.div
                 key={category.name}
@@ -256,6 +260,7 @@ export function Home() {
                 onClick={() =>
                   router.push(`/businesses?type=${category.name.toLowerCase()}`)
                 }
+                className="w-full sm:w-xs"
               >
                 <Card className="cursor-pointer hover:shadow-card transition-smooth text-center p-6">
                   <CardContent className="p-0">
@@ -300,19 +305,21 @@ export function Home() {
             </BukkaButton>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-content-center">
             {isLoading ? (
-              <CircularLoader />
+              Array.from({ length: 6 }).map((_, i) => (
+                <BusinessCardSkeleton key={i} />
+              ))
             ) : featuredBusinesses.length ? (
-              featuredBusinesses.map((buiness, index) => (
+              featuredBusinesses.map((business, index) => (
                 <motion.div
-                  key={buiness.id}
+                  key={business.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.2, duration: 0.6 }}
                 >
-                  <BusinessCard business={buiness} />
+                  <BusinessCard business={business} />
                 </motion.div>
               ))
             ) : isError ? (

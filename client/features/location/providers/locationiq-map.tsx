@@ -70,8 +70,6 @@ const ICONS: Record<BusinessTypeEnum, L.Icon> = {
   ),
 };
 
-const DEFAULT_CENTER = LAGOS;
-
 const CURRENT_CLICK_ICON = IconHelper.createColoredIcon(
   "/icons/custom/you.svg",
   "animate-pulse",
@@ -83,6 +81,8 @@ const USER_LOCATION_ICON = IconHelper.createColoredIcon(
   "animate-pulse",
   [45, 61]
 );
+
+const DEFAULT_CENTER = LAGOS;
 
 function MapClickHandler({
   onClick,
@@ -330,6 +330,7 @@ export function LocationIQMap({
             icons[business?.type as BusinessTypeEnum] || icons.OTHER;
           return (
             <Marker
+              bubblingMouseEvents
               key={business?.id}
               position={[lat, lng]}
               icon={markerIcon}
@@ -352,8 +353,9 @@ export function LocationIQMap({
                 },
               }}
             >
-              <Popup>
-                <BusinessPopUp business={business} />
+              <Popup className="sm:w-sm">
+                <BusinessPopUp business={business} className="sm:w-[21.5rem]" />
+                {/* <BusinessPopUp business={business} /> */}
               </Popup>
               <Tooltip>{business?.name}</Tooltip>
             </Marker>

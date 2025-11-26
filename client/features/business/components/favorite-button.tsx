@@ -9,6 +9,7 @@ import { useToggleFavorite } from "@/data/mutations/favorite/use-toggle-favorite
 import { useFavorites } from "@/data/queries/use-favorites";
 import { Favorite } from "@/data/interfaces/Favorite";
 import { BukkaButton } from "@/components/ui/button-variants";
+import { toast } from "sonner";
 
 export const FavoriteButton = ({
   useIcon = true,
@@ -56,7 +57,9 @@ export const FavoriteButton = ({
     e.preventDefault();
 
     if (!user) {
-      router.push("/signin");
+      toast("Login Required", {
+        description: "Login to save favorites",
+      });
       return;
     }
     toggleFavorite({ businessId, userId: user?.id });

@@ -8,3 +8,18 @@ export type TDashboardNavigation = {
   hasSubmenu?: boolean;
   submenu?: SubMenuItem[];
 }[];
+
+export type CookieCategory = {
+  id: string;
+  title: string;
+  description?: string;
+  required?: boolean;
+  defaultEnabled?: boolean;
+};
+
+export type CookieConsentState = {
+  version: string;
+  timestamp: number;
+  preferences: Record<string, boolean>;
+  acceptedAll?: boolean;
+};

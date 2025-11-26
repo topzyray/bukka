@@ -11,7 +11,7 @@ import { NotificationTypeEnum } from 'src/DomainLayer/Enums/NotificationTypeEnum
 
 @Injectable()
 export class SupportNotificationService extends NotificationService {
-  async processAccountConfirmation(
+  async processNewTicketConfirmation(
     data: processAccountConfirmationDto,
     _category: string,
   ): Promise<void> {

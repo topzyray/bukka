@@ -25,7 +25,7 @@ import { TypeAnimation } from "react-type-animation";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { TextHelper } from "@/helpers";
 import { SearchBox } from "@/components/ui/search-box";
-import { CircularLoader } from "@/components/loaders/circular-loader";
+import { BusinessCardSkeleton } from "./components/business-card-skeleton";
 
 const filters = [
   "All",
@@ -273,11 +273,10 @@ export function FindBusinessPage() {
                 : "grid-cols-1 max-w-4xl mx-auto"
             )}
           >
-            {isLoading && (
-              <div className="flex justify-center items-center mt-4 md:mt-8 w-full col-span-3">
-                <CircularLoader text="Loading Data..." />
-              </div>
-            )}
+            {isLoading &&
+              Array.from({ length: 6 }).map((_, i) => (
+                <BusinessCardSkeleton key={i} />
+              ))}
 
             {!isLoading &&
               results.map((b, i) => (
