@@ -110,29 +110,4 @@ export class StorageUtilsHelper {
       localStorage.removeItem(data);
     }
   }
-
-  static getSubdomainFromHost() {
-    if (typeof window === "undefined") return null;
-    const host = window.location.hostname;
-    const parts = host.split(".");
-
-    if (parts.length > 1) {
-      return parts[0];
-    }
-    return null;
-  }
-
-  getSubdomainFromCookies = (
-    cookieHeader: string | undefined
-  ): string | null => {
-    if (!cookieHeader) return null;
-
-    const cookies = cookieHeader.split(";").reduce((acc, curr) => {
-      const [key, val] = curr.trim().split("=");
-      acc[key] = val;
-      return acc;
-    }, {} as Record<string, string>);
-
-    return cookies["school"] || null;
-  };
 }

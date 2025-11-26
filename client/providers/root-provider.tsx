@@ -19,6 +19,7 @@ export function RootProvider({ children }: { children: React.ReactNode }) {
       >
         <SessionExpirationModal />
         <UserLocationProvider>
+          {/* <LocationConsent /> */}
           <AuthProvider>
             <GlobalStateProvider>
               {children}

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import React, {
   useCallback,
   useEffect,
@@ -17,27 +16,23 @@ import {
   Tooltip,
 } from "react-leaflet";
 import L from "leaflet";
+import Image from "next/image";
 import "leaflet/dist/leaflet.css";
-import { LAGOS } from "@/data/interfaces/Location";
-import { Business } from "@/data/interfaces/Business";
-import { CircularLoader } from "@/components/loaders/circular-loader";
+import { debounce } from "@/utils";
+import { envConfig } from "@/configs";
 import { useTheme } from "next-themes";
+import { LAGOS } from "@/data/interfaces/Location";
+import { IconHelper } from "@/helpers/icon-helper";
+import { Business } from "@/data/interfaces/Business";
+import { useGlobalState, useUserLocation } from "@/providers";
+import { CustomZoomControl } from "../components/custom-zoom";
+import { BusinessPopUp } from "../components/business-pop-up";
+import { RecenterButton } from "../components/recenter-button";
+import { usePathname, useSearchParams } from "next/navigation";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
+import { CircularLoader } from "@/components/loaders/circular-loader";
 import { LocationCoordsHelper } from "@/helpers/location-coords-helper";
 import { SearchPlacesWithAutocomplete } from "../search-places-with-autocomplete";
-import { envConfig } from "@/configs";
-import { useGlobalState, useUserLocation } from "@/providers";
-import { IconHelper } from "@/helpers/icon-helper";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { debounce } from "@/utils";
-import { Badge } from "@/components/ui/badge";
-import { TextHelper } from "@/helpers";
-import { Separator } from "@/components/ui/separator";
-import { FavoriteButton } from "../../business/components/favorite-button";
-import { BukkaButton } from "@/components/ui/button-variants";
-import { Star, View } from "lucide-react";
-import { RecenterButton } from "../components/recenter-button";
-import { CustomZoomControl } from "../components/custom-zoom";
 
 const ICONS: Record<BusinessTypeEnum, L.Icon> = {
   [BusinessTypeEnum.RESTAURANT]: IconHelper.createColoredIcon(
@@ -75,8 +70,6 @@ const ICONS: Record<BusinessTypeEnum, L.Icon> = {
   ),
 };
 
-const DEFAULT_CENTER = LAGOS;
-
 const CURRENT_CLICK_ICON = IconHelper.createColoredIcon(
   "/icons/custom/you.svg",
   "animate-pulse",
@@ -88,6 +81,8 @@ const USER_LOCATION_ICON = IconHelper.createColoredIcon(
   "animate-pulse",
   [45, 61]
 );
+
+const DEFAULT_CENTER = LAGOS;
 
 function MapClickHandler({
   onClick,
@@ -141,7 +136,7 @@ export function LocationIQMap({
   const { theme } = useTheme();
   const geoAttempted = useRef(false);
   const lastEmitted = useRef<{ lat: number; lng: number } | null>(null);
-  const router = useRouter();
+
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
@@ -326,16 +321,17 @@ export function LocationIQMap({
           </Marker>
         )}
 
-        {businesses.map((b) => {
-          const lat = b?.location?.latitude;
-          const lng = b?.location?.longitude;
+        {businesses.map((business) => {
+          const lat = business?.location?.latitude;
+          const lng = business?.location?.longitude;
           if (lat == null || lng == null) return null;
 
-          const markerIcon = icons[b?.type as BusinessTypeEnum] || icons.OTHER;
-
+          const markerIcon =
+            icons[business?.type as BusinessTypeEnum] || icons.OTHER;
           return (
             <Marker
-              key={b.id}
+              bubblingMouseEvents
+              key={business?.id}
               position={[lat, lng]}
               icon={markerIcon}
               eventHandlers={{
@@ -343,80 +339,25 @@ export function LocationIQMap({
                 click: () => {
                   if (onMarkerClick) {
                     try {
-                      onMarkerClick(b.id);
+                      onMarkerClick(business?.id);
                     } catch {
                       // safe no-op
                     }
                   }
-                  if (syncQuery && b?.location) {
-                    updateQuery(b.location.latitude, b.location.longitude);
+                  if (syncQuery && business?.location) {
+                    updateQuery(
+                      business?.location?.latitude,
+                      business?.location?.longitude
+                    );
                   }
                 },
               }}
             >
-              <Popup>
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between gap-4">
-                    <div className="font-semibold text-base">{b?.name}</div>
-                    <Badge className="capitalize">
-                      {TextHelper.normalizeText(b?.type)}
-                    </Badge>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    {b?.category && (
-                      <div className="text-xs text-muted-foreground">
-                        {b.category.name}
-                      </div>
-                    )}
-                    {b?.location?.address && (
-                      <div className="text-xs text-muted-foreground">
-                        {b.location.address}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                      <span className="font-semibold">
-                        {b?.averageRating?.toFixed(1) ?? "0.0"}
-                      </span>
-                    </div>
-                    <span className="opacity-80">
-                      ({b?.reviewCount ?? "0"} reviews)
-                    </span>
-                  </div>
-                  <Separator />
-
-                  <div className="flex gap-2">
-                    <BukkaButton
-                      variant="glow"
-                      size="sm"
-                      className="text-xs"
-                      onClick={() => {
-                        try {
-                          router.push(`/businesses/${b.id}`);
-                        } catch {
-                          window.location.href = `/businesses/${b.id}`;
-                        }
-                      }}
-                      title={`More Details about ${b.name}`}
-                    >
-                      <View />
-                      View Details
-                    </BukkaButton>
-
-                    <FavoriteButton
-                      variant="float"
-                      size="sm"
-                      useIcon={false}
-                      businessId={b.id}
-                      className="rounded-lg"
-                    />
-                  </div>
-                </div>
+              <Popup className="sm:w-sm">
+                <BusinessPopUp business={business} className="sm:w-[21.5rem]" />
+                {/* <BusinessPopUp business={business} /> */}
               </Popup>
-              <Tooltip>{b?.name}</Tooltip>
+              <Tooltip>{business?.name}</Tooltip>
             </Marker>
           );
         })}

@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import { Heart, Loader2 } from "lucide-react";
 import { useCurrentUser } from "@/data/queries";
 import { cn } from "@/lib/utils";
@@ -9,6 +8,7 @@ import { useToggleFavorite } from "@/data/mutations/favorite/use-toggle-favorite
 import { useFavorites } from "@/data/queries/use-favorites";
 import { Favorite } from "@/data/interfaces/Favorite";
 import { BukkaButton } from "@/components/ui/button-variants";
+import { toast } from "sonner";
 
 export const FavoriteButton = ({
   useIcon = true,
@@ -38,7 +38,6 @@ export const FavoriteButton = ({
     | null
     | undefined;
 }) => {
-  const router = useRouter();
   const { data: user } = useCurrentUser();
   const { data: userFavoriteData } = useFavorites();
 
@@ -56,7 +55,9 @@ export const FavoriteButton = ({
     e.preventDefault();
 
     if (!user) {
-      router.push("/signin");
+      toast("Login Required", {
+        description: "Login to save favorites",
+      });
       return;
     }
     toggleFavorite({ businessId, userId: user?.id });
