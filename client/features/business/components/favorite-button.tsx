@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import { Heart, Loader2 } from "lucide-react";
 import { useCurrentUser } from "@/data/queries";
 import { cn } from "@/lib/utils";
@@ -39,7 +38,6 @@ export const FavoriteButton = ({
     | null
     | undefined;
 }) => {
-  const router = useRouter();
   const { data: user } = useCurrentUser();
   const { data: userFavoriteData } = useFavorites();
 

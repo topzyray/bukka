@@ -27,7 +27,6 @@ import { useInfiniteBusinessesQuery } from "@/data/queries/use-businesses-query"
 import { BusinessCard } from "./components/business-card";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Business } from "@/data/interfaces/Business";
-import { CircularLoader } from "@/components/loaders/circular-loader";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   PageWrapper,

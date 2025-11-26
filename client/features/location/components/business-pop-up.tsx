@@ -16,7 +16,7 @@ import { useBusinessFiles } from "@/data/queries/use-business-files";
 import { Badge, BukkaButton, Card, CardContent } from "@/components/ui";
 import { PlanMyJourneyButton } from "@/features/business/ui/plan-my-journey";
 import { BusinessHelper } from "@/features/business/helper/bussiness-helper";
-import { Clock, ExternalLink, Info, MapPin, Phone, Star } from "lucide-react";
+import { Clock, Info, MapPin, Phone, Star } from "lucide-react";
 import { FavoriteButton } from "@/features/business/components/favorite-button";
 
 interface IBusinessCard {
