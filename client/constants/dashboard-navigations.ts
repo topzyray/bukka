@@ -16,8 +16,8 @@ export const ADMIN: TDashboardNavigation = [
     isSidebarNav: true,
   },
   {
-    title: "Accounts",
-    url: "/dashboard/admin/accounts",
+    title: "All Users",
+    url: "/dashboard/admin/users",
     icon: "UserPlus",
     hasSubmenu: false,
     isSidebarNav: true,
