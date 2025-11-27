@@ -16,29 +16,23 @@ jobs:
       # Checkout code
       - uses: actions/checkout@v4
 
-      # Set up Node.js
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+          run_install: false
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
-          cache: "npm"
-          cache-dependency-path: "client/package-lock.json"
+          cache: "pnpm"
+          cache-dependency-path: "client/pnpm-lock.yaml"
 
-      # Cache node_modules folder for faster installs
-      # - name: Cache node modules
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ~/.npm
-      #     key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-node-
-
-      # Install dependencies
       - name: Install Dependencies
-        run: npm ci
         working-directory: client
+        run: pnpm install --frozen-lockfile
 
-      # Inject environment variables
       - name: Set Environment Variables
         run: |
           echo "NEXT_PUBLIC_NODE_ENV=${{ secrets.NEXT_PUBLIC_NODE_ENV }}" >> $GITHUB_ENV
@@ -48,19 +42,17 @@ jobs:
           echo "NEXT_PUBLIC_DOMAIN_URL=${{ secrets.NEXT_PUBLIC_DOMAIN_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN=${{ secrets.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
-      # Lint the code
       - name: Lint
-        run: npm run lint
+        run: pnpm lint
         working-directory: client
 
-      # Run type check
       - name: Type Check
-        run: npm run type-check
+        run: pnpm type-check
         working-directory: client
 
       # Build the project (optional if Vercel handles it)
       - name: Build Project
-        run: npm run build
+        run: pnpm build
         working-directory: client
 
   deploy:
@@ -68,6 +60,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install pnpm
+        run: npm install -g pnpm
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
