@@ -36,7 +36,6 @@
 
 # ---- Build Stage ----
 FROM node:22-alpine AS builder
-LABEL stage=builder
 WORKDIR /app
 
 # Install build dependencies
@@ -45,17 +44,12 @@ RUN apk add --no-cache libc6-compat python3 make g++ git
 # Install pnpm
 RUN npm install -g pnpm
 
-# Copy package manifests
+# Copy package manifests and install dependencies (dev + prod)
 COPY package.json pnpm-lock.yaml ./
-
-# Install all dependencies (dev + prod)
 RUN pnpm install --frozen-lockfile
 
-# Copy Prisma schema and generate client
+# Copy source code and Prisma schema
 COPY prisma ./prisma
-RUN npx prisma generate
-
-# Copy the rest of the app
 COPY . .
 
 # Build NestJS app
@@ -65,25 +59,30 @@ RUN pnpm build
 FROM node:22-alpine AS prod
 WORKDIR /app
 
-# Install runtime deps for Prisma + Sharp
-RUN apk add --no-cache libc6-compat
+# Runtime dependencies (for Prisma and Sharp)
+RUN apk add --no-cache libc6-compat python3 make g++ git
 
-# Install pnpm directly
+# Install pnpm
 RUN npm install -g pnpm
 
-# Copy package files and install only prod deps
+# Copy package files and install prod dependencies (dev needed for Prisma client generation)
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
 
-# Copy built app and Prisma client
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+# Copy Prisma schema and source code
+COPY prisma ./prisma
+COPY . .
 
-# Copy templates if needed
-COPY --from=builder /app/src/UtilityLayer/Views/Templates ./dist/UtilityLayer/Views/Templates
+# Generate Prisma client in prod
+RUN npx prisma generate
 
-# Environment
+# Build NestJS in prod (if needed)
+RUN pnpm build
+
+# Optional: Copy templates if you are not bundling them via nest-cli.json
+COPY src/UtilityLayer/Views/Templates ./dist/UtilityLayer/Views/Templates
+
+# Environment variables
 ENV NODE_ENV=production
 ENV EMAIL_TEMPLATES_DIR=/app/dist/UtilityLayer/Views/Templates
 
