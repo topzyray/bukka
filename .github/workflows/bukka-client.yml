@@ -21,21 +21,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
-          cache: "npm"
-          cache-dependency-path: "client/package-lock.json"
+          cache: "pnpm"
+          cache-dependency-path: "client/pnpm-lock.yaml"
 
       # Cache node_modules folder for faster installs
       # - name: Cache node modules
       #   uses: actions/cache@v4
       #   with:
       #     path: ~/.npm
-      #     key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+      #     key: ${{ runner.os }}-node-${{ hashFiles('client/pnpm-lock.yaml') }}
       #     restore-keys: |
       #       ${{ runner.os }}-node-
 
+      # Install pnpm globally
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       # Install dependencies
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
         working-directory: client
 
       # Inject environment variables
@@ -50,17 +54,17 @@ jobs:
 
       # Lint the code
       - name: Lint
-        run: npm run lint
+        run: pnpm lint
         working-directory: client
 
       # Run type check
       - name: Type Check
-        run: npm run type-check
+        run: pnpm type-check
         working-directory: client
 
       # Build the project (optional if Vercel handles it)
       - name: Build Project
-        run: npm run build
+        run: pnpm build
         working-directory: client
 
   deploy:
@@ -68,6 +72,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install pnpm
+        run: npm install -g pnpm
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
