@@ -1,3 +1,4 @@
+import { QueryKeyEnum } from "@/data/enums";
 import { useCustomMutation } from "@/data/mutations/base";
 import { BusinessApiService } from "@/data/services/BusinessApiService";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,12 +13,14 @@ export const useCreateBusiness = ({
   const queryClient = useQueryClient();
   return useCustomMutation(BusinessApiService.createBusiness, {
     onSuccessCallback: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["businesses"] });
       await queryClient.invalidateQueries({
-        queryKey: ["user-activities-summary"],
+        queryKey: [QueryKeyEnum.BUSINESSES],
       });
       await queryClient.invalidateQueries({
-        queryKey: ["admin-overview"],
+        queryKey: [QueryKeyEnum.USER_ACTIVITIES_SUMMARY],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
       });
       resetForm();
       onSuccess?.();
@@ -38,7 +41,9 @@ export const useUpdateBusiness = ({
       BusinessApiService.updateBusiness(id, payload),
     {
       onSuccessCallback: async () => {
-        await queryClient.invalidateQueries({ queryKey: ["businesses"] });
+        await queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.BUSINESSES],
+        });
         resetForm();
         onSuccess?.();
       },
@@ -54,12 +59,14 @@ export const useDeleteBusiness = ({
   const queryClient = useQueryClient();
   return useCustomMutation(BusinessApiService.deleteBusiness, {
     onSuccessCallback: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["businesses"] });
       await queryClient.invalidateQueries({
-        queryKey: ["user-activities-summary"],
+        queryKey: [QueryKeyEnum.BUSINESSES],
       });
       await queryClient.invalidateQueries({
-        queryKey: ["admin-overview"],
+        queryKey: [QueryKeyEnum.USER_ACTIVITIES_SUMMARY],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
       });
       onSuccess?.();
     },

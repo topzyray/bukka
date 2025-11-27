@@ -1,19 +1,20 @@
 import { useCustomMutation } from "../base";
 import { useQueryClient } from "@tanstack/react-query";
 import { UserSessionApiService } from "@/data/services/UserSessionApiService";
+import { QueryKeyEnum } from "@/data/enums";
 
 export const useRevokeSession = ({ onSuccess }: { onSuccess?: () => void }) => {
   const queryClient = useQueryClient();
   return useCustomMutation(UserSessionApiService.deleteSessionById, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
-        queryKey: ["user-sessions"],
+        queryKey: [QueryKeyEnum.USER_SESSIONS],
       });
       queryClient.invalidateQueries({
-        queryKey: ["user-active-session"],
+        queryKey: [QueryKeyEnum.USER_ACTIVE_SESSIONS],
       });
       queryClient.invalidateQueries({
-        queryKey: ["admin-overview"],
+        queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
       });
       onSuccess?.();
     },

@@ -1,3 +1,4 @@
+import { QueryKeyEnum } from "../enums";
 import { Order } from "../interfaces/Order";
 import { OrderApiService } from "../services";
 import {
@@ -19,7 +20,7 @@ export const useOrdersQuery = ({
   enabled?: boolean;
 }) => {
   return useCustomQuery<BukkaResponse<PagedResponse<Order[]>>, Error>(
-    ["orders", filters, pageNumber, pageSize],
+    [QueryKeyEnum.ORDERS, filters, pageNumber, pageSize],
     (params?: QueryParams) =>
       OrderApiService.getOrders({
         pageNumber: params?.pageNumber ?? pageNumber,
@@ -46,7 +47,7 @@ export const useVendorsOrder = ({
   enabled?: boolean;
 }) => {
   return useCustomQuery<BukkaResponse<PagedResponse<Order[]>>, Error>(
-    ["orders", filters, pageNumber, pageSize],
+    [QueryKeyEnum.ORDERS, filters, pageNumber, pageSize],
     (params?: QueryParams) =>
       OrderApiService.getOrders({
         pageNumber: params?.pageNumber ?? pageNumber,
@@ -69,7 +70,7 @@ export const useOrderDetailsQuery = ({
   enabled?: boolean;
 }) => {
   return useCustomQuery<BukkaResponse<Order>, Error>(
-    ["order-details", orderId],
+    [QueryKeyEnum.ORDER_DETAILS, orderId],
     () => OrderApiService.getOrderById(orderId as number),
     {
       enabled: enabled && !!orderId,

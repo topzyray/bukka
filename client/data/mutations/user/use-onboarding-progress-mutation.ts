@@ -1,3 +1,4 @@
+import { QueryKeyEnum } from "@/data/enums";
 import { User } from "@/data/interfaces/User";
 import { useCustomMutation } from "@/data/mutations/base";
 import { UserApiService } from "@/data/services/UserApiService";
@@ -14,10 +15,12 @@ export const useSaveOnboardingProgress = ({
   return useCustomMutation(UserApiService.updateUser, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
-        queryKey: ["onboarding-progress", user?.id],
+        queryKey: [QueryKeyEnum.ONBOARDING_PROGRESS, user?.id],
       });
-      queryClient.invalidateQueries({ queryKey: ["current-user"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+      queryClient.invalidateQueries({ queryKey: [QueryKeyEnum.CURRENT_USER] });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+      });
     },
     toastStatusMessage,
     onErrorCallback: () => {},

@@ -2,13 +2,13 @@
 
 import React from "react";
 import { Heart, Loader2 } from "lucide-react";
-import { useCurrentUser } from "@/data/queries";
 import { cn } from "@/lib/utils";
 import { useToggleFavorite } from "@/data/mutations/favorite/use-toggle-favorite";
 import { useFavorites } from "@/data/queries/use-favorites";
 import { Favorite } from "@/data/interfaces/Favorite";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { toast } from "sonner";
+import { useAuth } from "@/providers";
 
 export const FavoriteButton = ({
   useIcon = true,
@@ -38,7 +38,7 @@ export const FavoriteButton = ({
     | null
     | undefined;
 }) => {
-  const { data: user } = useCurrentUser();
+  const { user } = useAuth();
   const { data: userFavoriteData } = useFavorites();
 
   const isUserFavorite =

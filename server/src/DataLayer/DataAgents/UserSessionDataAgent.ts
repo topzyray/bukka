@@ -86,7 +86,7 @@ export class UserSessionDataAgent {
         ],
       },
     };
-    await this.model.deleteOne(spec);
+    await this.model.deleteMany(spec);
     return null;
   }
 

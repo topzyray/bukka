@@ -12,7 +12,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { InputComponent } from "@/components/form-ui/base/input-component";
 import { FileApiService } from "@/data/services";
-import { FileCategoryEnum, FileReferenceTypeEnum } from "@/data/enums";
+import {
+  FileCategoryEnum,
+  FileReferenceTypeEnum,
+  QueryKeyEnum,
+} from "@/data/enums";
 import { Business } from "@/data/interfaces/Business";
 
 const reviewSchema = z.object({
@@ -113,7 +117,7 @@ export function AddEditMenuForm({
             }}
             onUploadSuccess={() => {
               queryClient.invalidateQueries({
-                queryKey: ["business-files", business?.id],
+                queryKey: [QueryKeyEnum.BUSINESS_FILES, business?.id],
               });
             }}
           />

@@ -1,10 +1,11 @@
 import { BukkaResponse, useCustomQuery } from "./base";
 import { UserSessionApiService } from "../services/UserSessionApiService";
 import { UserSession } from "../interfaces/UserSession";
+import { QueryKeyEnum } from "../enums";
 
 export const useUserSessions = ({ userId }: { userId: number }) => {
   return useCustomQuery<BukkaResponse<UserSession[]>>(
-    ["user-sessions"],
+    [QueryKeyEnum.USER_SESSIONS],
     () => UserSessionApiService.getLoggedUserSession(),
     {
       enabled: !!userId,
@@ -22,7 +23,7 @@ export const useUserActionSessions = ({
   };
 }) => {
   return useCustomQuery<BukkaResponse<UserSession>>(
-    ["user-active-session"],
+    [QueryKeyEnum.USER_ACTIVE_SESSIONS],
     () => UserSessionApiService.getUserActiveSession(query),
     {
       enabled: !!query.userId && !!query.deviceId,

@@ -88,21 +88,23 @@ export class UserSessionRepository {
     deviceId: string,
   ): Promise<BukkaResponse<UserSession>> {
     // const loggedInUser = await UserHelper.getLoggedInUser();
-    await UserHelper.hasAccess(userId);
+    // await UserHelper.hasAccess(userId);
 
-    const userSession =
-      await this._userSessionDataAgent.getSessionByUserIdAndDeviceId(
+    // const userSession =
+    //   await this._userSessionDataAgent.getSessionByUserIdAndDeviceId(
+    //     userId,
+    //     deviceId,
+    //   );
+
+    // if (!userSession) {
+    //   return BukkaResponse.GetSingleDataResponse('User session', null);
+    // }
+
+    const deletedSession =
+      this._userSessionDataAgent.deleteSessionByUserIdAndDeviceId(
         userId,
         deviceId,
       );
-
-    if (!userSession) {
-      return BukkaResponse.GetSingleDataResponse('User session', null);
-    }
-
-    const deletedSession = this._userSessionDataAgent.deleteSessionById(
-      userSession?.id,
-    );
 
     return BukkaResponse.DeleteResponse(
       'Session',

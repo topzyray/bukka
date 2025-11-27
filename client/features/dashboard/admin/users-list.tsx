@@ -130,11 +130,7 @@ export function UsersList() {
                   onOpenChange={handleOpenChange}
                   mode={mode}
                   initialData={mode === "edit" ? initialData : undefined}
-                  onSuccess={() => {
-                    queryClient.removeQueries({ queryKey: ["businesses"] });
-                    setPage(1);
-                    setIsModalOpen(false);
-                  }}
+             
                 />
               </div> */}
       </header>

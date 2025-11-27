@@ -8,7 +8,11 @@ import {
   Card,
   SingleFileUploader,
 } from "@/components/ui";
-import { FileCategoryEnum, FileReferenceTypeEnum } from "@/data/enums";
+import {
+  FileCategoryEnum,
+  FileReferenceTypeEnum,
+  QueryKeyEnum,
+} from "@/data/enums";
 import { File } from "@/data/interfaces/File";
 import { User } from "@/data/interfaces/User";
 import { FileApiService } from "@/data/services";
@@ -58,11 +62,17 @@ export function ProfileAvatar({
             },
           }}
           onUploadSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: ["current-user"] });
-            queryClient.invalidateQueries({ queryKey: ["user-files"] });
-            queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
             queryClient.invalidateQueries({
-              queryKey: ["user-activities-summary"],
+              queryKey: [QueryKeyEnum.CURRENT_USER],
+            });
+            queryClient.invalidateQueries({
+              queryKey: [QueryKeyEnum.USER_FILES],
+            });
+            queryClient.invalidateQueries({
+              queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+            });
+            queryClient.invalidateQueries({
+              queryKey: [QueryKeyEnum.USER_ACTIVITIES_SUMMARY],
             });
           }}
         />

@@ -30,6 +30,7 @@ import {
 import {
   FileCategoryEnum,
   FileReferenceTypeEnum,
+  QueryKeyEnum,
   UserRoleEnum,
 } from "@/data/enums";
 import { toast } from "sonner";
@@ -129,11 +130,17 @@ export function SettingsOverview() {
                 },
               }}
               onUploadSuccess={() => {
-                queryClient.invalidateQueries({ queryKey: ["current-user"] });
-                queryClient.invalidateQueries({ queryKey: ["user-files"] });
-                queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
                 queryClient.invalidateQueries({
-                  queryKey: ["user-activities-summary"],
+                  queryKey: [QueryKeyEnum.CURRENT_USER],
+                });
+                queryClient.invalidateQueries({
+                  queryKey: [QueryKeyEnum.USER_FILES],
+                });
+                queryClient.invalidateQueries({
+                  queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+                });
+                queryClient.invalidateQueries({
+                  queryKey: [QueryKeyEnum.USER_ACTIVITIES_SUMMARY],
                 });
               }}
             />

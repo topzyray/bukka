@@ -10,6 +10,7 @@ import { PaginationHelper } from "@/helpers/pagination-helper";
 import { TextHelper } from "@/helpers";
 import { Order } from "@/data/interfaces/Order";
 import { useOrdersQuery } from "@/data/queries";
+import { QueryKeyEnum } from "@/data/enums";
 
 export function OrdersListBase({
   title,
@@ -43,7 +44,7 @@ export function OrdersListBase({
       total,
       pageSize: PAGE_SIZE,
       queryClient,
-      queryKey: ["orders"],
+      queryKey: [QueryKeyEnum.ORDERS],
       setPage,
     });
   };

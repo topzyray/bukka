@@ -2,6 +2,7 @@ import { AuthApiService } from "@/data/services/AuthApiService";
 import { useCustomMutation } from "@/data/mutations/base";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { QueryKeyEnum } from "@/data/enums";
 
 export const useSignUp = ({ resetForm }: { resetForm: any }) => {
   const queryClient = useQueryClient();
@@ -10,7 +11,9 @@ export const useSignUp = ({ resetForm }: { resetForm: any }) => {
     AuthApiService.signUp,
     {
       onSuccessCallback: () => {
-        queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+        });
         resetForm();
         setTimeout(() => {
           router.push("/confirm-email");

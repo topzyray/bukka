@@ -33,7 +33,7 @@ const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
-  const { data: user, isLoading, isError } = useCurrentUser();
+  const { data: user, isFirstLoad, isError } = useCurrentUser();
   let {
     data: userFiles,
     isLoading: isLoadingUserFiles,
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isAuthenticated: !!user && !isError,
       isError: !!isError,
       logout,
-      isLoading: !!isLoading,
+      isLoading: isFirstLoad,
       userFiles,
       isLoadingUserFiles,
       isUserFilesError,
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       user,
       isError,
       logout,
-      isLoading,
+      isFirstLoad,
       userFiles,
       isLoadingUserFiles,
       isUserFilesError,

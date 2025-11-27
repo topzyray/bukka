@@ -1,9 +1,10 @@
 import { FileApiService } from "@/data/services/FileApiService";
 import { useCustomQuery } from "./base";
+import { QueryKeyEnum } from "../enums";
 
 export const useUserFiles = ({ userId }: { userId?: number }) => {
   return useCustomQuery(
-    ["user-files", userId],
+    [QueryKeyEnum.USER_FILES, userId],
     () => FileApiService.getLoggedInUserFiles(),
     {
       enabled: !!userId,

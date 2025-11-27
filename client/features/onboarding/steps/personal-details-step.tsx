@@ -10,7 +10,7 @@ import { InputComponent } from "@/components/form-ui/base/input-component";
 import { SelectComponent } from "@/components/form-ui/base/select-component";
 import { PhoneNumberInput } from "@/components/form-ui/base/phone-number-component";
 import { TextAreaComponent } from "@/components/form-ui/base/text-area-component";
-import { GenderEnum } from "@/data/enums";
+import { GenderEnum, QueryKeyEnum } from "@/data/enums";
 import { useAuth } from "@/providers/auth-provider";
 import { toast } from "sonner";
 import { Form } from "@/components/ui/form";
@@ -102,7 +102,9 @@ export function PersonalDetailsStep({
     useUpdateUserData({
       onSuccess: () => {
         form.reset;
-        queryClient.invalidateQueries({ queryKey: ["current-user"] });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.CURRENT_USER],
+        });
         onNext();
       },
     });

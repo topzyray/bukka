@@ -9,6 +9,7 @@ import { FileApiService } from "@/data/services";
 import {
   FileCategoryEnum,
   FileReferenceTypeEnum,
+  QueryKeyEnum,
   UserRoleEnum,
 } from "@/data/enums";
 import { useQueryClient } from "@tanstack/react-query";
@@ -129,7 +130,7 @@ export function BusinessHero({
                 }}
                 onUploadSuccess={() => {
                   queryClient.invalidateQueries({
-                    queryKey: ["business-files", business?.id],
+                    queryKey: [QueryKeyEnum.BUSINESS_FILES, business?.id],
                   });
                 }}
               />

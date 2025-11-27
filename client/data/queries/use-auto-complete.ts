@@ -1,9 +1,10 @@
 import { useCustomQuery } from "./base";
 import { LocationApiService } from "../services/LocationApiService";
+import { QueryKeyEnum } from "../enums";
 
 export const useAutoComplete = (query: string) => {
   return useCustomQuery(
-    ["location-autocomplete", query],
+    [QueryKeyEnum.LOCATION_AUTOCOMPLETE, query],
     () => LocationApiService.fetchLocationSuggestions(query),
     {
       enabled: query.trim().length >= 2, // only run for valid queries

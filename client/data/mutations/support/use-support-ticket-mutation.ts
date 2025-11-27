@@ -1,3 +1,4 @@
+import { QueryKeyEnum } from "@/data/enums";
 import { useCustomMutation } from "../base";
 import { SupportApiService } from "@/data/services";
 import { useQueryClient } from "@tanstack/react-query";
@@ -7,10 +8,10 @@ export const useCreateTicket = ({ onSuccess }: { onSuccess?: () => void }) => {
   return useCustomMutation(SupportApiService.createTicket, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
-        queryKey: ["supports"],
+        queryKey: [QueryKeyEnum.SUPPORTS],
       });
       queryClient.invalidateQueries({
-        queryKey: ["support"],
+        queryKey: [QueryKeyEnum.SUPPORT],
       });
       onSuccess?.();
     },
@@ -26,10 +27,10 @@ export const useAssignTicketToTeam = ({
   return useCustomMutation(SupportApiService.assignTicket, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
-        queryKey: ["supports"],
+        queryKey: [QueryKeyEnum.SUPPORTS],
       });
       queryClient.invalidateQueries({
-        queryKey: ["support"],
+        queryKey: [QueryKeyEnum.SUPPORT],
       });
       onSuccess?.();
     },
@@ -41,10 +42,10 @@ export const useResolveTicket = ({ onSuccess }: { onSuccess?: () => void }) => {
   return useCustomMutation(SupportApiService.resolveTicket, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
-        queryKey: ["supports"],
+        queryKey: [QueryKeyEnum.SUPPORTS],
       });
       queryClient.invalidateQueries({
-        queryKey: ["support"],
+        queryKey: [QueryKeyEnum.SUPPORT],
       });
       onSuccess?.();
     },
@@ -56,10 +57,10 @@ export const useDeleteTicket = ({ onSuccess }: { onSuccess?: () => void }) => {
   return useCustomMutation(SupportApiService.deleteSupport, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
-        queryKey: ["supports"],
+        queryKey: [QueryKeyEnum.SUPPORTS],
       });
       queryClient.invalidateQueries({
-        queryKey: ["support"],
+        queryKey: [QueryKeyEnum.SUPPORT],
       });
       onSuccess?.();
     },

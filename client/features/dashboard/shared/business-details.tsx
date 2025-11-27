@@ -12,7 +12,7 @@ import { CreateUpdateBusinessModal } from "../vendor/modals/create-update-busine
 import { useQueryClient } from "@tanstack/react-query";
 import { Business } from "@/data/interfaces/Business";
 import { BusinessReviews } from "@/features/business/components/business-reviews";
-import { FileCategoryEnum, UserRoleEnum } from "@/data/enums";
+import { FileCategoryEnum, QueryKeyEnum, UserRoleEnum } from "@/data/enums";
 import { useBusinessFiles } from "@/data/queries/use-business-files";
 import { File } from "@/data/interfaces/File";
 import { motion } from "framer-motion";
@@ -111,7 +111,9 @@ export const BusinessDetails: React.FC = () => {
                   mode={mode}
                   initialData={mode === "edit" ? initialData : undefined}
                   onSuccess={() => {
-                    queryClient.removeQueries({ queryKey: ["my-businesses"] });
+                    queryClient.removeQueries({
+                      queryKey: [QueryKeyEnum.MY_BUSINESSES],
+                    });
                     setIsModalOpen(false);
                   }}
                 />

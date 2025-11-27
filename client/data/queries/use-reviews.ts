@@ -1,3 +1,4 @@
+import { QueryKeyEnum } from "../enums";
 import { Review } from "../interfaces/Review";
 import { ReviewApiService } from "../services";
 import {
@@ -20,7 +21,7 @@ export const useInfiniteReviewsQuery = ({
   enabled?: boolean;
 }) => {
   return useCustomInfiniteQuery<Review>(
-    ["business-reviews", businessId, JSON.stringify(filters)],
+    [QueryKeyEnum.BUSINESS_REVIEWS, businessId, JSON.stringify(filters)],
     ({ pageNumber }) =>
       ReviewApiService.getReviews({
         pageNumber,
@@ -50,7 +51,7 @@ export const useUserAllReviewsQuery = ({
   enabled?: boolean;
 }) => {
   return useCustomQuery<BukkaResponse<PagedResponse<Review[]>>, Error>(
-    ["user-reviews", userId, filters, pageNumber, pageSize],
+    [QueryKeyEnum.USER_REVIEWS, userId, filters, pageNumber, pageSize],
     (params?: QueryParams) =>
       ReviewApiService.getReviews({
         pageNumber: params?.pageNumber ?? pageNumber,

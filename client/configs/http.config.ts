@@ -10,6 +10,7 @@ import { authRoutes } from "@/constants/routes";
 import { toast } from "sonner";
 import { STORE_KEYS } from "./store.config";
 import { StorageUtilsHelper } from "@/utils";
+import { QueryKeyEnum } from "@/data/enums";
 
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
@@ -116,7 +117,7 @@ class HttpClient {
 
         if (this.queryClient) {
           await this.queryClient.invalidateQueries({
-            queryKey: ["current-user"],
+            queryKey: [QueryKeyEnum.CURRENT_USER],
           });
         }
         return this.client(originalRequest);
@@ -128,6 +129,11 @@ class HttpClient {
             { withCredentials: true }
           );
           StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.DEVICE_ID);
+          if (this.queryClient) {
+            this.queryClient.removeQueries({
+              queryKey: [QueryKeyEnum.CURRENT_USER],
+            });
+          }
         } catch {}
 
         if (this.queryClient) {

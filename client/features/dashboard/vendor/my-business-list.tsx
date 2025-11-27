@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useDeleteBusiness } from "@/data/mutations/business/use-business-mutation";
 import { PaginationHelper } from "@/helpers/pagination-helper";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
+import { QueryKeyEnum } from "@/data/enums";
 
 export function MyBusinessList() {
   const PAGE_SIZE = 10;
@@ -54,7 +55,7 @@ export function MyBusinessList() {
       total: total,
       pageSize: PAGE_SIZE,
       queryClient: queryClient,
-      queryKey: ["businesses"],
+      queryKey: [QueryKeyEnum.BUSINESSES],
       setPage: setPage,
     });
   };
@@ -64,19 +65,19 @@ export function MyBusinessList() {
     const sortBy = s?.id;
     const sortOrder = s?.desc ? "desc" : "asc";
     setFilters((f) => ({ ...f, sortBy, sortOrder }));
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.BUSINESSES] });
     setPage(1);
   };
 
   const onSearchChange = (term: string) => {
     setSearch(term);
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.BUSINESSES] });
     setPage(1);
   };
 
   const onFilterChange = (f: Record<string, any>) => {
     setFilters(f);
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.BUSINESSES] });
     setPage(1);
   };
 
@@ -138,7 +139,9 @@ export function MyBusinessList() {
             mode={mode}
             initialData={mode === "edit" ? initialData : undefined}
             onSuccess={() => {
-              queryClient.removeQueries({ queryKey: ["businesses"] });
+              queryClient.removeQueries({
+                queryKey: [QueryKeyEnum.BUSINESSES],
+              });
               setPage(1);
               setIsModalOpen(false);
             }}

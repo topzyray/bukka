@@ -17,6 +17,7 @@ import {
 import { useClearAllNotifications } from "@/data/mutations/userNotification/use-clear-notification";
 import { useAuth } from "@/providers";
 import { Loader2, MailOpen, Trash2 } from "lucide-react";
+import { QueryKeyEnum } from "@/data/enums";
 
 export function Notifications() {
   const PAGE_SIZE = 10;
@@ -49,7 +50,7 @@ export function Notifications() {
       total: total,
       pageSize: PAGE_SIZE,
       queryClient: queryClient,
-      queryKey: ["businesses"],
+      queryKey: [QueryKeyEnum.NOTIFICATIONS],
       setPage: setPage,
     });
   };
@@ -59,19 +60,19 @@ export function Notifications() {
     const sortBy = s?.id;
     const sortOrder = s?.desc ? "desc" : "asc";
     setFilters((f) => ({ ...f, sortBy, sortOrder }));
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.NOTIFICATIONS] });
     setPage(1);
   };
 
   const onSearchChange = (term: string) => {
     setSearch(term);
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.NOTIFICATIONS] });
     setPage(1);
   };
 
   const onFilterChange = (f: Record<string, any>) => {
     setFilters(f);
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.NOTIFICATIONS] });
     setPage(1);
   };
 

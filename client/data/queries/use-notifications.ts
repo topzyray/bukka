@@ -7,6 +7,7 @@ import {
 } from "./base";
 import { UserNotificationApiService } from "../services";
 import { UserNotification } from "../interfaces/Notification";
+import { QueryKeyEnum } from "../enums";
 
 export const useInfiniteUserNotifications = ({
   userId,
@@ -22,7 +23,7 @@ export const useInfiniteUserNotifications = ({
   initialPageParam?: number;
 }) => {
   return useCustomInfiniteQuery<UserNotification>(
-    ["notifications-infinite", userId],
+    [QueryKeyEnum.NOTIFICATIONS_INFINITE, userId],
     ({ pageNumber, ...rest }) =>
       UserNotificationApiService.getAllMyNotifications({
         pageNumber: pageNumber,
@@ -56,7 +57,7 @@ export const useUserNotificationsQuery = ({
     BukkaResponse<PagedResponse<UserNotification[]>>,
     Error
   >(
-    ["notifications", search, filters, pageNumber, pageSize],
+    [QueryKeyEnum.NOTIFICATIONS, search, filters, pageNumber, pageSize],
     (params?: QueryParams) =>
       UserNotificationApiService.getAllMyNotifications({
         pageNumber: params?.pageNumber ?? pageNumber,
@@ -74,7 +75,7 @@ export const useUserNotificationsQuery = ({
 
 export const useNotificationUnreadCount = ({ userId }: { userId?: number }) => {
   return useCustomQuery(
-    ["unread-count", userId],
+    [QueryKeyEnum.UNREAD_COUNT, userId],
     () => UserNotificationApiService.getUnreadNotificationCount(),
     {
       enabled: !!userId,
@@ -89,7 +90,7 @@ export const useNotificationById = ({
   notificationId: number;
 }) => {
   return useCustomQuery<BukkaResponse<UserNotification>>(
-    ["business", notificationId],
+    [QueryKeyEnum.NOTIFICATION, notificationId],
     () => UserNotificationApiService.getNotificationById(notificationId),
     { enabled: !!notificationId, placeholderData: (prev) => prev }
   );

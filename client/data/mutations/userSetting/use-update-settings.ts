@@ -1,6 +1,7 @@
 import { NotificationSettingApiService } from "@/data/services";
 import { useCustomMutation } from "../base";
 import { useQueryClient } from "@tanstack/react-query";
+import { QueryKeyEnum } from "@/data/enums";
 
 export const useUpdateSettings = () => {
   const queryClient = useQueryClient();
@@ -8,7 +9,9 @@ export const useUpdateSettings = () => {
     NotificationSettingApiService.updateMyNotificationSetting,
     {
       onSuccessCallback() {
-        queryClient.invalidateQueries({ queryKey: ["notification-setting"] });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.NOTIFICATION_SETTING],
+        });
       },
     }
   );

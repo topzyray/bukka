@@ -6,6 +6,7 @@ import { MapProviderEnum } from "@/data/enums/MapProviderEnum";
 import { BusinessApiService } from "@/data/services/BusinessApiService";
 import { useCustomInfiniteQuery } from "@/data/queries/base";
 import { Business } from "@/data/interfaces/Business";
+import { QueryKeyEnum } from "@/data/enums";
 
 type Props = {
   zoom?: number;
@@ -35,7 +36,7 @@ export function MapSelector({
   const PAGE_SIZE = 10;
 
   const { data: infiniteData } = useCustomInfiniteQuery<Business>(
-    ["businesses"],
+    [QueryKeyEnum.BUSINESSES],
     ({ pageNumber }) =>
       BusinessApiService.getBusinesses({
         page: pageNumber,

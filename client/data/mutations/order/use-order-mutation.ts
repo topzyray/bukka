@@ -5,15 +5,17 @@ import { toast } from "sonner";
 import { useCustomMutation } from "../base";
 import { OrderApiService } from "@/data/services";
 import { Order } from "@/data/interfaces/Order";
+import { QueryKeyEnum } from "@/data/enums";
 
 export const useOrderMutation = () => {
   const queryClient = useQueryClient();
 
   const mutation = useCustomMutation(OrderApiService.createOrder, {
     onMutate: async (newOrder) => {
-      await queryClient.cancelQueries({ queryKey: ["orders"] });
+      await queryClient.cancelQueries({ queryKey: [QueryKeyEnum.ORDERS] });
 
-      const prevOrders = queryClient.getQueryData<Order[]>(["orders"]) || [];
+      const prevOrders =
+        queryClient.getQueryData<Order[]>([QueryKeyEnum.ORDERS]) || [];
 
       // const optimisticOrder: Order = {
       //   id: `temp-${Date.now()}`,
@@ -34,7 +36,10 @@ export const useOrderMutation = () => {
         createdAt: new Date().toISOString(),
       };
 
-      queryClient.setQueryData(["orders"], [...prevOrders, optimisticOrder]);
+      queryClient.setQueryData(
+        [QueryKeyEnum.ORDERS],
+        [...prevOrders, optimisticOrder]
+      );
 
       toast.loading("Placing your order...");
 
@@ -42,7 +47,7 @@ export const useOrderMutation = () => {
     },
 
     onSuccess: (data) => {
-      queryClient.setQueryData<Order[]>(["orders"], (old = []) =>
+      queryClient.setQueryData<Order[]>([QueryKeyEnum.ORDERS], (old = []) =>
         old.map((o) => (o.id.startsWith("temp-") ? data : o))
       );
       toast.success("Order confirmed!");
@@ -51,14 +56,18 @@ export const useOrderMutation = () => {
     onError: (error: any, _, context) => {
       toast.error("Order failed. Please try again.");
       if (context?.prevOrders) {
-        queryClient.setQueryData(["orders"], context.prevOrders);
+        queryClient.setQueryData([QueryKeyEnum.ORDERS], context.prevOrders);
       }
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
-      queryClient.invalidateQueries({ queryKey: ["user-activities-summary"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+      queryClient.invalidateQueries({ queryKey: [QueryKeyEnum.ORDERS] });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.USER_ACTIVITIES_SUMMARY],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+      });
     },
   });
 
@@ -70,9 +79,10 @@ export const useOrderStatusMutation = (businessId: number) => {
 
   const mutation = useCustomMutation(OrderApiService.createOrder, {
     onMutate: async (newOrder) => {
-      await queryClient.cancelQueries({ queryKey: ["orders"] });
+      await queryClient.cancelQueries({ queryKey: [QueryKeyEnum.ORDERS] });
 
-      const prevOrders = queryClient.getQueryData<Order[]>(["orders"]) || [];
+      const prevOrders =
+        queryClient.getQueryData<Order[]>([QueryKeyEnum.ORDERS]) || [];
 
       const optimisticOrder = {
         id: `temp-${Date.now()}`,
@@ -93,7 +103,10 @@ export const useOrderStatusMutation = (businessId: number) => {
       //   createdAt: new Date().toISOString(),
       // };
 
-      queryClient.setQueryData(["orders"], [...prevOrders, optimisticOrder]);
+      queryClient.setQueryData(
+        [QueryKeyEnum.ORDERS],
+        [...prevOrders, optimisticOrder]
+      );
 
       toast.loading("Placing your order...");
 
@@ -101,7 +114,7 @@ export const useOrderStatusMutation = (businessId: number) => {
     },
 
     onSuccess: (data) => {
-      queryClient.setQueryData<Order[]>(["orders"], (old = []) =>
+      queryClient.setQueryData<Order[]>([QueryKeyEnum.ORDERS], (old = []) =>
         old.map((o) => (o.id.startsWith("temp-") ? data : o))
       );
       toast.success("Order confirmed!");
@@ -110,14 +123,18 @@ export const useOrderStatusMutation = (businessId: number) => {
     onError: (error: any, _, context) => {
       toast.error("Order failed. Please try again.");
       if (context?.prevOrders) {
-        queryClient.setQueryData(["orders"], context.prevOrders);
+        queryClient.setQueryData([QueryKeyEnum.ORDERS], context.prevOrders);
       }
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
-      queryClient.invalidateQueries({ queryKey: ["user-activities-summary"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+      queryClient.invalidateQueries({ queryKey: [QueryKeyEnum.ORDERS] });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.USER_ACTIVITIES_SUMMARY],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+      });
     },
   });
 
