@@ -12,6 +12,7 @@ import { useAuth } from "@/providers";
 import { toast } from "sonner";
 import { Business } from "@/data/interfaces/Business";
 import { useQueryClient } from "@tanstack/react-query";
+import { QueryKeyEnum } from "@/data/enums";
 
 export function BusinessReviews({ business }: { business: Business }) {
   const PAGE_SIZE = 10;
@@ -64,7 +65,9 @@ export function BusinessReviews({ business }: { business: Business }) {
   }, [reviews, user?.id]);
 
   useEffect(() => {
-    queryClient.removeQueries({ queryKey: ["business-reviews", business.id] });
+    queryClient.removeQueries({
+      queryKey: [QueryKeyEnum.BUSINESS_REVIEWS, business.id],
+    });
     // window.scrollTo({ top: 0 });
     refetch();
   }, [business.id, selectedRating, refetch, queryClient]);

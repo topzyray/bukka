@@ -10,6 +10,7 @@ import { extractErrorMessage, StorageUtilsHelper } from "@/utils";
 import { useCustomMutation } from "@/data/mutations/base";
 import { useQueryClient } from "@tanstack/react-query";
 import { STORE_KEYS } from "@/configs";
+import { QueryKeyEnum } from "@/data/enums";
 
 export const useSignIn = () => {
   const queryClient = useQueryClient();
@@ -32,29 +33,31 @@ export const useSignIn = () => {
           }
         }
 
-        queryClient.setQueryData(["current-user"], user);
+        queryClient.setQueryData([QueryKeyEnum.CURRENT_USER], user);
 
         await Promise.allSettled([
           queryClient.prefetchQuery({
-            queryKey: ["current-user"],
+            queryKey: [QueryKeyEnum.CURRENT_USER],
             queryFn: () => UserApiService.getLoggedInUser(),
           }),
           queryClient.prefetchQuery({
-            queryKey: ["user-files"],
+            queryKey: [QueryKeyEnum.USER_FILES],
             queryFn: () => FileApiService.getLoggedInUserFiles(),
           }),
           queryClient.prefetchQuery({
-            queryKey: ["notifications"],
+            queryKey: [QueryKeyEnum.NOTIFICATIONS],
             queryFn: () => UserNotificationApiService.getAllMyNotifications(),
           }),
           queryClient.prefetchQuery({
-            queryKey: ["notification-setting"],
+            queryKey: [QueryKeyEnum.NOTIFICATION_SETTING],
             queryFn: () =>
               NotificationSettingApiService.getMyNotificationSetting(),
           }),
         ]);
 
-        await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+        await queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.CURRENT_USER],
+        });
       },
 
       onErrorCallback: (error) => {

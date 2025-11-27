@@ -5,10 +5,10 @@ import { VendorOverview } from "@/features/dashboard/vendor/overview";
 import { DefaultOverview } from "@/features/dashboard/other/overview-default";
 import { UserOverview } from "@/features/dashboard/user/overview";
 import { UserRoleEnum } from "@/data/enums";
-import { useCurrentUser } from "@/data/queries";
+import { useAuth } from "@/providers";
 
 export default function OverviewPage() {
-  const { data: user } = useCurrentUser();
+  const { user } = useAuth();
 
   switch (user?.role) {
     case UserRoleEnum.ADMIN:

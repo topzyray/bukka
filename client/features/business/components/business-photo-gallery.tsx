@@ -12,6 +12,7 @@ import {
 import {
   FileCategoryEnum,
   FileReferenceTypeEnum,
+  QueryKeyEnum,
   UserRoleEnum,
 } from "@/data/enums";
 import { Business } from "@/data/interfaces/Business";
@@ -43,7 +44,9 @@ export function BusinessPhotoGallery({
 
   const deleteFileMutation = useDeleteFile({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["business-files"] });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.BUSINESS_FILES],
+      });
     },
   });
 
@@ -167,7 +170,7 @@ export function BusinessPhotoGallery({
               }}
               onUploadSuccess={() => {
                 queryClient.invalidateQueries({
-                  queryKey: ["business-files", business?.id],
+                  queryKey: [QueryKeyEnum.BUSINESS_FILES, business?.id],
                 });
               }}
             />

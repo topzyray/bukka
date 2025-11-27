@@ -7,6 +7,7 @@ import {
 } from "@/data/queries/base";
 import { BusinessApiService } from "@/data/services/BusinessApiService";
 import { Business } from "@/data/interfaces/Business";
+import { QueryKeyEnum } from "../enums";
 
 export const useInfiniteBusinessesQuery = ({
   search = "",
@@ -20,7 +21,7 @@ export const useInfiniteBusinessesQuery = ({
   enabled?: boolean;
 }) => {
   return useCustomInfiniteQuery<Business>(
-    ["businesses-infinite", search, filters],
+    [QueryKeyEnum.BUSINESSES_INFINITE, search, filters],
     ({ pageNumber, ...filters }) =>
       BusinessApiService.getBusinesses({
         pageNumber,
@@ -50,7 +51,7 @@ export const useBusinessesQuery = ({
   enabled?: boolean;
 }) => {
   return useCustomQuery<BukkaResponse<PagedResponse<Business[]>>, Error>(
-    ["businesses", search, filters, pageNumber, pageSize],
+    [QueryKeyEnum.BUSINESSES, search, filters, pageNumber, pageSize],
     (params?: QueryParams) =>
       BusinessApiService.getBusinesses({
         pageNumber: params?.pageNumber ?? pageNumber,
@@ -80,7 +81,7 @@ export const useMyBusinessesQuery = ({
   enabled?: boolean;
 }) => {
   return useCustomQuery<BukkaResponse<PagedResponse<Business[]>>, Error>(
-    ["my-businesses", search, filters, pageNumber, pageSize],
+    [QueryKeyEnum.MY_BUSINESSES, search, filters, pageNumber, pageSize],
     (params?: QueryParams) =>
       BusinessApiService.getLoggedInVendorBusinesses({
         pageNumber: params?.pageNumber ?? pageNumber,
@@ -98,7 +99,7 @@ export const useMyBusinessesQuery = ({
 
 export const useBusinessById = ({ businessId }: { businessId: number }) => {
   return useCustomQuery<BukkaResponse<Business>>(
-    ["business", businessId],
+    [QueryKeyEnum.BUSINESS, businessId],
     () => BusinessApiService.getBusinessById(businessId),
     { enabled: !!businessId, placeholderData: (prev) => prev }
   );

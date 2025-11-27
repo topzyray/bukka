@@ -4,6 +4,7 @@ import { STORE_KEYS } from "@/configs/store.config";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { authRoutes } from "@/constants/routes";
+import { QueryKeyEnum } from "@/data/enums";
 
 export const useTokenRefresh = () => {
   const queryClient = useQueryClient();
@@ -30,7 +31,9 @@ export const useTokenRefresh = () => {
           [STORE_KEYS.USER_REFRESH_TOKEN, newRefreshToken]
         );
 
-        await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+        await queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.CURRENT_USER],
+        });
       } catch (error) {
         console.warn("Token refresh failed", error);
         StorageUtilsHelper.deleteFromLocalStorage([

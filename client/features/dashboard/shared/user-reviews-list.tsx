@@ -18,6 +18,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { PaginationHelper } from "@/helpers/pagination-helper";
 import { UpdateReviewModal } from "./modals/update-review-modal";
 import { useUserAllReviewsQuery } from "@/data/queries/use-reviews";
+import { QueryKeyEnum } from "@/data/enums";
 
 export function UserReviewsList() {
   const PAGE_SIZE = 10;
@@ -56,7 +57,7 @@ export function UserReviewsList() {
       total,
       pageSize: PAGE_SIZE,
       queryClient,
-      queryKey: ["user-reviews"],
+      queryKey: [QueryKeyEnum.USER_REVIEWS],
       setPage,
     });
   };
@@ -72,7 +73,9 @@ export function UserReviewsList() {
   };
 
   useEffect(() => {
-    queryClient.removeQueries({ queryKey: ["user-reviews", user?.id] });
+    queryClient.removeQueries({
+      queryKey: [QueryKeyEnum.USER_REVIEWS, user?.id],
+    });
     refetch();
   }, [user?.id, selectedRating, refetch, queryClient]);
 

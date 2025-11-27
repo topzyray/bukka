@@ -16,7 +16,11 @@ import { Button } from "@/components/ui/button";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import { useAuth } from "@/providers/auth-provider";
 import { toast } from "sonner";
-import { FileCategoryEnum, FileReferenceTypeEnum } from "@/data/enums";
+import {
+  FileCategoryEnum,
+  FileReferenceTypeEnum,
+  QueryKeyEnum,
+} from "@/data/enums";
 import { useFileUpload } from "@/data/mutations/file/use-file-uploader";
 import { FileApiService } from "@/data/services";
 import { useQueryClient } from "@tanstack/react-query";
@@ -69,8 +73,8 @@ export function ImageUploadStep({
   const { handleFileUpload, isUploading } = useFileUpload({
     uploadFn: async (formData: FormData) => FileApiService.uploadFile(formData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["current-user"] });
-      queryClient.invalidateQueries({ queryKey: ["user-files"] });
+      queryClient.invalidateQueries({ queryKey: [QueryKeyEnum.CURRENT_USER] });
+      queryClient.invalidateQueries({ queryKey: [QueryKeyEnum.USER_FILES] });
       saveOnboardingProgressMutation(progressPayload);
       onNext();
     },

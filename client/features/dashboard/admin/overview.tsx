@@ -44,6 +44,7 @@ import { useAuth } from "@/providers";
 import { useAdminOverview } from "@/data/queries/use-analytics-query";
 import { UserRole } from "@/data/interfaces/Auth";
 import { TextHelper } from "@/helpers";
+import { Skeleton } from "@/components/ui";
 
 const ICON_KEYWORDS: Record<string, any> = {
   user: Users,
@@ -77,7 +78,7 @@ function getIconForStat(title: string) {
 export function AdminOverview() {
   const router = useRouter();
   const { user } = useAuth();
-  const { data: adminOverview } = useAdminOverview({
+  const { data: adminOverview, isLoading } = useAdminOverview({
     userId: user?.id as number,
     role: user?.role as UserRole,
   });
@@ -137,38 +138,53 @@ export function AdminOverview() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {overviewData?.stats.map((stat, index) => {
-          const Icon = getIconForStat(stat.title);
-
-          return (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-            >
-              <Card className="shadow-card">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        {stat.title}
-                      </p>
-                      <p className="text-2xl font-bold">{stat.value}</p>
-                      <Badge
-                        variant={stat.positive ? "default" : "destructive"}
-                        className="mt-1"
-                      >
-                        {stat.change}
-                      </Badge>
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <Card key={index} className="shadow-card p-6">
+                <CardContent>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-6 w-16" />
+                      <Skeleton className="h-4 w-12 mt-1" />
                     </div>
-                    <Icon className="w-8 h-8 text-primary" />
+                    <Skeleton className="w-8 h-8 rounded-full" />
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
-          );
-        })}
+            ))
+          : overviewData?.stats.map((stat, index) => {
+              const Icon = getIconForStat(stat.title);
+
+              return (
+                <motion.div
+                  key={stat.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                >
+                  <Card className="shadow-card">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">
+                            {stat.title}
+                          </p>
+                          <p className="text-2xl font-bold">{stat.value}</p>
+                          <Badge
+                            variant={stat.positive ? "default" : "destructive"}
+                            className="mt-1"
+                          >
+                            {stat.change}
+                          </Badge>
+                        </div>
+                        <Icon className="w-8 h-8 text-primary" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
       </div>
 
       {/* Charts Grid */}
@@ -183,24 +199,35 @@ export function AdminOverview() {
             <CardDescription>Monthly user registration trends</CardDescription>
           </CardHeader>
 
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={overviewData?.userGrowthData}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="month" />
-                <YAxis domain={[0, "auto"]} allowDecimals={false} />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="users"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={3}
-                  dot={{ r: 5 }}
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
+          {isLoading ? (
+            <CardContent>
+              <Skeleton className="h-[300px] w-full" />
+            </CardContent>
+          ) : (
+            overviewData?.userGrowthData && (
+              <CardContent className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={overviewData?.userGrowthData}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      className="opacity-30"
+                    />
+                    <XAxis dataKey="month" />
+                    <YAxis domain={[0, "auto"]} allowDecimals={false} />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="users"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={3}
+                      dot={{ r: 5 }}
+                      activeDot={{ r: 8 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            )
+          )}
         </Card>
 
         {/* Business Status */}
@@ -261,7 +288,28 @@ export function AdminOverview() {
         </CardHeader>
 
         <CardContent>
-          {overviewData?.businessCategoryData?.length ? (
+          {isLoading ? (
+            <>
+              {/* 🧮 Metric Cards Row Skeleton */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                {Array.from({ length: 3 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-3 p-4 rounded-lg bg-muted/40 border"
+                  >
+                    <Skeleton className="w-6 h-6 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-6 w-12" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 📊 Bar Chart Skeleton */}
+              <Skeleton className="h-[400px] w-full rounded-lg" />
+            </>
+          ) : overviewData?.businessCategoryData?.length ? (
             <>
               {/* 🧮 Metric Cards Row */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -319,7 +367,7 @@ export function AdminOverview() {
               {/* 📊 Bar Chart */}
               <ResponsiveContainer
                 width="100%"
-                height={300}
+                height={400}
                 className="capitalize"
               >
                 <BarChart
@@ -358,6 +406,7 @@ export function AdminOverview() {
           )}
         </CardContent>
       </Card>
+
       {/* Orders Chart */}
       <Card className="shadow-card">
         <CardHeader>
@@ -367,17 +416,23 @@ export function AdminOverview() {
           </CardTitle>
           <CardDescription>Order volume for the past week</CardDescription>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={overviewData?.orderData}>
-              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis dataKey="day" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="orders" fill="hsl(var(--primary))" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
+        {isLoading ? (
+          <CardContent>
+            <Skeleton className="h-[400px] w-full" />
+          </CardContent>
+        ) : (
+          <CardContent>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={overviewData?.orderData}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis dataKey="day" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="orders" fill="hsl(var(--primary))" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        )}
       </Card>
 
       {/* Recent Activity */}
@@ -389,20 +444,26 @@ export function AdminOverview() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {overviewData?.recentActivity.map((activity, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-3 rounded-lg bg-muted/30"
-            >
-              <div>
-                <p className="font-medium">{activity.action}</p>
-                <p className="text-sm text-muted-foreground">{activity.user}</p>
-              </div>
-              <span className="text-sm text-muted-foreground">
-                {TextHelper.smartTimeAgo(activity?.time)}
-              </span>
-            </div>
-          ))}
+          {isLoading
+            ? Array.from({ length: 5 }).map((_, idx) => (
+                <Skeleton key={idx} className="h-12 w-full rounded-lg" />
+              ))
+            : overviewData?.recentActivity.map((activity, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted/30"
+                >
+                  <div>
+                    <p className="font-medium">{activity.action}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {activity.user}
+                    </p>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {TextHelper.smartTimeAgo(activity?.time)}
+                  </span>
+                </div>
+              ))}
         </CardContent>
       </Card>
     </section>

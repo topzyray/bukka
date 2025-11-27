@@ -2,20 +2,38 @@
 
 import { UserApiService } from "@/data/services";
 import { useCustomQuery } from "./base";
+import { useQueryClient } from "@tanstack/react-query";
+import { QueryKeyEnum } from "../enums";
 
 export const useCurrentUser = () => {
-  return useCustomQuery(
-    ["current-user"],
-    () => UserApiService.getLoggedInUser(),
+  const queryClient = useQueryClient();
+  const ACCESS_TOKEN_MAX_AGE = 1800000; // 30 minutes
+  const query = useCustomQuery(
+    [QueryKeyEnum.CURRENT_USER],
+    async () => {
+      try {
+        return await UserApiService.getLoggedInUser();
+      } catch (err: any) {
+        if (err?.status === 401) {
+          queryClient.setQueryData([QueryKeyEnum.CURRENT_USER], null);
+        }
+        throw err;
+      }
+    },
     {
       enabled: true,
-      staleTime: 1000 * 60 * 5,
-      // refetchInterval: 1000 * 60 * 10, // This can polling and can waste resources
+      staleTime: ACCESS_TOKEN_MAX_AGE,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      placeholderData: (prev) => prev,
+      // placeholderData: (prev) => prev,
+      placeholderData: () =>
+        queryClient.getQueryData([QueryKeyEnum.CURRENT_USER]) || null,
     }
   );
+  const isFirstLoad =
+    query.isLoading &&
+    queryClient.getQueryData([QueryKeyEnum.CURRENT_USER]) === undefined;
+  return { ...query, isFirstLoad };
 };
 
 // "use client";
@@ -56,7 +74,7 @@ export const useCurrentUser = () => {
 //   }, [pathname, allowedPathPatterns]);
 
 //   const query = useCustomQuery(
-//     ["current-user"],
+//     [QueryKeyEnum.CURRENT_USER],
 //     () => UserApiService.getLoggedInUser(),
 //     {
 //       enabled: false, // start disabled to avoid SSR/client mismatch

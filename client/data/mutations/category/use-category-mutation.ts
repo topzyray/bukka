@@ -1,3 +1,4 @@
+import { QueryKeyEnum } from "@/data/enums";
 import { useCustomMutation } from "@/data/mutations/base";
 import { BusinessCategoryApiService } from "@/data/services/BusinessCategoryApiService";
 import { useQueryClient } from "@tanstack/react-query";
@@ -14,10 +15,13 @@ export const useCreateCategory = ({
   return useCustomMutation(BusinessCategoryApiService.createCategory, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
-        queryKey: ["business-categories"],
+        queryKey: [QueryKeyEnum.BUSINESS_CATEGORIES],
       });
       queryClient.invalidateQueries({
-        queryKey: ["admin-overview"],
+        queryKey: [QueryKeyEnum.BUSINESS_CATEGORIES_INFINITE],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
       });
       resetForm();
       onSuccess?.();
@@ -34,10 +38,13 @@ export const useUpdateCategory = ({
   return useCustomMutation(BusinessCategoryApiService.updateCategory, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
-        queryKey: ["business-categories"],
+        queryKey: [QueryKeyEnum.BUSINESS_CATEGORIES],
       });
       queryClient.invalidateQueries({
-        queryKey: ["admin-overview"],
+        queryKey: [QueryKeyEnum.BUSINESS_CATEGORIES_INFINITE],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
       });
       onSuccess?.();
     },
@@ -52,7 +59,15 @@ export const useDeleteCategory = ({
   const queryClient = useQueryClient();
   return useCustomMutation(BusinessCategoryApiService.deleteCategory, {
     onSuccessCallback: async () => {
-      queryClient.removeQueries({ queryKey: ["business-categories"] });
+      queryClient.removeQueries({
+        queryKey: [QueryKeyEnum.BUSINESS_CATEGORIES],
+      });
+      queryClient.removeQueries({
+        queryKey: [QueryKeyEnum.BUSINESS_CATEGORIES_INFINITE],
+      });
+      queryClient.removeQueries({
+        queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+      });
       onSuccess?.();
     },
   });

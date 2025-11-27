@@ -1,14 +1,21 @@
 import { UserNotificationApiService } from "@/data/services";
 import { useCustomMutation } from "../base";
 import { useQueryClient } from "@tanstack/react-query";
+import { QueryKeyEnum } from "@/data/enums";
 
 export const useReadAllNotificaiton = ({ userId }: { userId?: number }) => {
   const queryClient = useQueryClient();
   return useCustomMutation(UserNotificationApiService.readAllMyNotification, {
     onSuccessCallback() {
-      queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
-      queryClient.invalidateQueries({ queryKey: ["unread-count", userId] });
-      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS, userId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.UNREAD_COUNT, userId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+      });
     },
   });
 };
@@ -19,8 +26,12 @@ export const useReadNotificaiton = ({ userId }: { userId?: number }) => {
     (id: number) => UserNotificationApiService.readNotificationById(id),
     {
       onSuccessCallback() {
-        queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
-        queryClient.invalidateQueries({ queryKey: ["unread-count", userId] });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.NOTIFICATIONS, userId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.UNREAD_COUNT, userId],
+        });
       },
     }
   );

@@ -7,6 +7,7 @@ import {
 import { SupportApiService } from "../services";
 import { Support } from "../interfaces/Support";
 import { User } from "../interfaces/User";
+import { QueryKeyEnum } from "../enums";
 
 export const useSupportsQuery = ({
   user,
@@ -22,7 +23,7 @@ export const useSupportsQuery = ({
   pageSize?: number;
 }) => {
   return useCustomQuery<BukkaResponse<PagedResponse<Support[]>>, Error>(
-    ["supports", search, filters, pageNumber, pageSize],
+    [QueryKeyEnum.SUPPORTS, search, filters, pageNumber, pageSize],
     (params?: QueryParams) =>
       SupportApiService.getSupports({
         pageNumber: params?.pageNumber ?? pageNumber,
@@ -46,7 +47,7 @@ export const useSupportById = ({
   user: User;
 }) => {
   return useCustomQuery<BukkaResponse<Support>>(
-    ["support", ticketId],
+    [QueryKeyEnum.SUPPORT, ticketId],
     () => SupportApiService.getSupportByTicketId(ticketId),
     { enabled: !!ticketId && !!user, placeholderData: (prev) => prev }
   );

@@ -1,6 +1,7 @@
 import { useCustomInfiniteQuery } from "@/data/queries/base";
 import { BusinessApiService } from "@/data/services/BusinessApiService";
 import { Business } from "@/data/interfaces/Business";
+import { QueryKeyEnum } from "../enums";
 
 export const useVendorBusinesses = ({
   search = "",
@@ -14,7 +15,7 @@ export const useVendorBusinesses = ({
   enabled?: boolean;
 }) => {
   return useCustomInfiniteQuery<Business>(
-    ["vendor-businesses", search, filters],
+    [QueryKeyEnum.VENDOR_BUSINESSES, search, filters],
     ({ pageNumber, ...filters }) =>
       BusinessApiService.getLoggedInVendorBusinesses({
         pageNumber,

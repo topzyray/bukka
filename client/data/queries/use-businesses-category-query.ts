@@ -7,6 +7,7 @@ import {
 } from "@/data/queries/base";
 import { BusinessCategoryApiService } from "../services/BusinessCategoryApiService";
 import { BusinessCategory } from "../interfaces/BusinessCategory";
+import { QueryKeyEnum } from "../enums";
 
 export const useInfiniteCategoriesQuery = ({
   search = "",
@@ -20,7 +21,7 @@ export const useInfiniteCategoriesQuery = ({
   enabled?: boolean;
 }) => {
   return useCustomInfiniteQuery<BusinessCategory>(
-    ["business-categories-infinite", search, filters],
+    [QueryKeyEnum.BUSINESS_CATEGORIES_INFINITE, search, filters],
     ({ pageNumber, ...filters }) =>
       BusinessCategoryApiService.getCategories({
         pageNumber,
@@ -53,7 +54,7 @@ export const useCategoriesQuery = ({
     BukkaResponse<PagedResponse<BusinessCategory[]>>,
     Error
   >(
-    ["business-categories", search, filters, pageNumber, pageSize],
+    [QueryKeyEnum.BUSINESS_CATEGORIES, search, filters, pageNumber, pageSize],
     (params?: QueryParams) =>
       BusinessCategoryApiService.getCategories({
         pageNumber: params?.pageNumber ?? pageNumber,

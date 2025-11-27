@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/providers";
 import { BukkaButton } from "@/components/ui";
-import { UserRoleEnum } from "@/data/enums";
+import { QueryKeyEnum, UserRoleEnum } from "@/data/enums";
 import { Support } from "@/data/interfaces/Support";
 import { DataTable } from "@/components/ui/data-table";
 import { useQueryClient } from "@tanstack/react-query";
@@ -65,7 +65,7 @@ export function SupportTicketList() {
       total: total,
       pageSize: PAGE_SIZE,
       queryClient: queryClient,
-      queryKey: ["businesses"],
+      queryKey: [QueryKeyEnum.SUPPORTS],
       setPage: setPage,
     });
   };
@@ -75,19 +75,19 @@ export function SupportTicketList() {
     const sortBy = s?.id;
     const sortOrder = s?.desc ? "desc" : "asc";
     setFilters((f) => ({ ...f, sortBy, sortOrder }));
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.SUPPORTS] });
     setPage(1);
   };
 
   const onSearchChange = (term: string) => {
     setSearch(term);
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.SUPPORTS] });
     setPage(1);
   };
 
   const onFilterChange = (f: Record<string, any>) => {
     setFilters(f);
-    queryClient.removeQueries({ queryKey: ["businesses"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.SUPPORTS] });
     setPage(1);
   };
 
@@ -151,7 +151,7 @@ export function SupportTicketList() {
             user={user}
             initialData={mode === "edit" ? initialData : undefined}
             onSuccess={() => {
-              queryClient.removeQueries({ queryKey: ["supports"] });
+              queryClient.removeQueries({ queryKey: [QueryKeyEnum.SUPPORTS] });
               setPage(1);
               setIsModalOpen(false);
             }}

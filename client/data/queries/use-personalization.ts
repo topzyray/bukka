@@ -1,10 +1,11 @@
 import { BukkaResponse, useCustomQuery } from "./base";
 import { UserPersonalizationApiService } from "../services";
 import { UserPersonalization } from "../interfaces/UserPersonalization";
+import { QueryKeyEnum } from "../enums";
 
 export const useUserPersonalization = ({ userId }: { userId?: number }) => {
   return useCustomQuery<BukkaResponse<UserPersonalization>>(
-    ["user-personalization", userId],
+    [QueryKeyEnum.USER_PERSONALIZATION, userId],
     () => UserPersonalizationApiService.getLoggedUserPersonalization(),
     {
       enabled: !!userId,

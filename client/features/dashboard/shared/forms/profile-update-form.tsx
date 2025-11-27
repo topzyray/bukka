@@ -4,7 +4,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { TextHelper } from "@/helpers";
-import { GenderEnum } from "@/data/enums";
+import { GenderEnum, QueryKeyEnum } from "@/data/enums";
 import { useForm } from "react-hook-form";
 import { Card, Form } from "@/components/ui";
 import { User } from "@/data/interfaces/User";
@@ -96,7 +96,9 @@ export function ProfileUpdateForm({
   const { mutateAsync: updateUserData, isPending: isUpdatingUserData } =
     useUpdateUserData({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["current-user"] });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.CURRENT_USER],
+        });
         setEditProfile(false);
       },
     });

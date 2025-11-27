@@ -1,4 +1,4 @@
-import { UserRoleEnum } from "../enums";
+import { QueryKeyEnum, UserRoleEnum } from "../enums";
 import { AdminOverview, UserActivitiesSummary } from "../interfaces/Analytics";
 import { UserRole } from "../interfaces/Auth";
 import { AnalyticsApiService } from "../services/AnalyticsApiService";
@@ -6,7 +6,7 @@ import { BukkaResponse, useCustomQuery } from "./base";
 
 export const useUserActivitySummary = ({ userId }: { userId: number }) => {
   return useCustomQuery<BukkaResponse<UserActivitiesSummary>>(
-    ["user-activities-summary"],
+    [QueryKeyEnum.USER_ACTIVITIES_SUMMARY],
     () => AnalyticsApiService.userActivitySummary(),
     {
       enabled: !!userId,
@@ -23,7 +23,7 @@ export const useAdminOverview = ({
   role: UserRole;
 }) => {
   return useCustomQuery<BukkaResponse<AdminOverview>>(
-    ["admin-overview"],
+    [QueryKeyEnum.ADMIN_OVERVIEW],
     () => AnalyticsApiService.adminOverview(),
     {
       enabled: !!userId && role === UserRoleEnum.ADMIN,

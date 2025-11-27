@@ -8,6 +8,7 @@ import { CircularLoader } from "@/components/loaders/circular-loader";
 import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
 import { CreateEditPersonalizationForm } from "@/features/dashboard/user/forms/create-edit-personalization";
 import { extractErrorMessage } from "@/utils";
+import { QueryKeyEnum } from "@/data/enums";
 
 export function UserPersonalizedDetailsStep({
   onNext,
@@ -30,7 +31,9 @@ export function UserPersonalizedDetailsStep({
   const { mutateAsync: updateUserData, isPending: isUpdatingUserData } =
     useUpdateUserData({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["current-user"] });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.CURRENT_USER],
+        });
         onNext();
       },
       toastStatusMessage: false,

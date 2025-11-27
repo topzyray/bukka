@@ -4,6 +4,7 @@ import { UseFormReset } from "react-hook-form";
 import { extractErrorMessage } from "@/utils";
 import { useCustomMutation } from "../base";
 import { useQueryClient } from "@tanstack/react-query";
+import { QueryKeyEnum } from "@/data/enums";
 
 export const useAccountVerification = ({
   resetForm,
@@ -17,7 +18,9 @@ export const useAccountVerification = ({
   const { mutate: verifyNewUser, isPending: isVerifyingUser } =
     useCustomMutation(AuthApiService.confirmEmail, {
       onSuccessCallback: () => {
-        queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+        });
         setTimeout(() => {
           router.push("/signin");
         }, 3000);

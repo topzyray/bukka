@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { PaginationHelper } from "@/helpers/pagination-helper";
 import { useDeleteCategory } from "@/data/mutations/category/use-category-mutation";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
+import { QueryKeyEnum } from "@/data/enums";
 
 export function CategoryList() {
   const PAGE_SIZE = 10;
@@ -54,7 +55,7 @@ export function CategoryList() {
       total: total,
       pageSize: PAGE_SIZE,
       queryClient: queryClient,
-      queryKey: ["business-categories"],
+      queryKey: [QueryKeyEnum.BUSINESS_CATEGORIES],
       setPage: setPage,
     });
   };
@@ -64,19 +65,19 @@ export function CategoryList() {
     const sortBy = s?.id;
     const sortOrder = s?.desc ? "desc" : "asc";
     setFilters((f) => ({ ...f, sortBy, sortOrder }));
-    queryClient.removeQueries({ queryKey: ["business-categories"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.BUSINESS_CATEGORIES] });
     setPage(1);
   };
 
   const onSearchChange = (term: string) => {
     setSearch(term);
-    queryClient.removeQueries({ queryKey: ["business-categories"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.BUSINESS_CATEGORIES] });
     setPage(1);
   };
 
   const onFilterChange = (f: Record<string, any>) => {
     setFilters(f);
-    queryClient.removeQueries({ queryKey: ["business-categories"] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.BUSINESS_CATEGORIES] });
     setPage(1);
   };
 
@@ -138,7 +139,7 @@ export function CategoryList() {
             initialData={mode === "edit" ? initialData : undefined}
             onSuccess={() => {
               queryClient.removeQueries({
-                queryKey: ["business-categories"],
+                queryKey: [QueryKeyEnum.BUSINESS_CATEGORIES],
               });
               setPage(1);
               setIsModalOpen(false);

@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useOrdersQuery } from "@/data/queries";
+import { QueryKeyEnum } from "@/data/enums";
 
 export function OrdersTableBase({
   title,
@@ -50,7 +51,7 @@ export function OrdersTableBase({
       total,
       pageSize: PAGE_SIZE,
       queryClient,
-      queryKey: ["orders"],
+      queryKey: [QueryKeyEnum.ORDERS],
       setPage,
     });
   };

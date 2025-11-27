@@ -7,6 +7,7 @@ import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
 import { useAuth } from "@/providers";
 import { useQueryClient } from "@tanstack/react-query";
 import { CircularLoader } from "@/components/loaders/circular-loader";
+import { QueryKeyEnum } from "@/data/enums";
 
 export default function BusinessDetailsStep({
   onNext,
@@ -25,7 +26,9 @@ export default function BusinessDetailsStep({
   const { mutateAsync: updateUserData, isPending: isUpdatingUserData } =
     useUpdateUserData({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["current-user"] });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.CURRENT_USER],
+        });
         onNext();
       },
       toastStatusMessage: false,
