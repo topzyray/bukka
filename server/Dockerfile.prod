@@ -25,7 +25,6 @@ RUN pnpm install --prod --frozen-lockfile
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/src/UtilityLayer/Views/Templates ./dist/UtilityLayer/Views/Templates
 COPY --from=builder /app/src/UtilityLayer/Views/Templates/Images ./dist/UtilityLayer/Views/Templates/Images
 
@@ -33,4 +32,4 @@ ENV NODE_ENV=production
 ENV EMAIL_TEMPLATES_DIR=/app/dist/UtilityLayer/Views/Templates
 
 EXPOSE 8000
-CMD ["pnpm", "start:prod"]
+CMD ["node", "dist/main"]
