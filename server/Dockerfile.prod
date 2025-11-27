@@ -24,7 +24,7 @@ RUN pnpm install --prod --frozen-lockfile
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/.pnpm/@prisma+client@6.19.0_prisma@6.19.0_typescript@5.9.3__typescript@5.9.3/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/src/UtilityLayer/Views/Templates ./dist/UtilityLayer/Views/Templates
 COPY --from=builder /app/src/UtilityLayer/Views/Templates/Images ./dist/UtilityLayer/Views/Templates/Images
 
