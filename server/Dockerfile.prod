@@ -63,16 +63,15 @@ RUN pnpm build
 
 # ---- Production Stage ----
 FROM node:22-alpine AS prod
-LABEL stage=prod
 WORKDIR /app
 
-# Runtime dependencies for Prisma & Sharp
+# Install runtime deps for Prisma + Sharp
 RUN apk add --no-cache libc6-compat
 
-# Copy pnpm from builder
-COPY --from=builder /usr/local/share/.config/yarn/global/node_modules/.bin/pnpm /usr/local/bin/pnpm
+# Install pnpm directly
+RUN npm install -g pnpm
 
-# Copy package files and install only prod dependencies
+# Copy package files and install only prod deps
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
 
@@ -84,11 +83,11 @@ COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/clie
 # Copy templates if needed
 COPY --from=builder /app/src/UtilityLayer/Views/Templates ./dist/UtilityLayer/Views/Templates
 
-# Set environment
+# Environment
 ENV NODE_ENV=production
 ENV EMAIL_TEMPLATES_DIR=/app/dist/UtilityLayer/Views/Templates
 
-# Expose default port
+# Expose port
 EXPOSE 8000
 
 # Start the app
