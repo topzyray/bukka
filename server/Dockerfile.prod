@@ -8,7 +8,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY prisma ./prisma
-RUN pnpm prisma generate --output ./prisma-client
+RUN npx prisma generate
 
 COPY . .
 RUN pnpm build
@@ -17,14 +17,13 @@ RUN pnpm build
 FROM node:22-alpine AS prod
 WORKDIR /app
 
-RUN npm install -g pnpm
-
 COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm
 RUN pnpm install --prod --frozen-lockfile
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/prisma-client ./node_modules/@prisma/client
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/src/UtilityLayer/Views/Templates ./dist/UtilityLayer/Views/Templates
 COPY --from=builder /app/src/UtilityLayer/Views/Templates/Images ./dist/UtilityLayer/Views/Templates/Images
 
