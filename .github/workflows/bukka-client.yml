@@ -16,7 +16,12 @@ jobs:
       # Checkout code
       - uses: actions/checkout@v4
 
-      # Set up Node.js
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+          run_install: false
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -24,25 +29,10 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: "client/pnpm-lock.yaml"
 
-      # Cache node_modules folder for faster installs
-      # - name: Cache node modules
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ~/.npm
-      #     key: ${{ runner.os }}-node-${{ hashFiles('client/pnpm-lock.yaml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-node-
-
-      # Install pnpm globally
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      # Install dependencies
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
         working-directory: client
+        run: pnpm install --frozen-lockfile
 
-      # Inject environment variables
       - name: Set Environment Variables
         run: |
           echo "NEXT_PUBLIC_NODE_ENV=${{ secrets.NEXT_PUBLIC_NODE_ENV }}" >> $GITHUB_ENV
@@ -52,12 +42,10 @@ jobs:
           echo "NEXT_PUBLIC_DOMAIN_URL=${{ secrets.NEXT_PUBLIC_DOMAIN_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN=${{ secrets.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
-      # Lint the code
       - name: Lint
         run: pnpm lint
         working-directory: client
 
-      # Run type check
       - name: Type Check
         run: pnpm type-check
         working-directory: client
