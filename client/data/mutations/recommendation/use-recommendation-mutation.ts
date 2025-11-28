@@ -1,6 +1,6 @@
 import { QueryKeyEnum } from "@/data/enums";
 import { useCustomMutation } from "@/data/mutations/base";
-import { BusinessApiService } from "@/data/services/BusinessApiService";
+import { RecommendationApiService } from "@/data/services";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const useAddRecommendation = ({
@@ -11,7 +11,7 @@ export const useAddRecommendation = ({
   onSuccess?: () => void;
 }) => {
   const queryClient = useQueryClient();
-  return useCustomMutation(BusinessApiService.createBusiness, {
+  return useCustomMutation(RecommendationApiService.createRecommenation, {
     onSuccessCallback: async () => {
       await queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.RECOMMENDATIONS],
@@ -29,55 +29,41 @@ export const useAddRecommendation = ({
 };
 
 export const useApproveRecommendation = ({
-  resetForm,
   onSuccess,
 }: {
-  resetForm: () => void;
   onSuccess?: () => void;
 }) => {
   const queryClient = useQueryClient();
-  return useCustomMutation(
-    ({ id, payload }: { id: number; payload: any }) =>
-      BusinessApiService.updateBusiness(id, payload),
-    {
-      onSuccessCallback: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: [QueryKeyEnum.RECOMMENDATIONS],
-        });
-        await queryClient.invalidateQueries({
-          queryKey: [QueryKeyEnum.BUSINESSES],
-        });
-        resetForm();
-        onSuccess?.();
-      },
-    }
-  );
+  return useCustomMutation(RecommendationApiService.approveRecommendation, {
+    onSuccessCallback: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.RECOMMENDATIONS],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.BUSINESSES],
+      });
+      onSuccess?.();
+    },
+  });
 };
 
 export const useRejectRecommendation = ({
-  resetForm,
   onSuccess,
 }: {
-  resetForm: () => void;
   onSuccess?: () => void;
 }) => {
   const queryClient = useQueryClient();
-  return useCustomMutation(
-    ({ id, payload }: { id: number; payload: any }) =>
-      BusinessApiService.updateBusiness(id, payload),
-    {
-      onSuccessCallback: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: [QueryKeyEnum.RECOMMENDATIONS],
-        });
-        await queryClient.invalidateQueries({
-          queryKey: [QueryKeyEnum.BUSINESSES],
-        });
-        resetForm();
-        onSuccess?.();
-      },
-    }
-  );
+  return useCustomMutation(RecommendationApiService.rejectRecommendation, {
+    onSuccessCallback: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.RECOMMENDATIONS],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.BUSINESSES],
+      });
+      onSuccess?.();
+    },
+  });
 };
 
 export const useDeleteRecommendation = ({
@@ -86,7 +72,7 @@ export const useDeleteRecommendation = ({
   onSuccess?: () => void;
 }) => {
   const queryClient = useQueryClient();
-  return useCustomMutation(BusinessApiService.deleteBusiness, {
+  return useCustomMutation(RecommendationApiService.deleteRecommendation, {
     onSuccessCallback: async () => {
       await queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.RECOMMENDATIONS],

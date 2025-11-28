@@ -70,14 +70,30 @@ export class UpdateRecommendationDto extends PartialType(
 ) {}
 
 export class FilterRecommendationDto extends PaginationDto {
+  @ApiProperty({
+    example: 'Temiade Kitchen',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiProperty({
+    example: BusinessTypeEnum.RESTAURANT,
+    required: true,
+  })
+  @IsOptional()
+  @IsString()
+  type: BusinessTypeEnum;
+
   @ApiProperty({ example: RecommendationStatusEnum.PENDING, required: false })
   @IsOptional()
   @IsString()
   status?: RecommendationStatusEnum;
 
-  @ApiProperty({ example: 1, required: true })
-  @IsNotEmpty()
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
   @IsNumber()
   @Transform(({ value }) => Number.parseInt(value, 10))
-  recommenderId: number;
+  recommenderId?: number;
 }

@@ -28,6 +28,7 @@ import { SearchBox } from "@/components/ui/search-box";
 import { ErrorBox } from "@/components/ui/error-box";
 import { BusinessCardSkeleton } from "../business/components/business-card-skeleton";
 import { useAuth } from "@/providers";
+import { toast } from "sonner";
 
 const categories = [
   { name: BusinessTypeEnum.RESTAURANT, icon: "🍛", count: "120+" },
@@ -209,12 +210,19 @@ export function Home() {
                   className="flex flex-wrap justify-center gap-4 mt-8"
                 >
                   <BukkaButton
-                    variant="glass"
+                    variant="warm"
                     size="sm"
-                    onClick={() =>
-                      router.push(user ? "/businesses/recommend" : "/signin")
-                    }
-                    className="py-6 px-8 font-bold text-lg"
+                    onClick={() => {
+                      if (!user) {
+                        toast("Requires Signin", {
+                          description:
+                            "You need to sign in before recommending a business",
+                        });
+                      } else {
+                        router.push("/businesses/recommend");
+                      }
+                    }}
+                    className="py-5 md:py-6 px-8 font-bold md:text-lg shadow-glow dark:shadow-white hover:shadow-elegant animate-pulse-glow"
                   >
                     Recommend A Business
                     <HandHeart className="w-4 h-4 mr-2" />
@@ -284,7 +292,7 @@ export function Home() {
                 }
                 className="w-full sm:w-xs"
               >
-                <Card className="cursor-pointer hover:shadow-card transition-smooth text-center p-6">
+                <Card className="cursor-pointer hover:shadow-card transition-smooth text-center p-6 drop-shadow-lg shadow-muted-foreground hover:animate-pulse-glow border-none">
                   <CardContent className="p-0">
                     <div className="text-4xl mb-3">{category.icon}</div>
                     <h3 className="font-semibold mb-1 uppercase">

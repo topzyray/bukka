@@ -17,7 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { File } from "@/data/interfaces/File";
 import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
 import { useCurrentUser } from "@/data/queries/use-current-user";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface IAuthContextType {
   user: User | null;
@@ -34,6 +34,7 @@ const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { data: user, isFirstLoad, isError } = useCurrentUser();
   let {
@@ -71,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (pathname.startsWith("/dashboard")) {
       window.location.href = "/signin";
     } else {
-      window.location.href = "/";
+      router.replace("/");
     }
   }, [queryClient]);
 

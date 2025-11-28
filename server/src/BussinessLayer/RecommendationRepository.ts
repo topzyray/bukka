@@ -101,8 +101,14 @@ export class RecommendationRepository {
       });
 
     await invalidateCache('recommendations', {});
+    await invalidateCache('my-recommendations', {});
 
-    return BukkaResponse.CreateResponse('Recommendation', recommendation);
+    return BukkaResponse.CustomResponse(
+      'Thanks for your recommendation!',
+      HttpStatus.CREATED,
+      true,
+      recommendation,
+    );
   }
 
   async getRecommendationById(
@@ -124,12 +130,47 @@ export class RecommendationRepository {
     );
   }
 
-  async getUserRecommendations(): Promise<BukkaResponse<Recommendation>> {
+  async getUserRecommendations(
+    filterDto: FilterRecommendationDto,
+  ): Promise<PagedData<Recommendation[]>> {
+    const { recommenderId, ...otherFilters } = filterDto;
     const loggedInUser = await UserHelper.getLoggedInUser();
-    const business = await this.recommendationDataAgent.findByRecommenderId(
-      loggedInUser.id,
+    const processedFilter = {
+      ...otherFilters,
+      recommenderId: loggedInUser?.id,
+    };
+    const query = FilterQueryHelper.buildQuery({
+      dto: processedFilter,
+      rules: [
+        { field: 'type' },
+        { field: 'status' },
+        { field: 'recommenderId' },
+      ],
+      searchConfig: {
+        fields: [
+          'name',
+          'description',
+          'note',
+          'slug',
+          { field: 'cuisines', dtoKey: 'cuisines', defaultOp: 'has' },
+        ],
+        mode: 'insensitive',
+      },
+    });
+    const { pageSize, pageNumber } =
+      FilterQueryHelper.extractPagination(processedFilter);
+    return handleCache(
+      'my-recommendations',
+      processedFilter as Record<string, any>,
+      () => {
+        return this.recommendationDataAgent.findAll(
+          query,
+          pageSize,
+          pageNumber,
+        );
+      },
+      CacheTTLPolicyEnum.MY_RECOMMENDATION_LIST,
     );
-    return BukkaResponse.GetSingleDataResponse('Recommendations', business);
   }
 
   async getRecommendations(
@@ -137,11 +178,16 @@ export class RecommendationRepository {
   ): Promise<PagedData<Recommendation[]>> {
     const query = FilterQueryHelper.buildQuery({
       dto: filterDto,
-      rules: [{ field: 'type' }],
+      rules: [
+        { field: 'type' },
+        { field: 'status' },
+        { field: 'recommenderId' },
+      ],
       searchConfig: {
         fields: [
           'name',
           'description',
+          'note',
           'slug',
           { field: 'cuisines', dtoKey: 'cuisines', defaultOp: 'has' },
         ],
@@ -190,6 +236,7 @@ export class RecommendationRepository {
 
     await invalidateCache('recommendation', { id });
     await invalidateCache('recommendations', {});
+    await invalidateCache('my-recommendations', {});
     await invalidateCache('businesses', {});
 
     return BukkaResponse.CustomResponse(
@@ -211,6 +258,7 @@ export class RecommendationRepository {
     );
     await invalidateCache('recommendation', { id });
     await invalidateCache('recommendations', {});
+    await invalidateCache('my-recommendations', {});
     await invalidateCache('businesses', {});
     return BukkaResponse.CustomResponse(
       'Recommendation reject successfully!',
@@ -235,6 +283,7 @@ export class RecommendationRepository {
     await this.recommendationDataAgent.deleteRecommendation(id);
     await invalidateCache('recommendation', { id });
     await invalidateCache('recommendations', {});
+    await invalidateCache('my-recommendations', {});
     return BukkaResponse.DeleteResponse('Recommendation', true);
   }
 }

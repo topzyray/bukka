@@ -66,14 +66,20 @@ export class RecommendationController {
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
   @ApiSecurity('device-id')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Get all businesses for logged-in vendor' })
-  async getMyBusinesses(@Res() res: Response) {
-    const response = await this.businessRepository.getUserRecommendations();
-    const data = BukkaResponse.GetSingleDataResponse(
-      'Vendor Businesses',
+  @ApiOperation({
+    summary: 'Get all recommendations for logged-in user with filters',
+  })
+  async getMyRecommendations(
+    @Query() filters: FilterRecommendationDto,
+    @Res() res: Response,
+  ) {
+    const response =
+      await this.businessRepository.getUserRecommendations(filters);
+    const data = BukkaResponse.GetPagedDataResponse(
+      'My Recommendations',
       response,
     );
-    return BukkaResponse.GetStatusResponse(response, res);
+    return BukkaResponse.GetStatusResponse(data, res);
   }
 
   @Get()

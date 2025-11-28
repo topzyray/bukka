@@ -9,24 +9,29 @@ const bukkaButtonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-accent-foreground dark:hover:bg-accent-foreground/90 dark:ring dark:ring-muted-foreground",
-        destructive: "bg-destructive text-white hover:bg-destructive/90",
+          "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-accent-foreground dark:hover:bg-accent-foreground/90 dark:ring dark:ring-muted-foreground hover-lift",
+        destructive:
+          "bg-destructive text-white hover:bg-destructive/90 hover-lift",
         outline:
-          "border border-input bg-background text-primary dark:text-white hover:bg-accent hover:text-accent-foreground hover:dark:text-foreground",
+          "border border-input bg-background text-primary dark:text-white hover:bg-accent hover:text-accent-foreground hover:dark:text-foreground hover-lift",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover-lift",
         ghost:
-          "dark:text-primary hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 dark:text-foreground",
-        link: "text-primary underline-offset-4 hover:underline bg-transparent hover:bg-transparent hover:underline",
+          "dark:text-primary hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 dark:text-foreground hover-lift",
+        link: "text-primary underline-offset-4 hover:underline bg-transparent hover:bg-transparent hover:underline hover-lift",
 
         // Bukka-specific variants
-        hero: "hero-gradient text-white font-semibold shadow-elegant hover:shadow-glow hover:scale-105 border-0",
-        warm: "warm-gradient text-white font-medium shadow-card hover:shadow-elegant",
-        glow: "bg-primary text-primary-foreground shadow-glow hover:shadow-elegant animate-pulse-glow",
+        hero: "hero-gradient text-white font-semibold shadow-elegant hover:shadow-glow hover:scale-105 border-0 hover-lift",
+        warm: "warm-gradient text-white font-medium shadow-card hover:shadow-elegant hover-lift",
+        glow: "bg-primary text-primary-foreground shadow-glow hover:shadow-elegant animate-pulse-glow hover-lift",
         glass:
-          "glass text-white hover:text-foreground hover:bg-white/90 backdrop-blur-md",
+          "glass text-white hover:text-foreground hover:bg-white/90 backdrop-blur-md hover-lift",
         float:
           "bg-white text-primary dark:text-foreground shadow-card hover:shadow-elegant hover:bg-primary hover:text-white hover-lift",
+        success:
+          "bg-green-600 dark:bg-green-600 text-white shadow-card hover:shadow-elegant dark:hover:bg-primary-700 hover:bg-green-700 hover-lift",
+        warning:
+          "bg-yellow-600 dark:bg-yellow-600 text-white shadow-card hover:shadow-elegant dark:hover:bg-yellow-700 hover:bg-yellow-700 hover-lift",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

@@ -9,9 +9,12 @@ import { UserRoleEnum } from "@/data/enums";
 import { Input } from "@/components/ui/input";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Mail, Phone, Instagram, Twitter, Facebook } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function Footer() {
   const { user } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = React.useState("");
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
@@ -100,8 +103,7 @@ export function Footer() {
                 </li>
               ) : (
                 <>
-                  {(user?.role === UserRoleEnum.VENDOR ||
-                    user?.role === UserRoleEnum.ADMIN) && (
+                  {user?.role === UserRoleEnum.VENDOR && (
                     <li>
                       <Link
                         href={`/dashboard/${user?.role?.toLowerCase()}/businesses`}
@@ -111,14 +113,36 @@ export function Footer() {
                       </Link>
                     </li>
                   )}
-                  {user?.role === UserRoleEnum.USER && (
+                  {user?.role === UserRoleEnum.ADMIN && (
                     <li>
                       <Link
-                        href={`/businesses/recommend`}
+                        href={`/dashboard/${user?.role?.toLowerCase()}/businesses`}
                         className="text-muted-foreground hover:text-primary transition-colors"
                       >
-                        Recommend A Business
+                        Add A Business
                       </Link>
+                    </li>
+                  )}
+                  {user?.role === UserRoleEnum.USER && (
+                    <li
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                      onClick={() => {
+                        if (!user) {
+                          toast("Requires Signin", {
+                            description:
+                              "You need to sign in before recommending a business",
+                          });
+                        } else {
+                          router.push("/businesses/recommend");
+                        }
+                      }}
+                    >
+                      {/* <Link
+                        href={`/businesses/recommend`}
+                        className="text-muted-foreground hover:text-primary transition-colors"
+                      > */}
+                      Recommend A Business
+                      {/* </Link> */}
                     </li>
                   )}
                 </>

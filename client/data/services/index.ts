@@ -13,3 +13,4 @@ export * from "./OrderApiService";
 export * from "./UserNotificationApiService";
 export * from "./UserPersonalizationApiService";
 export * from "./NotificationSettingApiService";
+export * from "./RecommendationApiService";

@@ -54,7 +54,11 @@ const publicRecommendationSchema = z.object({
     .optional()
     .nullable(),
   website: z.url().or(z.literal("")).optional().nullable(),
-  note: z.string().min(5, "Please tell us a bit more"),
+  note: z
+    .string()
+    .min(5, "Please tell us a bit more")
+    .optional()
+    .or(z.literal("")),
   location: locationSchema,
 });
 
@@ -91,7 +95,7 @@ export function RecommendBusinessForm({ onSuccess }: IRecommendBusinessForm) {
     resetForm: form.reset,
   });
 
-  const busy = form.formState.isSubmitting;
+  const busy = createMutation.isPending;
 
   const onSubmit = (data: PublicRecommendationValues) => {
     const { location, ...otherData } = data;
@@ -120,8 +124,8 @@ export function RecommendBusinessForm({ onSuccess }: IRecommendBusinessForm) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
-        <ScrollArea className="w-full h-full px-4">
-          <div className="space-y-6 w-full h-full px-4">
+        <ScrollArea className="w-full h-full">
+          <div className="space-y-6 w-full h-full px-2">
             <div className="space-y-2">
               <h3 className="text-base font-semibold">
                 Where is this place? (all required)
