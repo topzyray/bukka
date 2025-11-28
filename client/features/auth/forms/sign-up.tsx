@@ -83,7 +83,7 @@ export const SignUpForm = ({ onBack }: { onBack: () => void }) => {
         <CardContent className="space-y-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <SelectComponent
+              {/* <SelectComponent
                 formControl={form.control}
                 formName="role"
                 formLabel="Role"
@@ -97,6 +97,17 @@ export const SignUpForm = ({ onBack }: { onBack: () => void }) => {
                 ]}
                 icon={ShieldCheck}
                 disabled={true}
+              /> */}
+
+              <InputComponent
+                formControl={form.control}
+                formName="role"
+                formLabel="Role"
+                formInputType="text"
+                formPlaceholder="Your role"
+                disabled={isSigningUp}
+                icon={User}
+                readOnly
               />
 
               <InputComponent

@@ -95,18 +95,29 @@ export function Footer() {
                     href="/signup"
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
-                    Add Your Business
+                    Signup to Recommend Business
                   </Link>
                 </li>
               ) : (
                 <>
-                  {user?.role === UserRoleEnum.VENDOR && (
+                  {(user?.role === UserRoleEnum.VENDOR ||
+                    user?.role === UserRoleEnum.ADMIN) && (
                     <li>
                       <Link
                         href={`/dashboard/${user?.role?.toLowerCase()}/businesses`}
                         className="text-muted-foreground hover:text-primary transition-colors"
                       >
                         Add Your Business
+                      </Link>
+                    </li>
+                  )}
+                  {user?.role === UserRoleEnum.USER && (
+                    <li>
+                      <Link
+                        href={`/recommend-business`}
+                        className="text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        Recommend A Business
                       </Link>
                     </li>
                   )}
