@@ -3,6 +3,9 @@
 import { motion } from "framer-motion";
 import { UserRoleEnum } from "@/data/enums";
 import { RoleCard } from "@/features/auth/components/role-card";
+import Link from "next/link";
+import { Button, Separator } from "@/components/ui";
+import { useRouter } from "next/navigation";
 
 const roles: {
   role: string;
@@ -32,15 +35,38 @@ const roles: {
 ];
 
 export function SignUpInfo({ setOpenForm }: { setOpenForm: () => any }) {
+  const router = useRouter();
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="grid grid-cols-2 gap-6 px-6"
-    >
-      {roles.map((r, i) => (
-        <RoleCard key={i} {...r} delay={i * 0.1} action={setOpenForm} />
-      ))}
-    </motion.div>
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="grid grid-cols-2 gap-6 px-6"
+      >
+        {roles.map((r, i) => (
+          <RoleCard key={i} {...r} delay={i * 0.1} action={setOpenForm} />
+        ))}
+      </motion.div>
+      <Separator />
+      <div className="text-center">
+        <p className="text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href="/signin"
+            className="text-primary dark:text-foreground hover:underline font-medium"
+          >
+            Sign In
+          </Link>
+        </p>
+        <Button
+          type="button"
+          variant="link"
+          onClick={() => router.back()}
+          className="dark:text-foreground"
+        >
+          Back
+        </Button>
+      </div>
+    </>
   );
 }
