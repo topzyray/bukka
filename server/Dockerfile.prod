@@ -1,3 +1,59 @@
+# Builder
+FROM node:22-slim AS builder
+ARG PNPM_VERSION=10.24.0
+WORKDIR /app
+
+# system deps for native builds (Prisma/sharp)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 build-essential git ca-certificates openssl && \
+    rm -rf /var/lib/apt/lists/*
+
+# pin & enable pnpm via corepack (reproducible)
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
+
+# copy manifests early for caching
+COPY package.json pnpm-lock.yaml ./
+
+# install all deps (dev + prod) in builder
+# NOTE: --shamefully-hoist gives a flat node_modules layout that copies well into Docker.
+RUN pnpm install --frozen-lockfile --shamefully-hoist
+
+# copy source + prisma schema
+COPY prisma ./prisma
+COPY . .
+
+# generate prisma client (use pnpm exec to ensure local binary runs)
+RUN pnpm exec prisma generate
+
+# build the Nest app
+RUN pnpm build
+
+# optional: prune dev dependencies to reduce final node_modules size
+RUN pnpm prune --prod
+
+# Production
+FROM node:22-slim AS prod
+WORKDIR /app
+
+# copy runtime artifacts from builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/src/UtilityLayer/Views/Templates ./dist/UtilityLayer/Views/Templates
+COPY --from=builder /app/src/UtilityLayer/Views/Templates/Images ./dist/UtilityLayer/Views/Templates/Images
+
+ENV NODE_ENV=production
+ENV EMAIL_TEMPLATES_DIR=/app/dist/UtilityLayer/Views/Templates
+
+EXPOSE 8000
+
+CMD ["node", "dist/main"]
+
+
+
+
+
+
 # # ---- Build Stage ----
 # FROM node:22-alpine AS builder
 # WORKDIR /app
@@ -32,59 +88,3 @@
 
 # EXPOSE 8000
 # CMD ["node", "dist/main"]
-
-
-# Dockerfile (final, production-ready)
-# - node:22-slim chosen for stability with native binaries (Prisma, sharp)
-# - builder installs all deps, runs prisma generate & build
-# - builder prunes prod deps (optional) then copies node_modules + dist to prod image
-# - pinned pnpm via corepack
-
-# ---------- BUILDER ----------
-FROM node:22-slim AS builder
-ARG PNPM_VERSION=10.24.0
-WORKDIR /app
-
-# 1) system deps for native builds (Prisma/sharp)
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3 build-essential git ca-certificates openssl && \
-    rm -rf /var/lib/apt/lists/*
-
-# 2) pin & enable pnpm via corepack (reproducible)
-RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
-
-# 3) copy manifests early for caching
-COPY package.json pnpm-lock.yaml ./
-
-# 4) install all deps (dev + prod) in builder
-#    NOTE: --shamefully-hoist gives a flat node_modules layout that copies well into Docker.
-RUN pnpm install --frozen-lockfile --shamefully-hoist
-
-# 5) copy source + prisma schema
-COPY prisma ./prisma
-COPY . .
-
-# 6) generate prisma client (use pnpm exec to ensure local binary runs)
-RUN pnpm exec prisma generate
-
-# 7) build the Nest app
-RUN pnpm build
-
-# 8) optional: prune dev dependencies to reduce final node_modules size
-#    Be aware of pnpm prune corner-cases if you use workspaces; test locally.
-RUN pnpm prune --prod
-
-# ---------- PRODUCTION ----------
-FROM node:22-slim AS prod
-WORKDIR /app
-
-# copy runtime artifacts from builder
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
-
-ENV NODE_ENV=production
-EXPOSE 8000
-
-# Start the app (adjust if you use pm2 or another runner)
-CMD ["node", "dist/main"]
