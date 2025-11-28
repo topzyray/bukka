@@ -28,6 +28,7 @@ import { WaitListController } from './ServiceLayer/Controllers/WaitListControlle
 import { FavoriteController } from './ServiceLayer/Controllers/FavoriteController';
 import { UserSessionController } from './ServiceLayer/Controllers/UserSessionController';
 import { AnalyticsController } from './ServiceLayer/Controllers/Shared/AnalyticsController';
+import { RecommendationController } from './ServiceLayer/Controllers/RecommendationController';
 import { AdminControlController } from './ServiceLayer/Controllers/Admin/AdminControlController';
 import { UserNotificationController } from './ServiceLayer/Controllers/UserNotificationController';
 import { BusinessCategoryController } from './ServiceLayer/Controllers/BusinessCategoryController';
@@ -49,6 +50,7 @@ import { WaitlistRepository } from './BussinessLayer/WaitlistRepository';
 import { BusinessRepository } from './BussinessLayer/BusinessRepository';
 import { LocationRepository } from './BussinessLayer/LocationRepository';
 import { UserSessionRepository } from './BussinessLayer/UserSessionRepository';
+import { RecommendationRepository } from './BussinessLayer/RecommendationRepository';
 import { BusinessCategoryRepository } from './BussinessLayer/BusinessCategoryRepository';
 import { UserNotificationRepository } from './BussinessLayer/UserNotificationRepository';
 import { UserPersonalizationRepository } from './BussinessLayer/UserPersonalizationRepository';
@@ -67,6 +69,7 @@ import { WaitlistDataAgent } from './DataLayer/DataAgents/WaitlistDataAgent';
 import { BusinessDataAgent } from './DataLayer/DataAgents/BusinessDataAgent';
 import { FavoriteDataAgent } from './DataLayer/DataAgents/FavoriteDataAgent';
 import { UserSessionDataAgent } from './DataLayer/DataAgents/UserSessionDataAgent';
+import { RecommendationDataAgent } from './DataLayer/DataAgents/RecommendationDataAgent';
 import { BusinessCategoryDataAgent } from './DataLayer/DataAgents/BusinessCategoryDataAgent';
 import { UserNotificationDataAgent } from './DataLayer/DataAgents/UserNotificationDataAgent';
 import { UserPersonalizationDataAgent } from './DataLayer/DataAgents/UserPersonalizationDataAgent';
@@ -144,6 +147,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     UserNotificationController,
     NotificationSettingsController,
     UserPersonalizationController,
+    RecommendationController,
     FavoriteController,
     BusinessCategoryController,
     BusinessController,
@@ -193,6 +197,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     LocationRepository,
     EmailTemplateFactory,
     UserSessionRepository,
+    RecommendationRepository,
     UserNotificationRepository,
     BusinessCategoryRepository,
     NotificationSettingsRepository,
@@ -210,6 +215,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     FavoriteDataAgent,
     BusinessDataAgent,
     UserSessionDataAgent,
+    RecommendationDataAgent,
     BusinessCategoryDataAgent,
     UserNotificationDataAgent,
     UserPersonalizationDataAgent,

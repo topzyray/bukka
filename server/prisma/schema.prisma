@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]
 }
 
@@ -62,6 +62,12 @@ enum BusinessType {
   OTHER
 }
 
+enum RecommendationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum SupportStatus {
   SUBMITTED
   PENDING
@@ -114,44 +120,46 @@ model Waitlist {
 }
 
 model User {
-  id                      Int                @id @default(autoincrement())
-  email                   String             @unique
+  id                      Int        @id @default(autoincrement())
+  email                   String     @unique
   password                String
-  role                    UserRole           @default(USER)
+  role                    UserRole   @default(USER)
   firstName               String
   lastName                String
-  username                String?            @unique
+  username                String?    @unique
   gender                  Gender?
   phoneNumber             String?
   bio                     String?
   phoneCountryCode        String?
   phoneNumberConfirmed    Boolean?
-  userStatus              UserStatus         @default(ACTIVE)
-  emailConfirmed          Boolean            @default(false)
+  userStatus              UserStatus @default(ACTIVE)
+  emailConfirmed          Boolean    @default(false)
   confirmationCode        String?
   confirmationCodeExpires DateTime?
-  onboardingProgress      Int?               @default(0)
+  onboardingProgress      Int?       @default(0)
   passwordResetToken      String?
   passwordResetExpires    DateTime?
   passwordChangedAt       DateTime?
   lastLoginAt             DateTime?
-  isDeleted               Boolean            @default(false)
-  isOnboarded             Boolean            @default(false)
+  isDeleted               Boolean    @default(false)
+  isOnboarded             Boolean    @default(false)
   deletedAt               DateTime?
   locationId              Int?
-  createdAt               DateTime           @default(now())
-  updatedAt               DateTime           @updatedAt
+  createdAt               DateTime   @default(now())
+  updatedAt               DateTime   @updatedAt
 
-  userNotifications       UserNotification[]
-  favorites               Favorite[]
-  authSessions            UserSession[]
-  reviews                 Review[]
-  business                Business[]
-  location                Location?          @relation(fields: [locationId], references: [id], onDelete: SetNull)
-  Support                 Support[]
-  userOrders              Order[]            @relation("UserOrders")
-  vendorOrders            Order[]            @relation("VendorOrders")
-  riderOrders             Order[]            @relation("RiderOrders")
+  userNotifications     UserNotification[]
+  favorites             Favorite[]
+  authSessions          UserSession[]
+  reviews               Review[]
+  ownedBusinesses       Business[]         @relation("BusinessOwner")
+  recommendedBusinesses Business[]         @relation("BusinessRecommender")
+  location              Location?          @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  Support               Support[]
+  userOrders            Order[]            @relation("UserOrders")
+  vendorOrders          Order[]            @relation("VendorOrders")
+  riderOrders           Order[]            @relation("RiderOrders")
+  recommendations       Recommendation[]
 
   @@index([email])
   @@index([username])
@@ -159,25 +167,26 @@ model User {
 }
 
 model Location {
-  id         Int        @id @default(autoincrement())
-  placeId    String?    @unique
-  latitude   Float
-  longitude  Float
-  address    String?
-  city       String?
-  state      String?
-  country    String?
-  zipCode    String?
-  landmark   String?
-  plusCode   String?
-  cityId     String?
-  stateId    String?
-  countryId  String?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id        Int      @id @default(autoincrement())
+  placeId   String?  @unique
+  latitude  Float
+  longitude Float
+  address   String?
+  city      String?
+  state     String?
+  country   String?
+  zipCode   String?
+  landmark  String?
+  plusCode  String?
+  cityId    String?
+  stateId   String?
+  countryId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  businesses Business[]
-  users      User[]
+  businesses      Business[]
+  users           User[]
+  recommendations Recommendation[]
 
   @@index([placeId, id])
   @@index([latitude, longitude])
@@ -185,26 +194,28 @@ model Location {
 }
 
 model BusinessCategory {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
-  slug        String       @unique
-  createdBy   Int
-  description String?
-  iconUrl     String?
-  type        BusinessType
-  businesses  Business[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  slug            String           @unique
+  createdBy       Int
+  description     String?
+  iconUrl         String?
+  type            BusinessType
+  businesses      Business[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  recommendations Recommendation[]
 
   @@index([slug])
 }
 
 model Business {
-  id             Int               @id @default(autoincrement())
-  ownerId        Int
+  id             Int          @id @default(autoincrement())
+  ownerId        Int?
+  recommenderId  Int?
   name           String
   description    String?
-  type           BusinessType      @default(RESTAURANT)
+  type           BusinessType @default(RESTAURANT)
   categoryId     Int
   slug           String
   phoneNumber    String?
@@ -212,29 +223,58 @@ model Business {
   website        String?
   registrationNo String?
   cuisines       Json[]
-  isVerified     Boolean           @default(false)
-  isActive       Boolean           @default(false)
+  isVerified     Boolean      @default(false)
+  isActive       Boolean      @default(false)
   openingHours   Json?
   socialLinks    Json?
   locationId     Int?
-  averageRating  Float?            @default(0)
-  reviewCount    Int?              @default(0)
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  averageRating  Float?       @default(0)
+  reviewCount    Int?         @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  location       Location?         @relation(fields: [locationId], references: [id], onDelete: SetNull)
-  category       BusinessCategory? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  owner          User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  reviews        Review[]
-  favorites      Favorite[]
-  orders         Order[]
-  menus          Menu[]
-  services       Service[]
+  location    Location?         @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  category    BusinessCategory? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  owner       User?             @relation("BusinessOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  recommender User?             @relation("BusinessRecommender", fields: [recommenderId], references: [id], onDelete: SetNull)
+  reviews     Review[]
+  favorites   Favorite[]
+  orders      Order[]
+  menus       Menu[]
+  services    Service[]
 
   @@index([ownerId])
   @@index([categoryId])
   @@index([locationId])
   @@index([type])
+}
+
+model Recommendation {
+  id             Int                  @id @default(autoincrement())
+  name           String
+  description    String?
+  type           BusinessType         @default(RESTAURANT)
+  categoryId     Int
+  slug           String?
+  phoneNumber    String?
+  email          String?
+  website        String?
+  registrationNo String?
+  cuisines       Json[]
+  note           String?
+  recommenderId  Int?
+  status         RecommendationStatus @default(PENDING)
+  locationId     Int?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  location    Location?         @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  category    BusinessCategory? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  recommender User?             @relation(fields: [recommenderId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([recommenderId])
+  @@index([locationId])
 }
 
 // model BusinessStaff {
@@ -370,11 +410,11 @@ model Order {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
-  user     User     @relation("UserOrders", fields: [userId], references: [id], onDelete: Cascade)
-  vendor   User     @relation("VendorOrders", fields: [vendorId], references: [id], onDelete: Cascade)
-  rider    User?    @relation("RiderOrders", fields: [riderId], references: [id], onDelete: SetNull)
-  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  items OrderItem[]
+  user     User        @relation("UserOrders", fields: [userId], references: [id], onDelete: Cascade)
+  vendor   User        @relation("VendorOrders", fields: [vendorId], references: [id], onDelete: Cascade)
+  rider    User?       @relation("RiderOrders", fields: [riderId], references: [id], onDelete: SetNull)
+  business Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  items    OrderItem[]
 
   @@index([userId])
   @@index([vendorId])
@@ -383,7 +423,7 @@ model Order {
 }
 
 model OrderItem {
-  id        Int     @id @default(autoincrement())
+  id        Int   @id @default(autoincrement())
   orderId   Int
   menuId    Int?
   serviceId Int?
@@ -392,12 +432,12 @@ model OrderItem {
   total     Float
   meta      Json? // variants, addons, special request
 
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  menu  Menu? @relation(fields: [menuId], references: [id])
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menu    Menu?    @relation(fields: [menuId], references: [id])
   service Service? @relation(fields: [serviceId], references: [id])
 
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Menu {
@@ -410,7 +450,7 @@ model Menu {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  business   Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]
 
   @@index([businessId])
@@ -428,14 +468,12 @@ model Service {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  business   Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]
 
   @@index([businessId])
   @@index([isActive])
 }
-
-
 
 // // MENU and related models
 // model MenuCategory {
@@ -446,15 +484,12 @@ model Service {
 // createdAt DateTime @default(now())
 // updatedAt DateTime @updatedAt
 
-
 // business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 // menus Menu[]
-
 
 // @@unique([businessId, slug])
 // @@index([businessId])
 // }
-
 
 // model Menu {
 // id Int @id @default(autoincrement())
@@ -471,7 +506,6 @@ model Service {
 // createdAt DateTime @default(now())
 // updatedAt DateTime @updatedAt
 
-
 // business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 // category MenuCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 // image File? @relation(fields: [imageId], references: [id], onDelete: SetNull)
@@ -479,8 +513,6 @@ model Service {
 // addons MenuAddon[]
 // orderItems OrderItem[]
 
-
 // @@index([businessId])
 // @@index([isActive])
 // }
-

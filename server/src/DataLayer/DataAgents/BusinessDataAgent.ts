@@ -32,6 +32,14 @@ export class BusinessDataAgent {
           location: true,
           reviews: true,
           owner: true,
+          recommender: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
         },
       },
     };
@@ -75,6 +83,14 @@ export class BusinessDataAgent {
           location: true,
           owner: {
             select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          recommender: {
+            select: {
+              id: true,
               firstName: true,
               lastName: true,
               email: true,
