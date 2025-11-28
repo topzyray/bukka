@@ -14,6 +14,7 @@ import {
   List,
   Loader2,
   Search as SearchIcon,
+  TriangleAlert,
 } from "lucide-react";
 import { Header } from "@/components/layouts/header";
 import { Footer } from "@/components/layouts/footer";
@@ -37,6 +38,8 @@ import {
 } from "@/components/ui/page-wrapper";
 import { BusinessCardSkeleton } from "./components/business-card-skeleton";
 import { MapSkeleton } from "../location/components/map-skeleton";
+import { extractErrorMessage } from "@/utils";
+import { toast } from "sonner";
 
 const MapSelector = dynamic(
   () => import("@/features/location/map-selector").then((m) => m.MapSelector),
@@ -101,6 +104,8 @@ export function ExplorePage() {
     data,
     isLoading,
     isError,
+    error,
+    refetch,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -185,6 +190,15 @@ export function ExplorePage() {
     const el = document.querySelector(`[data-business-id="${id}"]`);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
   };
+
+  useEffect(() => {
+    if (isError) {
+      toast.error("Failed to load businesses", {
+        description: "Please check your connection or try again later.",
+      });
+    }
+  }, [isError]);
+
   return (
     <PageWrapper>
       <PageWrapperHeader className="sticky top-0 backdrop-blur z-50">
@@ -236,7 +250,7 @@ export function ExplorePage() {
 
                 <div className="space-y-3">
                   {isLoading && (
-                    <ScrollArea className="h-[33rem]">
+                    <ScrollArea className="h-132">
                       <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-0.5">
                         {Array.from({ length: 6 }).map((_, i) => (
                           <BusinessCardSkeleton key={i} />
@@ -246,13 +260,29 @@ export function ExplorePage() {
                   )}
 
                   {isError && (
-                    <div className="flex items-center text-destructive gap-2 text-sm">
-                      <AlertTriangle className="w-4 h-4" />
-                      <span>Failed to load businesses.</span>
+                    <div className="text-center py-16">
+                      <div className="flex justify-center items-center">
+                        <TriangleAlert
+                          size={55}
+                          className="mb-6 text-destructive"
+                        />
+                      </div>
+
+                      <h3 className="text-xl font-semibold mb-2 text-destructive">
+                        Oops!{" "}
+                        {extractErrorMessage(error) ?? "Something went wrong."}
+                      </h3>
+                      <p className="text-muted-foreground mb-6">
+                        We couldn’t load businesses at the moment. Please try
+                        again later.
+                      </p>
+                      <BukkaButton variant="hero" onClick={() => refetch()}>
+                        Retry
+                      </BukkaButton>
                     </div>
                   )}
 
-                  <ScrollArea className="h-[33rem]">
+                  <ScrollArea className="h-132">
                     <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-0.5">
                       {!isLoading &&
                         !isError &&
@@ -266,7 +296,7 @@ export function ExplorePage() {
                             data-business-id={b.id}
                             onClick={() => handleListClick(b)}
                             className={cn(
-                              "cursor-pointer w-full rounded-xl sm:max-w-[22rem] gap-4  shadow-card hover:shadow-elegant",
+                              "cursor-pointer w-full rounded-xl sm:max-w-88 gap-4  shadow-card hover:shadow-elegant",
                               selectedId === b.id
                                 ? "ring-1 ring-primary rounded-xl"
                                 : ""
@@ -277,8 +307,23 @@ export function ExplorePage() {
                   </ScrollArea>
 
                   {!isLoading && !isError && businesses.length === 0 && (
-                    <div className="text-center text-sm text-muted-foreground py-8">
-                      No businesses found nearby.
+                    <div className="text-center pb-8">
+                      <div className="text-6xl mb-6">🍽️</div>
+                      <h3 className="text-xl font-semibold mb-2">
+                        No businesses found
+                      </h3>
+                      <p className="text-muted-foreground mb-6">
+                        Try adjusting your filters or check the map to discover
+                        more.
+                      </p>
+                      <BukkaButton
+                        variant="hero"
+                        onClick={() => {
+                          setQ("");
+                        }}
+                      >
+                        Clear Filters
+                      </BukkaButton>
                     </div>
                   )}
                 </div>

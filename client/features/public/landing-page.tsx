@@ -9,6 +9,7 @@ import {
   Utensils,
   Clock,
   TrendingUp,
+  HandHeart,
 } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { Card, CardContent } from "@/components/ui/card";
@@ -360,7 +361,7 @@ export function Home() {
                 Join thousands of food lovers discovering amazing spots every
                 day
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-wrap flex-row gap-4 justify-center">
                 <Link href="/signup">
                   <BukkaButton variant="float" size="lg" asChild>
                     Get Started Free
@@ -371,6 +372,12 @@ export function Home() {
                   <BukkaButton variant="glass" size="lg" asChild>
                     Explore Businesses
                     <MapPin className="w-5 h-5 ml-2" />
+                  </BukkaButton>
+                </Link>
+                <Link href="/businesses/recommend">
+                  <BukkaButton variant="warm" size="lg" asChild>
+                    Recommend Businesses
+                    <HandHeart className="w-5 h-5 ml-2" />
                   </BukkaButton>
                 </Link>
               </div>

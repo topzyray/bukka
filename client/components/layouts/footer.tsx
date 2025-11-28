@@ -114,7 +114,7 @@ export function Footer() {
                   {user?.role === UserRoleEnum.USER && (
                     <li>
                       <Link
-                        href={`/recommend-business`}
+                        href={`/businesses/recommend`}
                         className="text-muted-foreground hover:text-primary transition-colors"
                       >
                         Recommend A Business

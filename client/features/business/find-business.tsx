@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from "react";
 import { motion } from "framer-motion";
-import { Filter, Grid, List, Loader2 } from "lucide-react";
+import { Filter, Grid, List, Loader2, TriangleAlert } from "lucide-react";
 import { Header } from "@/components/layouts/header";
 import { Footer } from "@/components/layouts/footer";
 import { BukkaButton } from "@/components/ui/button-variants";
@@ -26,6 +26,7 @@ import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { TextHelper } from "@/helpers";
 import { SearchBox } from "@/components/ui/search-box";
 import { BusinessCardSkeleton } from "./components/business-card-skeleton";
+import { extractErrorMessage } from "@/utils";
 
 const filters = [
   "All",
@@ -85,6 +86,8 @@ export function FindBusinessPage() {
     data,
     isLoading,
     isError,
+    error,
+    refetch,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -321,25 +324,25 @@ export function FindBusinessPage() {
           {/* Error State */}
           {isError && (
             <div className="text-center py-16">
-              <div className="text-6xl mb-6">⚠️</div>
-              <h3 className="text-xl font-semibold mb-2">
-                Oops! Something went wrong.
+              <div className="flex justify-center items-center">
+                <TriangleAlert size={55} className="mb-6 text-destructive" />
+              </div>
+
+              <h3 className="text-xl font-semibold mb-2 text-destructive">
+                Oops! {extractErrorMessage(error) ?? "Something went wrong."}
               </h3>
               <p className="text-muted-foreground mb-6">
                 We couldn’t load businesses at the moment. Please try again
                 later.
               </p>
-              <BukkaButton
-                variant="hero"
-                onClick={() => window.location.reload()}
-              >
+              <BukkaButton variant="hero" onClick={() => refetch()}>
                 Retry
               </BukkaButton>
             </div>
           )}
 
           {/* Empty State */}
-          {!isLoading && results.length === 0 && (
+          {!isLoading && !isError && results.length === 0 && (
             <div className="text-center pb-8">
               <div className="text-6xl mb-6">🍽️</div>
               <h3 className="text-xl font-semibold mb-2">
