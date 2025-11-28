@@ -99,7 +99,7 @@ export class BusinessRepository {
     const business = await this.businessDataAgent.createBusiness({
       ...otherDto,
       locationId: location?.id,
-      ownerId,
+      ownerId: ownerId ?? null,
       isActive: true,
     });
 
@@ -180,7 +180,10 @@ export class BusinessRepository {
     const business = await this.businessDataAgent.findById(id);
 
     if (!business) throw new NotFoundException('Business not found');
-    if (business.ownerId !== loggedInUser.id)
+    if (
+      business.ownerId !== loggedInUser.id ||
+      loggedInUser.role !== UserRoleEnum.ADMIN
+    )
       throw new ForbiddenException('Unauthorized delete');
 
     await this.businessDataAgent.deleteBusiness(id);

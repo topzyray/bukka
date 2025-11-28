@@ -8,6 +8,7 @@ import { BusinessTypeEnum } from '../Enums/BusinessTypeEnum';
 export class Business {
   id: number;
   ownerId: number;
+  recommenderId: number;
   name: string;
   description: string;
   type: BusinessTypeEnum;
@@ -30,6 +31,7 @@ export class Business {
   location: Location;
   category: BusinessCategory;
   owner: User;
+  recommender: User;
   reviews: Review[];
   favorites: Favorite[];
   createdAt: Date;
