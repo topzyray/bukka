@@ -14,6 +14,7 @@ import {
   FormInputIcon,
   LayoutDashboard,
   BriefcaseBusiness,
+  LogOut,
 } from "lucide-react";
 import { RouteHelper } from "@/helpers";
 import { useRouter } from "next/navigation";
@@ -31,7 +32,7 @@ export function Header({ className }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const route = RouteHelper.getDashboardPath(user as User);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -91,19 +92,34 @@ export function Header({ className }: HeaderProps) {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-2">
-            <BukkaButton variant="ghost" size="sm" asChild>
+            <BukkaButton
+              variant="ghost"
+              size="sm"
+              asChild
+              title="View all businesses"
+            >
               <Link href="/businesses" className="flex items-center gap-2">
                 <BriefcaseBusiness className="w-4 h-4" />
                 Businesses
               </Link>
             </BukkaButton>
-            <BukkaButton variant="ghost" size="sm" asChild>
+            <BukkaButton
+              variant="ghost"
+              size="sm"
+              asChild
+              title="Explore businesses"
+            >
               <Link href="/explore" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Explore
               </Link>
             </BukkaButton>
-            <BukkaButton variant="ghost" size="sm" asChild>
+            <BukkaButton
+              variant="ghost"
+              size="sm"
+              asChild
+              title="View businesses on Map"
+            >
               <Link href="/maps" className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Map View
@@ -114,10 +130,26 @@ export function Header({ className }: HeaderProps) {
               size="sm"
               asChild
               onClick={() => router.push(route)}
+              title={
+                user?.role ? "Go to your dashboard" : "Sigin in to your account"
+              }
             >
               <FormInput />
               {user?.role ? "Dashboard" : "Sign In"}
             </BukkaButton>
+            {user && (
+              <BukkaButton
+                variant="destructive"
+                size="sm"
+                asChild
+                onClick={() => logout()}
+                title="Logout"
+                className="dark:bg-red-600 dark:hover:bg-red-700"
+              >
+                <LogOut />
+                Logout
+              </BukkaButton>
+            )}
             <ThemeToggle />
           </nav>
 
@@ -194,6 +226,22 @@ export function Header({ className }: HeaderProps) {
                 </span>
               </BukkaButton>
             </section>
+
+            <div className="flex justify-end">
+              {user && (
+                <BukkaButton
+                  variant="destructive"
+                  size="sm"
+                  asChild
+                  onClick={() => logout()}
+                  title="Logout"
+                  className="dark:bg-red-600 dark:hover:bg-red-700"
+                >
+                  <LogOut />
+                  Logout
+                </BukkaButton>
+              )}
+            </div>
           </section>
         </motion.nav>
       </section>

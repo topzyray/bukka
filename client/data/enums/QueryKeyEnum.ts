@@ -8,6 +8,8 @@ export enum QueryKeyEnum {
   BUSINESS_CATEGORIES_INFINITE = "business-categories-infinite",
   BUSINESSES = "businesses",
   BUSINESS = "business",
+  RECOMMENDATIONS = "recommendations",
+  RECOMMENDATION = "recommendation",
   BUSINESSES_INFINITE = "businesses-infinite",
   MY_BUSINESSES = "my-businesses",
   FAVOURITES = "favourites",

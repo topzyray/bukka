@@ -23,6 +23,8 @@ export class User {
   deletedAt?: Date;
   isOnboarded?: boolean;
   userNotifications?: any;
+  ownedBusinesses?: any;
+  recommendedBusinesses?: any;
   authSessions?: any;
   favorites: any;
   createdAt?: Date;

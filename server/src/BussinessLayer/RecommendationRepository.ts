@@ -124,6 +124,14 @@ export class RecommendationRepository {
     );
   }
 
+  async getUserRecommendations(): Promise<BukkaResponse<Recommendation>> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const business = await this.recommendationDataAgent.findByRecommenderId(
+      loggedInUser.id,
+    );
+    return BukkaResponse.GetSingleDataResponse('Recommendations', business);
+  }
+
   async getRecommendations(
     filterDto: FilterRecommendationDto,
   ): Promise<PagedData<Recommendation[]>> {
@@ -179,6 +187,11 @@ export class RecommendationRepository {
     await this.recommendationDataAgent.updateRecommendation(id, {
       status: RecommendationStatusEnum.APPROVED,
     });
+
+    await invalidateCache('recommendation', { id });
+    await invalidateCache('recommendations', {});
+    await invalidateCache('businesses', {});
+
     return BukkaResponse.CustomResponse(
       'Recommendation approved successfully. Recommendation is now live!',
       HttpStatus.OK,
@@ -198,6 +211,7 @@ export class RecommendationRepository {
     );
     await invalidateCache('recommendation', { id });
     await invalidateCache('recommendations', {});
+    await invalidateCache('businesses', {});
     return BukkaResponse.CustomResponse(
       'Recommendation reject successfully!',
       HttpStatus.OK,

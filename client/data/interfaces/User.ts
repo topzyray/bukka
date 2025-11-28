@@ -27,11 +27,13 @@ export interface User {
   isOnboarded: boolean;
   userNotifications: any;
   favorites: any;
+  ownedBusinesses: any;
+  recommendedBusinesses: any;
   createdAt: string;
   updatedAt: string;
-  preferences: {
-    cuisines: string[];
-    priceRange: [number, number];
-    radius: number;
-  };
+  // preferences: {
+  //   cuisines: string[];
+  //   priceRange: [number, number];
+  //   radius: number;
+  // };
 }

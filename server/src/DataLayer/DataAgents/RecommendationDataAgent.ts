@@ -53,6 +53,13 @@ export class RecommendationDataAgent {
     return this.model.findOne(spec);
   }
 
+  async findByRecommenderId(recommenderId: number): Promise<Recommendation[]> {
+    const spec: QuerySpec = {
+      filter: { field: 'recommenderId', op: 'eq', value: recommenderId },
+    };
+    return this.model.find(spec);
+  }
+
   async findAll(
     filter: any,
     pageSize: number,

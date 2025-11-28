@@ -10,6 +10,7 @@ export * from "./analyticsRoutes";
 export * from "./userSessionRoutes";
 export * from "./adminControlRoutes";
 export * from "./userManagementRoutes";
+export * from "./recommendationRoutes";
 export * from "./businessCategoryRoutes";
 export * from "./userNotificationRoutes";
 export * from "./notificationSettingRoutes";

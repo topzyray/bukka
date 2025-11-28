@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import { SearchBox } from "@/components/ui/search-box";
 import { ErrorBox } from "@/components/ui/error-box";
 import { BusinessCardSkeleton } from "../business/components/business-card-skeleton";
+import { useAuth } from "@/providers";
 
 const categories = [
   { name: BusinessTypeEnum.RESTAURANT, icon: "🍛", count: "120+" },
@@ -45,6 +46,7 @@ const categories = [
 export function Home() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const router = useRouter();
+  const { user } = useAuth();
 
   const { data, isLoading, isError, error } = useInfiniteBusinessesQuery({});
 
@@ -197,6 +199,25 @@ export function Home() {
                   >
                     <Clock className="w-4 h-4 mr-2" />
                     Open Now
+                  </BukkaButton>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8, duration: 0.8 }}
+                  className="flex flex-wrap justify-center gap-4 mt-8"
+                >
+                  <BukkaButton
+                    variant="glass"
+                    size="sm"
+                    onClick={() =>
+                      router.push(user ? "/businesses/recommend" : "/signin")
+                    }
+                    className="py-6 px-8 font-bold text-lg"
+                  >
+                    Recommend A Business
+                    <HandHeart className="w-4 h-4 mr-2" />
                   </BukkaButton>
                 </motion.div>
               </motion.div>
