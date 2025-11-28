@@ -32,7 +32,7 @@ export class RecommendationDataAgent {
         include: {
           category: true,
           location: true,
-          recommendeder: {
+          recommender: {
             select: {
               id: true,
               firstName: true,
@@ -53,6 +53,41 @@ export class RecommendationDataAgent {
     return this.model.findOne(spec);
   }
 
+  async findByRecommenderId(
+    filter: any,
+    pageSize: number,
+    pageNumber: number,
+  ): Promise<PagedData<Recommendation[]>> {
+    const pageData = new PagedData<Recommendation[]>();
+    pageData.page = pageNumber;
+    pageData.pageSize = pageSize;
+
+    const spec: QuerySpec = {
+      filter,
+      sort: [{ field: 'createdAt', direction: 'desc' }],
+      pagination: { page: pageNumber, pageSize },
+      extras: {
+        include: {
+          category: true,
+          location: true,
+          recommender: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+        },
+      },
+    };
+    const total = await this.model.count({ filter });
+    pageData.total = total;
+    pageData.pageCount = Math.ceil(total / pageSize);
+    pageData.data = await this.model.find(spec);
+    return pageData;
+  }
+
   async findAll(
     filter: any,
     pageSize: number,
@@ -70,7 +105,7 @@ export class RecommendationDataAgent {
         include: {
           category: true,
           location: true,
-          recommendeder: {
+          recommender: {
             select: {
               id: true,
               firstName: true,

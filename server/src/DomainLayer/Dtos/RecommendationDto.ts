@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   IsArray,
+  IsUrl,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { CreateLocationDto } from './LocationDto';
@@ -44,6 +45,24 @@ export class CreateRecommendationDto extends CreateLocationDto {
   @IsArray()
   @IsString({ each: true })
   cuisines?: string[];
+
+  @ApiProperty({ example: '+2347035527946', required: false })
+  @IsOptional()
+  @IsString()
+  phoneNumber?: string;
+
+  @ApiProperty({ example: 'hello@newcafe.com', required: false })
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @ApiProperty({
+    example: 'https://www.temiadegroup.com',
+    required: false,
+  })
+  @IsOptional()
+  @IsUrl()
+  website?: string;
 }
 
 export class UpdateRecommendationDto extends PartialType(
@@ -51,14 +70,30 @@ export class UpdateRecommendationDto extends PartialType(
 ) {}
 
 export class FilterRecommendationDto extends PaginationDto {
+  @ApiProperty({
+    example: 'Temiade Kitchen',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiProperty({
+    example: BusinessTypeEnum.RESTAURANT,
+    required: true,
+  })
+  @IsOptional()
+  @IsString()
+  type: BusinessTypeEnum;
+
   @ApiProperty({ example: RecommendationStatusEnum.PENDING, required: false })
   @IsOptional()
   @IsString()
   status?: RecommendationStatusEnum;
 
-  @ApiProperty({ example: 1, required: true })
-  @IsNotEmpty()
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
   @IsNumber()
   @Transform(({ value }) => Number.parseInt(value, 10))
-  recommenderId: number;
+  recommenderId?: number;
 }

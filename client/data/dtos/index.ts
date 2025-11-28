@@ -14,3 +14,4 @@ export * from "./UserPersonalizationDto";
 export * from "./WaitlistDto";
 export * from "./OrderDto";
 export * from "./NotificationSettingDto";
+export * from "./RecommendationDto";

@@ -23,6 +23,13 @@ export const ADMIN: TDashboardNavigation = [
     isSidebarNav: true,
   },
   {
+    title: "Recommendations",
+    url: "/dashboard/admin/recommendations",
+    icon: "HandHeart",
+    hasSubmenu: false,
+    isSidebarNav: true,
+  },
+  {
     title: "Businesses",
     url: "/dashboard/admin/businesses",
     icon: "BriefcaseBusiness",
@@ -103,6 +110,13 @@ export const VENDOR: TDashboardNavigation = [
     isSidebarNav: true,
   },
   {
+    title: "Recommendations",
+    url: "/dashboard/vendor/recommendations",
+    icon: "HandHeart",
+    hasSubmenu: false,
+    isSidebarNav: true,
+  },
+  {
     title: "My Orders",
     url: "/dashboard/vendor/orders",
     icon: "ListOrdered",
@@ -169,6 +183,13 @@ export const USER: TDashboardNavigation = [
     isSidebarNav: true,
   },
   {
+    title: "Recommendations",
+    url: "/dashboard/user/recommendations",
+    icon: "HandHeart",
+    hasSubmenu: false,
+    isSidebarNav: true,
+  },
+  {
     title: "Favourites",
     url: "/dashboard/user/favourites",
     icon: "Heart",
@@ -182,13 +203,6 @@ export const USER: TDashboardNavigation = [
     hasSubmenu: false,
     isSidebarNav: true,
   },
-  // {
-  //   title: "Recommendations",
-  //   url: "/dashboard/user/recommendations",
-  //   icon: "SquarePen",
-  //   hasSubmenu: false,
-  //   isSidebarNav: true,
-  // },
   {
     title: "My Activites",
     url: "/dashboard/user/activities",
