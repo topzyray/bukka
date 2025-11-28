@@ -10,7 +10,7 @@ export enum QueryKeyEnum {
   BUSINESS = "business",
   RECOMMENDATIONS = "recommendations",
   RECOMMENDATION = "recommendation",
-  MY_RECOMMENDATIONS = "recommendation",
+  MY_RECOMMENDATIONS = "my-recommendation",
   BUSINESSES_INFINITE = "businesses-infSSSinite",
   MY_BUSINESSES = "my-businesses",
   FAVOURITES = "favourites",
