@@ -6,7 +6,7 @@ import { UserRoleEnum } from "@/data/enums";
 import Cookies from "js-cookie";
 import ServiceWorkderRegistrar from "./service-worker";
 
-type TCoordinates = {
+export type TCoordinates = {
   lng: number;
   lat: number;
   address?: string;

@@ -33,6 +33,8 @@ import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { LocationCoordsHelper } from "@/helpers/location-coords-helper";
 import { SearchPlacesWithAutocomplete } from "../search-places-with-autocomplete";
+import { MyLocationPopUp } from "../components/my-location-pop-up";
+import { PinBusinessPopUp } from "../components/pin-business-pop-up";
 
 const ICONS: Record<BusinessTypeEnum, L.Icon> = {
   [BusinessTypeEnum.RESTAURANT]: IconHelper.createColoredIcon(
@@ -296,13 +298,7 @@ export function LocationIQMap({
           icon={CURRENT_CLICK_ICON}
         >
           <Popup>
-            <div className="text-sm">
-              <p>
-                {disabled
-                  ? "Location locked"
-                  : "Drag or click to update location"}
-              </p>
-            </div>
+            <PinBusinessPopUp lat={marker.lat} lng={marker.lng} />
           </Popup>
         </Marker>
 
@@ -314,9 +310,10 @@ export function LocationIQMap({
             icon={USER_LOCATION_ICON}
           >
             <Popup>
-              <div className="text-sm">
-                <p>My Location</p>
-              </div>
+              <MyLocationPopUp
+                lat={userCoordinates.lat}
+                lng={userCoordinates.lng}
+              />
             </Popup>
           </Marker>
         )}

@@ -47,17 +47,6 @@ export class BusinessController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Get(':businessId')
-  @ApiOperation({ summary: 'Get a business by ID' })
-  @ApiParam({ name: 'businessId', example: 1 })
-  async getBusinessById(
-    @Param('businessId', ParseIntPipe) businessId: number,
-    @Res() res: Response,
-  ) {
-    const response = await this.businessRepository.getBusinessById(businessId);
-    return BukkaResponse.GetStatusResponse(response, res);
-  }
-
   @Get('my-businesses')
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
   @ApiSecurity('device-id')
@@ -69,6 +58,17 @@ export class BusinessController {
       'Vendor Businesses',
       response,
     );
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Get(':businessId')
+  @ApiOperation({ summary: 'Get a business by ID' })
+  @ApiParam({ name: 'businessId', example: 1 })
+  async getBusinessById(
+    @Param('businessId', ParseIntPipe) businessId: number,
+    @Res() res: Response,
+  ) {
+    const response = await this.businessRepository.getBusinessById(businessId);
     return BukkaResponse.GetStatusResponse(response, res);
   }
 

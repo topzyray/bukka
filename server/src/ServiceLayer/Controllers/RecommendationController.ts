@@ -50,18 +50,6 @@ export class RecommendationController {
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
-  @Get(':recommendationId')
-  @ApiOperation({ summary: 'Get a recommendation by ID' })
-  @ApiParam({ name: 'recommendationId', example: 1 })
-  async getRecommendationById(
-    @Param('recommendationId', ParseIntPipe) recommendationId: number,
-    @Res() res: Response,
-  ) {
-    const response =
-      await this.businessRepository.getRecommendationById(recommendationId);
-    return BukkaResponse.GetStatusResponse(response, res);
-  }
-
   @Get('my-recommendations')
   @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
   @ApiSecurity('device-id')
@@ -80,6 +68,18 @@ export class RecommendationController {
       response,
     );
     return BukkaResponse.GetStatusResponse(data, res);
+  }
+
+  @Get(':recommendationId')
+  @ApiOperation({ summary: 'Get a recommendation by ID' })
+  @ApiParam({ name: 'recommendationId', example: 1 })
+  async getRecommendationById(
+    @Param('recommendationId', ParseIntPipe) recommendationId: number,
+    @Res() res: Response,
+  ) {
+    const response =
+      await this.businessRepository.getRecommendationById(recommendationId);
+    return BukkaResponse.GetStatusResponse(response, res);
   }
 
   @Get()

@@ -171,7 +171,7 @@ export function Home() {
                 </motion.div>
 
                 {/* Quick Actions */}
-                <motion.div
+                {/* <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8, duration: 0.8 }}
@@ -201,7 +201,7 @@ export function Home() {
                     <Clock className="w-4 h-4 mr-2" />
                     Open Now
                   </BukkaButton>
-                </motion.div>
+                </motion.div> */}
 
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}

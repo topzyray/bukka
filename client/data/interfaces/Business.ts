@@ -8,6 +8,7 @@ import { BusinessTypeEnum } from "../enums/BusinessTypeEnum";
 export interface Business {
   id: number;
   ownerId: number;
+  recommenderId: number;
   name: string;
   description: string;
   type: BusinessTypeEnum;
@@ -31,6 +32,7 @@ export interface Business {
   owner: User;
   reviews: Review[];
   favorites: Favorite[];
+  recommender: User;
   createdAt: Date;
   updatedAt: Date;
 }

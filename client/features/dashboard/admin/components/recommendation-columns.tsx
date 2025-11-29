@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { CheckCheck, CircleX, Edit, Loader2, Trash, View } from "lucide-react";
 import { Recommendation } from "@/data/interfaces/Recommendation";
 import { User } from "@/data/interfaces/User";
-import { UserRoleEnum } from "@/data/enums";
+import { RecommendationStatusEnum, UserRoleEnum } from "@/data/enums";
 import { BukkaButton } from "@/components/ui";
+import { cn } from "@/lib/utils";
+import { TextHelper } from "@/helpers";
 
 export const recommendationColumns = (
   user: User | null,
@@ -22,6 +24,36 @@ export const recommendationColumns = (
   currentItemRejecting: number | null,
   parentPath: "recommendations"
 ): ColumnDef<Recommendation>[] => [
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const r = row.original;
+      const statusColor = {
+        light: {
+          PENDING: "text-amber-500",
+          APPROVED: "text-green-600",
+          REJECTED: "text-red-600",
+        },
+        dark: {
+          PENDING: "text-amber-400",
+          APPROVED: "text-green-400",
+          REJECTED: "text-red-400",
+        },
+      };
+      return (
+        <div
+          className={cn(
+            statusColor.light[r?.status],
+            `dark:${statusColor.dark[r?.status]}`,
+            "font-bold uppercase"
+          )}
+        >
+          {TextHelper.capitalize(r?.status)}
+        </div>
+      );
+    },
+  },
   {
     accessorKey: "name",
     header: "Name",
@@ -98,6 +130,11 @@ export const recommendationColumns = (
                 variant="success"
                 size="sm"
                 onClick={() => onApprove(recommendation.id)}
+                disabled={
+                  (isApproving && currentItemApproving === recommendation.id) ||
+                  recommendation.status === RecommendationStatusEnum.APPROVED ||
+                  recommendation.status === RecommendationStatusEnum.REJECTED
+                }
                 title="Approve"
               >
                 {isApproving && currentItemApproving === recommendation.id ? (
@@ -110,6 +147,11 @@ export const recommendationColumns = (
                 variant="warning"
                 size="sm"
                 onClick={() => onReject(recommendation.id)}
+                disabled={
+                  (isRejecting && currentItemRejecting === recommendation.id) ||
+                  recommendation.status === RecommendationStatusEnum.APPROVED ||
+                  recommendation.status === RecommendationStatusEnum.REJECTED
+                }
                 title="Reject"
               >
                 {isRejecting && currentItemRejecting === recommendation.id ? (

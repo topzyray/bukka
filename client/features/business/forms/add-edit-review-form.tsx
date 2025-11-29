@@ -120,9 +120,9 @@ export function AddEditReviewForm({
               disabled={busy || !form.formState.isValid}
             >
               {busy ? (
-                <span>
+                <span className="flex items-center gap-2">
                   <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                  Saving changes
+                  Saving...
                 </span>
               ) : isEdit ? (
                 "Save changes"
