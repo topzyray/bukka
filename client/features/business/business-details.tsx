@@ -78,7 +78,7 @@ export function BusinessDetails(): JSX.Element {
                 business={business}
                 businessImages={businessImages}
               />
-              <BusinessMenuAndServices />
+              {/* <BusinessMenuAndServices /> */}
               <BusinessReviews business={business} />
             </div>
 

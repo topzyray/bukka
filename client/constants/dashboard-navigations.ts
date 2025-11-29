@@ -96,7 +96,7 @@ export const VENDOR: TDashboardNavigation = [
     isSidebarNav: true,
   },
   {
-    title: "Maps",
+    title: "My Map",
     url: "/dashboard/vendor/maps",
     icon: "Map",
     hasSubmenu: false,
@@ -116,13 +116,13 @@ export const VENDOR: TDashboardNavigation = [
     hasSubmenu: false,
     isSidebarNav: true,
   },
-  {
-    title: "My Orders",
-    url: "/dashboard/vendor/orders",
-    icon: "ListOrdered",
-    hasSubmenu: false,
-    isSidebarNav: true,
-  },
+  // {
+  //   title: "My Orders",
+  //   url: "/dashboard/vendor/orders",
+  //   icon: "ListOrdered",
+  //   hasSubmenu: false,
+  //   isSidebarNav: true,
+  // },
   {
     title: "Reviews",
     url: "/dashboard/vendor/reviews",
@@ -130,13 +130,13 @@ export const VENDOR: TDashboardNavigation = [
     hasSubmenu: false,
     isSidebarNav: true,
   },
-  {
-    title: "Analytics",
-    url: "/dashboard/vendor/analytics",
-    icon: "Timeline",
-    hasSubmenu: false,
-    isSidebarNav: true,
-  },
+  // {
+  //   title: "Analytics",
+  //   url: "/dashboard/vendor/analytics",
+  //   icon: "Timeline",
+  //   hasSubmenu: false,
+  //   isSidebarNav: true,
+  // },
   {
     title: "Supports",
     url: "/dashboard/vendor/tickets",
@@ -169,19 +169,19 @@ export const USER: TDashboardNavigation = [
     isSidebarNav: true,
   },
   {
-    title: "Maps",
+    title: "My Map",
     url: "/dashboard/user/maps",
     icon: "Map",
     hasSubmenu: false,
     isSidebarNav: true,
   },
-  {
-    title: "My Orders",
-    url: "/dashboard/user/orders",
-    icon: "ListOrdered",
-    hasSubmenu: false,
-    isSidebarNav: true,
-  },
+  // {
+  //   title: "My Orders",
+  //   url: "/dashboard/user/orders",
+  //   icon: "ListOrdered",
+  //   hasSubmenu: false,
+  //   isSidebarNav: true,
+  // },
   {
     title: "Recommendations",
     url: "/dashboard/user/recommendations",
@@ -203,13 +203,13 @@ export const USER: TDashboardNavigation = [
     hasSubmenu: false,
     isSidebarNav: true,
   },
-  {
-    title: "My Activites",
-    url: "/dashboard/user/activities",
-    icon: "Timeline",
-    hasSubmenu: false,
-    isSidebarNav: true,
-  },
+  // {
+  //   title: "My Activites",
+  //   url: "/dashboard/user/activities",
+  //   icon: "Timeline",
+  //   hasSubmenu: false,
+  //   isSidebarNav: true,
+  // },
   {
     title: "My Tickets",
     url: "/dashboard/user/tickets",
@@ -242,7 +242,7 @@ export const RIDER: TDashboardNavigation = [
     isSidebarNav: true,
   },
   {
-    title: "Maps",
+    title: "My Map",
     url: "/dashboard/rider/maps",
     icon: "Map",
     hasSubmenu: false,

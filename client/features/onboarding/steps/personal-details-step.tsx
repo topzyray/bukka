@@ -199,6 +199,7 @@ export function PersonalDetailsStep({
               formPlaceholder="Bio"
               formDescription="Max 150 characters"
               maxLength={150}
+              rows={3}
               disabled={isUpdatingUserData}
               inputClassName="max-w-xl"
             />

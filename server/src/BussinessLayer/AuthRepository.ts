@@ -66,7 +66,7 @@ export class AuthRepository {
       this._queue.publishToQueue(
         QueueEnum.AUTH_NOTIFICATION,
         {
-          messageType: AuthQueueMessageTypeEnum.SIGNUP,
+          messageType: AuthQueueMessageTypeEnum.CONFIRM_EMAIL,
           payload: {
             userId: data?.responseData?.id,
             email: data?.responseData?.email,

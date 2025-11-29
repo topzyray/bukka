@@ -132,9 +132,17 @@ export class BusinessRepository {
   async getBusinesses(
     filterDto: FilterBusinessDto,
   ): Promise<PagedData<Business[]>> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    let processedFilterDto = {
+      ...filterDto,
+      ...(loggedInUser.role === UserRoleEnum.VENDOR && {
+        ownerId: loggedInUser.id,
+      }),
+    };
+
     const query = FilterQueryHelper.buildQuery({
-      dto: filterDto,
-      rules: [{ field: 'type' }],
+      dto: processedFilterDto,
+      rules: [{ field: 'type' }, { field: 'ownerId' }],
       // rules: [{ field: 'type' }, { field: 'cuisines' }],
       searchConfig: {
         fields: [
@@ -147,10 +155,10 @@ export class BusinessRepository {
       },
     });
     const { pageSize, pageNumber } =
-      FilterQueryHelper.extractPagination(filterDto);
+      FilterQueryHelper.extractPagination(processedFilterDto);
     return handleCache(
       'businesses',
-      filterDto as Record<string, any>,
+      processedFilterDto as Record<string, any>,
       () => {
         return this.businessDataAgent.findAll(query, pageSize, pageNumber);
       },

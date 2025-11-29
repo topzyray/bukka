@@ -65,7 +65,34 @@ export const businessColumns = (
       return (
         <div className="flex flex-col">
           <div className="font-semibold capitalize">
-            {r.owner?.firstName} {r.owner?.lastName}
+            {r.ownerId ? (
+              <>
+                {" "}
+                {r.owner?.firstName} {r.owner?.lastName}
+              </>
+            ) : (
+              "Not yet claimed"
+            )}
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "recomender",
+    header: "Recommended By",
+    cell: ({ row }) => {
+      const r = row.original;
+      return (
+        <div className="flex flex-col">
+          <div className="font-semibold capitalize">
+            {r.recommenderId ? (
+              <>
+                {r.recommender?.firstName} {r.recommender?.lastName}
+              </>
+            ) : (
+              "Not Applicable"
+            )}
           </div>
         </div>
       );

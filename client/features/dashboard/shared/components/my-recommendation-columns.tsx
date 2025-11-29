@@ -3,16 +3,46 @@
 import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { CheckCheck, CircleX, Edit, Loader2, Trash, View } from "lucide-react";
+import { Loader2, Trash, View } from "lucide-react";
 import { Recommendation } from "@/data/interfaces/Recommendation";
-import { User } from "@/data/interfaces/User";
-import { UserRoleEnum } from "@/data/enums";
+import { cn } from "@/lib/utils";
+import { TextHelper } from "@/helpers";
 
 export const myRecommendationColumns = (
   onDelete: (id: number) => void,
   isdeleting: boolean,
   currentItemDeleting: number | null
 ): ColumnDef<Recommendation>[] => [
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const r = row.original;
+      const statusColor = {
+        light: {
+          PENDING: "text-amber-500",
+          APPROVED: "text-green-600",
+          REJECTED: "text-red-600",
+        },
+        dark: {
+          PENDING: "text-amber-400",
+          APPROVED: "text-green-400",
+          REJECTED: "text-red-400",
+        },
+      };
+      return (
+        <div
+          className={cn(
+            statusColor.light[r?.status],
+            `dark:${statusColor.dark[r?.status]}`,
+            "font-bold uppercase"
+          )}
+        >
+          {TextHelper.capitalize(r?.status)}
+        </div>
+      );
+    },
+  },
   {
     accessorKey: "name",
     header: "Name",
@@ -57,20 +87,7 @@ export const myRecommendationColumns = (
     header: "Active",
     cell: ({ getValue }) => <span>{getValue() ? "Yes" : "No"}</span>,
   },
-  {
-    accessorKey: "recommender",
-    header: "Recommended By",
-    cell: ({ row }) => {
-      const r = row.original;
-      return (
-        <div className="flex flex-col">
-          <div className="font-semibold capitalize">
-            {r.recommender?.firstName} {r.recommender?.lastName}
-          </div>
-        </div>
-      );
-    },
-  },
+
   {
     id: "actions",
     header: "Actions",

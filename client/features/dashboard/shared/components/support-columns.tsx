@@ -80,7 +80,7 @@ export const supportColumns = (
     cell: ({ row }) => {
       const r = row.original;
       return (
-        <div className="max-w-[10rem] truncate" title={r.message}>
+        <div className="max-w-40 truncate" title={r.message}>
           {r.message}
         </div>
       );
@@ -93,7 +93,7 @@ export const supportColumns = (
       const r = row.original;
       return (
         <div
-          className="max-w-[10rem] truncate"
+          className="max-w-40 truncate"
           title={
             r.assignee
               ? `${r.assignee?.firstName} ${r.assignee?.lastName}`
@@ -114,7 +114,7 @@ export const supportColumns = (
       const r = row.original;
       return (
         <div
-          className="max-w-[10rem] truncate"
+          className="max-w-40 truncate"
           title={
             r.resolvedAt
               ? TextHelper.getFormattedDate(r.resolvedAt)

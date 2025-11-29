@@ -84,7 +84,7 @@ export class FilterRecommendationDto extends PaginationDto {
   })
   @IsOptional()
   @IsString()
-  type: BusinessTypeEnum;
+  type?: BusinessTypeEnum;
 
   @ApiProperty({ example: RecommendationStatusEnum.PENDING, required: false })
   @IsOptional()

@@ -151,7 +151,7 @@ export const BusinessDetails: React.FC = () => {
                             business={business}
                             businessImages={businessImages}
                           />
-                          <BusinessMenuAndServices />
+                          {/* <BusinessMenuAndServices /> */}
                           <BusinessReviews business={business} />
                         </div>
 

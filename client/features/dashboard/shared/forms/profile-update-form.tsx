@@ -187,6 +187,7 @@ export function ProfileUpdateForm({
               formPlaceholder="Bio"
               formDescription="Max 150 characters"
               maxLength={150}
+              rows={3}
               disabled={isUpdatingUserData}
             />
 

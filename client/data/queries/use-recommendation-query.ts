@@ -54,25 +54,17 @@ export const useMyRecommendationsQuery = ({
   enabled?: boolean;
 }) => {
   return useCustomQuery<BukkaResponse<PagedResponse<Recommendation[]>>, Error>(
-    [
-      QueryKeyEnum.MY_RECOMMENDATIONS,
-      userId,
-      search,
-      filters,
-      pageNumber,
-      pageSize,
-    ],
+    [QueryKeyEnum.MY_RECOMMENDATIONS, search, filters, pageNumber, pageSize],
     (params?: QueryParams) =>
       RecommendationApiService.getLoggedInUserRecommendations({
         pageNumber: params?.pageNumber ?? pageNumber,
         pageSize: params?.pageSize ?? pageSize,
         search: params?.search ?? search,
-        userId,
         ...filters,
         ...params,
       }),
     {
-      params: { pageNumber, pageSize, search, userId, ...filters },
+      params: { pageNumber, pageSize, search, ...filters },
       enabled: !!userId && enabled,
     }
   );
