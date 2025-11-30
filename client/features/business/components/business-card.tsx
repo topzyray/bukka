@@ -102,7 +102,7 @@ export const BusinessCard = memo(function BusinessCard({
       >
         <Card className="overflow-hidden shadow-card hover:shadow-elegant h-full transition-smooth py-0">
           <CardContent className="p-3 flex items-center gap-3">
-            <div className="relative w-16 h-16 lg:w-20 lg:h-20 rounded-lg overflow-hidden flex-shrink-0">
+            <div className="relative w-16 h-16 lg:w-20 lg:h-20 rounded-lg overflow-hidden shrink-0">
               {!imageError && coverImage ? (
                 <Image
                   src={coverImage?.fullPath}
@@ -140,7 +140,7 @@ export const BusinessCard = memo(function BusinessCard({
 
             <FavoriteButton
               businessId={business?.id}
-              className="flex-shrink-0 w-8 h-8"
+              className="shrink-0 w-8 h-8"
             />
           </CardContent>
         </Card>
@@ -159,7 +159,7 @@ export const BusinessCard = memo(function BusinessCard({
     >
       <Card className="py-0 overflow-hidden shadow-card hover:shadow-elegant h-full transition-smooth group gap-0">
         <div className="relative overflow-hidden">
-          <div className="relative overflow-hidden w-full aspect-[16/9]">
+          <div className="relative overflow-hidden w-full aspect-video">
             {!imageError && coverImage ? (
               <Image
                 src={coverImage?.fullPath}

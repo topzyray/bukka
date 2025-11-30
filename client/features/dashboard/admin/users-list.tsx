@@ -28,12 +28,6 @@ export function UsersList() {
   const [search, setSearch] = React.useState<string>("");
   const [filters, setFilters] = React.useState<Record<string, any>>({});
 
-  // const deleteBusinessMutation = useDeleteBusiness({
-  //   onSuccess: () => {
-  //     setCurrentItemDeleting(null);
-  //   },
-  // });
-
   const { data: usersData, isLoading } = useAdminGetUsersQuery({
     search,
     filters,
@@ -105,13 +99,7 @@ export function UsersList() {
   };
 
   const columns = React.useMemo(
-    () =>
-      userColumnsAdmin(
-        handleEdit,
-        handleDelete
-        // deleteBusinessMutation.isPending,
-        // currentItemDeleting
-      ),
+    () => userColumnsAdmin(handleEdit, handleDelete),
     [handleDelete]
   );
 
@@ -122,17 +110,6 @@ export function UsersList() {
           <h1 className="text-2xl font-bold">Users Account</h1>
           <p className="text-sm text-muted-foreground">Manage all users</p>
         </div>
-
-        {/* <div className="flex items-center gap-2">
-                <Button onClick={handleCreate}>Add Business</Button>
-                <CreateUpdateBusinessModal
-                  open={isModalOpen}
-                  onOpenChange={handleOpenChange}
-                  mode={mode}
-                  initialData={mode === "edit" ? initialData : undefined}
-             
-                />
-              </div> */}
       </header>
 
       <div>

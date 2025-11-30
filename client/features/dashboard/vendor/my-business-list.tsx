@@ -6,7 +6,7 @@ import { Business } from "@/data/interfaces/Business";
 import { CreateUpdateBusinessModal } from "./modals/create-update-business-modal";
 import { DataTable } from "@/components/ui/data-table";
 import { businessColumns } from "../shared/components/business-columns";
-import { useBusinessesQuery } from "@/data/queries/use-businesses-query";
+import { useMyBusinessesQuery } from "@/data/queries/use-businesses-query";
 import { Button } from "@/components/ui/button";
 import { useDeleteBusiness } from "@/data/mutations/business/use-business-mutation";
 import { PaginationHelper } from "@/helpers/pagination-helper";
@@ -36,7 +36,7 @@ export function MyBusinessList() {
     },
   });
 
-  const { data: businessesData, isLoading } = useBusinessesQuery({
+  const { data: businessesData, isLoading } = useMyBusinessesQuery({
     search,
     filters,
     pageNumber: page,
@@ -55,7 +55,7 @@ export function MyBusinessList() {
       total: total,
       pageSize: PAGE_SIZE,
       queryClient: queryClient,
-      queryKey: [QueryKeyEnum.BUSINESSES],
+      queryKey: [QueryKeyEnum.MY_BUSINESSES],
       setPage: setPage,
     });
   };
@@ -65,19 +65,19 @@ export function MyBusinessList() {
     const sortBy = s?.id;
     const sortOrder = s?.desc ? "desc" : "asc";
     setFilters((f) => ({ ...f, sortBy, sortOrder }));
-    queryClient.removeQueries({ queryKey: [QueryKeyEnum.BUSINESSES] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.MY_BUSINESSES] });
     setPage(1);
   };
 
   const onSearchChange = (term: string) => {
     setSearch(term);
-    queryClient.removeQueries({ queryKey: [QueryKeyEnum.BUSINESSES] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.MY_BUSINESSES] });
     setPage(1);
   };
 
   const onFilterChange = (f: Record<string, any>) => {
     setFilters(f);
-    queryClient.removeQueries({ queryKey: [QueryKeyEnum.BUSINESSES] });
+    queryClient.removeQueries({ queryKey: [QueryKeyEnum.MY_BUSINESSES] });
     setPage(1);
   };
 
@@ -140,7 +140,7 @@ export function MyBusinessList() {
             initialData={mode === "edit" ? initialData : undefined}
             onSuccess={() => {
               queryClient.removeQueries({
-                queryKey: [QueryKeyEnum.BUSINESSES],
+                queryKey: [QueryKeyEnum.MY_BUSINESSES],
               });
               setPage(1);
               setIsModalOpen(false);

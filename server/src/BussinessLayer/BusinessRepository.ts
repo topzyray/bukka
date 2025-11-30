@@ -121,23 +121,24 @@ export class BusinessRepository {
     );
   }
 
-  async getBusinessesByOwner(): Promise<BukkaResponse<Business>> {
-    const loggedInUser = await UserHelper.getLoggedInUser();
-    const business = await this.businessDataAgent.findByOwnerId(
-      loggedInUser.id,
-    );
-    return BukkaResponse.GetSingleDataResponse('Business', business);
-  }
+  // async getBusinessesByOwner(): Promise<BukkaResponse<Business>> {
+  //   const loggedInUser = await UserHelper.getLoggedInUser();
+  //   const business = await this.businessDataAgent.findByOwnerId(
+  //     loggedInUser.id,
+  //   );
+  //   return BukkaResponse.GetSingleDataResponse('Business', business);
+  // }
 
-  async getBusinesses(
+  async getBusinessesByOwner(
     filterDto: FilterBusinessDto,
   ): Promise<PagedData<Business[]>> {
     const loggedInUser = await UserHelper.getLoggedInUser();
     let processedFilterDto = {
       ...filterDto,
-      ...(loggedInUser.role === UserRoleEnum.VENDOR && {
-        ownerId: loggedInUser.id,
-      }),
+      ...(loggedInUser &&
+        loggedInUser?.role === UserRoleEnum.VENDOR && {
+          ownerId: loggedInUser?.id,
+        }),
     };
 
     const query = FilterQueryHelper.buildQuery({
@@ -157,8 +158,37 @@ export class BusinessRepository {
     const { pageSize, pageNumber } =
       FilterQueryHelper.extractPagination(processedFilterDto);
     return handleCache(
-      'businesses',
+      'my-businesses',
       processedFilterDto as Record<string, any>,
+      () => {
+        return this.businessDataAgent.findAll(query, pageSize, pageNumber);
+      },
+      CacheTTLPolicyEnum.MY_BUSINESS_LIST,
+    );
+  }
+
+  async getBusinesses(
+    filterDto: FilterBusinessDto,
+  ): Promise<PagedData<Business[]>> {
+    const query = FilterQueryHelper.buildQuery({
+      dto: filterDto,
+      rules: [{ field: 'type' }],
+      // rules: [{ field: 'type' }, { field: 'cuisines' }],
+      searchConfig: {
+        fields: [
+          'name',
+          'description',
+          'slug',
+          { field: 'cuisines', dtoKey: 'cuisines', defaultOp: 'has' },
+        ],
+        mode: 'insensitive',
+      },
+    });
+    const { pageSize, pageNumber } =
+      FilterQueryHelper.extractPagination(filterDto);
+    return handleCache(
+      'businesses',
+      filterDto as Record<string, any>,
       () => {
         return this.businessDataAgent.findAll(query, pageSize, pageNumber);
       },
@@ -180,6 +210,7 @@ export class BusinessRepository {
     const updated = await this.businessDataAgent.updateBusiness(id, dto);
     await invalidateCache('business', { id });
     await invalidateCache('businesses', {});
+    await invalidateCache('my-businesses', {});
     return BukkaResponse.UpdateResponse('Business', updated);
   }
 
@@ -197,6 +228,7 @@ export class BusinessRepository {
     await this.businessDataAgent.deleteBusiness(id);
     await invalidateCache('business', { id });
     await invalidateCache('businesses', {});
+    await invalidateCache('my-businesses', {});
     return BukkaResponse.DeleteResponse('Business', true);
   }
 
