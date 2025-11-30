@@ -13,8 +13,16 @@ export interface QuerySpec {
   extras?: any; // escape-hatch for adapter-specific options
 }
 
+export interface InsertManyOptions {
+  skipDuplicates?: boolean;
+}
+
 export interface ModelProxy<T = any> {
   insert(doc: Partial<T>): Promise<T>;
+  insertMany(
+    docs: Partial<T>[],
+    options?: InsertManyOptions,
+  ): Promise<{ count: number }>;
   find(spec?: QuerySpec): Promise<T[]>;
   findOne(spec?: QuerySpec): Promise<T | null>;
   updateOne(spec: QuerySpec, update: Partial<T>): Promise<T | null>;

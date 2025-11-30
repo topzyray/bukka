@@ -1,28 +1,28 @@
-import { UserStatusEnum } from 'src/DomainLayer/Enums/UserStatusEnum';
-import { Inject, Injectable } from '@nestjs/common';
-import { PagedData } from 'src/DomainLayer/Models/PagedData';
 import type {
   IDatabaseAdapter,
   ModelProxy,
   QuerySpec,
 } from '../Adapters/DatabaseAdapter';
 import { User } from 'src/DomainLayer/Models/User';
-import { DatabaseConstant } from 'src/DomainLayer/Constants/DatabaseConstant';
+import { File } from 'src/DomainLayer/Models/File';
+import { Inject, Injectable } from '@nestjs/common';
+import { Review } from 'src/DomainLayer/Models/Review';
+import { Favorite } from 'src/DomainLayer/Models/Favorite';
+import { Business } from 'src/DomainLayer/Models/Business';
+import { PagedData } from 'src/DomainLayer/Models/PagedData';
+import { UserSession } from 'src/DomainLayer/Models/UserSession';
 import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
+import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
+import { UserStatusEnum } from 'src/DomainLayer/Enums/UserStatusEnum';
+import { TextHelper } from 'src/InfrastructureLayer/Helpers/TextHelper';
+import { BusinessTypeEnum } from 'src/DomainLayer/Enums/BusinessTypeEnum';
+import { DatabaseConstant } from 'src/DomainLayer/Constants/DatabaseConstant';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { IReferenceEntityAgent } from '../Abstracts/Interfaces/IReferenceEntityAgent';
-import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
-import { Favorite } from 'src/DomainLayer/Models/Favorite';
-import { Review } from 'src/DomainLayer/Models/Review';
-import { File } from 'src/DomainLayer/Models/File';
-import { UserSession } from 'src/DomainLayer/Models/UserSession';
-import { Business } from 'src/DomainLayer/Models/Business';
-import { BusinessTypeEnum } from 'src/DomainLayer/Enums/BusinessTypeEnum';
-import { TextHelper } from 'src/InfrastructureLayer/Helpers/TextHelper';
 
 @Injectable()
 export class UserDataAgent implements IReferenceEntityAgent {
-  private readonly model: ModelProxy<User>;
+  private readonly userModel: ModelProxy<User>;
   private readonly favouriteModel: ModelProxy<Favorite>;
   private readonly reviewModel: ModelProxy<Review>;
   private readonly fileModel: ModelProxy<File>;
@@ -33,7 +33,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
     @Inject(DatabaseConstant.DATABASE_ADAPTER)
     private readonly db: IDatabaseAdapter,
   ) {
-    this.model = this.db.getModel<User>('user');
+    this.userModel = this.db.getModel<User>('user');
     this.favouriteModel = this.db.getModel<Favorite>('favorite');
     this.reviewModel = this.db.getModel<Review>('review');
     this.fileModel = this.db.getModel<File>('file');
@@ -42,7 +42,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
   }
 
   async createUserAsync(data: Partial<User>): Promise<User> {
-    return this.model.insert(data);
+    return this.userModel.insert(data);
   }
 
   async getUserByEmail(email: string) {
@@ -63,7 +63,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
         },
       },
     };
-    return this.model.findOne(spec);
+    return this.userModel.findOne(spec);
   }
 
   async getUserById(userId: number): Promise<User | null> {
@@ -85,7 +85,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
         },
       },
     };
-    return this.model.findOne(spec);
+    return this.userModel.findOne(spec);
   }
 
   async getById(id: number) {
@@ -99,7 +99,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
     const spec: QuerySpec = {
       filter: { field: type, op: 'eq', value: token },
     };
-    return this.model.findOne(spec);
+    return this.userModel.findOne(spec);
   }
 
   async getAdminUserById(userId: number): Promise<User | null> {
@@ -121,7 +121,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
         },
       },
     };
-    return this.model.findOne(spec);
+    return this.userModel.findOne(spec);
   }
 
   async getAdminUserByRole(): Promise<User | null> {
@@ -133,7 +133,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
         ],
       },
     };
-    return this.model.findOne(spec);
+    return this.userModel.findOne(spec);
   }
 
   async updateUser(userId: number, data: Partial<User>): Promise<User | null> {
@@ -141,14 +141,14 @@ export class UserDataAgent implements IReferenceEntityAgent {
     const spec: QuerySpec = {
       filter: { field: 'id', op: 'eq', value: userId },
     };
-    return this.model.updateOne(spec, updateData);
+    return this.userModel.updateOne(spec, updateData);
   }
 
   async deleteUser(userId: number) {
     const spec: QuerySpec = {
       filter: { field: 'id', op: 'eq', value: userId },
     };
-    return this.model.updateOne(spec, {
+    return this.userModel.updateOne(spec, {
       userStatus: UserStatusEnum.DELETED,
       isDeleted: true,
       deletedAt: new Date(),
@@ -185,11 +185,11 @@ export class UserDataAgent implements IReferenceEntityAgent {
       },
     };
 
-    const total = await this.model.count({ filter: mergedFilter });
+    const total = await this.userModel.count({ filter: mergedFilter });
     pageData.total = total;
     pageData.pageCount = Math.ceil(total / pageSize);
 
-    const data = await this.model.find(spec);
+    const data = await this.userModel.find(spec);
     pageData.data = data;
     return pageData;
   }
@@ -218,30 +218,30 @@ export class UserDataAgent implements IReferenceEntityAgent {
         },
       },
     };
-    const total = await this.model.count({ filter });
+    const total = await this.userModel.count({ filter });
     pageData.total = total;
     pageData.pageCount = Math.ceil(total / pageSize);
-    pageData.data = await this.model.find(spec);
+    pageData.data = await this.userModel.find(spec);
     return pageData;
   }
 
   async getAdminOverview() {
-    const totalUsers = await this.model.count({});
-    const newSignups = await this.model.count({
+    const totalUsers = await this.userModel.count({});
+    const newSignups = await this.userModel.count({
       filter: {
         field: 'createdAt',
         op: 'gte',
         value: new Date(new Date().setDate(new Date().getDate() - 7)), // Last 7 days
       },
     });
-    const activeAccounts = await this.model.count({
+    const activeAccounts = await this.userModel.count({
       filter: {
         field: 'userStatus',
         op: 'eq',
         value: UserStatusEnum.ACTIVE,
       },
     });
-    const deletedAccounts = await this.model.count({
+    const deletedAccounts = await this.userModel.count({
       filter: {
         field: 'userStatus',
         op: 'eq',
@@ -256,7 +256,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
     };
   }
 
-  async getUserActivitiesOverview(userId: number) {
+  async getUserActivitiesSummary(userId: number) {
     const businesses = await this.businessModel.count({
       filter: {
         field: 'ownerId',
@@ -314,8 +314,8 @@ export class UserDataAgent implements IReferenceEntityAgent {
     // If raw is not available on adapter, fallback to simple per-month counts.
     try {
       if (
-        typeof (this.model as any).aggregate === 'function' &&
-        (this.model as any).aggregate
+        typeof (this.userModel as any).aggregate === 'function' &&
+        (this.userModel as any).aggregate
       ) {
         // if adapter supports aggregate pipeline, implement here (adapter-specific)
         // fallback to loop below
@@ -339,7 +339,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
 
     const result: { month: string; users: number }[] = [];
     for (const m of monthsArr) {
-      const count = await this.model.count({
+      const count = await this.userModel.count({
         filter: {
           AND: [
             { field: 'createdAt', op: 'gte', value: m.start },
@@ -445,7 +445,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
 
   /**
    * Orders per day for the last N days (default 7)
-   * Requires that your DB exposes an "order" model — if not, you can adapt to your order model
+   * Requires that your DB exposes an "order" userModel — if not, you can adapt to your order userModel
    */
   async getOrdersPerDay(
     lastNDays = 7,
@@ -475,8 +475,8 @@ export class UserDataAgent implements IReferenceEntityAgent {
         999,
       );
 
-      // if you have orderModel in this agent, replace `this.model` with this.orderModel
-      // I will assume you have an order model available via the adapter on a different agent;
+      // if you have orderModel in this agent, replace `this.userModel` with this.orderModel
+      // I will assume you have an order userModel available via the adapter on a different agent;
       // If not, you should move this implementation to the data agent owning orders.
       try {
         const orderModel = this.db.getModel('order'); // using db escape hatch
@@ -493,7 +493,7 @@ export class UserDataAgent implements IReferenceEntityAgent {
           orders: count,
         });
       } catch {
-        // If order model is unavailable, push zero; caller can adapt
+        // If order userModel is unavailable, push zero; caller can adapt
         result.push({
           day: dayStart.toLocaleString('en-US', { weekday: 'short' }),
           orders: 0,

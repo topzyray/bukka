@@ -1,11 +1,21 @@
 import { PrismaAdapterHelper } from './../../../InfrastructureLayer/Helpers/PrismaAdapterHelper';
-import { ModelProxy, QuerySpec } from '../DatabaseAdapter';
+import { InsertManyOptions, ModelProxy, QuerySpec } from '../DatabaseAdapter';
 
 export class PrismaModelProxy<T> implements ModelProxy<T> {
   constructor(private modelDelegate: any) {}
 
   insert(doc: Partial<T>) {
     return this.modelDelegate.create({ data: doc });
+  }
+
+  insertMany(
+    docs: Partial<T>[],
+    options?: InsertManyOptions,
+  ): Promise<{ count: number }> {
+    return this.modelDelegate.createMany({
+      data: docs,
+      skipDuplicates: options?.skipDuplicates ?? false,
+    });
   }
 
   async find(spec?: QuerySpec) {

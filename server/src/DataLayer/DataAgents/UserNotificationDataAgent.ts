@@ -27,10 +27,7 @@ export class UserNotificationDataAgent {
   }
 
   async createMultipleUserNotifications(data: Partial<UserNotification>[]) {
-    // If adapter supports bulk insert via extras, it can be used. Safe fallback: loop.
-    const out: UserNotification[] = [];
-    for (const d of data) out.push(await this.model.insert(d));
-    return out;
+    return this.model.insertMany(data);
   }
 
   async getUserNotificationById(

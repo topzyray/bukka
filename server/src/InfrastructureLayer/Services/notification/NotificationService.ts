@@ -1,9 +1,27 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { EmailService } from '../email/EmailService';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { CreateNotificationDto } from 'src/DomainLayer/Dtos/UserNotificationDto';
 import { NotificationTypeEnum } from 'src/DomainLayer/Enums/NotificationTypeEnum';
-import { UserNotification } from 'src/DomainLayer/Models/UserNotification';
 import { UserNotificationRepository } from 'src/BussinessLayer/UserNotificationRepository';
 import { NotificationSettingsRepository } from 'src/BussinessLayer/NotificationSettingsRepository';
+
+interface ChannelInput {
+  channels: NotificationTypeEnum[];
+  inapp?: {
+    userId: number | number[];
+    title: string;
+    message: string;
+    link?: string;
+    notificationCategory: string;
+    icon?: string;
+  };
+  email?: {
+    template: string;
+    subject: string;
+    to: string;
+    context: Record<string, any>;
+  };
+}
 
 interface NotificationSettings {
   isEmailTurnedOn: boolean;
@@ -19,58 +37,100 @@ const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
 
 @Injectable()
 export class NotificationService {
+  private readonly logger = new Logger(NotificationService.name);
+  private static readonly BATCH_SIZE = 100;
+
   constructor(
     protected readonly _notif: UserNotificationRepository,
     protected readonly _emailService: EmailService,
     private readonly _settingsRepo: NotificationSettingsRepository,
   ) {}
 
-  async dispatchNotification(input: {
-    channels: NotificationTypeEnum[];
-    // businessId?: string;
-    inapp?: {
-      title: string;
-      message: string;
-      link?: string;
-      notificationCategory: string;
-      icon?: string;
-    };
-    email?: {
-      template: string;
-      subject: string;
-      to: string;
-      context: Record<string, any>;
-    };
-  }) {
+  async dispatchNotification(input: ChannelInput) {
     const settings = await this.getUserNotificationSettings();
 
     for (const channel of input.channels) {
-      switch (channel) {
-        case NotificationTypeEnum.IN_APP:
-          if (settings?.isInAppTurnedOn) {
-            await this._notif.createUserNotification({
-              title: input.inapp?.title as string,
-              message: input.inapp?.message as string,
-              link: input.inapp?.link,
-              notificationCategory: input.inapp?.notificationCategory as string,
-              icon: input.inapp?.icon,
-            });
-          }
-          break;
-        case NotificationTypeEnum.EMAIL:
-          if (settings?.isEmailTurnedOn && input.email) {
-            await this._emailService.sendTemplateMail({
-              template: input.email.template,
-              subject: input.email.subject,
-              to: input.email.to,
-              context: input.email.context,
-            });
-          }
-          break;
-        default:
-          break;
+      try {
+        switch (channel) {
+          case NotificationTypeEnum.IN_APP:
+            if (settings.isInAppTurnedOn && input.inapp) {
+              await this.handleInAppNotification(input.inapp);
+            }
+            break;
+          case NotificationTypeEnum.EMAIL:
+            if (settings.isEmailTurnedOn && input.email) {
+              await this.handleEmailNotification(input.email);
+            }
+            break;
+          default:
+            this.logger.warn(`Unknown notification channel: ${channel}`);
+            break;
+        }
+      } catch (error) {
+        this.logger.error(
+          `Error processing notification for channel ${channel}: ${error?.message}`,
+        );
       }
     }
+  }
+
+  private async handleInAppNotification(inapp: ChannelInput['inapp']) {
+    if (!inapp) return;
+
+    const { userId, title, message, link, notificationCategory, icon } = inapp;
+
+    if (!title || !message || !notificationCategory) {
+      throw new BadRequestException(
+        'In-app notification payload is incomplete.',
+      );
+    }
+
+    if (typeof userId === 'number') {
+      await this._notif.createUserNotification({
+        userId,
+        title,
+        message,
+        link,
+        notificationCategory,
+        icon,
+      });
+      return;
+    }
+
+    if (Array.isArray(userId) && userId.length === 0) {
+      throw new BadRequestException('User ID array cannot be empty.');
+    }
+
+    for (let i = 0; i < userId.length; i += NotificationService.BATCH_SIZE) {
+      const batch = userId.slice(i, i + NotificationService.BATCH_SIZE);
+
+      const notifications: CreateNotificationDto[] = batch.map((uid) => ({
+        userId: uid,
+        title,
+        message,
+        link,
+        notificationCategory,
+        icon,
+      }));
+
+      await this._notif.createMultipleUsersNotification(notifications);
+    }
+  }
+
+  private async handleEmailNotification(email: ChannelInput['email']) {
+    if (!email) return;
+    const { template, subject, to, context } = email;
+    if (!template || !subject || !to) {
+      throw new BadRequestException(
+        'Email notification payload is incomplete.',
+      );
+    }
+    await this._emailService.sendTemplateMail({
+      template,
+      subject,
+      to,
+      context,
+    });
   }
 
   private async getUserNotificationSettings(): Promise<NotificationSettings> {
@@ -79,29 +139,5 @@ export class NotificationService {
     const userSettings =
       settings?.responseData?.settings ?? DEFAULT_NOTIFICATION_SETTINGS;
     return userSettings;
-  }
-
-  // TODO: Add user notification settings check later
-  protected async createMultipleNotifications(
-    userIds: number[],
-    title: string,
-    message: string,
-    type: NotificationTypeEnum[],
-    // businessId?: string,
-    link?: string,
-    notificationCategory?: string,
-    icon?: string,
-  ): Promise<void> {
-    const notifications = userIds.map((userId) => ({
-      userId,
-      // businessId,
-      title,
-      message,
-      notificationType: type,
-      link,
-      notificationCategory,
-      icon,
-    })) as unknown as UserNotification[];
-    await this._notif.createMultipleUsersNotification(notifications);
   }
 }
