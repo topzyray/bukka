@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (pathname.startsWith("/dashboard")) {
       window.location.href = "/signin";
     } else {
-      router.replace("/");
+      window.location.href = "/";
     }
   }, [queryClient]);
 

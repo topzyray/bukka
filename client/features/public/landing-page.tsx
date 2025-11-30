@@ -340,7 +340,7 @@ export function Home() {
               Array.from({ length: 6 }).map((_, i) => (
                 <BusinessCardSkeleton key={i} />
               ))
-            ) : featuredBusinesses.length ? (
+            ) : featuredBusinesses && featuredBusinesses.length ? (
               featuredBusinesses.map((business, index) => (
                 <motion.div
                   key={business.id}

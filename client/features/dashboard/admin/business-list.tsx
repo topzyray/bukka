@@ -12,6 +12,7 @@ import { useDeleteBusiness } from "@/data/mutations/business/use-business-mutati
 import { PaginationHelper } from "@/helpers/pagination-helper";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { QueryKeyEnum } from "@/data/enums";
+import { BukkaButton } from "@/components/ui";
 
 export function BusinessList() {
   const PAGE_SIZE = 10;
@@ -132,7 +133,7 @@ export function BusinessList() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button onClick={handleCreate}>Add Business</Button>
+          <BukkaButton onClick={handleCreate}>Add Business</BukkaButton>
           <CreateUpdateBusinessModal
             open={isModalOpen}
             onOpenChange={handleOpenChange}

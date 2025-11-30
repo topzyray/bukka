@@ -203,8 +203,10 @@ export function RecommendBusinessForm({ onSuccess }: IRecommendBusinessForm) {
                 formControl={form.control}
                 formName="description"
                 formLabel="Description (optional)"
+                formDescription="Max 150 characters"
                 formPlaceholder="Describe the place briefly"
                 rows={3}
+                maxLength={150}
               />
 
               <PhoneNumberInput
@@ -243,6 +245,7 @@ export function RecommendBusinessForm({ onSuccess }: IRecommendBusinessForm) {
                 formControl={form.control}
                 formName="note"
                 formLabel="Your Note"
+                formDescription="Max 150 characters"
                 formPlaceholder="Tell us why this place is worth adding…"
                 rows={3}
               />

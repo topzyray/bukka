@@ -13,9 +13,9 @@ import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { AdminControlService } from 'src/InfrastructureLayer/Services/AdminControlService';
 
 @Controller(`${AdminApiRoutesConstant.BASE_URL}/control`)
-// @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
-// @ApiSecurity('device-id')
-// @UseGuards(JwtAuthGuard, AdminAuthGuard)
+@ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+@ApiSecurity('device-id')
+@UseGuards(JwtAuthGuard, AdminAuthGuard)
 @ApiTags('Admin Control')
 export class AdminControlController {
   constructor(private controlService: AdminControlService) {}
