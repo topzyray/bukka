@@ -23,8 +23,8 @@ export class UserNotificationRepository {
   async createUserNotification(
     dto: CreateNotificationDto,
   ): Promise<BukkaResponse<UserNotification>> {
-    const loggedInUser = await UserHelper.getLoggedInUser();
-    const newUserNotification = { ...dto, userId: loggedInUser?.id };
+    // const loggedInUser = await UserHelper.getLoggedInUser();
+    const newUserNotification = { ...dto };
     const result = await this._userNotificationDataAgent.createUserNotification(
       newUserNotification as unknown as UserNotification,
     );
@@ -32,16 +32,16 @@ export class UserNotificationRepository {
   }
 
   async createMultipleUsersNotification(
-    userNotifications: UserNotification[],
-  ): Promise<BukkaResponse<any>> {
+    userNotifications: CreateNotificationDto[],
+  ): Promise<BukkaResponse<{ count: number }>> {
     const result =
       await this._userNotificationDataAgent.createMultipleUserNotifications(
         userNotifications as unknown as UserNotification[],
       );
     return BukkaResponse.CreateMultipleResponse(
-      'user notifications',
+      'User notifications',
       [],
-      // result.count,
+      result.count,
     );
   }
 

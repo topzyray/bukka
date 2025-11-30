@@ -59,7 +59,7 @@ export class BukkaResponse<K> {
         (data.length > 0 || count > 0
           ? `${entityName}s successfully created.`
           : `Failed to create ${entityName}s.`),
-      responseData: data.length > 0 ? data : null,
+      responseData: data.length > 0 || count > 0 ? data || count : null,
     };
   }
 

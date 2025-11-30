@@ -37,6 +37,7 @@ export class AuthNotificationService extends NotificationService {
     await this.dispatchNotification({
       channels: [NotificationTypeEnum.EMAIL],
       inapp: {
+        userId: data.userId,
         title: 'Confirm Your Email',
         message: 'Welcome to Bukka!',
         notificationCategory: category,
@@ -59,10 +60,12 @@ export class AuthNotificationService extends NotificationService {
     category: string,
   ): Promise<void> {
     await this.dispatchNotification({
-      channels: [NotificationTypeEnum.EMAIL],
+      channels: [NotificationTypeEnum.EMAIL, NotificationTypeEnum.IN_APP],
       inapp: {
-        title: 'Confirm Your Email',
-        message: 'Welcome to Bukka!',
+        userId: data.userId,
+        title: 'Congratulations',
+        message:
+          'Welcome to Bukka! We are glad to have you onboard! You can recommend a business',
         notificationCategory: category,
       },
       email: {

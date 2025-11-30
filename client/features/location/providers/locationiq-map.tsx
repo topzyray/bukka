@@ -351,7 +351,7 @@ export function LocationIQMap({
               }}
             >
               <Popup className="sm:w-sm">
-                <BusinessPopUp business={business} className="sm:w-[21.5rem]" />
+                <BusinessPopUp business={business} className="sm:w-86" />
                 {/* <BusinessPopUp business={business} /> */}
               </Popup>
               <Tooltip>{business?.name}</Tooltip>
@@ -369,7 +369,7 @@ export function LocationIQMap({
       </MapContainer>
 
       {showSearchPlaces && (
-        <div className="absolute top-2.5 left-1/2 transform -translate-x-1/2 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-[14rem] sm:max-w-[18rem] w-full">
+        <div className="absolute top-2.5 left-1/2 transform -translate-x-1/2 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-56 sm:max-w-[18rem] w-full">
           <SearchPlacesWithAutocomplete />
         </div>
       )}

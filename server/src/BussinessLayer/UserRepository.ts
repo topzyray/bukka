@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserDataAgent } from 'src/DataLayer/DataAgents/UserDataAgent';
 import {
@@ -338,15 +339,177 @@ export class UserRepository {
     );
   }
 
-  async getUserActivitiesOverview() {
+  async getUserActivitiesSummary() {
     const loggedInUser = await UserHelper.getLoggedInUser();
-    const result = await this.userDataAgent.getUserActivitiesOverview(
+    const result = await this.userDataAgent.getUserActivitiesSummary(
       loggedInUser?.id,
     );
     return result;
   }
 
   async getAdminOverview(): Promise<IAdminOverview> {
+    const overview = await this.userDataAgent.getAdminOverview();
+
+    const [userGrowthData, businessStatus, orderDataRaw, recentActivitiesRaw] =
+      await Promise.all([
+        this.userDataAgent.getMonthlyUserRegistrations(6),
+        this.userDataAgent.getBusinessStatusDistribution(),
+        this.userDataAgent.getOrdersPerDay(7),
+        this.userDataAgent.getRecentActivities(6),
+      ]);
+
+    // Build stats array (format values nicely; you can add change calculations if you want)
+    const stats = [
+      {
+        title: 'Total Users',
+        value: Intl.NumberFormat().format((overview.totalUsers as number) ?? 0),
+        change: undefined,
+        positive: true,
+      },
+      {
+        title: 'Active Businesses',
+        value: Intl.NumberFormat().format(
+          businessStatus.find((b) => b.name === 'Active')?.value ?? 0,
+        ),
+        change: undefined,
+        positive: true,
+      },
+      {
+        title: 'Total Orders',
+        value: Intl.NumberFormat().format(
+          orderDataRaw.reduce((s, d) => s + d.orders, 0),
+        ),
+        change: undefined,
+        positive: true,
+      },
+      {
+        title: 'Revenue',
+        value: '₦0', // revenue isn't available in the user data agent; replace with real source if available
+        change: undefined,
+        positive: true,
+      },
+    ];
+
+    // Add colors (frontend uses CSS variables; provide css variable strings)
+    const businessCategoryData = businessStatus.map((b, i) => ({
+      ...b,
+      color:
+        i === 0
+          ? 'hsl(var(--primary))'
+          : i === 1
+            ? 'hsl(var(--accent))'
+            : 'hsl(var(--destructive))',
+    }));
+
+    const orderData = orderDataRaw.map((d) => ({
+      day: d.day,
+      orders: d.orders,
+    }));
+
+    const recentActivity = recentActivitiesRaw.map((a) => ({
+      action: a.action,
+      user: a.user,
+      // formatted relative time - you can compute actual "2 minutes ago" on frontend; here provide ISO
+      time: a.time.toISOString(),
+    }));
+
+    return {
+      stats,
+      userGrowthData,
+      businessCategoryData,
+      orderData,
+      recentActivity,
+      others: overview,
+    } as IAdminOverview;
+  }
+
+  async getVendorOverview(): Promise<IAdminOverview> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    if (loggedInUser?.role !== UserRoleEnum.VENDOR) {
+      throw new UnauthorizedException('You are not authorized');
+    }
+
+    const overview = await this.userDataAgent.getAdminOverview();
+
+    const [userGrowthData, businessStatus, orderDataRaw, recentActivitiesRaw] =
+      await Promise.all([
+        this.userDataAgent.getMonthlyUserRegistrations(6),
+        this.userDataAgent.getBusinessStatusDistribution(),
+        this.userDataAgent.getOrdersPerDay(7),
+        this.userDataAgent.getRecentActivities(6),
+      ]);
+
+    // Build stats array (format values nicely; you can add change calculations if you want)
+    const stats = [
+      {
+        title: 'Total Users',
+        value: Intl.NumberFormat().format((overview.totalUsers as number) ?? 0),
+        change: undefined,
+        positive: true,
+      },
+      {
+        title: 'Active Businesses',
+        value: Intl.NumberFormat().format(
+          businessStatus.find((b) => b.name === 'Active')?.value ?? 0,
+        ),
+        change: undefined,
+        positive: true,
+      },
+      {
+        title: 'Total Orders',
+        value: Intl.NumberFormat().format(
+          orderDataRaw.reduce((s, d) => s + d.orders, 0),
+        ),
+        change: undefined,
+        positive: true,
+      },
+      {
+        title: 'Revenue',
+        value: '₦0', // revenue isn't available in the user data agent; replace with real source if available
+        change: undefined,
+        positive: true,
+      },
+    ];
+
+    // Add colors (frontend uses CSS variables; provide css variable strings)
+    const businessCategoryData = businessStatus.map((b, i) => ({
+      ...b,
+      color:
+        i === 0
+          ? 'hsl(var(--primary))'
+          : i === 1
+            ? 'hsl(var(--accent))'
+            : 'hsl(var(--destructive))',
+    }));
+
+    const orderData = orderDataRaw.map((d) => ({
+      day: d.day,
+      orders: d.orders,
+    }));
+
+    const recentActivity = recentActivitiesRaw.map((a) => ({
+      action: a.action,
+      user: a.user,
+      // formatted relative time - you can compute actual "2 minutes ago" on frontend; here provide ISO
+      time: a.time.toISOString(),
+    }));
+
+    return {
+      stats,
+      userGrowthData,
+      businessCategoryData,
+      orderData,
+      recentActivity,
+      others: overview,
+    } as IAdminOverview;
+  }
+
+  async getUserOverview(): Promise<IAdminOverview> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    if (loggedInUser?.role !== UserRoleEnum.USER) {
+      throw new UnauthorizedException('You are not authorized');
+    }
+
     const overview = await this.userDataAgent.getAdminOverview();
 
     const [userGrowthData, businessStatus, orderDataRaw, recentActivitiesRaw] =

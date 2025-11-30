@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { NotificationTypeEnum } from '../Enums/NotificationTypeEnum';
-import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsBoolean,
+  IsNumber,
+} from 'class-validator';
 import { PaginationDto } from './Base/PaginationDto';
 import { Transform } from 'class-transformer';
 
@@ -54,6 +60,12 @@ export class UserNotificationDto {
 }
 
 export class CreateNotificationDto {
+  @ApiProperty({ example: 2, required: false })
+  @IsNotEmpty()
+  @IsNumber()
+  @Transform(({ value }) => Number.parseInt(value, 10))
+  userId: number;
+
   @ApiProperty({ example: 'Welcome to Bukka', required: true })
   @IsNotEmpty()
   @IsString()
