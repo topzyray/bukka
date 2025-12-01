@@ -6,6 +6,9 @@ import {
   ResolveSupportDto,
   SupportFilterDto,
 } from 'src/DomainLayer/Dtos/SupportDto';
+import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
+import { SupportQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/SupportQueueMessageTypeEnum copy';
+import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
 import { SupportStatusEnum } from 'src/DomainLayer/Enums/SupportStatusEnum';
 import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
@@ -14,14 +17,20 @@ import { Support } from 'src/DomainLayer/Models/Support';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { TextHelper } from 'src/InfrastructureLayer/Helpers/TextHelper';
 import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
+import { QueueService } from 'src/InfrastructureLayer/Services/queue/QueueService';
 
 @Injectable()
 export class SupportRepository {
-  constructor(private readonly _supportDataAgent: SupportDataAgent) {}
+  constructor(
+    private readonly _supportDataAgent: SupportDataAgent,
+    private readonly _queue: QueueService,
+  ) {}
 
   async createSupportAsync(
     createSupportDto: CreateSupportDto,
   ): Promise<BukkaResponse<Support>> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+
     let ticketId = TextHelper.generateTicketId();
 
     const existingTicketId = await this.getSupportByTicketId(ticketId);
@@ -33,12 +42,33 @@ export class SupportRepository {
     const newSupport = {
       ...createSupportDto,
       ticketId,
+      creatorId: createSupportDto?.email ?? null,
+      creatorEmail: createSupportDto?.email ?? null,
     };
     const support = await this._supportDataAgent.createSupportAsync(newSupport);
 
     if (!support) {
       return BukkaResponse.ErrorResponse('Support', HttpStatus.NOT_IMPLEMENTED);
     }
+
+    this._queue.publishToQueue(
+      QueueEnum.SUPPORT_NOTIFICATION,
+      {
+        messageType: SupportQueueMessageTypeEnum.SUPPORT_TICKET_CREATED,
+        payload: {
+          creatorId: loggedInUser?.id,
+          creatorEmail: loggedInUser?.email,
+          firstName: loggedInUser?.firstName,
+          lastName: loggedInUser?.lastName,
+          ticketId: support?.ticketId,
+          subject: support?.subject,
+          message: support?.message,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
 
     return BukkaResponse.CustomResponse(
       'Thank you for contacting us at Bukka. We will get back to you soon.',
@@ -60,7 +90,7 @@ export class SupportRepository {
 
   async getSupportByFilter(
     filterDto: SupportFilterDto,
-  ): Promise<PagedData<any[]>> {
+  ): Promise<PagedData<Support[]>> {
     const loggedInUser = await UserHelper.getLoggedInUser();
 
     const baseFilters = { ...filterDto };
@@ -96,6 +126,26 @@ export class SupportRepository {
       assigneeId,
       status: SupportStatusEnum.PENDING,
     });
+
+    this._queue.publishToQueue(
+      QueueEnum.SUPPORT_NOTIFICATION,
+      {
+        messageType: SupportQueueMessageTypeEnum.SUPPORT_TICKET_ASSIGNED,
+        payload: {
+          creatorId: updated?.creatorId,
+          creatorEmail: updated?.creatorEmail,
+          assigneeFirstName: updated?.assignee?.firstName,
+          assigneeLastName: updated?.assignee?.lastName,
+          ticketId: updated?.ticketId,
+          subject: updated?.subject,
+          message: updated?.message,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     return BukkaResponse.CustomResponse(
       'Ticket assigned successfully',
       HttpStatus.OK,
@@ -112,6 +162,22 @@ export class SupportRepository {
       resolvedAt,
       status: SupportStatusEnum.RESOLVED,
     });
+
+    this._queue.publishToQueue(
+      QueueEnum.SUPPORT_NOTIFICATION,
+      {
+        messageType: SupportQueueMessageTypeEnum.SUPPORT_TICKET_RESOLVED,
+        payload: {
+          creatorId: updated?.creatorId,
+          creatorEmail: updated?.creatorEmail,
+          ticketId: updated?.ticketId,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     return BukkaResponse.CustomResponse(
       'Ticket resolved successfully',
       HttpStatus.OK,

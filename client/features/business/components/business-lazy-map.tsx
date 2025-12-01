@@ -2,8 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { MapPin } from "lucide-react";
 import { LazyMapObserver } from "./lazy-map-observer";
 import { Business } from "@/data/interfaces/Business";
+import { Recommendation } from "@/data/interfaces/Recommendation";
 
-export function BusinessLazyMap({ business }: { business: Business }) {
+export function BusinessLazyMap({
+  business,
+}: {
+  business: Business | Recommendation;
+}) {
   return (
     <Card>
       <CardHeader>

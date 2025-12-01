@@ -14,14 +14,49 @@ import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { OrderDataAgent } from 'src/DataLayer/DataAgents/OrderDataAgent';
 import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
+import { QueueService } from 'src/InfrastructureLayer/Services/queue/QueueService';
+import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
+import { OrderQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/OrderQueueMessageTypeEnum';
+import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
 
 @Injectable()
 export class OrderRepository {
-  constructor(private readonly orderDataAgent: OrderDataAgent) {}
+  constructor(
+    private readonly orderDataAgent: OrderDataAgent,
+    private readonly _queue: QueueService,
+  ) {}
 
   async createOrder(dto: CreateOrderDto): Promise<BukkaResponse<Order>> {
     // validate user, vendor, business exist
     const order = await this.orderDataAgent.createOrder(dto);
+
+    this._queue.publishToQueue(
+      QueueEnum.ORDER_NOTIFICATION,
+      {
+        messageType: OrderQueueMessageTypeEnum.ORDER_CREATED,
+        payload: {
+          orderId: order.id,
+          customerId: order.user.id,
+          customerEmail: order.user.email,
+          customerFirstName: order.user.firstName,
+          customerLastName: order.user.lastName,
+          customerRole: order.user.role,
+          businessId: order.business.id,
+          status: order.status,
+          totalAmount: order.totalAmount,
+          vendorId: order.vendor.id,
+          vendorEmail: order.vendor.email,
+          vendorFirstName: order.vendor.firstName,
+          vendorLastName: order.vendor.lastName,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
+    await invalidateCache('orders', {});
+
     return BukkaResponse.CreateResponse('Order', order);
   }
 
@@ -58,6 +93,32 @@ export class OrderRepository {
     if (!order) throw new NotFoundException('Order not found');
     // role-based permission checks...
     const updated = await this.orderDataAgent.updateOrder(dto.orderId, dto);
+
+    this._queue.publishToQueue(
+      QueueEnum.ORDER_NOTIFICATION,
+      {
+        messageType: OrderQueueMessageTypeEnum.ORDER_CREATED,
+        payload: {
+          orderId: order.id,
+          customerId: order.user.id,
+          customerEmail: order.user.email,
+          customerFirstName: order.user.firstName,
+          customerLastName: order.user.lastName,
+          customerRole: order.user.role,
+          businessId: order.business.id,
+          status: order.status,
+          totalAmount: order.totalAmount,
+          vendorId: order.vendor.id,
+          vendorEmail: order.vendor.email,
+          vendorFirstName: order.vendor.firstName,
+          vendorLastName: order.vendor.lastName,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     await invalidateCache('orders', {});
     await invalidateCache('orders', { businessId: order.businessId });
     await invalidateCache('order', { id: order.id });

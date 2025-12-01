@@ -7,7 +7,7 @@ export function NotificationsList({
   notifications: UserNotification[];
 }) {
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {notifications.map((n) => (
         <NotificationCard key={n.id} notification={n} />
       ))}

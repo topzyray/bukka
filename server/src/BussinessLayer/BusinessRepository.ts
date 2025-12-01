@@ -24,6 +24,10 @@ import { LocationDataAgent } from 'src/DataLayer/DataAgents/LocationDataAgent';
 import { BusinessDataAgent } from 'src/DataLayer/DataAgents/BusinessDataAgent';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { LocationCoordsHelper } from 'src/InfrastructureLayer/Helpers/LocationCoordsHelper';
+import { QueueService } from 'src/InfrastructureLayer/Services/queue/QueueService';
+import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
+import { BusinessQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/BusinessQueueMessageTypeEnum';
+import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
 
 const TOLERANCE = 1e-5;
 
@@ -32,6 +36,7 @@ export class BusinessRepository {
   constructor(
     private readonly businessDataAgent: BusinessDataAgent,
     private readonly locationDataAgent: LocationDataAgent,
+    private readonly _queue: QueueService,
     private readonly fileRepo: FileRepository,
   ) {}
 
@@ -103,6 +108,33 @@ export class BusinessRepository {
       isActive: true,
     });
 
+    this._queue.publishToQueue(
+      QueueEnum.BUSINESS_NOTIFICATION,
+      {
+        messageType: BusinessQueueMessageTypeEnum.BUSINESS_CREATED,
+        payload: {
+          ownerId,
+          firstName:
+            (loggedInUser?.role === UserRoleEnum.ADMIN
+              ? business?.owner?.firstName
+              : loggedInUser?.firstName) ?? '',
+          lastName:
+            (loggedInUser?.role === UserRoleEnum.ADMIN
+              ? business?.owner?.lastName
+              : loggedInUser?.lastName) ?? '',
+          ownerEmail:
+            (loggedInUser?.role === UserRoleEnum.ADMIN
+              ? business?.owner?.email
+              : loggedInUser?.email) ?? '',
+          businessId: business?.id,
+          businessName: business?.name,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     await invalidateCache('businesses', {});
 
     return BukkaResponse.CreateResponse('Business', business);
@@ -120,14 +152,6 @@ export class BusinessRepository {
       CacheTTLPolicyEnum.BUSINESS_DETAIL,
     );
   }
-
-  // async getBusinessesByOwner(): Promise<BukkaResponse<Business>> {
-  //   const loggedInUser = await UserHelper.getLoggedInUser();
-  //   const business = await this.businessDataAgent.findByOwnerId(
-  //     loggedInUser.id,
-  //   );
-  //   return BukkaResponse.GetSingleDataResponse('Business', business);
-  // }
 
   async getBusinessesByOwner(
     filterDto: FilterBusinessDto,
@@ -207,7 +231,41 @@ export class BusinessRepository {
     if (business.ownerId !== loggedInUser.id)
       throw new ForbiddenException('Unauthorized update');
 
-    const updated = await this.businessDataAgent.updateBusiness(id, dto);
+    const updated = await this.businessDataAgent.updateBusiness(
+      business.id,
+      dto,
+    );
+
+    this._queue.publishToQueue(
+      QueueEnum.BUSINESS_NOTIFICATION,
+      {
+        messageType: BusinessQueueMessageTypeEnum.BUSINESS_UPDATED,
+        payload: {
+          ownerId:
+            (loggedInUser?.role === UserRoleEnum.ADMIN
+              ? business?.owner?.id
+              : loggedInUser?.id) ?? '',
+          firstName:
+            (loggedInUser?.role === UserRoleEnum.ADMIN
+              ? business?.owner?.firstName
+              : loggedInUser?.firstName) ?? '',
+          lastName:
+            (loggedInUser?.role === UserRoleEnum.ADMIN
+              ? business?.owner?.lastName
+              : loggedInUser?.lastName) ?? '',
+          ownerEmail:
+            (loggedInUser?.role === UserRoleEnum.ADMIN
+              ? business?.owner?.email
+              : loggedInUser?.email) ?? '',
+          businessId: business?.id,
+          businessName: business?.name,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     await invalidateCache('business', { id });
     await invalidateCache('businesses', {});
     await invalidateCache('my-businesses', {});
@@ -224,6 +282,36 @@ export class BusinessRepository {
       loggedInUser.role !== UserRoleEnum.ADMIN
     )
       throw new ForbiddenException('Unauthorized delete');
+
+    this._queue.publishToQueue(
+      QueueEnum.BUSINESS_NOTIFICATION,
+      {
+        messageType: BusinessQueueMessageTypeEnum.BUSINESS_DELETED,
+        payload: {
+          ownerId:
+            (loggedInUser?.role === UserRoleEnum.ADMIN
+              ? business?.owner?.id
+              : loggedInUser?.id) ?? '',
+          firstName:
+            (loggedInUser?.role === UserRoleEnum.ADMIN
+              ? business?.owner?.firstName
+              : loggedInUser?.firstName) ?? '',
+          lastName:
+            (loggedInUser?.role === UserRoleEnum.ADMIN
+              ? business?.owner?.lastName
+              : loggedInUser?.lastName) ?? '',
+          ownerEmail:
+            (loggedInUser?.role === UserRoleEnum.ADMIN
+              ? business?.owner?.email
+              : loggedInUser?.email) ?? '',
+          businessId: business?.id,
+          businessName: business?.name,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
 
     await this.businessDataAgent.deleteBusiness(id);
     await invalidateCache('business', { id });

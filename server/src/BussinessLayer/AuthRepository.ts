@@ -524,7 +524,7 @@ export class AuthRepository {
           getStartedLink:
             this._configService.nodeEnv === EnvironmentTypeEnum.DEV
               ? AppUrlTypeEnum.LOCAL
-              : AppUrlTypeEnum.PROD,
+              : AppUrlTypeEnum.FRONTEND,
           userType: result?.responseData?.userType,
         },
       },

@@ -1,3 +1,6 @@
+import { Business } from "@/data/interfaces/Business";
+import { BusinessLike } from "@/data/interfaces/BusinessLike";
+import { Recommendation } from "@/data/interfaces/Recommendation";
 import { toast } from "sonner";
 
 interface ItemWithId {
@@ -82,5 +85,25 @@ export class DataHelper {
     } else {
       throw Error("Only strings are allowed");
     }
+  }
+
+  static normalizeBusiness(entity: Business | Recommendation): BusinessLike {
+    return {
+      id: entity.id,
+      name: entity.name,
+      description: entity.description ?? "",
+      type: entity.type,
+      cuisines: entity.cuisines ?? [],
+      website: entity.website,
+      phoneNumber: entity.phoneNumber,
+      location: {
+        address: entity.location?.address,
+        city: entity.location?.city,
+        state: entity.location?.state,
+      },
+      openingHours: "openingHours" in entity ? entity.openingHours : undefined,
+      averageRating: "averageRating" in entity ? entity.averageRating : 0,
+      reviewCount: "reviewCount" in entity ? entity.reviewCount : 0,
+    };
   }
 }

@@ -18,6 +18,10 @@ export class AppConfigurationService {
     return this.configService.get<string>('DATABASE_URL')?.trim() as string;
   }
 
+  get supportEmail(): string {
+    return this.configService.get<string>('SUPPORT_EMAIL')?.trim() as string;
+  }
+
   get redisUri(): string {
     return this.configService.get<string>('REDIS_URL')?.trim() as string;
   }

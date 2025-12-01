@@ -1,0 +1,4 @@
+export enum OrderQueueMessageTypeEnum {
+  ORDER_CREATED = 'ORDER_CREATED',
+  ORDER_STATUS_UPDATED = 'ORDER_STATUS_UPDATED',
+}

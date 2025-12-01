@@ -12,12 +12,21 @@ export const useUpdateUserData = ({
 }) => {
   const queryClient = useQueryClient();
   return useCustomMutation(UserApiService.updateUser, {
-    onSuccessCallback: async () => {
-      await queryClient.invalidateQueries({
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.CURRENT_USER],
       });
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.UNREAD_COUNT],
       });
       onSuccess?.();
     },

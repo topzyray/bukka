@@ -17,6 +17,15 @@ export const useCreateReview = ({ onSuccess }: { onSuccess?: () => void }) => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.UNREAD_COUNT],
+      });
       onSuccess?.();
     },
   });
@@ -35,6 +44,15 @@ export const useUpdateReview = ({ onSuccess }: { onSuccess?: () => void }) => {
       });
       queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.UNREAD_COUNT],
       });
       onSuccess?.();
     },

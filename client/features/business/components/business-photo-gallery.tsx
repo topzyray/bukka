@@ -17,6 +17,7 @@ import {
 } from "@/data/enums";
 import { Business } from "@/data/interfaces/Business";
 import { File } from "@/data/interfaces/File";
+import { Recommendation } from "@/data/interfaces/Recommendation";
 import { useDeleteFile } from "@/data/mutations/file/use-file-mutations";
 import { FileApiService } from "@/data/services";
 import { useAuth } from "@/providers";
@@ -25,7 +26,7 @@ import { Camera, Loader2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 interface IBusinessPhotoGallery {
-  business: Business;
+  business: Business | Recommendation;
   businessImages: File[];
 }
 

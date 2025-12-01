@@ -18,6 +18,15 @@ export const useReplyReview = () => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.UNREAD_COUNT],
+      });
     },
   });
 };

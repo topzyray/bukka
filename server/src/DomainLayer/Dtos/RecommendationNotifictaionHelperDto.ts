@@ -1,13 +1,35 @@
-export class ProcessRecommendationCreatedDto {
+export class ProcessNewRecommendationDto {
   userId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  recommendationId: number;
   recommenderId: number;
+  recommenderEmail: string;
   recommenderName: string;
   businessName: string;
-  businessId: number;
-  status: string;
-  createdAt: string;
+  recommendationId: number;
+}
+
+export class ProcessRecommendationApprovalDto {
+  userId: number;
+  recommenderId: number;
+  recommenderEmail: string;
+  recommenderName: string;
+  businessName: string;
+  recommendationId: number;
+}
+
+export class ProcessRecommendationRejectionDto {
+  userId: number;
+  recommenderId: number;
+  recommenderEmail: string;
+  recommenderName: string;
+  businessName: string;
+  recommendationId: number;
+}
+
+export class ProcessRecommendationDeletionDto {
+  userId: number;
+  recommenderId: number;
+  recommenderEmail: string;
+  recommenderName: string;
+  businessName: string;
+  recommendationId: number;
 }

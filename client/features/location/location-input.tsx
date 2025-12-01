@@ -148,7 +148,7 @@ export function LocationInput({
                         userCoordinates.lat,
                         userCoordinates.lng
                       );
-                      toast.success("Location selected from cache");
+                      toast.success("Location selected");
                       return;
                     }
 

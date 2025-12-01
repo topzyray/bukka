@@ -25,6 +25,10 @@ import { Recommendation } from 'src/DomainLayer/Models/Recommendation';
 import { RecommendationStatusEnum } from 'src/DomainLayer/Enums/RecommendationStatuEnum';
 import { BusinessDataAgent } from 'src/DataLayer/DataAgents/BusinessDataAgent';
 import { Business } from 'src/DomainLayer/Models/Business';
+import { QueueService } from 'src/InfrastructureLayer/Services/queue/QueueService';
+import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
+import { RecommendationQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/RecommendationQueueMessageTypeEnum';
+import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
 
 const TOLERANCE = 1e-5;
 
@@ -34,6 +38,7 @@ export class RecommendationRepository {
     private readonly recommendationDataAgent: RecommendationDataAgent,
     private readonly businessDataAgent: BusinessDataAgent,
     private readonly locationDataAgent: LocationDataAgent,
+    private readonly _queue: QueueService,
   ) {}
 
   async createRecommendation(
@@ -99,6 +104,23 @@ export class RecommendationRepository {
         recommenderId: loggedInUser.id,
         status: RecommendationStatusEnum.PENDING,
       });
+
+    this._queue.publishToQueue(
+      QueueEnum.RECOMMENDATION_NOTIFICATION,
+      {
+        messageType: RecommendationQueueMessageTypeEnum.RECOMMENDATION_CREATED,
+        payload: {
+          recommenderId: loggedInUser?.id,
+          recommenderEmail: loggedInUser?.email,
+          recommenderName: `${loggedInUser?.firstName} ${loggedInUser?.lastName}`,
+          recommendationId: recommendation?.id,
+          businessName: recommendation?.name,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
 
     await invalidateCache('recommendations', {});
     await invalidateCache('my-recommendations', {});
@@ -211,28 +233,46 @@ export class RecommendationRepository {
   }
 
   async approveRecommendation(id: number): Promise<BukkaResponse<Business>> {
-    const rec = await this.recommendationDataAgent.findById(id);
-    if (!rec) throw new NotFoundException('Recommendation not found');
+    const recommendation = await this.recommendationDataAgent.findById(id);
+    if (!recommendation)
+      throw new NotFoundException('Recommendation not found');
 
     const business = await this.businessDataAgent.createBusiness({
-      name: rec?.name,
-      description: rec?.description,
-      type: rec?.type,
-      categoryId: rec?.categoryId,
-      slug: rec?.slug,
-      phoneNumber: rec?.phoneNumber ?? null,
-      email: rec?.email ?? null,
-      website: rec?.website ?? null,
-      registrationNo: rec?.registrationNo ?? null,
-      cuisines: rec?.cuisines ?? [],
-      locationId: rec?.locationId,
-      recommenderId: rec?.recommenderId,
+      name: recommendation?.name,
+      description: recommendation?.description,
+      type: recommendation?.type,
+      categoryId: recommendation?.categoryId,
+      slug: recommendation?.slug,
+      phoneNumber: recommendation?.phoneNumber ?? null,
+      email: recommendation?.email ?? null,
+      website: recommendation?.website ?? null,
+      registrationNo: recommendation?.registrationNo ?? null,
+      cuisines: recommendation?.cuisines ?? [],
+      locationId: recommendation?.locationId,
+      recommenderId: recommendation?.recommenderId,
       isActive: true,
     });
 
     await this.recommendationDataAgent.updateRecommendation(id, {
       status: RecommendationStatusEnum.APPROVED,
     });
+
+    this._queue.publishToQueue(
+      QueueEnum.RECOMMENDATION_NOTIFICATION,
+      {
+        messageType: RecommendationQueueMessageTypeEnum.RECOMMENDATION_APPROVED,
+        payload: {
+          recommenderId: recommendation?.recommenderId,
+          recommenderEmail: recommendation?.email,
+          recommenderName: `${recommendation?.recommender?.firstName} ${recommendation?.recommender?.lastName}`,
+          recommendationId: recommendation?.id,
+          businessName: recommendation?.name,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
 
     await invalidateCache('recommendation', { id });
     await invalidateCache('recommendations', {});
@@ -248,14 +288,33 @@ export class RecommendationRepository {
   }
 
   async rejectRecommendation(id: number) {
-    const rec = await this.recommendationDataAgent.findById(id);
-    if (!rec) throw new NotFoundException('Recommendation not found');
+    const recommendation = await this.recommendationDataAgent.findById(id);
+    if (!recommendation)
+      throw new NotFoundException('Recommendation not found');
     const updated = await this.recommendationDataAgent.updateRecommendation(
       id,
       {
         status: RecommendationStatusEnum.REJECTED,
       },
     );
+
+    this._queue.publishToQueue(
+      QueueEnum.RECOMMENDATION_NOTIFICATION,
+      {
+        messageType: RecommendationQueueMessageTypeEnum.RECOMMENDATION_REJECTED,
+        payload: {
+          recommenderId: recommendation?.recommenderId,
+          recommenderEmail: recommendation?.email,
+          recommenderName: `${recommendation?.recommender?.firstName} ${recommendation?.recommender?.lastName}`,
+          recommendationId: recommendation?.id,
+          businessName: recommendation?.name,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     await invalidateCache('recommendation', { id });
     await invalidateCache('recommendations', {});
     await invalidateCache('my-recommendations', {});
@@ -281,6 +340,24 @@ export class RecommendationRepository {
       throw new ForbiddenException('Unauthorized delete');
 
     await this.recommendationDataAgent.deleteRecommendation(id);
+
+    this._queue.publishToQueue(
+      QueueEnum.RECOMMENDATION_NOTIFICATION,
+      {
+        messageType: RecommendationQueueMessageTypeEnum.RECOMMENDATION_DELETED,
+        payload: {
+          recommenderId: recommendation?.recommenderId,
+          recommenderEmail: recommendation?.email,
+          recommenderName: `${recommendation?.recommender?.firstName} ${recommendation?.recommender?.lastName}`,
+          recommendationId: recommendation?.id,
+          businessName: recommendation?.name,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     await invalidateCache('recommendation', { id });
     await invalidateCache('recommendations', {});
     await invalidateCache('my-recommendations', {});

@@ -12,6 +12,15 @@ export const useUpdateSettings = () => {
         queryClient.invalidateQueries({
           queryKey: [QueryKeyEnum.NOTIFICATION_SETTING],
         });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.NOTIFICATIONS],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.UNREAD_COUNT],
+        });
       },
     }
   );

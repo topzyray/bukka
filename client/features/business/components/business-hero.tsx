@@ -14,25 +14,33 @@ import {
 } from "@/data/enums";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/providers";
+import { Recommendation } from "@/data/interfaces/Recommendation";
+import { DataHelper } from "@/helpers";
 
 export function BusinessHero({
   isLoadingFiles,
   business,
   coverImage,
+  showFavButton = true,
+  showRating = true,
 }: {
-  business: Business;
+  business: Business | Recommendation;
   isLoadingFiles: boolean;
   coverImage: File | null | undefined;
+  showFavButton?: boolean;
+  showRating?: boolean;
 }) {
+  const data = DataHelper.normalizeBusiness(business);
+
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
   const handleShare = async () => {
     try {
-      if (!business) return;
+      if (!data) return;
       if (navigator.share) {
         await navigator.share({
-          title: business.name,
+          title: data.name,
           url: window.location.href,
         });
       } else {
@@ -56,7 +64,7 @@ export function BusinessHero({
       ) : coverImage ? (
         <Image
           src={coverImage?.fullPath}
-          alt={business?.name}
+          alt={data?.name}
           fill
           className="object-cover"
           priority={!!coverImage?.fullPath}
@@ -64,7 +72,7 @@ export function BusinessHero({
       ) : (
         <div className="w-full h-full warm-gradient flex items-center justify-center">
           <span className="text-white text-4xl lg:text-6xl font-bold">
-            {business?.name.charAt(0)}
+            {data?.name.charAt(0)}
           </span>
         </div>
       )}
@@ -72,17 +80,17 @@ export function BusinessHero({
       <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">
-            {business?.name}
+            {data?.name}
           </h1>
-          <div className="flex items-center gap-3 text-white">
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-            <span className="font-semibold">
-              {business?.averageRating?.toFixed(1) ?? "0.0"}
-            </span>
-            <span className="opacity-80">
-              ({business?.reviewCount} reviews)
-            </span>
-          </div>
+          {showRating && (
+            <div className="flex items-center gap-3 text-white">
+              <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+              <span className="font-semibold">
+                {data?.averageRating?.toFixed(1) ?? "0.0"}
+              </span>
+              <span className="opacity-80">({data?.reviewCount} reviews)</span>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2">
@@ -95,12 +103,14 @@ export function BusinessHero({
             <Share2 className="w-4 h-4" />
           </Button>
 
-          <FavoriteButton
-            variant="outline"
-            businessId={business?.id}
-            className="rounded-lg"
-            iconClassName="w-4 h-4 text-red-500"
-          />
+          {showFavButton && (
+            <FavoriteButton
+              variant="outline"
+              businessId={data?.id}
+              className="rounded-lg"
+              iconClassName="w-4 h-4 text-red-500"
+            />
+          )}
         </div>
       </div>
 
@@ -122,15 +132,15 @@ export function BusinessHero({
                 extraParams={{
                   referenceType: FileReferenceTypeEnum.BUSINESS,
                   category: FileCategoryEnum.BUSINESS_COVER,
-                  referenceId: business?.id,
+                  referenceId: data?.id,
                   isPublic: true,
                   metadata: {
-                    altText: `${business?.name} - cover image`,
+                    altText: `${data?.name} - cover image`,
                   },
                 }}
                 onUploadSuccess={() => {
                   queryClient.invalidateQueries({
-                    queryKey: [QueryKeyEnum.BUSINESS_FILES, business?.id],
+                    queryKey: [QueryKeyEnum.BUSINESS_FILES, data?.id],
                   });
                 }}
               />

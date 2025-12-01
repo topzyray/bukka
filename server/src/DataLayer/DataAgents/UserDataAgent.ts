@@ -102,6 +102,13 @@ export class UserDataAgent implements IReferenceEntityAgent {
     return this.userModel.findOne(spec);
   }
 
+  async getUsersByRole(role: UserRoleEnum): Promise<User[] | []> {
+    const spec: QuerySpec = {
+      filter: { field: 'role', op: 'eq', value: role },
+    };
+    return this.userModel.find(spec);
+  }
+
   async getAdminUserById(userId: number): Promise<User | null> {
     const spec: QuerySpec = {
       filter: {

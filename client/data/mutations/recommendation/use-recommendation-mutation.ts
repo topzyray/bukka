@@ -12,15 +12,24 @@ export const useAddRecommendation = ({
 }) => {
   const queryClient = useQueryClient();
   return useCustomMutation(RecommendationApiService.createRecommenation, {
-    onSuccessCallback: async () => {
-      await queryClient.invalidateQueries({
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.RECOMMENDATIONS],
       });
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.USER_ACTIVITIES_SUMMARY],
       });
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.UNREAD_COUNT],
       });
       resetForm();
       onSuccess?.();
