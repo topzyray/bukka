@@ -23,22 +23,30 @@ export const useClearAllNotifications = ({ userId }: { userId?: number }) => {
   });
 };
 
-export const useDeleteNotification = ({ userId }: { userId?: number }) => {
+export const useDeleteNotification = ({
+  userId,
+  onSuccess,
+}: {
+  userId?: number;
+  onSuccess?: () => void;
+}) => {
   const queryClient = useQueryClient();
   return useCustomMutation(UserNotificationApiService.deleteNotificationById, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
-        queryKey: [QueryKeyEnum.NOTIFICATIONS, userId],
+        queryKey: [QueryKeyEnum.NOTIFICATIONS],
       });
       queryClient.invalidateQueries({
-        queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE, userId],
+        queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
       });
       queryClient.invalidateQueries({
-        queryKey: [QueryKeyEnum.UNREAD_COUNT, userId],
+        queryKey: [QueryKeyEnum.UNREAD_COUNT],
       });
       queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
       });
+
+      onSuccess?.();
     },
   });
 };

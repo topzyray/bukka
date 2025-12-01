@@ -11,9 +11,12 @@ import { useDeleteRecommendation } from "@/data/mutations/recommendation/use-rec
 import { useAuth } from "@/providers";
 import { useMyRecommendationsQuery } from "@/data/queries";
 import { myRecommendationColumns } from "./components/my-recommendation-columns";
+import { BukkaButton } from "@/components/ui";
+import { useRouter } from "next/navigation";
 
 export function MyRecommendationsList() {
   const PAGE_SIZE = 10;
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -97,12 +100,19 @@ export function MyRecommendationsList() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-wrap items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">My Recommendations</h1>
           <p className="text-sm text-muted-foreground">
             Manage All My Recommendations
           </p>
+        </div>
+
+        {/* TODO: ADD MODAL FORM LATER */}
+        <div>
+          <BukkaButton onClick={() => router.push("/businesses/recommend")}>
+            Recommend Business
+          </BukkaButton>
         </div>
       </header>
 

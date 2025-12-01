@@ -12,15 +12,24 @@ export const useCreateBusiness = ({
 }) => {
   const queryClient = useQueryClient();
   return useCustomMutation(BusinessApiService.createBusiness, {
-    onSuccessCallback: async () => {
-      await queryClient.invalidateQueries({
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.BUSINESSES],
       });
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.USER_ACTIVITIES_SUMMARY],
       });
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.UNREAD_COUNT],
       });
       resetForm();
       onSuccess?.();
@@ -40,9 +49,18 @@ export const useUpdateBusiness = ({
     ({ id, payload }: { id: number; payload: any }) =>
       BusinessApiService.updateBusiness(id, payload),
     {
-      onSuccessCallback: async () => {
-        await queryClient.invalidateQueries({
+      onSuccessCallback: () => {
+        queryClient.invalidateQueries({
           queryKey: [QueryKeyEnum.BUSINESSES],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.NOTIFICATIONS],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.UNREAD_COUNT],
         });
         resetForm();
         onSuccess?.();
@@ -58,15 +76,24 @@ export const useDeleteBusiness = ({
 }) => {
   const queryClient = useQueryClient();
   return useCustomMutation(BusinessApiService.deleteBusiness, {
-    onSuccessCallback: async () => {
-      await queryClient.invalidateQueries({
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.BUSINESSES],
       });
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.USER_ACTIVITIES_SUMMARY],
       });
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.UNREAD_COUNT],
       });
       onSuccess?.();
     },

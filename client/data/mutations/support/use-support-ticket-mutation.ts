@@ -13,6 +13,15 @@ export const useCreateTicket = ({ onSuccess }: { onSuccess?: () => void }) => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.SUPPORT],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.UNREAD_COUNT],
+      });
       onSuccess?.();
     },
   });

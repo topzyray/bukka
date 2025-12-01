@@ -28,6 +28,7 @@ export class UserNotificationRepository {
     const result = await this._userNotificationDataAgent.createUserNotification(
       newUserNotification as unknown as UserNotification,
     );
+
     return BukkaResponse.CreateResponse('User notification', result);
   }
 
@@ -60,8 +61,14 @@ export class UserNotificationRepository {
         notification.id as number,
         { isRead: true },
       );
-    return BukkaResponse.UpdateResponse(
-      'User notification',
+
+    await invalidateCache('notifications', {});
+    await invalidateCache('notifications:count', {});
+
+    return BukkaResponse.CustomResponse(
+      'Notification read successfully!',
+      HttpStatus.OK,
+      true,
       updatedUserNotification,
     );
   }
@@ -72,8 +79,14 @@ export class UserNotificationRepository {
       await this._userNotificationDataAgent.viewAllUserNotification(
         loggedInUser?.id as number,
       );
-    return BukkaResponse.UpdateResponse(
-      'User notification',
+
+    await invalidateCache('notifications', {});
+    await invalidateCache('notifications:count', {});
+
+    return BukkaResponse.CustomResponse(
+      'All notifications read successfully!',
+      HttpStatus.OK,
+      true,
       updatedUserNotifications,
     );
   }
@@ -144,7 +157,9 @@ export class UserNotificationRepository {
         HttpStatus.FORBIDDEN,
       );
     }
+
     await UserHelper.hasAccess(notification?.userId);
+
     const deletedNotification =
       await this._userNotificationDataAgent.deleteNotification(
         notification.id as number,
@@ -154,7 +169,7 @@ export class UserNotificationRepository {
     await invalidateCache('notifications:count', {});
 
     return BukkaResponse.DeleteResponse(
-      'User notification',
+      'Notification',
       true,
       undefined,
       deletedNotification,
@@ -174,10 +189,13 @@ export class UserNotificationRepository {
       );
     }
 
+    await invalidateCache('notifications', {});
+    await invalidateCache('notifications:count', {});
+
     return BukkaResponse.DeleteResponse(
       'User notification',
       true,
-      undefined,
+      'All notificaitons deleted successfully!',
       deletedUserNotifications,
     );
   }

@@ -116,7 +116,7 @@ export class UserNotificationController {
     example: 2,
   })
   async updateUserNotification(
-    @Param('notificationId') notificationId: number,
+    @Param('notificationId', ParseIntPipe) notificationId: number,
     @Res() res: Response,
   ) {
     const response =
@@ -150,7 +150,7 @@ export class UserNotificationController {
     example: 1,
   })
   async deleteNotification(
-    @Param('notificationId') notificationId: number,
+    @Param('notificationId', ParseIntPipe) notificationId: number,
     @Res() res: Response,
   ) {
     const response =

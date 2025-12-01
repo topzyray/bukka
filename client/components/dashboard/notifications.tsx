@@ -52,7 +52,7 @@ const NotificationItem = ({
       className={cn(
         "cursor-pointer flex justify-between p-3 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-800",
         !notification?.isRead
-          ? "bg-amber-700/20 dark:bg-blue-950/30 font-medium"
+          ? "bg-amber-700/20 dark:bg-muted-foreground/20 font-medium"
           : "text-primary dark:text-gray-400"
       )}
     >
@@ -61,7 +61,7 @@ const NotificationItem = ({
           <div className="relative">
             <div
               className={cn(
-                "w-2.5 h-2.5 rounded-full flex-shrink-0 absolute -top-0.5 -right-0.5",
+                "w-2.5 h-2.5 rounded-full shrink-0 absolute -top-0.5 -right-0.5",
                 !notification?.isRead
                   ? "bg-green-500 animate-ping"
                   : "bg-transparent"
@@ -76,7 +76,7 @@ const NotificationItem = ({
             </span>
           </div>
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 max-w-52 sm:max-w-56">
           <p className="text-sm font-semibold text-primary dark:text-white leading-tight truncate">
             {notification?.title}
           </p>
@@ -88,6 +88,7 @@ const NotificationItem = ({
           </p>
         </div>
       </div>
+
       <div className="flex flex-col gap-2">
         {isReading ? (
           <PulseLoader size={10} />
@@ -96,7 +97,10 @@ const NotificationItem = ({
         ) : null}
         {notification?.link && (
           <Link href={notification?.link}>
-            <Badge variant="outline" className="hover:animate-pulse-glow">
+            <Badge
+              variant="secondary"
+              className="hover:animate-pulse-glow w-full"
+            >
               Details
             </Badge>
           </Link>
@@ -135,7 +139,10 @@ export function Notifications() {
     [data]
   );
 
-  const unreadCount = useNotificationUnreadCount({ userId: user?.id });
+  const { data: unreadCountApiData } = useNotificationUnreadCount({
+    userId: user?.id,
+  });
+  const unreadCount = unreadCountApiData?.responseData?.count;
 
   const totalRecords = data?.pages[0]?.totalRecords || 0;
   const isListEmpty = totalRecords === 0 && !isLoading;
@@ -174,12 +181,10 @@ export function Notifications() {
         >
           <section className="relative flex cursor-pointer hover:scale-105 text-primary dark:text-white transition-transform">
             {/* Red Badge for Unread Count */}
-            {unreadCount?.data?.responseData?.count && (
-              <span className="absolute -top-0.5 right-0 z-10 h-4 w-4 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold text-white leading-none">
-                {unreadCount?.data?.responseData?.count > 9
-                  ? "9+"
-                  : unreadCount?.data?.responseData?.count}
-                <span className="absolute -inset-0 inline-flex h-full w-full animate-ping rounded-full bg-red-700 opacity-75"></span>
+            {unreadCount && (
+              <span className="absolute -top-0.5 right-0 z-10 h-4 w-4 rounded-full bg-red-600 dark:bg-red-500 flex items-center justify-center text-[12px] font-bold text-white leading-none">
+                {unreadCount > 9 ? "9+" : unreadCount}
+                <span className="absolute inset-0 inline-flex h-full w-full animate-ping rounded-full bg-red-700 dark:bg-red-300 opacity-75"></span>
               </span>
             )}
             <span>
@@ -190,7 +195,7 @@ export function Notifications() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
-        className="max-w-sm w-full p-0 shadow-lg border border-gray-100 dark:border-gray-800"
+        className="max-w-sm w-full p-0 shadow-lg border border-gray-100 dark:border-muted-foreground"
       >
         {/* Header Section */}
         <div className="flex justify-between items-center p-4">
@@ -204,12 +209,12 @@ export function Notifications() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 text-xs"
+              className="h-7 text-xs dark:text-muted-foreground"
               onClick={() => markAllReadMutation.mutate()}
               disabled={
                 markAllReadMutation.isPending ||
                 isListEmpty ||
-                unreadCount?.data?.responseData?.count === 0
+                unreadCount === 0
               }
             >
               {markAllReadMutation.isPending ? (
@@ -241,7 +246,7 @@ export function Notifications() {
         {/* Search Bar */}
         <div className="p-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search notifications..."
               className="pl-10 h-9"
@@ -255,7 +260,7 @@ export function Notifications() {
         <DropdownMenuSeparator className="m-0" />
 
         {/* Content Section */}
-        <ScrollArea className="h-[20rem] max-h-[70vh]">
+        <ScrollArea className="h-80 max-h-[70vh]">
           <div className="p-2 space-y-1">
             {/* Initial Loading */}
             {isLoading && (
@@ -277,7 +282,7 @@ export function Notifications() {
 
             {/* Empty State */}
             {isListEmpty && (
-              <div className="flex h-40 flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+              <div className="flex h-40 flex-col items-center justify-center text-muted-foreground">
                 <BellIcon className="w-6 h-6 mb-2" />
                 <p>You&apos;re all caught up!</p>
                 <p className="text-xs">
@@ -320,7 +325,7 @@ export function Notifications() {
             {isFetching &&
               !isFetchingNextPage &&
               allNotifications.length > 0 && (
-                <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center">
+                <div className="absolute inset-0 bg-white/50 dark:bg-muted-foreground flex items-center justify-center">
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 </div>
               )}

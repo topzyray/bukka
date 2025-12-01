@@ -11,15 +11,21 @@ import {
   Separator,
 } from "@/components/ui";
 import { Business } from "@/data/interfaces/Business";
-import { TextHelper } from "@/helpers";
+import { DataHelper, TextHelper } from "@/helpers";
 import { Globe, MapPin, Phone } from "lucide-react";
 import { useMemo } from "react";
 import { BusinessHelper } from "../helper/bussiness-helper";
+import { Recommendation } from "@/data/interfaces/Recommendation";
 
-export function BusinessInfoCard({ business }: { business: Business }) {
+export function BusinessInfoCard({
+  business,
+}: {
+  business: Business | Recommendation;
+}) {
+  const data = DataHelper.normalizeBusiness(business);
   const openNow = useMemo(
-    () => BusinessHelper.isOpenNow(business?.openingHours),
-    [business?.openingHours]
+    () => BusinessHelper.isOpenNow(data?.openingHours),
+    [data?.openingHours]
   );
 
   return (
@@ -32,7 +38,7 @@ export function BusinessInfoCard({ business }: { business: Business }) {
           <div className="space-y-2">
             <Label>Type/Category</Label>
             <Badge variant="outline" className="uppercase">
-              {TextHelper.normalizeText(business?.type)}
+              {TextHelper.normalizeText(data?.type)}
             </Badge>
           </div>
 
@@ -49,9 +55,9 @@ export function BusinessInfoCard({ business }: { business: Business }) {
         <div className="space-y-2">
           <Label>Cuisines</Label>
           <div className="flex flex-wrap gap-1">
-            {business?.cuisines?.length === 0
+            {data?.cuisines?.length === 0
               ? "No cusines add yet!"
-              : business.cuisines?.map((c: string) => (
+              : data.cuisines?.map((c: string) => (
                   <Badge key={c} variant="secondary" className="capitalize">
                     {c}
                   </Badge>
@@ -62,22 +68,22 @@ export function BusinessInfoCard({ business }: { business: Business }) {
         <Separator />
 
         <p className="text-muted-foreground leading-relaxed">
-          {business.description || "No description provided."}
+          {data.description || "No description provided."}
         </p>
 
         <div className="flex items-center gap-3">
-          {business.website && (
+          {data.website && (
             <Button
               variant="outline"
               size="icon"
-              onClick={() => window.open(business.website, "_blank")}
+              onClick={() => window.open(data.website, "_blank")}
             >
               <Globe className="w-5 h-5" />
             </Button>
           )}
-          {business.phoneNumber && (
+          {data.phoneNumber && (
             <Button asChild variant="outline" size="icon">
-              <a href={`tel:${business.phoneNumber}`}>
+              <a href={`tel:${data.phoneNumber}`}>
                 <Phone className="w-5 h-5" />
               </a>
             </Button>
@@ -85,9 +91,9 @@ export function BusinessInfoCard({ business }: { business: Business }) {
           <div className="ml-auto flex items-center gap-3 text-sm text-muted-foreground">
             <MapPin className="w-4 h-4" />
             <span>
-              {business.location?.address ??
-                `${business.location?.city ?? ""}${
-                  business.location?.state ? ", " + business.location.state : ""
+              {data.location?.address ??
+                `${data.location?.city ?? ""}${
+                  data.location?.state ? ", " + data.location.state : ""
                 }`}
             </span>
           </div>

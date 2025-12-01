@@ -1,16 +1,27 @@
-import { RecommendationStatusEnum } from '../Enums/RecommendationStatuEnum';
-
-export class ProcessSupportCreatedDto {
-  userId: number;
+export class ProcessNewTicketDto {
+  creatorId: number;
   firstName: string;
   lastName: string;
-  email: string;
+  creatorEmail: string;
   ticketId: string;
-  supportId: number;
+  subject: string;
+  message: string;
+}
+
+export class ProcessAssignedTicketDto {
   creatorId: number;
   creatorEmail: string;
-  title: string;
-  description: string;
-  status: RecommendationStatusEnum;
   assigneeId: number;
+  assigneeEmail: string;
+  ticketId: string;
+  assigneeFirstName: string;
+  assigneeLastName: string;
+}
+
+export class ProcessResolvedTicketDto {
+  creatorId: number;
+  creatorEmail: string;
+  ticketId: string;
+  // firstName: string;
+  // lastName: string;
 }

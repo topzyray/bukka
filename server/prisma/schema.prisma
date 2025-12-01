@@ -379,18 +379,20 @@ model UserSession {
 }
 
 model Support {
-  id         Int           @id @default(autoincrement())
-  ticketId   String        @unique
-  name       String
-  email      String
-  subject    String
-  message    String
-  status     SupportStatus @default(SUBMITTED)
-  assigneeId Int?
-  assignee   User?         @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
-  resolvedAt DateTime?
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  id           Int           @id @default(autoincrement())
+  ticketId     String        @unique
+  name         String
+  email        String
+  subject      String
+  message      String
+  status       SupportStatus @default(SUBMITTED)
+  creatorId    String?
+  creatorEmail String?
+  assigneeId   Int?
+  assignee     User?         @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
+  resolvedAt   DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   @@index([ticketId])
   @@index([status])

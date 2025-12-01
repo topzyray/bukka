@@ -2,8 +2,13 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { MapPin } from "lucide-react";
 import { Business } from "@/data/interfaces/Business";
+import { Recommendation } from "@/data/interfaces/Recommendation";
 
-export function BusinessContactLocation({ business }: { business: Business }) {
+export function BusinessContactLocation({
+  business,
+}: {
+  business: Business | Recommendation;
+}) {
   return (
     <Card>
       <CardHeader>

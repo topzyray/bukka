@@ -17,6 +17,10 @@ export const configSchema = z.object({
       'DATABASE_URL cannot be empty — used by Prisma to connect to your DB',
     ),
 
+  SUPPORT_EMAIL: z
+    .string({ error: 'SUPPORT_EMAIL is required' })
+    .min(1, 'SUPPORT_EMAIL cannot be empty'),
+
   REDIS_URL: z
     .string({ error: 'REDIS_URL is required' })
     .min(1, 'REDIS_URL cannot be empty — used by connecting to Redis'),

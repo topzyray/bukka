@@ -35,7 +35,6 @@ export const useInfiniteUserNotifications = ({
       params: { searchParams: searchQuery },
       enabled: !!userId && isMenuOpen,
       initialPageParam: initialPageParam ?? 1,
-      staleTime: 1000 * 60 * 5,
     }
   );
 };
@@ -78,8 +77,8 @@ export const useNotificationUnreadCount = ({ userId }: { userId?: number }) => {
     [QueryKeyEnum.UNREAD_COUNT, userId],
     () => UserNotificationApiService.getUnreadNotificationCount(),
     {
-      enabled: !!userId,
-      staleTime: 1000 * 60 * 5,
+      enabled: true,
+      // staleTime: 1000 * 60 * 5,
     }
   );
 };

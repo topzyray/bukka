@@ -27,10 +27,13 @@ export const useReadNotificaiton = ({ userId }: { userId?: number }) => {
     {
       onSuccessCallback() {
         queryClient.invalidateQueries({
-          queryKey: [QueryKeyEnum.NOTIFICATIONS, userId],
+          queryKey: [QueryKeyEnum.NOTIFICATIONS],
         });
         queryClient.invalidateQueries({
-          queryKey: [QueryKeyEnum.UNREAD_COUNT, userId],
+          queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.UNREAD_COUNT],
         });
       },
     }

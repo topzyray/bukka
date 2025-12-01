@@ -39,11 +39,11 @@ import { NotificationSettingsController } from './ServiceLayer/Controllers/Notif
 // REPOSITORIES
 import { UserRepository } from './BussinessLayer/UserRepository';
 import { AuthRepository } from './BussinessLayer/AuthRepository';
-import { TokenRepository } from './BussinessLayer/TokenRepository';
-import { ServiceRepository } from './BussinessLayer/ServiceRepository';
 import { MenuRepository } from './BussinessLayer/MenuRepository';
+import { TokenRepository } from './BussinessLayer/TokenRepository';
 import { OrderRepository } from './BussinessLayer/OrderRepository';
 import { ReviewRepository } from './BussinessLayer/ReviewRepository';
+import { ServiceRepository } from './BussinessLayer/ServiceRepository';
 import { SupportRepository } from './BussinessLayer/SupportRepository';
 import { FavoriteRepository } from './BussinessLayer/FavoriteRepository';
 import { WaitlistRepository } from './BussinessLayer/WaitlistRepository';
@@ -83,13 +83,21 @@ import { QueueService } from './InfrastructureLayer/Services/queue/QueueService'
 import { EmailService } from './InfrastructureLayer/Services/email/EmailService';
 import { KeepAliveService } from './InfrastructureLayer/Services/KeepAliveService';
 import { HttpServiceWrapper } from './InfrastructureLayer/Services/HttpServiceWrapper';
+import { RoleResolverService } from './InfrastructureLayer/Services/RoleResolverService';
 import { AdminControlService } from './InfrastructureLayer/Services/AdminControlService';
 import { FileUploadService } from './InfrastructureLayer/Services/upload/FileUploadService';
 import { AppConfigurationService } from './UtilityLayer/Configuration/AppConfiguration.service';
-import { RestaurantSearchService } from './InfrastructureLayer/Services/RestaurantSearchService';
 import { NotificationService } from './InfrastructureLayer/Services/notification/NotificationService';
 import { AuthNotificationService } from './InfrastructureLayer/Services/notification/services/AuthNotificationService';
+import { OrderNotificationService } from './InfrastructureLayer/Services/notification/services/OrderNotificationService';
+import { SupportNotificationService } from './InfrastructureLayer/Services/notification/services/SupportNotificationService';
+import { BusinessNotificationService } from './InfrastructureLayer/Services/notification/services/BusinessNotificationService';
 import { AuthNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/AuthNotificationConsumerService';
+import { OrderNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/OrderNotificationConsumerService';
+import { SupportNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/SupportNotificationConsumerService';
+import { BusinessNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/BusinessNotificationConsumerService';
+import { RecommendationNotificationService } from './InfrastructureLayer/Services/notification/services/RecommendationNotificationService';
+import { RecommendationNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/RecommendationNotificationConsumerService';
 
 // FACTORIES
 import { FileRepository } from './BussinessLayer/FileRepository';
@@ -109,6 +117,10 @@ import { CloudinaryProvider } from './InfrastructureLayer/Services/upload/provid
 // HELPERS
 import { FileReferenceHelper } from './InfrastructureLayer/Helpers/FileReferenceHelper';
 import { AuthNotificationHelper } from './InfrastructureLayer/Helpers/AuthNotificationHelper';
+import { OrderNotificationHelper } from './InfrastructureLayer/Helpers/OrderNotificationHelper';
+import { SupportNotificationHelper } from './InfrastructureLayer/Helpers/SupportNotificationHelper';
+import { BusinessNotificationHelper } from './InfrastructureLayer/Helpers/BusinessNotificationHelper';
+import { RecommendationNotificationHelper } from './InfrastructureLayer/Helpers/RecommendationNotificationHelper';
 
 // OTHERS
 import { DbAdapterEnum } from './DomainLayer/Enums/DbAdapterEnum';
@@ -174,10 +186,19 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     FileUploadService,
     NotificationService,
     AdminControlService,
+    RoleResolverService,
     AppConfigurationService,
     AuthNotificationService,
-    RestaurantSearchService,
+    // RestaurantSearchService,
+    OrderNotificationService,
+    SupportNotificationService,
+    BusinessNotificationService,
     AuthNotificationConsumerService,
+    OrderNotificationConsumerService,
+    RecommendationNotificationService,
+    SupportNotificationConsumerService,
+    BusinessNotificationConsumerService,
+    RecommendationNotificationConsumerService,
 
     FileFactory,
     QueueFactory,
@@ -200,8 +221,8 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     RecommendationRepository,
     UserNotificationRepository,
     BusinessCategoryRepository,
-    NotificationSettingsRepository,
     UserPersonalizationRepository,
+    NotificationSettingsRepository,
 
     UserDataAgent,
     FileDataAgent,
@@ -223,6 +244,10 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
 
     FileReferenceHelper,
     AuthNotificationHelper,
+    OrderNotificationHelper,
+    SupportNotificationHelper,
+    BusinessNotificationHelper,
+    RecommendationNotificationHelper,
 
     BullMQProvider,
     MailjetProvider,

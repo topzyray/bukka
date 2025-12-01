@@ -84,6 +84,10 @@ export class UserRepository {
     return this.userDataAgent.getUserByToken(token, type);
   }
 
+  async findUsersByRole(role: UserRoleEnum): Promise<User[]> {
+    return this.userDataAgent.getUsersByRole(role);
+  }
+
   async findAdminUserById(userId: number) {
     return this.userDataAgent.getAdminUserById(userId);
   }

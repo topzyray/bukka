@@ -11,6 +11,8 @@ export class Support {
   status: SupportStatusEnum;
   assigneeId: number;
   assignee: User;
+  creatorId: string;
+  creatorEmail: string;
   resolvedAt: Date;
   createdAt: Date;
   updatedAt: Date;
