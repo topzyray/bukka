@@ -7,7 +7,7 @@ import {
   SupportFilterDto,
 } from 'src/DomainLayer/Dtos/SupportDto';
 import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
-import { SupportQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/SupportQueueMessageTypeEnum copy';
+import { SupportQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/SupportQueueMessageTypeEnum';
 import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
 import { SupportStatusEnum } from 'src/DomainLayer/Enums/SupportStatusEnum';
 import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
@@ -134,6 +134,7 @@ export class SupportRepository {
         payload: {
           creatorId: updated?.creatorId,
           creatorEmail: updated?.creatorEmail,
+          assigneeId: updated?.assignee?.id,
           assigneeFirstName: updated?.assignee?.firstName,
           assigneeLastName: updated?.assignee?.lastName,
           ticketId: updated?.ticketId,

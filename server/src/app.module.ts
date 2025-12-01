@@ -90,11 +90,15 @@ import { AppConfigurationService } from './UtilityLayer/Configuration/AppConfigu
 import { NotificationService } from './InfrastructureLayer/Services/notification/NotificationService';
 import { AuthNotificationService } from './InfrastructureLayer/Services/notification/services/AuthNotificationService';
 import { OrderNotificationService } from './InfrastructureLayer/Services/notification/services/OrderNotificationService';
+import { ReviewNotificationService } from './InfrastructureLayer/Services/notification/services/ReviewNotificationService';
 import { SupportNotificationService } from './InfrastructureLayer/Services/notification/services/SupportNotificationService';
+import { ProfileNotificationService } from './InfrastructureLayer/Services/notification/services/ProfileNotificationService';
 import { BusinessNotificationService } from './InfrastructureLayer/Services/notification/services/BusinessNotificationService';
 import { AuthNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/AuthNotificationConsumerService';
 import { OrderNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/OrderNotificationConsumerService';
+import { ReviewNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/ReviewNotificationConsumerService';
 import { SupportNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/SupportNotificationConsumerService';
+import { ProfileNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/ProfileNotificationConsumerService';
 import { BusinessNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/BusinessNotificationConsumerService';
 import { RecommendationNotificationService } from './InfrastructureLayer/Services/notification/services/RecommendationNotificationService';
 import { RecommendationNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/RecommendationNotificationConsumerService';
@@ -118,7 +122,9 @@ import { CloudinaryProvider } from './InfrastructureLayer/Services/upload/provid
 import { FileReferenceHelper } from './InfrastructureLayer/Helpers/FileReferenceHelper';
 import { AuthNotificationHelper } from './InfrastructureLayer/Helpers/AuthNotificationHelper';
 import { OrderNotificationHelper } from './InfrastructureLayer/Helpers/OrderNotificationHelper';
+import { ReviewNotificationHelper } from './InfrastructureLayer/Helpers/ReviewNotificationHelper';
 import { SupportNotificationHelper } from './InfrastructureLayer/Helpers/SupportNotificationHelper';
+import { ProfileNotificationHelper } from './InfrastructureLayer/Helpers/ProfileNotificationHelper';
 import { BusinessNotificationHelper } from './InfrastructureLayer/Helpers/BusinessNotificationHelper';
 import { RecommendationNotificationHelper } from './InfrastructureLayer/Helpers/RecommendationNotificationHelper';
 
@@ -191,12 +197,16 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     AuthNotificationService,
     // RestaurantSearchService,
     OrderNotificationService,
+    ReviewNotificationService,
     SupportNotificationService,
+    ProfileNotificationService,
     BusinessNotificationService,
     AuthNotificationConsumerService,
     OrderNotificationConsumerService,
     RecommendationNotificationService,
+    ReviewNotificationConsumerService,
     SupportNotificationConsumerService,
+    ProfileNotificationConsumerService,
     BusinessNotificationConsumerService,
     RecommendationNotificationConsumerService,
 
@@ -245,7 +255,9 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     FileReferenceHelper,
     AuthNotificationHelper,
     OrderNotificationHelper,
+    ReviewNotificationHelper,
     SupportNotificationHelper,
+    ProfileNotificationHelper,
     BusinessNotificationHelper,
     RecommendationNotificationHelper,
 

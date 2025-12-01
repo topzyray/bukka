@@ -10,7 +10,7 @@ import {
   QueueEnvelope,
   SubscriptionHandle,
 } from 'src/DataLayer/Abstracts/Interfaces/IQueueProvider';
-import { SupportQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/SupportQueueMessageTypeEnum copy';
+import { SupportQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/SupportQueueMessageTypeEnum';
 import { SupportNotificationHelper } from 'src/InfrastructureLayer/Helpers/SupportNotificationHelper';
 import { QueueService } from '../QueueService';
 

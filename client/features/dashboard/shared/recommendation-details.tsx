@@ -3,22 +3,16 @@
 import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { MenuManager } from "../vendor/components/menu-manager";
-import { ServiceManager } from "../vendor/components/service-manager";
 import { ErrorBox, BukkaButton } from "@/components/ui";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { CreateUpdateBusinessModal } from "../vendor/modals/create-update-business-modal";
 import { useQueryClient } from "@tanstack/react-query";
-import { BusinessReviews } from "@/features/business/components/business-reviews";
 import { FileCategoryEnum, QueryKeyEnum, UserRoleEnum } from "@/data/enums";
 import { useBusinessFiles } from "@/data/queries/use-business-files";
 import { File } from "@/data/interfaces/File";
 import { motion } from "framer-motion";
-import { BusinessPhotoGallery } from "@/features/business/components/business-photo-gallery";
 import { BusinessContactLocation } from "@/features/business/components/business-contact-location";
 import { BusinessLazyMap } from "@/features/business/components/business-lazy-map";
-import { BusinessOpeningHour } from "@/features/business/components/business-opening-hour";
-import { BusinessSocialLinks } from "@/features/business/components/business-social-links";
 import { BusinessInfoCard } from "@/features/business/components/business-info-card";
 import { BusinessHero } from "@/features/business/components/business-hero";
 import { Edit } from "lucide-react";
@@ -131,8 +125,8 @@ export const RecommendationDetails: React.FC = () => {
                     >
                       <BusinessHero
                         business={recommendation}
-                        coverImage={coverImage}
-                        isLoadingFiles={isLoadingFiles}
+                        coverImage={undefined}
+                        isLoadingFiles={false}
                         showFavButton={false}
                         showRating={false}
                       />
@@ -140,10 +134,10 @@ export const RecommendationDetails: React.FC = () => {
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 space-y-6">
                           <BusinessInfoCard business={recommendation} />
-                          <BusinessPhotoGallery
+                          {/* <BusinessPhotoGallery
                             business={recommendation}
                             businessImages={businessImages}
-                          />
+                          /> */}
                           {/* <BusinessMenuAndServices /> */}
                           {/* <BusinessReviews business={recommendation} /> */}
                         </div>

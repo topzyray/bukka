@@ -35,6 +35,10 @@ import { UserPersonalizationDataAgent } from 'src/DataLayer/DataAgents/UserPerso
 import { FileRepository } from './FileRepository';
 import { IAdminOverview } from 'src/DataLayer/Abstracts/Interfaces/IAdminOverview';
 import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
+import { QueueService } from 'src/InfrastructureLayer/Services/queue/QueueService';
+import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
+import { ProfileQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/ProfileQueueMessageTypeEnum';
+import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
 @Injectable()
 export class UserRepository {
   constructor(
@@ -47,6 +51,7 @@ export class UserRepository {
     private readonly notificaitonSettingDataAgent: NotificationSettingsDataAgent,
     private readonly personalizationDataAgent: UserPersonalizationDataAgent,
     private readonly fileRepository: FileRepository,
+    private readonly _queue: QueueService,
   ) {}
 
   async createUserAsync(data: CreateUserDto): Promise<BukkaResponse<User>> {
@@ -109,6 +114,24 @@ export class UserRepository {
       throw new NotFoundException('User not found!');
     }
     const updatedUser = await this.userDataAgent.updateUser(userId, data);
+
+    this._queue.publishToQueue(
+      QueueEnum.PROFILE_NOTIFICATION,
+      {
+        messageType: ProfileQueueMessageTypeEnum.PROFILE_UPDATED,
+        payload: {
+          userId: updatedUser?.id,
+          email: updatedUser?.email,
+          firstName: updatedUser?.firstName,
+          lastName: updatedUser?.lastName,
+          role: updatedUser?.role,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
@@ -161,6 +184,24 @@ export class UserRepository {
       loggedInUser?.id,
       cleanData,
     );
+
+    this._queue.publishToQueue(
+      QueueEnum.PROFILE_NOTIFICATION,
+      {
+        messageType: ProfileQueueMessageTypeEnum.PROFILE_UPDATED,
+        payload: {
+          userId: updatedUser?.id,
+          email: updatedUser?.email,
+          firstName: updatedUser?.firstName,
+          lastName: updatedUser?.lastName,
+          role: updatedUser?.role,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     await invalidateCache('user:profile', { id: loggedInUser.id });
     await invalidateCache('users:list', {});
 
@@ -229,6 +270,24 @@ export class UserRepository {
       loggedInUser?.id,
       userProfileDto,
     );
+
+    this._queue.publishToQueue(
+      QueueEnum.PROFILE_NOTIFICATION,
+      {
+        messageType: ProfileQueueMessageTypeEnum.PROFILE_UPDATED,
+        payload: {
+          userId: updatedUser?.id,
+          email: updatedUser?.email,
+          firstName: updatedUser?.firstName,
+          lastName: updatedUser?.lastName,
+          role: updatedUser?.role,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     await invalidateCache('user:profile', { id: loggedInUser.id });
     return BukkaResponse.UpdateResponse('User', updatedUser);
   }
@@ -242,7 +301,26 @@ export class UserRepository {
       loggedInUser?.id,
       data,
     );
+
+    this._queue.publishToQueue(
+      QueueEnum.PROFILE_NOTIFICATION,
+      {
+        messageType: ProfileQueueMessageTypeEnum.PROFILE_ONBOARDED,
+        payload: {
+          userId: updatedUser?.id,
+          email: updatedUser?.email,
+          firstName: updatedUser?.firstName,
+          lastName: updatedUser?.lastName,
+          role: updatedUser?.role,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     await invalidateCache('user:profile', { id: loggedInUser.id });
+
     return BukkaResponse.UpdateResponse('User', updatedUser);
   }
 
