@@ -55,7 +55,7 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.use(cookieParser());
   app.enableCors({
-    origin: [`${AppUrlTypeEnum.LOCAL}`, AppUrlTypeEnum.FRONTEND],
+    origin: [`${AppUrlTypeEnum.CLIENT_DEV}`, AppUrlTypeEnum.CLIENT_PROD],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: [

@@ -19,12 +19,21 @@ import {
   invalidateCache,
 } from 'src/InfrastructureLayer/Services/cache/CacheUtils';
 import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
+import { QueueService } from 'src/InfrastructureLayer/Services/queue/QueueService';
+import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
+import { ReviewQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/ReviewQueueMessageTypeEnum';
+import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
+import { AppUrlTypeEnum } from 'src/DomainLayer/Enums/AppUrlTypeEnum';
+import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
+import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
 
 @Injectable()
 export class ReviewRepository {
   constructor(
     private readonly reviewDataAgent: ReviewDataAgent,
     private readonly businessDataAgent: BusinessDataAgent,
+    private readonly configService: AppConfigurationService,
+    private readonly _queue: QueueService,
   ) {}
 
   async createReview(dto: CreateReviewDto) {
@@ -56,6 +65,37 @@ export class ReviewRepository {
       averageRating: Number(newAvg.toFixed(2)),
       reviewCount: newCount,
     } as any);
+
+    const url =
+      this.configService.nodeEnv === EnvironmentTypeEnum.DEV
+        ? AppUrlTypeEnum.CLIENT_DEV
+        : AppUrlTypeEnum.CLIENT_PROD;
+    const userReviewLink = `${url}/dashboard/user/reviews`;
+    const businessReviewedLink = `${url}/dashboard/vendor/business/${review.businessId}`;
+
+    this._queue.publishToQueue(
+      QueueEnum.REVIEW_NOTIFICATION,
+      {
+        messageType: ReviewQueueMessageTypeEnum.NEW_REVIEW,
+        payload: {
+          reviewerId: loggedInUser?.id,
+          reviewerFirstName: loggedInUser?.firstName,
+          reviewerLastName: loggedInUser?.lastName,
+          reviewerEmail: loggedInUser?.email,
+          vendorId: business?.ownerId,
+          vendorEmail: business?.email ?? '',
+          role: business?.owner?.role,
+          businessName: business?.name,
+          rating: dto?.rating,
+          comment: dto?.comment,
+          userReviewLink,
+          businessReviewedLink,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
 
     await invalidateCache('reviews', {});
     await invalidateCache('reviews', { businessId: dto.businessId });

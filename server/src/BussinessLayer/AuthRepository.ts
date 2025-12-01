@@ -34,6 +34,7 @@ import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
 import { QueueService } from 'src/InfrastructureLayer/Services/queue/QueueService';
 import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
 import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
+import { ProfileQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/ProfileQueueMessageTypeEnum';
 
 @Injectable()
 export class AuthRepository {
@@ -523,8 +524,8 @@ export class AuthRepository {
           firstName: result?.responseData?.firstName,
           getStartedLink:
             this._configService.nodeEnv === EnvironmentTypeEnum.DEV
-              ? AppUrlTypeEnum.LOCAL
-              : AppUrlTypeEnum.FRONTEND,
+              ? AppUrlTypeEnum.CLIENT_DEV
+              : AppUrlTypeEnum.CLIENT_PROD,
           userType: result?.responseData?.userType,
         },
       },
@@ -568,8 +569,25 @@ export class AuthRepository {
       exclude: ['password'],
     });
 
+    this._queue.publishToQueue(
+      QueueEnum.PROFILE_NOTIFICATION,
+      {
+        messageType: ProfileQueueMessageTypeEnum.PASSWORD_CHANGE,
+        payload: {
+          userId: result?.responseData?.id,
+          email: result?.responseData?.email,
+          firstName: result?.responseData?.firstName,
+          lastName: result?.responseData?.lastName,
+          role: result?.responseData?.role,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
     return BukkaResponse.CustomResponse(
-      'Password reset successful. You can now signin with your new password!',
+      'Password reset/updated successfully!',
       HttpStatus.OK,
       true,
       mappedData,

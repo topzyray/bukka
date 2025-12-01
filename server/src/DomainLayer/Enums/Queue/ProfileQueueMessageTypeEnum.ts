@@ -1,5 +1,5 @@
-export enum SecurityQueueMessageTypeEnum {
+export enum ProfileQueueMessageTypeEnum {
+  PASSWORD_CHANGE = 'PASSWORD_CHANGE',
   PROFILE_UPDATED = 'PROFILE_UPDATED',
   PROFILE_ONBOARDED = 'PROFILE_ONBOARDED',
-  PASSWORD_CHANGE = 'PASSWORD_CHANGE',
 }
