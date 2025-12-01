@@ -27,8 +27,8 @@ export function BusinessHero({
   business: Business | Recommendation;
   isLoadingFiles: boolean;
   coverImage: File | null | undefined;
-  showFavButton: boolean;
-  showRating: boolean;
+  showFavButton?: boolean;
+  showRating?: boolean;
 }) {
   const data = DataHelper.normalizeBusiness(business);
 
