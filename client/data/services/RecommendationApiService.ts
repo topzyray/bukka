@@ -1,6 +1,5 @@
 import { HttpClient } from "@/configs";
 import { recommendationRoutes } from "@/constants/routes";
-import { CreateBusinessDto, UpdateBusinessDto } from "../dtos";
 import { CreateRecommendationDto } from "../dtos";
 
 export class RecommendationApiService {

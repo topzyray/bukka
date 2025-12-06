@@ -80,7 +80,7 @@ export const LocationConsent: React.FC<Props> = ({
       >
         <SheetContent
           side="bottom"
-          className="glass rounded-t-xl max-w-full md:max-w-md animate-[var(--animate-slide-up)]"
+          className="glass rounded-t-xl max-w-full md:max-w-md animate-(--animate-slide-up)"
         >
           <SheetHeader>
             <SheetTitle>Allow location access?</SheetTitle>
@@ -122,7 +122,7 @@ export const LocationConsent: React.FC<Props> = ({
       open={open || enableLocation}
       onOpenChange={setOpen || setEnableLocation}
     >
-      <DialogContent className="max-w-md glass rounded-lg animate-[var(--animate-fade-in)]">
+      <DialogContent className="max-w-md glass rounded-lg animate-(--animate-fade-in)">
         <DialogHeader>
           <DialogTitle>Allow location access?</DialogTitle>
           <p className="text-sm text-muted-foreground">
@@ -135,8 +135,8 @@ export const LocationConsent: React.FC<Props> = ({
           {error && <p className="text-sm text-destructive">{error}</p>}
           {position && (
             <p className="text-sm">
-              Using location: {position?.latitude.toFixed(4)},{" "}
-              {position?.longitude.toFixed(4)}
+              Using location: {position?.latitude.toFixed(7)},{" "}
+              {position?.longitude.toFixed(7)}
             </p>
           )}
         </div>

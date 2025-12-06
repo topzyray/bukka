@@ -102,7 +102,11 @@
     var(--primary),
     var(--primary-glow)
   );
-  --gradient-warm: linear-gradient(135deg, var(--accent), var(--primary));
+  --gradient-warm: linear-gradient(
+    135deg,
+    var(--muted),
+    var(--muted-foreground)
+  );
   --gradient-subtle: linear-gradient(180deg, var(--background), var(--muted));
   --sidebar: hsl(0 0% 98%);
   --sidebar-foreground: hsl(240 5.3% 26.1%);

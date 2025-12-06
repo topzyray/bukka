@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, LayoutDashboard, MapPin } from "lucide-react";
 import { BukkaButton } from "@/components/ui/button-variants";
 
-export default function CatchAllRoutes() {
+export default function UnauthorizedPage() {
   const router = useRouter();
   const { role } = useParams() as { role: string };
   return (
@@ -25,9 +25,11 @@ export default function CatchAllRoutes() {
           🍽️
         </motion.div>
 
-        <h1 className="text-4xl lg:text-6xl font-bold text-shine mb-4">404</h1>
+        <h1 className="text-4xl lg:text-6xl font-bold text-shine mb-4 text-red-700">
+          Danger
+        </h1>
         <h2 className="text-xl lg:text-2xl font-semibold text-foreground mb-2 capitalize">
-          {role} Dashboard Page Not Found
+          You are not authorized
         </h2>
 
         <div className="space-y-3">

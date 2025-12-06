@@ -170,7 +170,7 @@ export const BusinessCard = memo(function BusinessCard({
               />
             ) : (
               <div className="w-full h-full warm-gradient flex items-center justify-center">
-                <span className="text-white text-4xl font-bold">
+                <span className="text-white text-4xl font-bold uppercase">
                   {business?.name.charAt(0)}
                 </span>
               </div>
@@ -197,7 +197,7 @@ export const BusinessCard = memo(function BusinessCard({
           <div className="space-y-3">
             <div>
               <h3 className="font-semibold text-lg truncate group-hover:text-foreground transition-colors">
-                {business?.name}{" "}
+                <span className="capitalize">{business?.name}</span>{" "}
                 <Badge className="uppercase">
                   {TextHelper.normalizeText(business?.type)}
                 </Badge>

@@ -128,7 +128,9 @@ export function AdminOverview() {
           </p>
         </div>
         <BukkaButton
-          onClick={() => router.push(`/dashboard/${user?.role}/settings`)}
+          onClick={() =>
+            router.push(`/dashboard/${user?.role}/settings/system`)
+          }
           variant="hero"
         >
           <Settings className="w-4 h-4 mr-2" />

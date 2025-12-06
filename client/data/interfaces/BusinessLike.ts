@@ -8,6 +8,7 @@ export interface BusinessLike {
   cuisines: string[];
   website?: string;
   phoneNumber?: string;
+  ownerId?: number;
   location?: {
     address?: string;
     city?: string;

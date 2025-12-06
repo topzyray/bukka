@@ -65,6 +65,13 @@ export class PrismaModelProxy<T> implements ModelProxy<T> {
     if (spec?.filter)
       args.where = PrismaAdapterHelper.toPrismaWhere(spec.filter);
 
+    if (args.where) {
+      args.where = this.sanitizeWhere(args.where);
+      if (Object.keys(args.where).length === 0) {
+        return null;
+      }
+    }
+
     if (spec?.extras?.include) args.include = spec.extras.include;
     else if (spec?.relations)
       args.include = PrismaAdapterHelper.toPrismaInclude(
@@ -128,5 +135,27 @@ export class PrismaModelProxy<T> implements ModelProxy<T> {
 
   aggregate?(_pipeline: any[]): Promise<any> {
     throw new Error('PrismaModelProxy.aggregate not implemented');
+  }
+
+  private sanitizeWhere(where: any) {
+    if (!where || typeof where !== 'object') return {};
+
+    // Remove keys with undefined
+    for (const key of Object.keys(where)) {
+      const val = where[key];
+
+      // Direct undefined
+      if (val === undefined) {
+        delete where[key];
+        continue;
+      }
+
+      // Nested undefined
+      if (val && typeof val === 'object') {
+        this.sanitizeWhere(val);
+      }
+    }
+
+    return where;
   }
 }

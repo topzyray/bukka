@@ -105,7 +105,7 @@ export function BusinessReviews({ business }: { business: Business }) {
         <CardTitle>Customer Reviews</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="w-full max-h-[35rem] h-full overflow-y-auto">
+        <div className="w-full max-h-140 h-full overflow-y-auto">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-3 bg-gray-50 p-2 rounded-md">
               <span className="text-sm font-medium text-gray-700">
@@ -291,21 +291,23 @@ export function BusinessReviews({ business }: { business: Business }) {
 
             {/* ADD REVIEW BUTTON */}
             {!isVendor && !alreadyMadeReview && !isNewReview && (
-              <BukkaButton
-                size="sm"
-                onClick={() => {
-                  if (!user) {
-                    toast("Requires sign in!", {
-                      icon: <Info className="h-3 w-3" />,
-                      description: "Please sign in to add review",
-                    });
-                    return;
-                  }
-                  setIsNewReview(true);
-                }}
-              >
-                Add Review
-              </BukkaButton>
+              <div>
+                <BukkaButton
+                  size="sm"
+                  onClick={() => {
+                    if (!user) {
+                      toast("Requires sign in!", {
+                        icon: <Info className="h-3 w-3" />,
+                        description: "Please sign in to add review",
+                      });
+                      return;
+                    }
+                    setIsNewReview(true);
+                  }}
+                >
+                  Add Review
+                </BukkaButton>
+              </div>
             )}
 
             {isNewReview && (

@@ -51,6 +51,10 @@ export class BusinessDataAgent {
   }
 
   async findByLocation(locationId: number): Promise<Business | null> {
+    if (!locationId) {
+      return null;
+    }
+
     const spec: QuerySpec = {
       filter: { field: 'locationId', op: 'eq', value: locationId },
     };

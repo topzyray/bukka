@@ -26,7 +26,7 @@ export function NotificationCard({
     null
   );
   const { user } = useAuth();
-  const readNotificationMutation = useReadNotificaiton({ userId: user?.id });
+  const readNotificationMutation = useReadNotificaiton({});
   const deleteNotificationMutation = useDeleteNotification({
     userId: user?.id,
     onSuccess: () => {
@@ -46,7 +46,7 @@ export function NotificationCard({
         !notification.isRead ? "border-primary" : ""
       }`}
     >
-      <CardContent className="p-4 flex justify-between items-center">
+      <CardContent className="p-4 flex flex-wrap justify-between items-center gap-2">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold">{notification.title}</h3>
@@ -67,6 +67,7 @@ export function NotificationCard({
           {!notification.isRead && (
             <Button
               size="sm"
+              className="h-7 text-xs"
               onClick={() => readNotificationMutation.mutate(notification.id)}
             >
               <View />
@@ -77,7 +78,7 @@ export function NotificationCard({
           <Button
             variant="destructive"
             size="sm"
-            className="dark:bg-red-700 dark:text-foreground"
+            className="dark:bg-red-800 dark:text-foreground h-7 text-xs"
             onClick={(e) => {
               e.preventDefault();
               handleDelete(notification.id);

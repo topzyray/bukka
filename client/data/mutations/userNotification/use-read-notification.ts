@@ -20,7 +20,11 @@ export const useReadAllNotificaiton = ({ userId }: { userId?: number }) => {
   });
 };
 
-export const useReadNotificaiton = ({ userId }: { userId?: number }) => {
+export const useReadNotificaiton = ({
+  onSuccess,
+}: {
+  onSuccess?: () => void;
+}) => {
   const queryClient = useQueryClient();
   return useCustomMutation(
     (id: number) => UserNotificationApiService.readNotificationById(id),
@@ -35,6 +39,7 @@ export const useReadNotificaiton = ({ userId }: { userId?: number }) => {
         queryClient.invalidateQueries({
           queryKey: [QueryKeyEnum.UNREAD_COUNT],
         });
+        onSuccess?.();
       },
     }
   );

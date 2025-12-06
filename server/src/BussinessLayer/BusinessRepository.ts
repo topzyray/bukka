@@ -16,18 +16,19 @@ import {
 } from 'src/InfrastructureLayer/Services/cache/CacheUtils';
 import { Business } from 'src/DomainLayer/Models/Business';
 import { PagedData } from 'src/DomainLayer/Models/PagedData';
+import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
 import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
+import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
 import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 import { LocationDataAgent } from 'src/DataLayer/DataAgents/LocationDataAgent';
 import { BusinessDataAgent } from 'src/DataLayer/DataAgents/BusinessDataAgent';
+import { QueueService } from 'src/InfrastructureLayer/Services/queue/QueueService';
 import { FilterQueryHelper } from 'src/InfrastructureLayer/Helpers/FilterQueryHelper';
 import { LocationCoordsHelper } from 'src/InfrastructureLayer/Helpers/LocationCoordsHelper';
-import { QueueService } from 'src/InfrastructureLayer/Services/queue/QueueService';
-import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
 import { BusinessQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/BusinessQueueMessageTypeEnum';
-import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
+import { Location } from 'src/DomainLayer/Models/Location';
 
 const TOLERANCE = 1e-5;
 
@@ -104,7 +105,7 @@ export class BusinessRepository {
     const business = await this.businessDataAgent.createBusiness({
       ...otherDto,
       locationId: location?.id,
-      ownerId: ownerId ?? null,
+      ownerId: ownerId ?? undefined,
       isActive: true,
     });
 
@@ -138,6 +139,190 @@ export class BusinessRepository {
     await invalidateCache('businesses', {});
 
     return BukkaResponse.CreateResponse('Business', business);
+  }
+
+  async importBusiness(
+    dto: CreateBusinessDto,
+  ): Promise<BukkaResponse<Business>> {
+    const {
+      longitude,
+      latitude,
+      address,
+      city,
+      state,
+      country,
+      zipCode,
+      placeId,
+      suburb,
+      street,
+      countryId,
+      county,
+      ...otherDto
+    } = dto;
+
+    let locationByPlaceId: Location | null = null;
+    let locationByCoordinates: Location | null = null;
+
+    if (placeId) {
+      locationByPlaceId =
+        await this.locationDataAgent.findLocationByPlaceId(placeId);
+    } else {
+      locationByCoordinates = await this.locationDataAgent.findNearbyLocation(
+        longitude,
+        latitude,
+        TOLERANCE,
+      );
+    }
+
+    let finalLocation: Location | null = null;
+
+    if (locationByPlaceId) {
+      finalLocation = locationByPlaceId;
+    } else if (locationByCoordinates) {
+      finalLocation = locationByCoordinates;
+    } else {
+      finalLocation = await this.locationDataAgent.createLocation({
+        placeId,
+        longitude,
+        latitude,
+        address,
+        city,
+        state,
+        country,
+        zipCode,
+        countryId: countryId ?? '',
+        street: street ?? '',
+        county: county ?? '',
+        suburb: suburb ?? '',
+      });
+    }
+
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const recommenderId = loggedInUser?.id;
+
+    const existingBusiness = await this.businessDataAgent.findByLocation(
+      finalLocation?.id as number,
+    );
+
+    if (existingBusiness) {
+      return BukkaResponse.CustomResponse(
+        'Business already exists.',
+        HttpStatus.OK,
+        true,
+        existingBusiness,
+      );
+    }
+
+    const business = await this.businessDataAgent.createBusiness({
+      ...otherDto,
+      locationId: finalLocation?.id,
+      recommenderId: recommenderId ?? undefined,
+      isActive: true,
+    });
+
+    this._queue.publishToQueue(
+      QueueEnum.BUSINESS_NOTIFICATION,
+      {
+        messageType: BusinessQueueMessageTypeEnum.BUSINESS_IMPORTED,
+        payload: {
+          recommenderId,
+          firstName: loggedInUser?.firstName,
+          lastName: loggedInUser?.lastName,
+          ownerEmail: loggedInUser?.email,
+          businessId: business?.id,
+          businessName: business?.name,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
+    await invalidateCache('businesses', {});
+
+    return BukkaResponse.CreateResponse(
+      'Business',
+      business,
+      'New business imported successfully.',
+    );
+  }
+
+  // async importFromGoogle(placeId: string) {
+  //   const googleData = await this.googlePlacesService.getPlaceDetails(placeId);
+
+  //   if (!googleData) {
+  //     throw new NotFoundException('Invalid Google Place ID');
+  //   }
+
+  //   let location = await this.locationDataAgent.findLocationByPlaceId(placeId);
+
+  //   if (!location) {
+  //     location = await this.locationDataAgent.createLocation({
+  //       placeId,
+  //       latitude: googleData.geometry.location.lat,
+  //       longitude: googleData.geometry.location.lng,
+  //       address: googleData.formatted_address,
+  //       city: googleData.address_components?.find((x) =>
+  //         x.types.includes('locality'),
+  //       )?.long_name,
+  //       state: googleData.address_components?.find((x) =>
+  //         x.types.includes('administrative_area_level_1'),
+  //       )?.long_name,
+  //       country: googleData.address_components?.find((x) =>
+  //         x.types.includes('country'),
+  //       )?.long_name,
+  //     });
+  //   }
+
+  //   const existingBusiness = await this.businessDataAgent.findByLocation(
+  //     location.id,
+  //   );
+  //   if (existingBusiness) {
+  //     return BukkaResponse.CustomResponse(
+  //       'Business already imported.',
+  //       HttpStatus.OK,
+  //       true,
+  //       existingBusiness,
+  //     );
+  //   }
+
+  //   const loggedInUser = await UserHelper.getLoggedInUser();
+
+  //   const business = await this.businessDataAgent.createBusiness({
+  //     name: googleData.name,
+  //     description: googleData.editorial_summary?.overview || '',
+  //     categoryId: null, // assign after mapping categories
+  //     ownerId: loggedInUser.id,
+  //     locationId: location.id,
+  //     rating: googleData.rating,
+  //     googlePlaceId: placeId,
+  //     isActive: true,
+  //   });
+
+  //   return BukkaResponse.CreateResponse('Business Imported', business);
+  // }
+
+  async importPostProcess(business: Business) {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    const ownerId = business?.ownerId ?? loggedInUser?.id ?? null;
+
+    this._queue.publishToQueue(
+      QueueEnum.BUSINESS_NOTIFICATION,
+      {
+        messageType: BusinessQueueMessageTypeEnum.BUSINESS_CREATED,
+        payload: {
+          ownerId,
+          firstName: loggedInUser?.firstName ?? '',
+          lastName: loggedInUser?.lastName ?? '',
+          ownerEmail: loggedInUser?.email ?? '',
+          businessId: business?.id,
+          businessName: business?.name,
+        },
+      },
+      { provider: QueueProviderEnum.BULLMQ },
+    );
+
+    await invalidateCache('businesses', {});
   }
 
   async getBusinessById(id: number): Promise<BukkaResponse<Business>> {

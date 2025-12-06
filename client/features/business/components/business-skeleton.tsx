@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 
 export function BusinessSkeleton() {
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl animate-in fade-in-0 duration-300">
+    <div className="animate-in fade-in-0 duration-300">
       {/* Header Section */}
       <section className="flex flex-col md:flex-row gap-6 mb-8">
         {/* Cover Image Skeleton */}

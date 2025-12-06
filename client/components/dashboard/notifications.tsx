@@ -113,6 +113,9 @@ const NotificationItem = ({
 export function Notifications() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentItemReading, setCurrentItemReading] = useState<number | null>(
+    null
+  );
   const { user } = useAuth();
 
   const {
@@ -131,7 +134,11 @@ export function Notifications() {
   });
 
   const markAllReadMutation = useReadAllNotificaiton({ userId: user?.id });
-  const readNotificationMutation = useReadNotificaiton({ userId: user?.id });
+  const readNotificationMutation = useReadNotificaiton({
+    onSuccess: () => {
+      setCurrentItemReading(null);
+    },
+  });
   const clearAllMutation = useClearAllNotifications({ userId: user?.id });
 
   const allNotifications: UserNotification[] = useMemo(
@@ -161,6 +168,7 @@ export function Notifications() {
       }, 600), // 600ms after the user stops typing
     [refetch]
   );
+
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
@@ -222,8 +230,9 @@ export function Notifications() {
               ) : (
                 <MailOpen className="w-4 h-4 mr-1" />
               )}
-              Read All
+              Mark All Read
             </Button>
+
             <Button
               variant="ghost"
               size="sm"
@@ -297,8 +306,14 @@ export function Notifications() {
               <NotificationItem
                 key={notification.id}
                 notification={notification}
-                onClick={() => readNotificationMutation.mutate(notification.id)}
-                isReading={readNotificationMutation.isPending}
+                onClick={() => {
+                  setCurrentItemReading(notification.id);
+                  readNotificationMutation.mutate(notification.id);
+                }}
+                isReading={
+                  readNotificationMutation.isPending &&
+                  notification.id === currentItemReading
+                }
               />
             ))}
 

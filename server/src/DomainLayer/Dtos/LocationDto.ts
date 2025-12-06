@@ -124,10 +124,31 @@ export class CreateLocationDto {
   @IsOptional()
   zipCode?: string;
 
-  @ApiProperty({ example: 'Sauka Area', required: false })
+  @ApiProperty({ example: 'The Green House', required: false })
   @IsString()
   @IsOptional()
   landmark?: string;
+
+  @ApiProperty({ example: 'Wuse II', required: false })
+  @IsString()
+  @IsOptional()
+  suburb?: string;
+
+  @ApiProperty({
+    example: 'Ilupeju Street',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  street?: string;
+
+  @ApiProperty({
+    example: 'Municipal Area Council',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  county?: string;
 }
 
 export class UpdateLocationDto extends PartialType(CreateLocationDto) {}

@@ -18,6 +18,7 @@ export interface Recommendation {
   cuisines: string[];
   note: string;
   recommenderId: number;
+  ownerId: number;
   status: RecommendationStatusEnum;
   locationId: number;
   location: Location;

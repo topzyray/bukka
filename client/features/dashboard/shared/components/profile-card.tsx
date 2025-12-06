@@ -116,7 +116,7 @@ export function UserProfileCard({ user, setEditProfile }: IUserProfileCard) {
         </h4>
         <div className="w-full bg-gray-200 dark:bg-neutral-800 rounded-full h-3">
           <div
-            className="bg-primary h-3 rounded-full transition-all"
+            className="bg-primary dark:bg-muted-foreground h-3 rounded-full transition-all"
             style={{ width: `${(user?.onboardingProgress / 3) * 100 || 0}%` }}
           ></div>
         </div>
