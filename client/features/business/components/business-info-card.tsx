@@ -65,8 +65,7 @@ export function BusinessInfoCard({
               onClick={() => {
                 if (!user) {
                   toast("Requires Signin", {
-                    description:
-                      "You need to sign in before recommending a business",
+                    description: "You need to sign in to claim this business",
                   });
                 } else {
                 }
