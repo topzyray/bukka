@@ -92,6 +92,10 @@ export class PrismaAdapterHelper {
     op: FieldOp,
     value: any,
   ): Record<string, any> {
+    if (value === undefined) {
+      return {}; // <-- prevents accidental findFirst()
+    }
+
     const buildNested = (fieldPath: string[], leaf: any) => {
       const out: any = {};
       let cur = out;

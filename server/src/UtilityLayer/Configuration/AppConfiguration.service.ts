@@ -32,6 +32,16 @@ export class AppConfigurationService {
       ?.trim() as string;
   }
 
+  get locationIQAccessToken(): string {
+    return this.configService
+      .get<string>('LOCATIONIQ_ACCESS_TOKEN')
+      ?.trim() as string;
+  }
+
+  get geoApiFy(): string {
+    return this.configService.get<string>('GEOAPIFY_KEY')?.trim() as string;
+  }
+
   get encryptionKey(): string {
     return this.configService.get<string>('ENCRYPTION_KEY')?.trim() as string;
   }

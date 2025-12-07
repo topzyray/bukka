@@ -50,7 +50,12 @@ export function PinBusinessPopUp({ lat, lng }: { lat: number; lng: number }) {
 
         {/* Future actions (placeholders, safe & scalable) */}
 
-        <BukkaButton variant="ghost" className="w-full justify-start" disabled>
+        <BukkaButton
+          size="sm"
+          variant="ghost"
+          className="w-full justify-start"
+          disabled
+        >
           <Info className="h-4 w-4 mr-2" />
           Suggest an Edit (Coming Soon)
         </BukkaButton>

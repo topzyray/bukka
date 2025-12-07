@@ -20,13 +20,13 @@ export default function SettingsLayout({
     <section className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">User & System Settings</h1>
+          <h1 className="text-2xl font-bold">All Settings</h1>
           <p className="text-sm text-muted-foreground">
             Manage, customize and view all settings
           </p>
         </div>
       </header>
-      <div className="flex flex-col lg:flex-row gap-4 animate-[fade-in_0.3s_ease-out] h-[100vh]">
+      <div className="flex flex-col lg:flex-row gap-4 animate-fade-in h-screen">
         <aside className="w-full lg:max-w-[16rem]">
           <Card className="rounded-lg lg:h-full border-2">
             <CardContent>
@@ -36,7 +36,7 @@ export default function SettingsLayout({
         </aside>
 
         <section className="flex-1 lg:h-full">
-          <Card className="animate-[slide-up_0.4s_ease-out] rounded-lg lg:h-full dark:bg-accent-foreground border-2">
+          <Card className="animate-slide-up rounded-lg lg:h-full dark:bg-accent-foreground border-2">
             <CardContent>{children}</CardContent>
           </Card>
         </section>

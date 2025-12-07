@@ -26,4 +26,5 @@ export enum CacheTTLPolicyEnum {
   SERVICE_HOURS = 300, // 5 min;
   SERVICE_AVAILABILITY = 60, // 1 min;
   SWR_BUFFER = 10, // buffer time in seconds for stale-while-revalidate
+  PLACES_IMPORT = 86400, // 24 hours
 }

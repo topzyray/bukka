@@ -10,6 +10,7 @@ import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfi
 import {
   ProcessBusinessCreationDto,
   ProcessBusinessDeletedDto,
+  ProcessBusinessImportDto,
   ProcessBusinessUpdatedDto,
 } from 'src/DomainLayer/Dtos/BusinessNotifictaionHelperDto';
 
@@ -66,6 +67,30 @@ export class BusinessNotificationService extends NotificationService {
         template: 'businessCreatedOwner',
         subject: `Your business ${data.businessName} was created`,
         to: data.ownerEmail,
+        context: data,
+      },
+    });
+  }
+
+  async processBusinessImported(
+    data: ProcessBusinessImportDto,
+    category: string,
+  ) {
+    // notify admin
+    // TODO: ADD EMAIL CHANNEL
+    await this.dispatchNotification({
+      channels: [NotificationTypeEnum.IN_APP],
+      inapp: {
+        userId: data.recommenderId,
+        title: `New business imported: ${data.businessName}`,
+        message: `${data.businessName} was imported successfully!`,
+        link: `${this.configService.appUrl}/dashboard/admin/businesses/${data.businessId}`,
+        notificationCategory: category,
+      },
+      email: {
+        template: 'businessImportedAdmin',
+        subject: `New business imported ${data.businessName}`,
+        to: this.configService.supportEmail,
         context: data,
       },
     });

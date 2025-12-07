@@ -36,7 +36,7 @@ import { SearchPlacesWithAutocomplete } from "../search-places-with-autocomplete
 import { MyLocationPopUp } from "../components/my-location-pop-up";
 import { PinBusinessPopUp } from "../components/pin-business-pop-up";
 
-const ICONS: Record<BusinessTypeEnum, L.Icon> = {
+const ICONS: Record<Partial<BusinessTypeEnum | string>, L.Icon> = {
   [BusinessTypeEnum.RESTAURANT]: IconHelper.createColoredIcon(
     `/icons/pin/${BusinessTypeEnum.RESTAURANT.toLowerCase()}.svg`
   ),
@@ -213,7 +213,7 @@ export function LocationIQMap({
   const updateQuery = useCallback(
     (lat: number, lng: number) => {
       if (!syncQuery) return;
-      const newQuery = `?q=${lat.toFixed(6)},${lng.toFixed(6)}`;
+      const newQuery = `?q=${lat.toFixed(7)},${lng.toFixed(7)}`;
       // router.replace(`${pathname}${newQuery}`, { scroll: false });
       window.history.replaceState(null, "", `${pathname}${newQuery}`);
     },

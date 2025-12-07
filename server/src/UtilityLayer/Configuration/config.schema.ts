@@ -29,6 +29,14 @@ export const configSchema = z.object({
     .string({ error: 'GOOGLE_MAPS_API_KEY is required' })
     .min(1, 'Google Maps API key must be provided'),
 
+  LOCATIONIQ_ACCESS_TOKEN: z
+    .string({ error: 'LOCATIONIQ_ACCESS_TOKEN is required' })
+    .min(1, 'LocationIQ Access Token must be provided'),
+
+  GEOAPIFY_KEY: z
+    .string({ error: 'GEOAPIFY_KEY is required' })
+    .min(1, 'GeoAPIFY must be provided'),
+
   TOKEN_SECRET: z
     .string({ error: 'TOKEN_SECRET is required' })
     .min(32, 'TOKEN_SECRET must be at least 32 characters long'),

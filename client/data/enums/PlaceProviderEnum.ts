@@ -1,0 +1,4 @@
+export enum PlaceProviderEnum {
+  GEOAPIFY = "geoapify",
+  GOOGLE = "google",
+}

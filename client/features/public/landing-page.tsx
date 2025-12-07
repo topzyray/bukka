@@ -403,12 +403,25 @@ export function Home() {
                     <MapPin className="w-5 h-5 ml-2" />
                   </BukkaButton>
                 </Link>
-                <Link href="/businesses/recommend">
-                  <BukkaButton variant="warm" size="lg" asChild>
-                    Recommend Businesses
-                    <HandHeart className="w-5 h-5 ml-2" />
-                  </BukkaButton>
-                </Link>
+
+                <BukkaButton
+                  onClick={() => {
+                    if (!user) {
+                      toast("Requires Signin", {
+                        description:
+                          "You need to sign in before recommending a business",
+                      });
+                    } else {
+                      router.push("/businesses/recommend");
+                    }
+                  }}
+                  variant="warm"
+                  size="lg"
+                  asChild
+                >
+                  Recommend A Business
+                  <HandHeart className="w-5 h-5 ml-2" />
+                </BukkaButton>
               </div>
             </div>
           </motion.div>

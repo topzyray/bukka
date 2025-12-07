@@ -3,8 +3,16 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Settings, User, Activity, LayoutDashboard, Mail } from "lucide-react";
+import {
+  Settings,
+  User,
+  Activity,
+  LayoutDashboard,
+  Mail,
+  Settings2Icon,
+} from "lucide-react";
 import { useAuth } from "@/providers";
+import { UserRoleEnum } from "@/data/enums";
 
 const navItems = [
   {
@@ -61,7 +69,6 @@ export function SettingsNav() {
     <nav className="flex flex-wrap gap-1 lg:flex-col space-y-1">
       {navItems.map((tab) => {
         const isActive = pathname.endsWith(tab.href);
-
         return (
           <Link
             key={tab.href}
@@ -79,6 +86,21 @@ export function SettingsNav() {
           </Link>
         );
       })}
+      {user?.role === UserRoleEnum.ADMIN && (
+        <Link
+          href={`/dashboard/${user?.role.toLowerCase()}/settings/system`}
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+            pathname.endsWith("settings/system")
+              ? "bg-sidebar-accent text-sidebar-accent-foreground"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            "text-text hover:bg-sidebar-accent hover:text-sidebar-accent-foreground pl-2 text-sm"
+          )}
+        >
+          <Settings2Icon className="w-4 h-4" />
+          System
+        </Link>
+      )}
     </nav>
   );
 }

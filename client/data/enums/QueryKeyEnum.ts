@@ -32,4 +32,5 @@ export enum QueryKeyEnum {
   SUPPORT = "support",
   USER_FILES = "user-files",
   VENDOR_BUSINESSES = "vendor-businesses",
+  PLACE_SEARCH = "place-search",
 }

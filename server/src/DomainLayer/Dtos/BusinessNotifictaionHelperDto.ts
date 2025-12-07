@@ -7,6 +7,15 @@ export class ProcessBusinessCreationDto {
   businessName: string;
 }
 
+export class ProcessBusinessImportDto {
+  firstName: string;
+  lastName: string;
+  businessId: number;
+  recommenderId: number;
+  ownerEmail: string;
+  businessName: string;
+}
+
 export class ProcessBusinessUpdatedDto {
   firstName: string;
   lastName: string;

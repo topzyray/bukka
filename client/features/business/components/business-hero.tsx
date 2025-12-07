@@ -71,7 +71,7 @@ export function BusinessHero({
         />
       ) : (
         <div className="w-full h-full warm-gradient flex items-center justify-center">
-          <span className="text-white text-4xl lg:text-6xl font-bold">
+          <span className="text-white text-4xl lg:text-6xl font-bold uppercase">
             {data?.name.charAt(0)}
           </span>
         </div>
@@ -79,7 +79,7 @@ export function BusinessHero({
       <div className="absolute inset-0 bg-black/28" />
       <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-1 capitalize">
             {data?.name}
           </h1>
           {showRating && (

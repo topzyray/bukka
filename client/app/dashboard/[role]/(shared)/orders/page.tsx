@@ -6,6 +6,7 @@ import { RiderOrders } from "@/features/dashboard/rider/rider-order-switcher";
 import { UserOrders } from "@/features/dashboard/user/user-orders-switcher";
 import { VendorOrders } from "@/features/dashboard/vendor/vendor-order-switcher";
 import { useAuth } from "@/providers";
+import { redirect } from "next/navigation";
 
 export default function OrdersPage() {
   const { user } = useAuth();
@@ -20,6 +21,6 @@ export default function OrdersPage() {
     case UserRoleEnum.USER:
       return <UserOrders />;
     default:
-      return null;
+      return redirect(`/dashboard/${user?.role.toLowerCase()}/overview`);
   }
 }

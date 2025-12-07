@@ -28,6 +28,7 @@ import { WaitListController } from './ServiceLayer/Controllers/WaitListControlle
 import { FavoriteController } from './ServiceLayer/Controllers/FavoriteController';
 import { UserSessionController } from './ServiceLayer/Controllers/UserSessionController';
 import { AnalyticsController } from './ServiceLayer/Controllers/Shared/AnalyticsController';
+import { PlaceAdminController } from './ServiceLayer/Controllers/Admin/PlaceAdminController';
 import { RecommendationController } from './ServiceLayer/Controllers/RecommendationController';
 import { AdminControlController } from './ServiceLayer/Controllers/Admin/AdminControlController';
 import { UserNotificationController } from './ServiceLayer/Controllers/UserNotificationController';
@@ -86,6 +87,7 @@ import { HttpServiceWrapper } from './InfrastructureLayer/Services/HttpServiceWr
 import { RoleResolverService } from './InfrastructureLayer/Services/RoleResolverService';
 import { AdminControlService } from './InfrastructureLayer/Services/AdminControlService';
 import { FileUploadService } from './InfrastructureLayer/Services/upload/FileUploadService';
+import { PlaceImportService } from './InfrastructureLayer/Services/place/PlaceImportService';
 import { AppConfigurationService } from './UtilityLayer/Configuration/AppConfiguration.service';
 import { NotificationService } from './InfrastructureLayer/Services/notification/NotificationService';
 import { AuthNotificationService } from './InfrastructureLayer/Services/notification/services/AuthNotificationService';
@@ -108,6 +110,7 @@ import { FileRepository } from './BussinessLayer/FileRepository';
 import { FileFactory } from './InfrastructureLayer/Services/upload/FileFactory';
 import { QueueFactory } from './InfrastructureLayer/Services/queue/QueueFactory';
 import { EmailFactory } from './InfrastructureLayer/Services/email/EmailFactory';
+import { PlaceProviderFactory } from './InfrastructureLayer/Services/place/PlaceProviderFactory';
 import { EmailTemplateFactory } from './InfrastructureLayer/Services/email/EmailTemplateFactory';
 
 // PROVIDERS
@@ -117,6 +120,8 @@ import { MailjetProvider } from './InfrastructureLayer/Services/email/providers/
 import { LocalDiskProvider } from './InfrastructureLayer/Services/upload/providers/LocalDiskProvider';
 import { NodemailerProvider } from './InfrastructureLayer/Services/email/providers/NodemailerProvider';
 import { CloudinaryProvider } from './InfrastructureLayer/Services/upload/providers/CloudinaryProvider';
+import { GooglePlaceProvider } from './InfrastructureLayer/Services/place/providers/GooglePlaceProvider';
+import { GeoapifyPlaceProvider } from './InfrastructureLayer/Services/place/providers/GeoapifyPlaceProvider';
 
 // HELPERS
 import { FileReferenceHelper } from './InfrastructureLayer/Helpers/FileReferenceHelper';
@@ -176,6 +181,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     ReviewController,
     UserManagementController,
     AdminControlController,
+    PlaceAdminController,
     AnalyticsController,
   ],
   providers: [
@@ -183,13 +189,13 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
-
     JwtService,
     AppService,
     EmailService,
     QueueService,
     KeepAliveService,
     FileUploadService,
+    PlaceImportService,
     NotificationService,
     AdminControlService,
     RoleResolverService,
@@ -227,6 +233,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     FavoriteRepository,
     LocationRepository,
     EmailTemplateFactory,
+    PlaceProviderFactory,
     UserSessionRepository,
     RecommendationRepository,
     UserNotificationRepository,
@@ -267,6 +274,8 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     LocalDiskProvider,
     NodemailerProvider,
     CloudinaryProvider,
+    GooglePlaceProvider,
+    GeoapifyPlaceProvider,
 
     Logger,
     HandlebarsEngine,

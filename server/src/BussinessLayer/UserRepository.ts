@@ -115,22 +115,22 @@ export class UserRepository {
     }
     const updatedUser = await this.userDataAgent.updateUser(userId, data);
 
-    this._queue.publishToQueue(
-      QueueEnum.PROFILE_NOTIFICATION,
-      {
-        messageType: ProfileQueueMessageTypeEnum.PROFILE_UPDATED,
-        payload: {
-          userId: updatedUser?.id,
-          email: updatedUser?.email,
-          firstName: updatedUser?.firstName,
-          lastName: updatedUser?.lastName,
-          role: updatedUser?.role,
-        },
-      },
-      {
-        provider: QueueProviderEnum.BULLMQ,
-      },
-    );
+    // this._queue.publishToQueue(
+    //   QueueEnum.PROFILE_NOTIFICATION,
+    //   {
+    //     messageType: ProfileQueueMessageTypeEnum.PROFILE_UPDATED,
+    //     payload: {
+    //       userId: updatedUser?.id,
+    //       email: updatedUser?.email,
+    //       firstName: updatedUser?.firstName,
+    //       lastName: updatedUser?.lastName,
+    //       role: updatedUser?.role,
+    //     },
+    //   },
+    //   {
+    //     provider: QueueProviderEnum.BULLMQ,
+    //   },
+    // );
 
     return BukkaResponse.UpdateResponse('User', updatedUser);
   }

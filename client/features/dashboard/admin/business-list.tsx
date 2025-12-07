@@ -13,10 +13,12 @@ import { PaginationHelper } from "@/helpers/pagination-helper";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { QueryKeyEnum } from "@/data/enums";
 import { BukkaButton } from "@/components/ui";
+import { useRouter } from "next/navigation";
 
 export function BusinessList() {
   const PAGE_SIZE = 10;
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -124,7 +126,7 @@ export function BusinessList() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-wrap items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Businesses</h1>
           <p className="text-sm text-muted-foreground">
@@ -133,6 +135,9 @@ export function BusinessList() {
         </div>
 
         <div className="flex items-center gap-2">
+          <BukkaButton onClick={() => router.push("place-import")}>
+            Import Place
+          </BukkaButton>
           <BukkaButton onClick={handleCreate}>Add Business</BukkaButton>
           <CreateUpdateBusinessModal
             open={isModalOpen}

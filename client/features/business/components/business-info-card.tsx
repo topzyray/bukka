@@ -2,6 +2,7 @@
 
 import {
   Badge,
+  BukkaButton,
   Button,
   Card,
   CardContent,
@@ -16,12 +17,16 @@ import { Globe, MapPin, Phone } from "lucide-react";
 import { useMemo } from "react";
 import { BusinessHelper } from "../helper/bussiness-helper";
 import { Recommendation } from "@/data/interfaces/Recommendation";
+import { toast } from "sonner";
+import { useAuth } from "@/providers";
 
 export function BusinessInfoCard({
   business,
 }: {
   business: Business | Recommendation;
 }) {
+  const { user } = useAuth();
+
   const data = DataHelper.normalizeBusiness(business);
   const openNow = useMemo(
     () => BusinessHelper.isOpenNow(data?.openingHours),
@@ -34,23 +39,45 @@ export function BusinessInfoCard({
         <CardTitle>Business Info</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex gap-6 h-16">
-          <div className="space-y-2">
-            <Label>Type/Category</Label>
-            <Badge variant="outline" className="uppercase">
-              {TextHelper.normalizeText(data?.type)}
-            </Badge>
+        <div className="flex justify-between flex-wrap gap-6">
+          <div className="flex gap-6">
+            <div className="space-y-2">
+              <Label>Type/Category</Label>
+              <Badge variant="outline" className="uppercase">
+                {TextHelper.normalizeText(data?.type)}
+              </Badge>
+            </div>
+
+            <Separator orientation="vertical" />
+
+            <div className="space-y-2">
+              <Label>Availability</Label>
+              <Badge variant={openNow ? "success" : "destructive"}>
+                {openNow ? "Open Now" : "Closed"}
+              </Badge>
+            </div>
           </div>
 
-          <Separator orientation="vertical" />
-
-          <div className="space-y-2">
-            <Label>Availability</Label>
-            <Badge variant={openNow ? "success" : "destructive"}>
-              {openNow ? "Open Now" : "Closed"}
-            </Badge>
-          </div>
+          {!business.ownerId && (
+            <BukkaButton
+              size="sm"
+              variant="glow"
+              onClick={() => {
+                if (!user) {
+                  toast("Requires Signin", {
+                    description:
+                      "You need to sign in before recommending a business",
+                  });
+                } else {
+                }
+              }}
+            >
+              Claim Business
+            </BukkaButton>
+          )}
         </div>
+
+        <Separator />
 
         <div className="space-y-2">
           <Label>Cuisines</Label>

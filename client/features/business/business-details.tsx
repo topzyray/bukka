@@ -21,6 +21,13 @@ import { BusinessSocialLinks } from "./components/business-social-links";
 import { BusinessInfoCard } from "./components/business-info-card";
 import { BusinessMenuAndServices } from "./components/business-menu-and-service";
 import { BusinessHero } from "./components/business-hero";
+import {
+  PageWrapper,
+  PageWrapperContent,
+  PageWrapperContentWithFramer,
+  PageWrapperFooter,
+  PageWrapperHeader,
+} from "@/components/ui";
 
 export function BusinessDetails(): JSX.Element {
   const { id } = useParams() as { id?: string };
@@ -51,54 +58,63 @@ export function BusinessDetails(): JSX.Element {
         )
       : [];
 
-  if (isLoading) return <BusinessSkeleton />;
-  if (isError || !business)
-    return <ErrorBox message="Unable to load business details." />;
-
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto px-4 py-6 lg:py-10 max-w-6xl">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="space-y-8"
-        >
-          <BusinessHero
-            business={business}
-            coverImage={coverImage}
-            isLoadingFiles={isLoadingFiles}
-          />
+    <PageWrapper>
+      <PageWrapperHeader>
+        <Header />
+      </PageWrapperHeader>
+      <PageWrapperContent>
+        <PageWrapperContentWithFramer className="mx-auto px-4 py-6 lg:py-10 max-w-7xl">
+          {isLoading && <BusinessSkeleton />}
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <BusinessInfoCard business={business} />
-              <BusinessPhotoGallery
+          {isError && <ErrorBox message="Unable to load business details." />}
+
+          {business && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+              className="space-y-8"
+            >
+              <BusinessHero
                 business={business}
-                businessImages={businessImages}
+                coverImage={coverImage}
+                isLoadingFiles={isLoadingFiles}
               />
-              {/* <BusinessMenuAndServices /> */}
-              <BusinessReviews business={business} />
-            </div>
 
-            <div className="space-y-6">
-              <BusinessContactLocation business={business} />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                  <BusinessInfoCard business={business} />
+                  <BusinessPhotoGallery
+                    business={business}
+                    businessImages={businessImages}
+                  />
+                  {/* <BusinessMenuAndServices /> */}
+                  <BusinessReviews business={business} />
+                </div>
 
-              {business.location?.latitude && business.location?.longitude && (
-                <BusinessLazyMap business={business} />
-              )}
+                <div className="space-y-6">
+                  <BusinessContactLocation business={business} />
 
-              <BusinessOpeningHour business={business} />
+                  {business.location?.latitude &&
+                    business.location?.longitude && (
+                      <BusinessLazyMap business={business} />
+                    )}
 
-              {business.socialLinks && (
-                <BusinessSocialLinks business={business} />
-              )}
-            </div>
-          </div>
-        </motion.div>
-      </main>
-      <Footer />
-    </div>
+                  <BusinessOpeningHour business={business} />
+
+                  {business.socialLinks && (
+                    <BusinessSocialLinks business={business} />
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </PageWrapperContentWithFramer>
+      </PageWrapperContent>
+      <PageWrapperFooter>
+        <Footer />
+      </PageWrapperFooter>{" "}
+    </PageWrapper>
   );
 }

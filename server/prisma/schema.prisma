@@ -172,11 +172,14 @@ model Location {
   latitude  Float
   longitude Float
   address   String?
+  street   String?
   city      String?
   state     String?
   country   String?
   zipCode   String?
   landmark  String?
+  suburb  String?
+  county  String?
   plusCode  String?
   cityId    String?
   stateId   String?

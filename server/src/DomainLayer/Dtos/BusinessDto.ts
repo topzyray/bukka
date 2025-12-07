@@ -17,11 +17,11 @@ import { BusinessTypeEnum } from '../Enums/BusinessTypeEnum';
 import { CreateLocationDto } from './LocationDto';
 
 export class CreateBusinessDto extends CreateLocationDto {
-  @ApiProperty({ example: 1, required: true })
-  @IsNotEmpty()
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
   @IsNumber()
   @Transform(({ value }) => Number.parseInt(value, 10))
-  ownerId: number;
+  ownerId?: number;
 
   @ApiProperty({
     example: 'Temiade Kitchen',

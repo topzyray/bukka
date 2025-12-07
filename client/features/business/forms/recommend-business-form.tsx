@@ -109,8 +109,8 @@ export function RecommendBusinessForm({ onSuccess }: IRecommendBusinessForm) {
 
     let payload: any = {
       ...otherData,
-      longitude: Number(location?.longitude.toFixed(6)),
-      latitude: Number(location?.latitude.toFixed(6)),
+      longitude: Number(location?.longitude.toFixed(7)),
+      latitude: Number(location?.latitude.toFixed(7)),
       type: category?.type,
       slug: category?.slug,
       address: location?.address,

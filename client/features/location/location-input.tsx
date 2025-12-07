@@ -63,7 +63,7 @@ export function LocationInput({
         };
 
         const handleCoordsSelected = async (lat: number, lng: number) => {
-          const coordKey = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+          const coordKey = `${lat.toFixed(7)},${lng.toFixed(7)}`;
 
           // If reverse geocode is enabled, use it — otherwise emit manual coords
           if (useReverseGeocode) {
@@ -190,8 +190,7 @@ export function LocationInput({
                           </div>
                         )}
                         <div className="text-xs text-muted-foreground">
-                          Lat: {selected?.latitude?.toFixed?.(6)} | Lng:{" "}
-                          {selected?.longitude?.toFixed?.(6)}
+                          Lat: {selected?.latitude} | Lng: {selected?.longitude}
                         </div>
                         {selected.city && (
                           <div className="text-xs">{selected.city}</div>

@@ -3,7 +3,6 @@
 import React, { useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { DataTable } from "@/components/ui/data-table";
-import { useBusinessesQuery } from "@/data/queries/use-businesses-query";
 import { PaginationHelper } from "@/helpers/pagination-helper";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { QueryKeyEnum, RecommendationStatusEnum } from "@/data/enums";

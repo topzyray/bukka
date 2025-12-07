@@ -97,12 +97,12 @@ export class NotificationService {
       return;
     }
 
-    if (Array.isArray(userId) && userId.length === 0) {
+    if (Array.isArray(userId) && userId?.length === 0) {
       throw new BadRequestException('User ID array cannot be empty.');
     }
 
-    for (let i = 0; i < userId.length; i += NotificationService.BATCH_SIZE) {
-      const batch = userId.slice(i, i + NotificationService.BATCH_SIZE);
+    for (let i = 0; i < userId?.length; i += NotificationService.BATCH_SIZE) {
+      const batch = userId?.slice(i, i + NotificationService.BATCH_SIZE);
 
       const notifications: CreateNotificationDto[] = batch.map((uid) => ({
         userId: uid,
