@@ -19,7 +19,6 @@ import { BusinessHelper } from "../helper/bussiness-helper";
 import { Recommendation } from "@/data/interfaces/Recommendation";
 import { toast } from "sonner";
 import { useAuth } from "@/providers";
-import { useRouter } from "next/navigation";
 
 export function BusinessInfoCard({
   business,
@@ -27,7 +26,6 @@ export function BusinessInfoCard({
   business: Business | Recommendation;
 }) {
   const { user } = useAuth();
-  const router = useRouter();
 
   const data = DataHelper.normalizeBusiness(business);
   const openNow = useMemo(
