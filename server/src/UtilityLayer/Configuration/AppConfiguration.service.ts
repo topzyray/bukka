@@ -32,12 +32,6 @@ export class AppConfigurationService {
       ?.trim() as string;
   }
 
-  get locationIQAccessToken(): string {
-    return this.configService
-      .get<string>('LOCATIONIQ_ACCESS_TOKEN')
-      ?.trim() as string;
-  }
-
   get geoApiFy(): string {
     return this.configService.get<string>('GEOAPIFY_KEY')?.trim() as string;
   }
