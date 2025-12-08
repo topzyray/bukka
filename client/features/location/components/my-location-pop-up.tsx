@@ -68,3 +68,5 @@ export const MyLocationPopUp = memo(function ({
     </div>
   );
 });
+
+MyLocationPopUp.displayName = "MyLocationPopUp";

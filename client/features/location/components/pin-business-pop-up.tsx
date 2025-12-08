@@ -2,9 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { BukkaButton } from "@/components/ui";
-import { Plus, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import { useAuth } from "@/providers";
-import { toast } from "sonner";
 import { memo } from "react";
 
 export const PinBusinessPopUp = memo(function ({
@@ -70,3 +69,5 @@ export const PinBusinessPopUp = memo(function ({
     </div>
   );
 });
+
+PinBusinessPopUp.displayName = "PinBusinessPopUp";

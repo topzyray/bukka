@@ -33,3 +33,5 @@ export const BusinessMarker = memo(
     );
   }
 );
+
+BusinessMarker.displayName = "BusinessMarker";
