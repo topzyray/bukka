@@ -9,7 +9,6 @@ import React, {
 } from "react";
 import dynamic from "next/dynamic";
 import {
-  AlertTriangle,
   Grid,
   List,
   Loader2,
@@ -54,10 +53,8 @@ export function ExplorePage() {
   const { coordinates, setCoordinates } = useGlobalState();
 
   const initialSearch = searchParams.get("search") || "";
-  const initialPage = parseInt(searchParams.get("page") || "1", 10);
 
   const [q, setQ] = useState(initialSearch);
-  const [page, setPage] = useState(initialPage);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
@@ -79,18 +76,17 @@ export function ExplorePage() {
   useEffect(() => {
     const params = new URLSearchParams();
     if (debouncedQ) params.set("search", debouncedQ);
-    if (page > 1) params.set("page", String(page));
 
     router.push(`/explore${params.toString() ? `?${params}` : ""}`);
-  }, [debouncedQ, page, router]);
+  }, [debouncedQ, router]);
 
   // Build filters using coordinates if available
   const filters = useMemo(() => {
     const base: any = {
       search: debouncedQ || undefined,
-      page,
       pageSize: PAGE_SIZE,
       sort: "distance",
+      enable: true,
     };
     if (coordinates?.lat && coordinates?.lng) {
       base.lat = coordinates.lat;
@@ -98,7 +94,7 @@ export function ExplorePage() {
       base.radiusKm = 10;
     }
     return base;
-  }, [debouncedQ, coordinates, page]);
+  }, [debouncedQ, coordinates]);
 
   const {
     data,
@@ -111,54 +107,46 @@ export function ExplorePage() {
     isFetchingNextPage,
   } = useInfiniteBusinessesQuery({ ...filters });
 
-  const findPage = useCallback(
-    (pn: number) => {
-      return data?.pages?.find((p) => p.pageNumber === pn)?.data ?? [];
-    },
-    [data?.pages]
+  const businesses: Business[] = useMemo(
+    () => data?.pages.flatMap((p) => p.data) ?? [],
+    [data]
   );
 
-  const goToPage = async (pn: number) => {
-    console.log("PAGE NUMBER: ", pn);
+  const observerRef = useRef<HTMLDivElement | null>(null);
 
-    if (pn <= 0) return;
-    if (findPage(pn).length > 0) {
-      setPage(pn);
-      return;
-    }
-    let safety = 0;
-    while (!findPage(pn) && safety < 20) {
-      await fetchNextPage();
-      safety++;
-      const last = data?.pages?.[data.pages.length - 1];
-      if (last && last.pageNumber >= pn) break;
-    }
-    setPage(
-      findPage(pn).length
-        ? pn
-        : data?.pages?.[data.pages.length - 1]?.pageNumber ?? 1
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [debouncedQ]);
+
+  // Observe the last element to auto-load next page
+  useEffect(() => {
+    if (!observerRef.current || !hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.5 }
     );
-  };
 
-  const businesses: Business[] = React.useMemo(
-    () => findPage(page),
-    [page, findPage]
-  );
+    const el = observerRef.current;
+    observer.observe(el);
 
-  const totalRecords = data?.pages?.[0]?.totalRecords ?? 0;
-
-  const totalPages = Math.max(1, Math.ceil(totalRecords / PAGE_SIZE));
+    return () => observer.unobserve(el);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   // Create a lightweight businesses shape for the map (min fields required by LocationIQMap)
   const businessesForMap = useMemo(
     () =>
-      businesses.map((b: any) => ({
+      businesses.map((b: Business) => ({
         id: b.id,
         name: b.name,
         location: {
-          latitude: b.location?.latitude ?? 0,
-          longitude: b.location?.longitude ?? 0,
-          address: b.location?.address ?? "",
+          latitude: b.location?.latitude,
+          longitude: b.location?.longitude,
+          address: b.location?.address,
         },
         type: b.type,
       })),
@@ -218,7 +206,6 @@ export function ExplorePage() {
                     Discover nearby food businesses
                   </p>
                 </div>
-
                 <div className="flex gap-2 mb-4">
                   <div className="flex-1 relative">
                     <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -247,7 +234,6 @@ export function ExplorePage() {
                     </BukkaButton>
                   </div>
                 </div>
-
                 <div className="space-y-3">
                   {isLoading && (
                     <ScrollArea className="h-132">
@@ -282,11 +268,11 @@ export function ExplorePage() {
                     </div>
                   )}
 
-                  <ScrollArea className="h-132">
+                  <ScrollArea className="h-144">
                     <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-0.5">
                       {!isLoading &&
                         !isError &&
-                        businesses.map((b: any) => (
+                        businesses.map((b: Business) => (
                           <BusinessCard
                             business={b}
                             variant={
@@ -303,6 +289,27 @@ export function ExplorePage() {
                             )}
                           />
                         ))}
+
+                      {/* Infinite Scroll Sentinel */}
+                      <div ref={observerRef} className="h-0" />
+
+                      {/* Loader */}
+                      {isFetchingNextPage && (
+                        <div className="flex justify-center items-center py-8">
+                          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                        </div>
+                      )}
+
+                      {/* <div className="col-span-full place-content-center mx-auto">
+                        <BukkaButton
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {}}
+                          disabled={!hasNextPage && !isFetchingNextPage}
+                        >
+                          View More
+                        </BukkaButton>
+                      </div> */}
                     </div>
                   </ScrollArea>
 
@@ -326,31 +333,6 @@ export function ExplorePage() {
                       </BukkaButton>
                     </div>
                   )}
-                </div>
-
-                {/* Simple pagination controls */}
-                <div className="flex justify-center mt-4 gap-2">
-                  <BukkaButton
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      goToPage(Math.min(1, page - 1));
-                    }} // onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                  >
-                    Prev
-                  </BukkaButton>
-                  <div className="flex items-center px-3 text-sm">{page}</div>
-                  <BukkaButton
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      goToPage(Math.min(totalPages, page + 1));
-                    }}
-                    disabled={!hasNextPage && !isFetchingNextPage}
-                  >
-                    Next
-                  </BukkaButton>
                 </div>
               </div>
             </aside>

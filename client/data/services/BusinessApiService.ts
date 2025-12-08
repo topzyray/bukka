@@ -1,6 +1,10 @@
 import { HttpClient } from "@/configs";
 import { businessRoutes } from "@/constants/routes";
-import { CreateBusinessDto, UpdateBusinessDto } from "../dtos";
+import {
+  CreateBusinessDto,
+  SetFeaturedBusinessDto,
+  UpdateBusinessDto,
+} from "../dtos";
 
 export class BusinessApiService {
   static async createBusiness(payload: CreateBusinessDto) {
@@ -27,6 +31,14 @@ export class BusinessApiService {
     return response.data;
   }
 
+  static async getFeaturedBusinesses(params: Record<string, any> = {}) {
+    const response = await HttpClient.getClient().get(
+      `${businessRoutes.getFeaturedBusinesses}`,
+      { params }
+    );
+    return response.data;
+  }
+
   static async getBusinessById(businessId: number) {
     const response = await HttpClient.getClient().get(
       `${businessRoutes.getBusinessById}/${businessId}`
@@ -37,6 +49,17 @@ export class BusinessApiService {
   static async updateBusiness(businessId: number, payload: UpdateBusinessDto) {
     const response = await HttpClient.getClient().put(
       `${businessRoutes.updateBusiness}/${businessId}`,
+      payload
+    );
+    return response.data;
+  }
+
+  static async setBusinessAsFeatured(
+    businessId: number,
+    payload: SetFeaturedBusinessDto
+  ) {
+    const response = await HttpClient.getClient().put(
+      `${businessRoutes.setBusinessAsFeatured}/${businessId}/featured`,
       payload
     );
     return response.data;

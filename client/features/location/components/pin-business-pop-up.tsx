@@ -2,11 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { BukkaButton } from "@/components/ui";
-import { Plus, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import { useAuth } from "@/providers";
-import { toast } from "sonner";
+import { memo } from "react";
 
-export function PinBusinessPopUp({ lat, lng }: { lat: number; lng: number }) {
+export const PinBusinessPopUp = memo(function ({
+  lat,
+  lng,
+}: {
+  lat: number;
+  lng: number;
+}) {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
 
@@ -62,4 +68,6 @@ export function PinBusinessPopUp({ lat, lng }: { lat: number; lng: number }) {
       </div>
     </div>
   );
-}
+});
+
+PinBusinessPopUp.displayName = "PinBusinessPopUp";

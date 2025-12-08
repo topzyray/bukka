@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useGlobalState, useUserLocation } from "@/providers";
+import { useUserLocation } from "@/providers";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useMap } from "react-leaflet";

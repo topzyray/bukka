@@ -24,12 +24,15 @@ import {
   CreateBusinessDto,
   UpdateBusinessDto,
   FilterBusinessDto,
+  FilterFeaturedBusinessDto,
+  AddFeatureBusinessDto,
 } from 'src/DomainLayer/Dtos/BusinessDto';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { BusinessRepository } from 'src/BussinessLayer/BusinessRepository';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
+import { AdminAuthGuard } from 'src/MiddlewareLayer/Guards/AdminAuthGuard';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/businesses`)
 @ApiTags('Business')
@@ -62,6 +65,18 @@ export class BusinessController {
       'Vendor Businesses',
       response,
     );
+    return BukkaResponse.GetStatusResponse(data, res);
+  }
+
+  @Get('featured')
+  @ApiOperation({ summary: 'Get all businesses with filters' })
+  async getFeaturedBusinesses(
+    @Query() filters: FilterFeaturedBusinessDto,
+    @Res() res: Response,
+  ) {
+    const response =
+      await this.businessRepository.getFeaturedBusinesses(filters);
+    const data = BukkaResponse.GetPagedDataResponse('Businesses', response);
     return BukkaResponse.GetStatusResponse(data, res);
   }
 
@@ -100,6 +115,22 @@ export class BusinessController {
     @Res() res: Response,
   ) {
     const response = await this.businessRepository.updateBusiness(
+      businessId,
+      dto,
+    );
+    return BukkaResponse.GetStatusResponse(response, res);
+  }
+
+  @Put(':businessId/featured')
+  @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
+  @UseGuards(JwtAuthGuard, AdminAuthGuard)
+  @ApiOperation({ summary: 'Set a business as featured' })
+  async featureBusiness(
+    @Param('businessId', ParseIntPipe) businessId: number,
+    @Body() dto: AddFeatureBusinessDto,
+    @Res() res: Response,
+  ) {
+    const response = await this.businessRepository.setBusinessFeatured(
       businessId,
       dto,
     );

@@ -11,6 +11,9 @@ export const useReadAllNotificaiton = ({ userId }: { userId?: number }) => {
         queryKey: [QueryKeyEnum.NOTIFICATIONS, userId],
       });
       queryClient.invalidateQueries({
+        queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE, userId],
+      });
+      queryClient.invalidateQueries({
         queryKey: [QueryKeyEnum.UNREAD_COUNT, userId],
       });
       queryClient.invalidateQueries({
@@ -38,6 +41,9 @@ export const useReadNotificaiton = ({
         });
         queryClient.invalidateQueries({
           queryKey: [QueryKeyEnum.UNREAD_COUNT],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.ADMIN_OVERVIEW],
         });
         onSuccess?.();
       },

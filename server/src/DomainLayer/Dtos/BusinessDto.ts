@@ -10,6 +10,10 @@ import {
   IsLatitude,
   IsDecimal,
   IsArray,
+  IsBoolean,
+  IsInt,
+  Min,
+  IsDate,
 } from 'class-validator';
 import { PaginationDto } from './Base/PaginationDto';
 import { Transform } from 'class-transformer';
@@ -125,6 +129,45 @@ export class CreateBusinessDto extends CreateLocationDto {
 
 export class UpdateBusinessDto extends PartialType(CreateBusinessDto) {}
 
+export class AddFeatureBusinessDto {
+  @ApiProperty({
+    example: true,
+    required: true,
+    description: 'Whether the business should be marked as featured',
+  })
+  @IsBoolean()
+  @IsNotEmpty()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') return value.toLowerCase() === 'true';
+    return Boolean(value);
+  })
+  isFeatured: boolean;
+
+  @ApiProperty({
+    example: 1,
+    required: false,
+    description: 'Rank used for sorting featured businesses',
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  featuredRank?: number;
+
+  @ApiProperty({
+    example: '2025-01-30T00:00:00Z',
+    required: false,
+    description: 'End date for the feature period',
+  })
+  @IsOptional()
+  @IsDate()
+  @Transform(({ value }) => {
+    if (!value) return undefined;
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? undefined : date;
+  })
+  featuredEnd?: Date;
+}
+
 export class FilterBusinessDto extends PaginationDto {
   @ApiProperty({
     example: 'Temiade Kitchen',
@@ -142,6 +185,8 @@ export class FilterBusinessDto extends PaginationDto {
   @IsString()
   type: BusinessTypeEnum;
 }
+
+export class FilterFeaturedBusinessDto extends PaginationDto {}
 
 export class BusinessWithinDistanceDto extends PaginationDto {
   @ApiProperty({ example: 37.7749, required: false })

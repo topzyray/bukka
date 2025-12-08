@@ -1,6 +1,7 @@
 export * from "./authRoutes";
 export * from "./fileRoutes";
 export * from "./userRoutes";
+export * from "./claimRoutes";
 export * from "./reviewRoutes";
 export * from "./supportRoutes";
 export * from "./favoriteRoutes";

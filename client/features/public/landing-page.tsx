@@ -2,33 +2,25 @@
 
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import {
-  Search,
-  MapPin,
-  Star,
-  Utensils,
-  Clock,
-  TrendingUp,
-  HandHeart,
-} from "lucide-react";
-import { BukkaButton } from "@/components/ui/button-variants";
-import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
+import { Search, MapPin, Utensils, TrendingUp, HandHeart } from "lucide-react";
+import { toast } from "sonner";
 import Link from "next/link";
+import Image from "next/image";
+import { useAuth } from "@/providers";
+import { TextHelper } from "@/helpers";
+import { useRouter } from "next/navigation";
+import { extractErrorMessage } from "@/utils";
 import { Header } from "@/components/layouts/header";
 import { Footer } from "@/components/layouts/footer";
 import { TypeAnimation } from "react-type-animation";
 import { Business } from "@/data/interfaces/Business";
-import { useInfiniteBusinessesQuery } from "@/data/queries/use-businesses-query";
-import { BusinessCard } from "../business/components/business-card";
-import { TextHelper } from "@/helpers";
-import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
-import { useRouter } from "next/navigation";
 import { SearchBox } from "@/components/ui/search-box";
-import { ErrorBox } from "@/components/ui/error-box";
+import { Card, CardContent } from "@/components/ui/card";
+import { BukkaButton } from "@/components/ui/button-variants";
+import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
+import { BusinessCard } from "../business/components/business-card";
 import { BusinessCardSkeleton } from "../business/components/business-card-skeleton";
-import { useAuth } from "@/providers";
-import { toast } from "sonner";
+import { useInfiniteFeaturedBusinessesQuery } from "@/data/queries/use-businesses-query";
 
 const categories = [
   { name: BusinessTypeEnum.RESTAURANT, icon: "🍛", count: "120+" },
@@ -49,7 +41,8 @@ export function Home() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const { data, isLoading, isError, error } = useInfiniteBusinessesQuery({});
+  const { data, isLoading, isError, error, refetch } =
+    useInfiniteFeaturedBusinessesQuery({});
 
   const featuredBusinesses: Business[] = useMemo(
     () => data?.pages.flatMap((p) => p.data) ?? [],
@@ -292,7 +285,7 @@ export function Home() {
                 }
                 className="w-full sm:w-xs"
               >
-                <Card className="cursor-pointer hover:shadow-card transition-smooth text-center p-6 drop-shadow-lg shadow-muted-foreground hover:animate-pulse-glow border-none">
+                <Card className="cursor-pointer hover:shadow-card transition-smooth text-center p-6 drop-shadow-lg shadow hover:animate-pulse-glow border-none">
                   <CardContent className="p-0">
                     <div className="text-4xl mb-3">{category.icon}</div>
                     <h3 className="font-semibold mb-1 uppercase">
@@ -353,9 +346,125 @@ export function Home() {
                 </motion.div>
               ))
             ) : isError ? (
-              <ErrorBox error={error} />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="col-span-full flex flex-col items-center justify-center text-center py-20"
+              >
+                <motion.div
+                  animate={{ rotate: [0, -10, 10, 0] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="text-7xl md:text-8xl mb-8 opacity-60"
+                >
+                  ⚠️
+                </motion.div>
+
+                <h3 className="text-2xl md:text-3xl font-bold mb-4 text-red-600 dark:text-red-400">
+                  Something Went Wrong
+                </h3>
+
+                <p className="text-muted-foreground max-w-md mx-auto mb-6 text-lg md:text-xl">
+                  We couldn’t load featured businesses right now. Please try
+                  again shortly.
+                </p>
+
+                {/* Optional: Show simplified error message */}
+                {error && (
+                  <p className="text-sm text-red-500 dark:text-red-300 max-w-md mb-8 break-words px-4">
+                    {extractErrorMessage(error)}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-4 justify-center">
+                  <BukkaButton
+                    variant="warm"
+                    size="lg"
+                    onClick={() => refetch()}
+                    className="px-6 md:px-8"
+                  >
+                    Retry
+                    <TrendingUp className="w-5 h-5 ml-2" />
+                  </BukkaButton>
+
+                  <Link href="/businesses">
+                    <BukkaButton
+                      variant="outline"
+                      size="lg"
+                      className="px-6 md:px-8"
+                    >
+                      Explore Businesses
+                      <MapPin className="w-5 h-5 ml-2" />
+                    </BukkaButton>
+                  </Link>
+                </div>
+              </motion.div>
             ) : (
-              <p>No featured business available yet.</p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="col-span-full flex flex-col items-center justify-center text-center py-20"
+              >
+                <div className="w-full flex justify-center mb-8">
+                  <motion.div
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="text-7xl md:text-8xl opacity-60"
+                  >
+                    ⭐
+                  </motion.div>
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                  No Featured Businesses Yet
+                </h3>
+
+                <p className="text-muted-foreground max-w-md mx-auto mb-8 text-lg md:text-xl">
+                  Once businesses start getting highlighted by the community,
+                  they’ll appear here. Be the first to recommend one!
+                </p>
+
+                <div className="flex flex-wrap gap-4 justify-center">
+                  <BukkaButton
+                    variant="warm"
+                    size="lg"
+                    onClick={() => {
+                      if (!user) {
+                        toast("Requires Signin", {
+                          description:
+                            "You need to sign in before recommending a business",
+                        });
+                      } else {
+                        router.push("/businesses/recommend");
+                      }
+                    }}
+                    className="px-6 md:px-8"
+                  >
+                    Recommend A Business
+                    <HandHeart className="w-5 h-5 ml-2" />
+                  </BukkaButton>
+
+                  <Link href="/businesses">
+                    <BukkaButton
+                      variant="outline"
+                      size="lg"
+                      className="px-6 md:px-8"
+                    >
+                      Explore Businesses
+                      <TrendingUp className="w-5 h-5 ml-2" />
+                    </BukkaButton>
+                  </Link>
+                </div>
+              </motion.div>
             )}
           </div>
         </div>

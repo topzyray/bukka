@@ -5,8 +5,15 @@ import { BukkaButton } from "@/components/ui";
 import { Locate, MapPin, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/providers";
+import { memo } from "react";
 
-export function MyLocationPopUp({ lat, lng }: { lat: number; lng: number }) {
+export const MyLocationPopUp = memo(function ({
+  lat,
+  lng,
+}: {
+  lat: number;
+  lng: number;
+}) {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
 
@@ -60,4 +67,6 @@ export function MyLocationPopUp({ lat, lng }: { lat: number; lng: number }) {
       </div>
     </div>
   );
-}
+});
+
+MyLocationPopUp.displayName = "MyLocationPopUp";

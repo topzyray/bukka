@@ -4,7 +4,8 @@ import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
 import { Business } from "@/data/interfaces/Business";
 import { Button } from "@/components/ui/button";
-import { Edit, Loader2, Trash, View } from "lucide-react";
+import { Edit, Loader2, Sparkles, Trash, View } from "lucide-react";
+import { FeatureBusinessDialog } from "../../admin/modals/featured-business-dialog";
 
 export const businessColumns = (
   onEdit: (data: Business) => void,
@@ -36,12 +37,12 @@ export const businessColumns = (
     header: "Type",
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "averageRating",
+    header: "Rating",
   },
   {
-    accessorKey: "phoneNumber",
-    header: "Phone",
+    accessorKey: "reviewCount",
+    header: "Reviews",
   },
   {
     accessorKey: "location.address",
@@ -110,6 +111,14 @@ export const businessColumns = (
               <View size={16} />
             </Button>
           </Link>
+          <FeatureBusinessDialog
+            trigger={
+              <Button variant="outline" size="sm" title="Add to Featured List">
+                <Sparkles size={16} />
+              </Button>
+            }
+            business={business}
+          />
           <Button
             variant="outline"
             size="sm"

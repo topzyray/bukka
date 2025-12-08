@@ -101,6 +101,49 @@ export const useUpdateBusiness = ({
   );
 };
 
+export const useAddFeaturedBusiness = ({
+  resetForm,
+  onSuccess,
+  onError,
+}: {
+  resetForm: () => void;
+  onSuccess?: () => void;
+  onError?: (error: unknown) => void;
+}) => {
+  const queryClient = useQueryClient();
+  return useCustomMutation(
+    ({ id, payload }: { id: number; payload: any }) =>
+      BusinessApiService.setBusinessAsFeatured(id, payload),
+    {
+      onSuccessCallback: () => {
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.BUSINESSES],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.BUSINESSES_INFINITE],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.FEATURED_BUSINESSES],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.NOTIFICATIONS],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.NOTIFICATIONS_INFINITE],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeyEnum.UNREAD_COUNT],
+        });
+        resetForm();
+        onSuccess?.();
+      },
+      onErrorCallback: (error) => {
+        onError?.(error);
+      },
+    }
+  );
+};
+
 export const useDeleteBusiness = ({
   onSuccess,
 }: {

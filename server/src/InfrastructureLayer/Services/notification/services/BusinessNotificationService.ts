@@ -10,12 +10,17 @@ import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfi
 import {
   ProcessBusinessCreationDto,
   ProcessBusinessDeletedDto,
+  ProcessBusinessFeaturedDto,
   ProcessBusinessImportDto,
   ProcessBusinessUpdatedDto,
 } from 'src/DomainLayer/Dtos/BusinessNotifictaionHelperDto';
+import { AppUrlTypeEnum } from 'src/DomainLayer/Enums/AppUrlTypeEnum';
+import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
 
 @Injectable()
 export class BusinessNotificationService extends NotificationService {
+  private clientUrl: string;
+
   constructor(
     _notif: UserNotificationRepository,
     _emailService: EmailService,
@@ -24,6 +29,10 @@ export class BusinessNotificationService extends NotificationService {
     private readonly configService: AppConfigurationService,
   ) {
     super(_notif, _emailService, _settingsRepo);
+    this.clientUrl =
+      this.configService.nodeEnv === EnvironmentTypeEnum.DEV
+        ? AppUrlTypeEnum.CLIENT_DEV
+        : AppUrlTypeEnum.CLIENT_PROD;
   }
 
   async processBusinessCreated(
@@ -42,7 +51,7 @@ export class BusinessNotificationService extends NotificationService {
         userId: opsIds,
         title: `New business registered: ${data.businessName}`,
         message: `New business created by user with ID ${data.ownerId}`,
-        link: `${this.configService.appUrl}/dashboard/admin/businesses/${data.businessId}`,
+        link: `${this.clientUrl}/dashboard/admin/businesses/${data.businessId}`,
         notificationCategory: category,
       },
       email: {
@@ -84,7 +93,7 @@ export class BusinessNotificationService extends NotificationService {
         userId: data.recommenderId,
         title: `New business imported: ${data.businessName}`,
         message: `${data.businessName} was imported successfully!`,
-        link: `${this.configService.appUrl}/dashboard/admin/businesses/${data.businessId}`,
+        link: `${this.clientUrl}/dashboard/admin/businesses/${data.businessId}`,
         notificationCategory: category,
       },
       email: {
@@ -134,6 +143,66 @@ export class BusinessNotificationService extends NotificationService {
       email: {
         template: 'businessUpdatedOwner',
         subject: `Your business ${data.businessName} was deleted successfully.`,
+        to: data.ownerEmail,
+        context: data,
+      },
+    });
+  }
+
+  async processBusinessFeatured(
+    data: ProcessBusinessFeaturedDto,
+    category: string,
+  ) {
+    // Get all admin user IDs
+    const adminIds = await this.roleResolver.resolveRoleToUserIds(
+      UserRoleEnum.ADMIN,
+    );
+
+    await this.dispatchNotification({
+      channels: [NotificationTypeEnum.IN_APP],
+      inapp: {
+        userId: adminIds,
+        title: `Business Featured: ${data.businessName}`,
+        message: `${data.businessName} has been set as featured.`,
+        link: `${this.clientUrl}/dashboard/admin/businesses/${data.businessId}`,
+        notificationCategory: category,
+      },
+      email: {
+        template: 'businessFeaturedAdmin',
+        subject: `Business Featured: ${data.businessName}`,
+        to: this.configService.supportEmail,
+        context: data,
+      },
+    });
+
+    await this.dispatchNotification({
+      channels: [NotificationTypeEnum.IN_APP],
+      inapp: {
+        userId: data.ownerId,
+        title: 'Your business is now featured!',
+        message: `Your business ${data.businessName} has been set as featured.`,
+        link: `${this.clientUrl}/dashboard/vendor/businesses/${data.businessId}`,
+        notificationCategory: category,
+      },
+      email: {
+        template: 'businessFeaturedOwner',
+        subject: `Your business ${data.businessName} is now featured`,
+        to: data.ownerEmail,
+        context: data,
+      },
+    });
+
+    await this.dispatchNotification({
+      channels: [NotificationTypeEnum.IN_APP],
+      inapp: {
+        userId: data.recommenderId,
+        title: 'A business you recommended is now featured!',
+        message: `The business ${data.businessName}, which you recommended, has been set as featured.`,
+        notificationCategory: category,
+      },
+      email: {
+        template: 'businessFeaturedOwner',
+        subject: `Your business ${data.businessName} is now featured`,
         to: data.ownerEmail,
         context: data,
       },

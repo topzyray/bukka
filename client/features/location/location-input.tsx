@@ -2,7 +2,7 @@
 
 import { LocationModel } from "@/data/interfaces/Location";
 import { LocationApiService } from "@/data/services/LocationApiService";
-import { useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import {
   FormField,
   FormItem,
@@ -50,6 +50,8 @@ export function LocationInput({
     error: userCoordinatesError,
     refreshUserLocation,
   } = useUserLocation();
+
+  const MemoizedMapSelector = memo(MapSelector);
 
   return (
     <FormField
@@ -161,7 +163,7 @@ export function LocationInput({
 
               {mapOpen && (
                 <div style={{ height }} className="w-full">
-                  <MapSelector
+                  <MemoizedMapSelector
                     provider={provider}
                     onSelect={async (lat, lng) =>
                       await handleCoordsSelected(lat, lng)

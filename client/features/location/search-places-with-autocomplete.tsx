@@ -123,9 +123,7 @@ export function SearchPlacesWithAutocomplete() {
 
             <ul className="m-0 w-full max-h-60 overflow-auto divide-y rounded-md">
               {query.trim().length < 2 ? (
-                <li className="p-4 text-sm italic">
-                  Type at least 2 characters…
-                </li>
+                <li className="p-4 text-sm">Type at least 2 characters…</li>
               ) : isError ? (
                 <li className="p-4 text-red-500">
                   {extractErrorMessage(error)}

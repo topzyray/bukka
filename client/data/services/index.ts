@@ -14,3 +14,4 @@ export * from "./UserNotificationApiService";
 export * from "./UserPersonalizationApiService";
 export * from "./NotificationSettingApiService";
 export * from "./RecommendationApiService";
+export * from "./ClaimApiService";

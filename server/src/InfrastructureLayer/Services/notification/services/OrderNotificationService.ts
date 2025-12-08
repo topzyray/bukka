@@ -11,9 +11,13 @@ import {
   ProcessOrderCreatedDto,
   ProcessOrderStatusDto,
 } from 'src/DomainLayer/Dtos/OrderNotifictaionHelperDto';
+import { AppUrlTypeEnum } from 'src/DomainLayer/Enums/AppUrlTypeEnum';
+import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
 
 @Injectable()
 export class OrderNotificationService extends NotificationService {
+  private clientUrl: string;
+
   constructor(
     _notif: UserNotificationRepository,
     _emailService: EmailService,
@@ -22,6 +26,10 @@ export class OrderNotificationService extends NotificationService {
     private readonly configService: AppConfigurationService,
   ) {
     super(_notif, _emailService, _settingsRepo);
+    this.clientUrl =
+      this.configService.nodeEnv === EnvironmentTypeEnum.DEV
+        ? AppUrlTypeEnum.CLIENT_DEV
+        : AppUrlTypeEnum.CLIENT_PROD;
   }
 
   async processOrderCreated(data: ProcessOrderCreatedDto, category: string) {
@@ -39,7 +47,7 @@ export class OrderNotificationService extends NotificationService {
         userId: adminIds,
         title: `New order #${data.orderId}`,
         message: `A new order was placed (₦${data.totalAmount}).`,
-        link: `${this.configService.appUrl}/dashboard/admin/orders/${data.orderId}`,
+        link: `${this.clientUrl}/dashboard/admin/orders/${data.orderId}`,
         notificationCategory: category,
       },
       email: {
@@ -60,7 +68,7 @@ export class OrderNotificationService extends NotificationService {
         userId: data.vendorId,
         title: `New order #${data.orderId}`,
         message: `A new order was placed (₦${data.totalAmount}).`,
-        link: `${this.configService.appUrl}/dashboard/vendor/orders/${data.orderId}`,
+        link: `${this.clientUrl}/dashboard/vendor/orders/${data.orderId}`,
         notificationCategory: category,
       },
       email: {
@@ -79,7 +87,7 @@ export class OrderNotificationService extends NotificationService {
         userId: data.customerId,
         title: `Order placed #${data.orderId}`,
         message: `Your order is received and being processed.`,
-        link: `${this.configService.appUrl}/dashboard/${data.customerRole.toLowerCase()}/orders/${data.orderId}`,
+        link: `${this.clientUrl}/dashboard/${data.customerRole.toLowerCase()}/orders/${data.orderId}`,
         notificationCategory: category,
       },
       email: {
@@ -103,7 +111,7 @@ export class OrderNotificationService extends NotificationService {
         userId: data.customerId,
         title: `Order ${data.orderId} -s status: ${data.status}`,
         message: `Your order is now ${data.status}.`,
-        link: `${this.configService.appUrl}/dashboard/${data.customerRole.toLowerCase()}/orders/${data.orderId}`,
+        link: `${this.clientUrl}/dashboard/${data.customerRole.toLowerCase()}/orders/${data.orderId}`,
         notificationCategory: category,
       },
       email: {

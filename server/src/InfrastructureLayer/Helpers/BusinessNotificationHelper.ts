@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   ProcessBusinessCreationDto,
   ProcessBusinessDeletedDto,
+  ProcessBusinessFeaturedDto,
   ProcessBusinessImportDto,
   ProcessBusinessUpdatedDto,
 } from 'src/DomainLayer/Dtos/BusinessNotifictaionHelperDto';
@@ -13,6 +14,10 @@ export class BusinessNotificationHelper {
 
   async processCreated(data: ProcessBusinessCreationDto, category: string) {
     await this.svc.processBusinessCreated(data, category);
+  }
+
+  async processFeatured(data: ProcessBusinessFeaturedDto, category: string) {
+    await this.svc.processBusinessFeatured(data, category);
   }
 
   async processImported(data: ProcessBusinessImportDto, category: string) {

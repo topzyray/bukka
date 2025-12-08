@@ -203,17 +203,17 @@ export function Notifications() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
-        className="max-w-sm w-full p-0 shadow-lg border border-gray-100 dark:border-muted-foreground"
+        className="max-w-lg w-full p-0 shadow-lg border border-gray-100 dark:border-muted-foreground"
       >
         {/* Header Section */}
-        <div className="flex justify-between items-center p-4">
+        <div className="flex flex-wrap justify-between items-center p-4">
           <Link href={`/dashboard/${user?.role.toLowerCase()}/notifications`}>
             <h4 className="text-lg font-semibold hover:underline">
               All Notifications ({totalRecords})
             </h4>
           </Link>
           {/* Action Buttons */}
-          <div className="flex gap-2">
+          <div className="flex gap-0">
             <Button
               variant="ghost"
               size="sm"
@@ -230,7 +230,7 @@ export function Notifications() {
               ) : (
                 <MailOpen className="w-4 h-4 mr-1" />
               )}
-              Mark All Read
+              Read All
             </Button>
 
             <Button
