@@ -44,3 +44,4 @@ export * from "./alert-dialog";
 export * from "./back-button";
 export * from "./smart-file-uploader";
 export * from "./single-file-uploader";
+export * from "./drawer";

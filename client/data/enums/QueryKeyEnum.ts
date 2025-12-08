@@ -13,6 +13,7 @@ export enum QueryKeyEnum {
   MY_RECOMMENDATIONS = "my-recommendation",
   BUSINESSES_INFINITE = "businesses-infSSSinite",
   MY_BUSINESSES = "my-businesses",
+  FEATURED_BUSINESSES = "featured-businesses",
   FAVOURITES = "favourites",
   LOCATIONS = "locations",
   NOTIFICATION_SETTING = "notification-setting",
@@ -33,4 +34,5 @@ export enum QueryKeyEnum {
   USER_FILES = "user-files",
   VENDOR_BUSINESSES = "vendor-businesses",
   PLACE_SEARCH = "place-search",
+  BUSINESS_CLAIMS = "business-claims",
 }

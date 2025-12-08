@@ -8,6 +8,7 @@ import {
   CreateBusinessDto,
   UpdateBusinessDto,
   FilterBusinessDto,
+  FilterFeaturedBusinessDto,
 } from 'src/DomainLayer/Dtos/BusinessDto';
 import { FileRepository } from './FileRepository';
 import {
@@ -405,6 +406,24 @@ export class BusinessRepository {
     );
   }
 
+  async getFeaturedBusinesses(
+    filterDto: FilterFeaturedBusinessDto,
+  ): Promise<PagedData<Business[]>> {
+    const { pageSize, pageNumber } =
+      FilterQueryHelper.extractPagination(filterDto);
+    return handleCache(
+      'featured-businesses',
+      filterDto as Record<string, any>,
+      () => {
+        return this.businessDataAgent.findFeaturedBusinesses(
+          pageSize,
+          pageNumber,
+        );
+      },
+      CacheTTLPolicyEnum.FEATURED_BUSINESS_LIST,
+    );
+  }
+
   async updateBusiness(
     id: number,
     dto: UpdateBusinessDto,
@@ -455,6 +474,61 @@ export class BusinessRepository {
     await invalidateCache('businesses', {});
     await invalidateCache('my-businesses', {});
     return BukkaResponse.UpdateResponse('Business', updated);
+  }
+
+  async setBusinessFeatured(
+    businessId: number,
+    data: {
+      isFeatured: boolean;
+      featuredRank?: number;
+      featuredEnd?: Date;
+    },
+  ) {
+    const business = await this.businessDataAgent.findById(businessId);
+    if (!business) throw new NotFoundException('Business not found');
+
+    const loggedInUser = await UserHelper.getLoggedInUser();
+    if (loggedInUser.role !== UserRoleEnum.ADMIN) {
+      throw new ForbiddenException('Only admins can feature businesses');
+    }
+
+    const updated = await this.businessDataAgent.updateBusiness(business.id, {
+      isFeatured: data.isFeatured,
+      featuredRank: data.featuredRank,
+      featuredStart: new Date(),
+      featuredEnd: data.featuredEnd,
+    });
+
+    this._queue.publishToQueue(
+      QueueEnum.BUSINESS_NOTIFICATION,
+      {
+        messageType: BusinessQueueMessageTypeEnum.BUSINESS_FEATURED,
+        payload: {
+          adminId: loggedInUser.id,
+          adminEmail: loggedInUser.email,
+          adminfirstName: loggedInUser?.firstName,
+          adminlastName: loggedInUser?.lastName,
+          ownerEmail: business?.owner?.email,
+          ownerId: business?.owner?.id,
+          ownerFirstName: business?.owner?.firstName,
+          ownerLastName: business?.owner?.lastName,
+          recommenderEmail: business?.recommender?.email,
+          recommenderId: business?.recommender?.id,
+          recommenderFirstName: business?.recommender?.firstName,
+          recommenderLastName: business?.recommender?.lastName,
+          businessId: business.id,
+          businessName: business?.name,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
+    await invalidateCache('featured-businesses', {});
+    await invalidateCache('businesses', {});
+
+    return BukkaResponse.UpdateResponse('Business Featured Status', updated);
   }
 
   async deleteBusiness(id: number): Promise<BukkaResponse<void>> {

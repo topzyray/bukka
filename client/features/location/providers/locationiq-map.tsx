@@ -14,6 +14,7 @@ import {
   Popup,
   useMapEvents,
   Tooltip,
+  useMap,
 } from "react-leaflet";
 import L from "leaflet";
 import Image from "next/image";
@@ -26,13 +27,13 @@ import { IconHelper } from "@/helpers/icon-helper";
 import { Business } from "@/data/interfaces/Business";
 import { useGlobalState, useUserLocation } from "@/providers";
 import { CustomZoomControl } from "../components/custom-zoom";
-import { BusinessPopUp } from "../components/business-pop-up";
 import { RecenterButton } from "../components/recenter-button";
 import { usePathname, useSearchParams } from "next/navigation";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { LocationCoordsHelper } from "@/helpers/location-coords-helper";
 import { SearchPlacesWithAutocomplete } from "../search-places-with-autocomplete";
+import { BusinessPopUp } from "../components/business-pop-up";
 import { MyLocationPopUp } from "../components/my-location-pop-up";
 import { PinBusinessPopUp } from "../components/pin-business-pop-up";
 
@@ -113,6 +114,18 @@ interface ILocationIQMap {
   businesses?: Business[];
   onSelect: (lat: number, lng: number) => void;
   onMarkerClick?: (businessId: number) => void;
+}
+
+function RecenterOnMarker({ lat, lng }: { lat: number; lng: number }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (lat && lng) {
+      map.flyTo([lat, lng], map.getZoom());
+    }
+  }, [lat, lng, map]);
+
+  return null;
 }
 
 export function LocationIQMap({
@@ -255,11 +268,15 @@ export function LocationIQMap({
     [disabled, setCoordinates, updateQuery, debouncedSelect]
   );
 
-  const tileUrl = !envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN
-    ? `https://{s}-tiles.locationiq.com/v3/${
-        theme === "light" ? "streets" : "dark"
-      }/r/{z}/{x}/{y}.png?key=${envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN}`
-    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const tileUrl = useMemo(() => {
+    return !envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN
+      ? `https://{s}-tiles.locationiq.com/v3/${
+          theme === "light" ? "streets" : "dark"
+        }/r/{z}/{x}/{y}.png?key=${
+          envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN
+        }`
+      : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  }, []);
 
   if (!marker) {
     return (
@@ -290,7 +307,7 @@ export function LocationIQMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
         />
         <MapClickHandler onClick={handleMapClick} disabled={disabled} />
-        {/* <RecenterOnProp lat={marker.lat} lng={marker.lng} /> */}
+        <RecenterOnMarker lat={marker.lat} lng={marker.lng} />
         <Marker
           position={[marker.lat, marker.lng]}
           draggable={!disabled}

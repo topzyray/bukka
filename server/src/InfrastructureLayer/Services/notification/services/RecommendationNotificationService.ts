@@ -13,6 +13,8 @@ import {
   ProcessRecommendationDeletionDto,
   ProcessRecommendationRejectionDto,
 } from 'src/DomainLayer/Dtos/RecommendationNotifictaionHelperDto';
+import { AppUrlTypeEnum } from 'src/DomainLayer/Enums/AppUrlTypeEnum';
+import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
 
 @Injectable()
 export class RecommendationNotificationService extends NotificationService {
@@ -43,7 +45,7 @@ export class RecommendationNotificationService extends NotificationService {
         title: 'New Recommendation Received',
         message: `${data.recommenderName ?? 'A user'} recommended ${data.businessName ?? 'a business'}`,
         notificationCategory: category,
-        link: `${this.configService.appUrl}/dashboard/admin/recommendations/${data.recommendationId}`,
+        link: `${this.configService.nodeEnv === EnvironmentTypeEnum.DEV ? AppUrlTypeEnum.CLIENT_DEV : AppUrlTypeEnum.CLIENT_PROD}/dashboard/admin/recommendations/${data.recommendationId}`,
       },
       email: {
         template: 'newRecommendationAdmin',

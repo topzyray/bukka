@@ -36,6 +36,12 @@ export class BusinessNotificationConsumerService
             envelope.messageType,
           );
           break;
+        case BusinessQueueMessageTypeEnum.BUSINESS_FEATURED:
+          await this.helper.processFeatured(
+            envelope.payload,
+            envelope.messageType,
+          );
+          break;
         case BusinessQueueMessageTypeEnum.BUSINESS_IMPORTED:
           await this.helper.processImported(
             envelope.payload,

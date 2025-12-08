@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { MapProviderEnum } from "@/data/enums/MapProviderEnum";
 import { BusinessApiService } from "@/data/services/BusinessApiService";
 import { useCustomInfiniteQuery } from "@/data/queries/base";
@@ -56,11 +56,16 @@ export function MapSelector({
     [infiniteData?.pages]
   );
 
-  const currentPageData = React.useMemo(() => {
+  const currentPageData = useMemo(() => {
     // const pageObj = findPage(100) ?? infiniteData?.pages?.[0];
     const pageObj = infiniteData?.pages?.[0];
     return pageObj?.data ?? [];
   }, [infiniteData?.pages]);
+
+  const businessData = useMemo(
+    () => currentPageData || businesses,
+    [currentPageData, businesses]
+  );
 
   switch (provider) {
     case MapProviderEnum.GOOGLE: {
@@ -86,7 +91,7 @@ export function MapSelector({
           height={height}
           showSearchPlaces={showSearchPlaces}
           syncQuery={syncQuery}
-          businesses={currentPageData || businesses}
+          businesses={businessData}
           showLegend={showLegend}
           onMarkerClick={onMarkerClick}
         />

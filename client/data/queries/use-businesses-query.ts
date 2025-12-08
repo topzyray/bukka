@@ -37,6 +37,28 @@ export const useInfiniteBusinessesQuery = ({
   );
 };
 
+export const useInfiniteFeaturedBusinessesQuery = ({
+  pageSize = 10,
+  enabled = true,
+}: {
+  pageSize?: number;
+  enabled?: boolean;
+}) => {
+  return useCustomInfiniteQuery<Business>(
+    [QueryKeyEnum.FEATURED_BUSINESSES, pageSize],
+    ({ pageNumber }) =>
+      BusinessApiService.getFeaturedBusinesses({
+        pageNumber,
+        pageSize,
+      }),
+    {
+      params: { pageSize },
+      initialPageParam: 1,
+      enabled,
+    }
+  );
+};
+
 export const useBusinessesQuery = ({
   pageNumber = 1,
   search = "",

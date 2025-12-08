@@ -45,3 +45,9 @@ export interface UpdateBusinessDto {
   iconUrl?: string | null;
   coverUrl?: string | null;
 }
+
+export interface SetFeaturedBusinessDto {
+  isFeatured: boolean;
+  featuredRank?: number;
+  featuredEnd?: Date | string;
+}

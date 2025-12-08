@@ -110,6 +110,52 @@ export class BusinessDataAgent {
     return pageData;
   }
 
+  async findFeaturedBusinesses(
+    pageSize: number,
+    pageNumber: number,
+  ): Promise<PagedData<Business[]>> {
+    const pageData = new PagedData<Business[]>();
+    pageData.page = pageNumber;
+    pageData.pageSize = pageSize;
+
+    const filter = { field: 'isFeatured', op: 'eq', value: true };
+
+    const spec: QuerySpec = {
+      filter,
+      sort: [
+        { field: 'featuredRank', direction: 'asc' },
+        { field: 'featuredStart', direction: 'desc' },
+      ],
+      pagination: { page: pageNumber, pageSize },
+      extras: {
+        include: {
+          category: true,
+          location: true,
+          owner: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          recommender: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+        },
+      },
+    };
+    const total = await this.model.count({ filter });
+    pageData.total = total;
+    pageData.pageCount = Math.ceil(total / pageSize);
+    pageData.data = await this.model.find(spec);
+    return pageData;
+  }
+
   async updateBusiness(
     id: number,
     updateData: Partial<Business>,

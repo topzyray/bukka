@@ -1,6 +1,7 @@
 export enum CacheTTLPolicyEnum {
   BUSINESS_DETAIL = 1800, // 30 min
   BUSINESS_LIST = 900, // 15 min
+  FEATURED_BUSINESS_LIST = 900, // 15 min
   MY_BUSINESS_LIST = 900, // 15 min
   RECOMMENDATION_DETAIL = 1800, // 30 min
   RECOMMENDATION_LIST = 900, // 15 min

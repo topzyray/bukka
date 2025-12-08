@@ -2,7 +2,7 @@
 
 import { LocationModel } from "@/data/interfaces/Location";
 import { LocationApiService } from "@/data/services/LocationApiService";
-import { useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import {
   FormField,
   FormItem,
@@ -51,6 +51,8 @@ export function LocationInput({
     refreshUserLocation,
   } = useUserLocation();
 
+  const MemoizedMapSelector = memo(MapSelector);
+
   return (
     <FormField
       control={control}
@@ -62,60 +64,67 @@ export function LocationInput({
           field.onChange(loc);
         };
 
-        const handleCoordsSelected = async (lat: number, lng: number) => {
-          const coordKey = `${lat.toFixed(7)},${lng.toFixed(7)}`;
+        const handleCoordsSelected = useCallback(
+          async (lat: number, lng: number) => {
+            const coordKey = `${lat.toFixed(7)},${lng.toFixed(7)}`;
 
-          // If reverse geocode is enabled, use it — otherwise emit manual coords
-          if (useReverseGeocode) {
-            // guard against duplicate reverse calls
-            if (lastCoordsRef.current === coordKey) return;
-            lastCoordsRef.current = coordKey;
+            // If reverse geocode is enabled, use it — otherwise emit manual coords
+            if (useReverseGeocode) {
+              // guard against duplicate reverse calls
+              if (lastCoordsRef.current === coordKey) return;
+              lastCoordsRef.current = coordKey;
 
-            setLoadingReverse(true);
-            try {
-              const data = await LocationApiService.reverseGeocode({
-                lat,
-                lng,
-              });
+              setLoadingReverse(true);
+              try {
+                const data = await LocationApiService.reverseGeocode({
+                  lat,
+                  lng,
+                });
 
-              const loc: LocationModel = {
-                latitude: Number(lat),
-                longitude: Number(lng),
-                address:
-                  data.address ?? data.formatted_address ?? data.display_name,
-                placeId: data.placeId ?? data.place_id,
-                city: data.city ?? data.town ?? data.village,
-                state: data.state ?? data.region,
-                country: data.country,
-                zipCode: data.postcode ?? data.zipCode,
-                source: data.source ?? provider ?? "database",
-              };
+                const loc: LocationModel = {
+                  latitude: Number(lat),
+                  longitude: Number(lng),
+                  address:
+                    data.address ?? data.formatted_address ?? data.display_name,
+                  placeId: data.placeId ?? data.place_id,
+                  city: data.city ?? data.town ?? data.village,
+                  state: data.state ?? data.region,
+                  country: data.country,
+                  zipCode: data.postcode ?? data.zipCode,
+                  source: data.source ?? provider ?? "database",
+                };
 
-              await handleEmit(loc);
-            } catch {
-              // If reverse fails, still emit coords so UI updates
+                await handleEmit(loc);
+              } catch {
+                // If reverse fails, still emit coords so UI updates
+                await handleEmit({
+                  latitude: lat,
+                  longitude: lng,
+                  source: "manual",
+                } as LocationModel);
+              } finally {
+                setLoadingReverse(false);
+              }
+            } else {
+              // no reverse geocode configured — just emit coordinates
               await handleEmit({
                 latitude: lat,
                 longitude: lng,
                 source: "manual",
               } as LocationModel);
-            } finally {
-              setLoadingReverse(false);
             }
-          } else {
-            // no reverse geocode configured — just emit coordinates
-            await handleEmit({
-              latitude: lat,
-              longitude: lng,
-              source: "manual",
-            } as LocationModel);
-          }
-        };
+          },
+          [useReverseGeocode]
+        );
 
-        const initialLatLng =
-          selected && selected.latitude && selected.longitude
-            ? { lat: selected.latitude, lng: selected.longitude }
-            : undefined;
+        // const initialLatLng =
+        //   selected && selected.latitude && selected.longitude
+        //     ? { lat: selected.latitude, lng: selected.longitude }
+        //     : undefined;
+        const initialLatLng = useMemo(() => {
+          if (!selected?.latitude || !selected?.longitude) return undefined;
+          return { lat: selected.latitude, lng: selected.longitude };
+        }, [selected?.latitude, selected?.longitude]);
 
         return (
           <FormItem className={cn(className)}>
@@ -161,7 +170,7 @@ export function LocationInput({
 
               {mapOpen && (
                 <div style={{ height }} className="w-full">
-                  <MapSelector
+                  <MemoizedMapSelector
                     provider={provider}
                     onSelect={async (lat, lng) =>
                       await handleCoordsSelected(lat, lng)

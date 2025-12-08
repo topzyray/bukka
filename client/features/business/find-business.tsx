@@ -53,7 +53,7 @@ export function FindBusinessPage() {
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedFilter, setSelectedFilter] = useState(initialType);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const PAGE_SIZE = 12;
+  const PAGE_SIZE = 6;
 
   const debouncedSearch = useDebounce(searchQuery, 600);
 

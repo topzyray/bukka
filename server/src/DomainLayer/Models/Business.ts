@@ -21,6 +21,10 @@ export class Business {
   cuisines: string[];
   isVerified: boolean;
   isActive: boolean;
+  isFeatured: boolean;
+  featuredRank: number;
+  featuredStart: Date;
+  featuredEnd: Date;
   rating: number;
   totalReviews: number;
   openingHours: any;

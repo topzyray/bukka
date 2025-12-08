@@ -20,6 +20,10 @@ export interface Business {
   cuisines: string[] | [];
   isVerified: boolean;
   isActive: boolean;
+  isFeatured: boolean;
+  featuredRank?: number;
+  featuredStart?: string | Date | null;
+  featuredEnd?: string | Date | null;
   rating: number;
   totalReviews: number;
   openingHours: any;

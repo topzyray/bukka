@@ -15,3 +15,4 @@ export * from "./WaitlistDto";
 export * from "./OrderDto";
 export * from "./NotificationSettingDto";
 export * from "./RecommendationDto";
+export * from "./ClaimDto";

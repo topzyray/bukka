@@ -66,12 +66,12 @@ export class ReviewRepository {
       reviewCount: newCount,
     } as any);
 
-    const url =
+    const clientUrl =
       this.configService.nodeEnv === EnvironmentTypeEnum.DEV
         ? AppUrlTypeEnum.CLIENT_DEV
         : AppUrlTypeEnum.CLIENT_PROD;
-    const userReviewLink = `${url}/dashboard/user/reviews`;
-    const businessReviewedLink = `${url}/dashboard/vendor/business/${review.businessId}`;
+    const userReviewLink = `${clientUrl}/dashboard/user/reviews`;
+    const businessReviewedLink = `${clientUrl}/dashboard/vendor/business/${review.businessId}`;
 
     this._queue.publishToQueue(
       QueueEnum.REVIEW_NOTIFICATION,

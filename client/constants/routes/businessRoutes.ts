@@ -7,7 +7,9 @@ type IBusinessApi =
   | "createBusiness"
   | "getBusinesses"
   | "getBusinessById"
+  | "getFeaturedBusinesses"
   | "getLoggedInVendorBusinesses"
+  | "setBusinessAsFeatured"
   | "updateBusiness"
   | "deleteBusiness";
 
@@ -15,7 +17,9 @@ const rawBusinessRoutes: Record<IBusinessApi, string> = {
   createBusiness: "/businesses",
   getBusinesses: "/businesses",
   getBusinessById: "/businesses",
+  getFeaturedBusinesses: "/businesses/featured",
   getLoggedInVendorBusinesses: "/businesses/my-businesses",
+  setBusinessAsFeatured: "/businesses",
   updateBusiness: "/businesses",
   deleteBusiness: "/businesses",
 };
