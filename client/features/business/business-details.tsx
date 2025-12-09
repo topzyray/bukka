@@ -101,7 +101,7 @@ export function BusinessDetails(): JSX.Element {
 
               {/* Optional: Show simplified error message */}
               {isError && (
-                <p className="text-lg text-red-500 dark:text-red-300 max-w-md mb-8 break-words px-4">
+                <p className="text-lg text-red-500 dark:text-red-300 max-w-md mb-8 wrap-break-word px-4">
                   Reason: {extractErrorMessage(error)}
                 </p>
               )}
