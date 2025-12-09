@@ -14,18 +14,21 @@ import {
 import { Business } from "@/data/interfaces/Business";
 import { DataHelper, TextHelper } from "@/helpers";
 import { Globe, MapPin, Phone } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { BusinessHelper } from "../helper/bussiness-helper";
 import { Recommendation } from "@/data/interfaces/Recommendation";
 import { toast } from "sonner";
 import { useAuth } from "@/providers";
+import { ClaimBusinessInfoModal } from "../modals/claim-business-info-modal";
+import { ClaimBusinessModal } from "../modals/claim-business-modal-form";
 
 export function BusinessInfoCard({
   business,
 }: {
   business: Business | Recommendation;
 }) {
-  const { user } = useAuth();
+  const [openClaimInfo, setOpenClaimInfo] = useState(false);
+  const [openClaimForm, setOpenClaimForm] = useState(false);
 
   const data = DataHelper.normalizeBusiness(business);
   const openNow = useMemo(
@@ -59,20 +62,41 @@ export function BusinessInfoCard({
           </div>
 
           {!business.ownerId && (
-            <BukkaButton
-              size="sm"
-              variant="glow"
-              onClick={() => {
-                if (!user) {
-                  toast("Requires Signin", {
-                    description: "You need to sign in to claim this business",
-                  });
-                } else {
-                }
-              }}
-            >
-              Claim Business
-            </BukkaButton>
+            // <BukkaButton
+            //   size="sm"
+            //   variant="glow"
+            //   onClick={() => {
+            //     if (!user) {
+            //       toast("Requires Signin", {
+            //         description: "You need to sign in to claim this business",
+            //       });
+            //     } else {
+            //     }
+            //   }}
+            // >
+            //   Claim Business
+            // </BukkaButton>
+            <>
+              <ClaimBusinessInfoModal
+                data={business}
+                open={openClaimInfo}
+                onOpenChange={setOpenClaimInfo}
+                onContinue={() => {
+                  setOpenClaimInfo(false);
+                  setOpenClaimForm(true);
+                }}
+              />
+
+              <ClaimBusinessModal
+                data={business}
+                open={openClaimForm}
+                onOpenChange={setOpenClaimForm}
+                onBack={() => {
+                  setOpenClaimForm(false);
+                  setOpenClaimInfo(true);
+                }}
+              />
+            </>
           )}
         </div>
 
