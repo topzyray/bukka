@@ -5,6 +5,7 @@ class EnvConfig {
   public NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: string;
   public NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN: string;
   public NEXT_PUBLIC_DOMAIN_URL: string;
+  public SENTRY_AUTH_TOKEN: string;
 
   constructor() {
     this.NEXT_PUBLIC_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
@@ -15,6 +16,7 @@ class EnvConfig {
     this.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN =
       process.env.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN || "";
     this.NEXT_PUBLIC_DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL || "";
+    this.SENTRY_AUTH_TOKEN = process.env.SENTRY_AUTH_TOKEN || "";
   }
 
   public validateConfig(): void {

@@ -166,7 +166,7 @@ export function ExplorePage() {
       setMapCenter({ lat: coordinates.lat, lng: coordinates.lng });
   }, [coordinates]);
 
-  const handleListClick = (b: any) => {
+  const handleListClick = (b: Business) => {
     if (b.location?.latitude && b.location?.longitude) {
       setMapCenter({ lat: b.location.latitude, lng: b.location.longitude });
       setSelectedId(b.id);
@@ -296,7 +296,13 @@ export function ExplorePage() {
                       {/* Loader */}
                       {isFetchingNextPage && (
                         <div className="flex justify-center items-center py-8">
-                          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                          <span className="flex items-center gap-2">
+                            <Loader2
+                              size={40}
+                              className="w-16 h-16 animate-spin text-muted-foreground"
+                            />
+                            Loading more data...
+                          </span>
                         </div>
                       )}
 

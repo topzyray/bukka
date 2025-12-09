@@ -53,7 +53,7 @@ export function RecenterButton({
   };
 
   return (
-    <div className="absolute top-2.5 right-2.5 z-[499]">
+    <div className="absolute top-2.5 right-2.5 z-499">
       <Button
         type="button"
         variant="ghost"

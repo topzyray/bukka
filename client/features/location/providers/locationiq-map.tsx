@@ -116,7 +116,7 @@ interface ILocationIQMap {
   onMarkerClick?: (businessId: number) => void;
 }
 
-function RecenterOnMarker({ lat, lng }: { lat: number; lng: number }) {
+export function RecenterOnMarker({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
 
   useEffect(() => {

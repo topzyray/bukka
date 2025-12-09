@@ -317,7 +317,13 @@ export function FindBusinessPage() {
           {/* Loader */}
           {isFetchingNextPage && (
             <div className="flex justify-center items-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              <span className="flex items-center gap-2">
+                <Loader2
+                  size={40}
+                  className="w-16 h-16 animate-spin text-muted-foreground"
+                />
+                Loading more data...
+              </span>
             </div>
           )}
 
