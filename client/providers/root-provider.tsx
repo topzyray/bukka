@@ -23,7 +23,7 @@ export function RootProvider({ children }: { children: React.ReactNode }) {
           <AuthProvider>
             <GlobalStateProvider>
               {children}
-              <Toaster richColors position="top-right" />
+              <Toaster richColors position="top-center" closeButton />
             </GlobalStateProvider>
           </AuthProvider>
         </UserLocationProvider>
