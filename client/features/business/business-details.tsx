@@ -22,17 +22,21 @@ import { BusinessInfoCard } from "./components/business-info-card";
 import { BusinessMenuAndServices } from "./components/business-menu-and-service";
 import { BusinessHero } from "./components/business-hero";
 import {
+  BukkaButton,
   PageWrapper,
   PageWrapperContent,
   PageWrapperContentWithFramer,
   PageWrapperFooter,
   PageWrapperHeader,
 } from "@/components/ui";
+import { extractErrorMessage } from "@/utils";
+import { MapPin, TrendingUp } from "lucide-react";
+import Link from "next/link";
 
 export function BusinessDetails(): JSX.Element {
   const { id } = useParams() as { id?: string };
 
-  const { data, isLoading, isError } = useBusinessById({
+  const { data, isLoading, isError, error, refetch } = useBusinessById({
     businessId: Number(id),
   });
 
@@ -67,7 +71,65 @@ export function BusinessDetails(): JSX.Element {
         <PageWrapperContentWithFramer className="mx-auto px-4 py-6 lg:py-10 max-w-7xl">
           {isLoading && <BusinessSkeleton />}
 
-          {isError && <ErrorBox message="Unable to load business details." />}
+          {isError && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="col-span-full flex flex-col items-center justify-center text-center py-20"
+            >
+              <motion.div
+                animate={{ rotate: [0, -10, 10, 0] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="text-7xl md:text-8xl mb-8 opacity-60"
+              >
+                ⚠️
+              </motion.div>
+
+              <h3 className="text-2xl md:text-3xl font-bold mb-4 text-red-600 dark:text-red-400">
+                Oops! An Error Occurred!
+              </h3>
+
+              <p className="text-muted-foreground max-w-md mx-auto mb-6 text-lg md:text-xl">
+                We couldn’t load the business details right now. Please try
+                again shortly.
+              </p>
+
+              {/* Optional: Show simplified error message */}
+              {isError && (
+                <p className="text-lg text-red-500 dark:text-red-300 max-w-md mb-8 wrap-break-word px-4">
+                  Reason: {extractErrorMessage(error)}
+                </p>
+              )}
+
+              <div className="flex flex-wrap gap-4 justify-center">
+                <BukkaButton
+                  variant="warm"
+                  size="lg"
+                  onClick={() => refetch()}
+                  className="px-6 md:px-8"
+                >
+                  Retry
+                  <TrendingUp className="w-5 h-5 ml-2" />
+                </BukkaButton>
+
+                <Link href="/businesses">
+                  <BukkaButton
+                    variant="outline"
+                    size="lg"
+                    className="px-6 md:px-8"
+                  >
+                    Explore Businesses
+                    <MapPin className="w-5 h-5 ml-2" />
+                  </BukkaButton>
+                </Link>
+              </div>
+            </motion.div>
+          )}
 
           {business && (
             <motion.div
