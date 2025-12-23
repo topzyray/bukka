@@ -188,6 +188,56 @@ export class FilterBusinessDto extends PaginationDto {
 
 export class FilterFeaturedBusinessDto extends PaginationDto {}
 
+export class FilterBusinessBoundsDto extends PaginationDto {
+  @ApiProperty({
+    example: 6.5244,
+    required: true,
+    description: 'North latitude',
+  })
+  @IsNotEmpty()
+  @IsLatitude()
+  @Transform(({ value }) => Number.parseFloat(value))
+  north: number;
+
+  @ApiProperty({ example: 6.4, required: true, description: 'South latitude' })
+  @IsNotEmpty()
+  @IsLatitude()
+  @Transform(({ value }) => Number.parseFloat(value))
+  south: number;
+
+  @ApiProperty({
+    example: 3.3792,
+    required: true,
+    description: 'East longitude',
+  })
+  @IsNotEmpty()
+  @IsLongitude()
+  @Transform(({ value }) => Number.parseFloat(value))
+  east: number;
+
+  @ApiProperty({ example: 3.2, required: true, description: 'West longitude' })
+  @IsNotEmpty()
+  @IsLongitude()
+  @Transform(({ value }) => Number.parseFloat(value))
+  west: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Transform(({ value }) => (value !== undefined ? value : undefined))
+  type?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+    return Boolean(value);
+  })
+  includeInactive?: boolean;
+}
+
 export class BusinessWithinDistanceDto extends PaginationDto {
   @ApiProperty({ example: 37.7749, required: false })
   @IsOptional()

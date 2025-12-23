@@ -13,7 +13,11 @@ interface FormValues {
   search: string;
 }
 
-export function SearchPlacesWithAutocomplete() {
+export function SearchPlacesWithAutocomplete({
+  onSelectLocation,
+}: {
+  onSelectLocation?: (lat: number, lng: number) => void;
+}) {
   const form = useForm<FormValues>({ defaultValues: { search: "" } });
   const [query, setQuery] = useState("");
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -52,6 +56,7 @@ export function SearchPlacesWithAutocomplete() {
       lng: Number.parseFloat(lon),
       address: value,
     });
+    onSelectLocation?.(Number.parseFloat(lat), Number.parseFloat(lon));
   }
 
   // Simulated submit handler
@@ -94,7 +99,7 @@ export function SearchPlacesWithAutocomplete() {
       ref={containerRef}
       className="relative w-full flex flex-col gap-0.5 bg-white dark:bg-background"
     >
-      <div className="bg-background rounded-lg h-[2.5rem] sm:h-[3rem]">
+      <div className="bg-background rounded-lg h-10 sm:h-12">
         <SearchBox
           {...form.register("search")}
           placeholder="Search location…"

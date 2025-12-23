@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { motion } from "framer-motion";
-import { Search, MapPin, Utensils, TrendingUp, HandHeart } from "lucide-react";
-import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
+import React, { useMemo } from "react";
+import { toast } from "sonner";
 import { useAuth } from "@/providers";
+import { motion } from "framer-motion";
 import { TextHelper } from "@/helpers";
 import { useRouter } from "next/navigation";
 import { extractErrorMessage } from "@/utils";
@@ -19,6 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BukkaButton } from "@/components/ui/button-variants";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { BusinessCard } from "../business/components/business-card";
+import { Search, MapPin, Utensils, TrendingUp, HandHeart } from "lucide-react";
 import { BusinessCardSkeleton } from "../business/components/business-card-skeleton";
 import { useInfiniteFeaturedBusinessesQuery } from "@/data/queries/use-businesses-query";
 

@@ -295,6 +295,17 @@ export function FindBusinessPage() {
                   />
                 </motion.div>
               ))}
+
+            {isFetchingNextPage && (
+              <div className="flex justify-center items-center py-8">
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-10 h-10 lg:w-16 lg:h-16 animate-spin text-muted-foreground" />
+                  <span className="animate-pulse lg:text-lg">
+                    Loading more...
+                  </span>
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Load More (simple) */}
@@ -315,7 +326,7 @@ export function FindBusinessPage() {
           <div ref={observerRef} className="h-10" />
 
           {/* Loader */}
-          {isFetchingNextPage && (
+          {/* {isFetchingNextPage && (
             <div className="flex justify-center items-center py-8">
               <span className="flex items-center gap-2">
                 <Loader2
@@ -325,7 +336,7 @@ export function FindBusinessPage() {
                 Loading more data...
               </span>
             </div>
-          )}
+          )} */}
 
           {/* Error State */}
           {isError && (

@@ -8,6 +8,7 @@ type IBusinessApi =
   | "getBusinesses"
   | "getBusinessById"
   | "getFeaturedBusinesses"
+  | "getBusinessesByBounds"
   | "getLoggedInVendorBusinesses"
   | "setBusinessAsFeatured"
   | "updateBusiness"
@@ -18,6 +19,7 @@ const rawBusinessRoutes: Record<IBusinessApi, string> = {
   getBusinesses: "/businesses",
   getBusinessById: "/businesses",
   getFeaturedBusinesses: "/businesses/featured",
+  getBusinessesByBounds: "/businesses/bounds",
   getLoggedInVendorBusinesses: "/businesses/my-businesses",
   setBusinessAsFeatured: "/businesses",
   updateBusiness: "/businesses",

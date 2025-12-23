@@ -98,17 +98,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     ]
   );
 
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex min-h-screen items-center justify-center">
-  //       <CircularLoader
-  //         text="Validating your session..."
-  //         textClassName="animate-pulse-glow rounded-lg px-4 mt-4"
-  //       />
-  //     </div>
-  //   );
-  // }
-
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

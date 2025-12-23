@@ -8,6 +8,8 @@ import {
 import { BusinessApiService } from "@/data/services/BusinessApiService";
 import { Business } from "@/data/interfaces/Business";
 import { QueryKeyEnum } from "../enums";
+import { MapBounds } from "../interfaces/MapBounds";
+import { useMemo } from "react";
 
 export const useInfiniteBusinessesQuery = ({
   search = "",
@@ -88,6 +90,91 @@ export const useBusinessesQuery = ({
     }
   );
 };
+
+export const useBusinessesByBounds = ({
+  enabled,
+  getBounds,
+  filters,
+  pageSize,
+}: {
+  enabled: boolean;
+  getBounds: () => MapBounds | null;
+  filters?: Record<string, any>;
+  pageSize?: number;
+}) => {
+  return useCustomQuery<BukkaResponse<PagedResponse<Business[]>>, Error>(
+    [QueryKeyEnum.BUSINESSES_BOUNDS, JSON.stringify(filters), pageSize],
+    async () => {
+      const b = getBounds();
+
+      if (!b) {
+        return { responseData: { data: [] } } as any;
+      }
+
+      return BusinessApiService.getBusinessesByBounds({
+        pageSize,
+        ...b,
+        ...filters,
+      });
+    },
+    {
+      enabled,
+      staleTime: 30_000,
+      refetchOnWindowFocus: false,
+    }
+  );
+};
+
+// export const useBusinessesByBounds = ({
+//   enabled,
+//   bounds, // change: pass MapBounds | null not ref
+//   filters = {},
+//   pageSize = 100,
+// }: {
+//   enabled: boolean;
+//   bounds: MapBounds | null;
+//   filters?: Record<string, any>;
+//   pageSize?: number;
+// }) => {
+//   // create a stable key representation of bounds + filters
+//   const key = useMemo(() => {
+//     const boundsKey = bounds
+//       ? `${bounds.north.toFixed(6)}_${bounds.south.toFixed(
+//           6
+//         )}_${bounds.east.toFixed(6)}_${bounds.west.toFixed(6)}`
+//       : "no-bounds";
+//     const filtersKey = Object.keys(filters).length
+//       ? JSON.stringify(filters)
+//       : "no-filters";
+//     return [QueryKeyEnum.BUSINESSES_BOUNDS, boundsKey, filtersKey, pageSize];
+//   }, [bounds, filters, pageSize]);
+
+//   return useCustomQuery<BukkaResponse<PagedResponse<Business[]>>, Error>(
+//     key,
+//     () => {
+//       // BusinessApiService.getBusinessesByBounds({
+//       //   pageSize,
+//       //   ...(bounds ?? {}),
+//       //   ...filters,
+//       // }),
+//       const controller = new AbortController();
+//       const promise = BusinessApiService.getBusinessesByBounds({
+//         pageSize,
+//         ...(bounds ?? {}),
+//         ...filters,
+//         signal: controller.signal,
+//       });
+//       (promise as any).cancel = () => controller.abort();
+//       return promise;
+//     },
+//     {
+//       params: { pageSize, ...(bounds ?? {}), ...filters },
+//       enabled: enabled && !!bounds, // only enable if we have bounds
+//       staleTime: 30_000,
+//       refetchOnWindowFocus: false,
+//     }
+//   );
+// };
 
 export const useMyBusinessesQuery = ({
   pageNumber = 1,
