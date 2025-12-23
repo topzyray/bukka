@@ -45,6 +45,10 @@ import { HeatmapLayer } from "../headmap-layer";
 import { ZoomWatcher } from "../components/zoom-water";
 import { AutoFitMarkers } from "../components/auto-fit-markers";
 import { useIsMobile } from "@/hooks";
+import {
+  MapCameraController,
+  MapCameraRef,
+} from "../components/map-camera-controller";
 
 const ICONS: Record<Partial<BusinessTypeEnum | string>, L.Icon> = {
   [BusinessTypeEnum.RESTAURANT]: IconHelper.createColoredIcon(
@@ -557,25 +561,6 @@ export function LocationIQMap({
     </div>
   );
 }
-
-export type MapCameraRef = {
-  flyTo: (lat: number, lng: number, zoom?: number) => void;
-};
-
-export const MapCameraController = forwardRef<MapCameraRef>((_, ref) => {
-  const map = useMap();
-
-  useImperativeHandle(ref, () => ({
-    flyTo(lat, lng, zoom) {
-      map.flyTo([lat, lng], zoom ?? map.getZoom(), {
-        animate: true,
-        duration: 0.6,
-      });
-    },
-  }));
-
-  return null;
-});
 
 // export async function fetchLocationIQRoute(
 //   start: { lat: number; lng: number },
