@@ -23,6 +23,14 @@ export class BusinessApiService {
     return response.data;
   }
 
+  static async getBusinessesByBounds(params: Record<string, any> = {}) {
+    const response = await HttpClient.getClient().get(
+      `${businessRoutes.getBusinessesByBounds}`,
+      { params }
+    );
+    return response.data;
+  }
+
   static async getLoggedInVendorBusinesses(params: Record<string, any> = {}) {
     const response = await HttpClient.getClient().get(
       `${businessRoutes.getLoggedInVendorBusinesses}`,

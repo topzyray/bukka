@@ -26,6 +26,7 @@ import {
   FilterBusinessDto,
   FilterFeaturedBusinessDto,
   AddFeatureBusinessDto,
+  FilterBusinessBoundsDto,
 } from 'src/DomainLayer/Dtos/BusinessDto';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
@@ -77,6 +78,20 @@ export class BusinessController {
     const response =
       await this.businessRepository.getFeaturedBusinesses(filters);
     const data = BukkaResponse.GetPagedDataResponse('Businesses', response);
+    return BukkaResponse.GetStatusResponse(data, res);
+  }
+
+  @Get('bounds')
+  @ApiOperation({ summary: 'Get all businesses by bounds' })
+  async getBusinessesBounds(
+    @Query() filters: FilterBusinessBoundsDto,
+    @Res() res: Response,
+  ) {
+    const response = await this.businessRepository.getBusinessesBounds(filters);
+    const data = BukkaResponse.GetPagedDataResponse(
+      'Businesses with bounds',
+      response,
+    );
     return BukkaResponse.GetStatusResponse(data, res);
   }
 

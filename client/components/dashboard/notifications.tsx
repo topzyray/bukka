@@ -207,7 +207,10 @@ export function Notifications() {
       >
         {/* Header Section */}
         <div className="flex flex-wrap justify-between items-center p-4">
-          <Link href={`/dashboard/${user?.role.toLowerCase()}/notifications`}>
+          <Link
+            href={`/dashboard/${user?.role.toLowerCase()}/notifications`}
+            onClick={() => setIsMenuOpen(false)}
+          >
             <h4 className="text-lg font-semibold hover:underline">
               All Notifications ({totalRecords})
             </h4>

@@ -46,7 +46,7 @@ function SettingToggle({
         checked={value}
         onCheckedChange={() => handler(name)}
         disabled={disabled}
-        className="cursor-pointer"
+        className="cursor-pointer dark:border-muted-foreground"
       />
     </div>
   );

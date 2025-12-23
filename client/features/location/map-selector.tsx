@@ -1,14 +1,15 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import React, { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { MapProviderEnum } from "@/data/enums/MapProviderEnum";
-import { BusinessApiService } from "@/data/services/BusinessApiService";
-import { useCustomInfiniteQuery } from "@/data/queries/base";
 import { Business } from "@/data/interfaces/Business";
-import { QueryKeyEnum } from "@/data/enums";
+import { MapBounds } from "@/data/interfaces/MapBounds";
+import { useBusinessesByBounds } from "@/data/queries/use-businesses-query";
+import { debounce } from "@/utils";
+import { useIsMobile } from "@/hooks";
 
-type Props = {
+type IMapSelectorProps = {
   zoom?: number;
   initial?: { lat: number; lng: number } | null;
   provider: MapProviderEnum;
@@ -32,39 +33,48 @@ export function MapSelector({
   businesses,
   onSelect,
   onMarkerClick,
-}: Props) {
-  const PAGE_SIZE = 10;
+}: IMapSelectorProps) {
+  const PAGE_SIZE = 300;
 
-  const { data: infiniteData } = useCustomInfiniteQuery<Business>(
-    [QueryKeyEnum.BUSINESSES],
-    ({ pageNumber }) =>
-      BusinessApiService.getBusinesses({
-        page: pageNumber,
-        limit: PAGE_SIZE,
-      }),
-    {
-      params: { limit: PAGE_SIZE },
-      initialPageParam: 1,
-      enabled: true,
-    }
+  const isMobile = useIsMobile();
+  const ZOOM = zoom ?? (isMobile ? 13 : 13);
+
+  const boundsRef = useRef<MapBounds | null>(null);
+
+  const filters = useMemo(() => ({}), []);
+
+  const {
+    data,
+    isLoading,
+    refetch: refetchBusinesses,
+  } = useBusinessesByBounds({
+    getBounds: () => boundsRef.current,
+    filters,
+    pageSize: PAGE_SIZE,
+    enabled: false,
+  });
+
+  const fetchedBusinesses = useMemo(
+    () => data?.responseData?.data ?? [],
+    [data]
   );
 
-  const findPage = useCallback(
-    (pn: number) => {
-      return infiniteData?.pages?.find((p) => p.pageNumber === pn);
+  const businessData = useMemo(() => {
+    if (fetchedBusinesses.length > 0) return fetchedBusinesses;
+    return businesses ?? [];
+  }, [fetchedBusinesses, businesses]);
+
+  const debouncedFetch = useMemo(
+    () => debounce(refetchBusinesses, 300),
+    [refetchBusinesses]
+  );
+
+  const handleBoundsChange = useCallback(
+    (b: MapBounds) => {
+      boundsRef.current = b;
+      debouncedFetch();
     },
-    [infiniteData?.pages]
-  );
-
-  const currentPageData = useMemo(() => {
-    // const pageObj = findPage(100) ?? infiniteData?.pages?.[0];
-    const pageObj = infiniteData?.pages?.[0];
-    return pageObj?.data ?? [];
-  }, [infiniteData?.pages]);
-
-  const businessData = useMemo(
-    () => currentPageData || businesses,
-    [currentPageData, businesses]
+    [debouncedFetch]
   );
 
   switch (provider) {
@@ -77,7 +87,6 @@ export function MapSelector({
         <GoogleMap initial={initial} onSelect={onSelect} height={height} />
       );
     }
-
     case MapProviderEnum.LOCATIONIQ: {
       const LocationIQMap = dynamic(
         () => import("./providers/locationiq-map").then((m) => m.LocationIQMap),
@@ -85,19 +94,20 @@ export function MapSelector({
       );
       return (
         <LocationIQMap
-          zoom={zoom}
+          zoom={ZOOM}
           initial={initial}
-          onSelect={onSelect}
           height={height}
+          showLegend={showLegend}
           showSearchPlaces={showSearchPlaces}
           syncQuery={syncQuery}
-          businesses={businessData}
-          showLegend={showLegend}
+          mapBusinesses={businessData}
+          onSelect={onSelect}
           onMarkerClick={onMarkerClick}
+          onBoundsChange={handleBoundsChange}
+          isLoading={isLoading}
         />
       );
     }
-
     default:
       return (
         <div

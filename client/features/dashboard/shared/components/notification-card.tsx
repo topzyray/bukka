@@ -70,8 +70,17 @@ export function NotificationCard({
               className="h-7 text-xs"
               onClick={() => readNotificationMutation.mutate(notification.id)}
             >
-              <View />
-              Mark as Read
+              {readNotificationMutation.isPending ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  Processing
+                </>
+              ) : (
+                <>
+                  <View />
+                  Mark as Read
+                </>
+              )}
             </Button>
           )}
 

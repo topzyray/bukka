@@ -176,7 +176,7 @@ export function SessionsSettings() {
                               "text-sm font-medium",
                               isExpired
                                 ? "text-destructive dark:bg-foreground p-1.5 rounded-md"
-                                : "text-green-600 dark:text-green-400"
+                                : "text-green-600 dark:bg-foreground p-1.5 rounded-md"
                             )}
                           >
                             {isExpired

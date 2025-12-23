@@ -1,8 +1,10 @@
 "use client";
 
 import React, {
+  forwardRef,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -18,6 +20,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import Image from "next/image";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import "leaflet/dist/leaflet.css";
 import { debounce } from "@/utils";
 import { envConfig } from "@/configs";
@@ -25,17 +28,27 @@ import { useTheme } from "next-themes";
 import { LAGOS } from "@/data/interfaces/Location";
 import { IconHelper } from "@/helpers/icon-helper";
 import { Business } from "@/data/interfaces/Business";
+import { MapBounds } from "@/data/interfaces/MapBounds";
+import { BoundsWatcher } from "../components/bounds-watcher";
+import { BusinessPopUp } from "../components/business-pop-up";
 import { useGlobalState, useUserLocation } from "@/providers";
 import { CustomZoomControl } from "../components/custom-zoom";
 import { RecenterButton } from "../components/recenter-button";
 import { usePathname, useSearchParams } from "next/navigation";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
+import { MyLocationPopUp } from "../components/my-location-pop-up";
+import { PinBusinessPopUp } from "../components/pin-business-pop-up";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { LocationCoordsHelper } from "@/helpers/location-coords-helper";
 import { SearchPlacesWithAutocomplete } from "../search-places-with-autocomplete";
-import { BusinessPopUp } from "../components/business-pop-up";
-import { MyLocationPopUp } from "../components/my-location-pop-up";
-import { PinBusinessPopUp } from "../components/pin-business-pop-up";
+import { HeatmapLayer } from "../headmap-layer";
+import { ZoomWatcher } from "../components/zoom-water";
+import { AutoFitMarkers } from "../components/auto-fit-markers";
+import { useIsMobile } from "@/hooks";
+import {
+  MapCameraController,
+  MapCameraRef,
+} from "../components/map-camera-controller";
 
 const ICONS: Record<Partial<BusinessTypeEnum | string>, L.Icon> = {
   [BusinessTypeEnum.RESTAURANT]: IconHelper.createColoredIcon(
@@ -103,6 +116,29 @@ function MapClickHandler({
   return null;
 }
 
+export function RecenterOnMarker({
+  lat,
+  lng,
+  enabled,
+}: {
+  lat: number;
+  lng: number;
+  enabled: boolean;
+}) {
+  const map = useMap();
+  const didRecenter = useRef(false);
+
+  useEffect(() => {
+    if (!enabled) return;
+    if (didRecenter.current) return;
+
+    map.setView([lat, lng], map.getZoom(), { animate: true });
+    didRecenter.current = true;
+  }, [lat, lng, enabled, map]);
+
+  return null;
+}
+
 interface ILocationIQMap {
   zoom?: number;
   initial?: { lat: number; lng: number } | null;
@@ -111,21 +147,11 @@ interface ILocationIQMap {
   showLegend?: boolean;
   showSearchPlaces?: boolean;
   syncQuery?: boolean;
-  businesses?: Business[];
+  isLoading?: boolean;
+  mapBusinesses?: Business[];
   onSelect: (lat: number, lng: number) => void;
   onMarkerClick?: (businessId: number) => void;
-}
-
-export function RecenterOnMarker({ lat, lng }: { lat: number; lng: number }) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (lat && lng) {
-      map.flyTo([lat, lng], map.getZoom());
-    }
-  }, [lat, lng, map]);
-
-  return null;
+  onBoundsChange?: (b: MapBounds) => void;
 }
 
 export function LocationIQMap({
@@ -136,42 +162,81 @@ export function LocationIQMap({
   showLegend = false,
   showSearchPlaces = true,
   syncQuery = false,
-  businesses = [],
+  isLoading,
+  mapBusinesses = [],
   onSelect,
   onMarkerClick,
+  onBoundsChange,
 }: ILocationIQMap) {
   const icons = useMemo(() => ICONS, []);
+  const urlUpdateInFlightRef = useRef(false);
 
   const { coordinates, setCoordinates } = useGlobalState();
   const { userCoordinates } = useUserLocation();
+  const { theme } = useTheme();
+  const isMobile = useIsMobile();
+  const MAX_ZOOM = isMobile ? 15 : 18;
 
   const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(
     initial ?? null
   );
-  const { theme } = useTheme();
+  const [zoomLevel, setZoomLevel] = useState(zoom);
+
   const geoAttempted = useRef(false);
   const lastEmitted = useRef<{ lat: number; lng: number } | null>(null);
+
+  const initialCenterRef = useRef<[number, number] | null>(null);
+  if (!initialCenterRef.current && marker?.lat != null && marker?.lng != null) {
+    initialCenterRef.current = [marker.lat, marker.lng];
+  }
+
+  const initialZoomRef = useRef<number>(zoom);
+
+  const cameraRef = useRef<MapCameraRef>(null);
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
   const debouncedSelect = useMemo(() => debounce(onSelect, 400), [onSelect]);
 
+  const emitSelect = (coords: { lat: number; lng: number }) => {
+    if (
+      lastEmitted.current &&
+      !LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords, 1e-6)
+    )
+      return;
+
+    lastEmitted.current = coords;
+    debouncedSelect(coords.lat, coords.lng);
+  };
+
+  const handleBoundsChanged = useCallback(
+    (b: MapBounds) => {
+      // do not update React state here — call the parent callback which will write to a ref
+      onBoundsChange?.(b);
+    },
+    [onBoundsChange]
+  );
+
   useEffect(() => {
     if (!syncQuery) return;
-
+    if (urlUpdateInFlightRef.current) return; // ignore this triggered effect
     const q = searchParams.get("q");
-    if (q) {
-      const parts = q.split(",");
-      if (parts.length === 2) {
-        const [lat, lng] = parts.map(Number);
-        if (!isNaN(lat) && !isNaN(lng)) {
+    if (!q) return;
+    const parts = q.split(",");
+    if (parts.length === 2) {
+      const [lat, lng] = parts.map(Number);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        if (
+          !marker ||
+          LocationCoordsHelper.coordsDiffer(marker, { lat, lng })
+        ) {
           setMarker({ lat, lng });
-          debouncedSelect(lat, lng);
+          emitSelect({ lat, lng });
         }
       }
     }
-  }, [syncQuery, searchParams, debouncedSelect]);
+  }, [syncQuery, searchParams, emitSelect, marker]);
 
   useEffect(() => {
     if (coordinates) {
@@ -194,13 +259,13 @@ export function LocationIQMap({
         LocationCoordsHelper.coordsDiffer(lastEmitted.current, userCoordinates)
       ) {
         lastEmitted.current = userCoordinates;
-        debouncedSelect(userCoordinates.lat, userCoordinates.lng);
+        emitSelect({ lat: userCoordinates.lat, lng: userCoordinates.lng });
       }
       return;
     }
 
     setMarker(DEFAULT_CENTER);
-  }, [coordinates, initial, debouncedSelect, userCoordinates]);
+  }, [coordinates, initial, emitSelect, userCoordinates]);
 
   useEffect(() => {
     if (!initial || initial.lat == null || initial.lng == null) return;
@@ -217,18 +282,23 @@ export function LocationIQMap({
         LocationCoordsHelper.coordsDiffer(lastEmitted.current, initial)
       ) {
         lastEmitted.current = initial;
-        debouncedSelect(initial.lat, initial.lng);
+        emitSelect({ lat: initial.lat, lng: initial.lng });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initial?.lat, initial?.lng, debouncedSelect]);
+  }, [initial?.lat, initial?.lng, emitSelect]);
 
   const updateQuery = useCallback(
     (lat: number, lng: number) => {
       if (!syncQuery) return;
       const newQuery = `?q=${lat.toFixed(7)},${lng.toFixed(7)}`;
-      // router.replace(`${pathname}${newQuery}`, { scroll: false });
+      urlUpdateInFlightRef.current = true;
       window.history.replaceState(null, "", `${pathname}${newQuery}`);
+      // clear the flag after a tick (or small timeout)
+      // setTimeout(() => (urlUpdateInFlightRef.current = false), 50);
+      queueMicrotask(() => {
+        urlUpdateInFlightRef.current = false;
+      });
     },
     [syncQuery, pathname]
   );
@@ -245,7 +315,7 @@ export function LocationIQMap({
         LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
       ) {
         lastEmitted.current = coords;
-        debouncedSelect(coords.lat, coords.lng);
+        emitSelect({ lat: coords.lat, lng: coords.lng });
       }
     } catch {}
   };
@@ -262,11 +332,15 @@ export function LocationIQMap({
         LocationCoordsHelper.coordsDiffer(lastEmitted.current, coords)
       ) {
         lastEmitted.current = coords;
-        debouncedSelect(lat, lng);
+        emitSelect({ lat, lng });
       }
     },
-    [disabled, setCoordinates, updateQuery, debouncedSelect]
+    [disabled, setCoordinates, updateQuery, emitSelect]
   );
+
+  const handleSearchMove = useCallback((lat: number, lng: number) => {
+    cameraRef.current?.flyTo(lat, lng, 16);
+  }, []);
 
   const tileUrl = useMemo(() => {
     return !envConfig.NEXT_PUBLIC_LOCATIONIQ_ACCESS_TOKEN
@@ -289,25 +363,38 @@ export function LocationIQMap({
     );
   }
 
+  const showHeatmap = zoomLevel < 13;
+  const showMarkers = zoomLevel >= 13;
+
   return (
     <div
       style={{ height, maxHeight: "100%" }}
       className="relative w-full rounded-md overflow-hidden"
     >
       <MapContainer
-        center={[marker.lat, marker.lng]}
+        center={
+          initialCenterRef.current ?? [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng]
+        }
         zoomControl={false}
-        zoom={zoom}
+        zoom={initialZoomRef.current}
         scrollWheelZoom
         style={{ height: "100%", width: "100%" }}
       >
-        <CustomZoomControl />
         <TileLayer
           url={tileUrl}
-          attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+          // attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
         />
+
+        <CustomZoomControl />
+
+        <MapCameraController ref={cameraRef} />
+
+        <ZoomWatcher onZoom={setZoomLevel} />
+
+        <BoundsWatcher onBoundsChanged={handleBoundsChanged} />
+
         <MapClickHandler onClick={handleMapClick} disabled={disabled} />
-        <RecenterOnMarker lat={marker.lat} lng={marker.lng} />
+
         <Marker
           position={[marker.lat, marker.lng]}
           draggable={!disabled}
@@ -335,61 +422,108 @@ export function LocationIQMap({
           </Marker>
         )}
 
-        {businesses.map((business) => {
-          const lat = business?.location?.latitude;
-          const lng = business?.location?.longitude;
-          if (lat == null || lng == null) return null;
+        {showHeatmap && (
+          <HeatmapLayer businesses={mapBusinesses} enabled={showHeatmap} />
+        )}
 
-          const markerIcon =
-            icons[business?.type as BusinessTypeEnum] || icons.OTHER;
-          return (
-            <Marker
-              bubblingMouseEvents
-              key={business?.id}
-              position={[lat, lng]}
-              icon={markerIcon}
-              eventHandlers={{
-                // when a marker is clicked, call parent handler
-                click: () => {
-                  if (onMarkerClick) {
-                    try {
-                      onMarkerClick(business?.id);
-                    } catch {
-                      // safe no-op
-                    }
-                  }
-                  if (syncQuery && business?.location) {
-                    updateQuery(
-                      business?.location?.latitude,
-                      business?.location?.longitude
-                    );
-                  }
-                },
-              }}
-            >
-              <Popup className="sm:w-sm">
-                <BusinessPopUp business={business} className="sm:w-86" />
-                {/* <BusinessPopUp business={business} /> */}
-              </Popup>
-              <Tooltip>{business?.name}</Tooltip>
-            </Marker>
-          );
-        })}
+        {showMarkers && (
+          <MarkerClusterGroup
+            chunkedLoading
+            showCoverageOnHover={false}
+            spiderfyOnMaxZoom={true}
+            zoomToBoundsOnClick={false}
+            eventHandlers={{
+              clusterclick: (e: { target: { _map: any }; layer: any }) => {
+                const map = e.target._map;
+                const cluster = e.layer;
+
+                const bounds = cluster.getBounds();
+                map.fitBounds(bounds, {
+                  padding: [80, 80],
+                  animate: true,
+                  duration: 0.6,
+                });
+              },
+            }}
+          >
+            {mapBusinesses?.map((business) => {
+              const lat = business?.location?.latitude;
+              const lng = business?.location?.longitude;
+              if (lat == null || lng == null) return null;
+
+              const markerIcon =
+                icons[business?.type as BusinessTypeEnum] || icons.OTHER;
+              return (
+                <Marker
+                  bubblingMouseEvents
+                  key={business?.id}
+                  position={[lat, lng]}
+                  icon={markerIcon}
+                  eventHandlers={{
+                    // when a marker is clicked, call parent handler
+                    click: () => {
+                      if (onMarkerClick) {
+                        try {
+                          onMarkerClick(business?.id);
+                        } catch {
+                          // safe no-op
+                        }
+                      }
+                      if (syncQuery && business?.location) {
+                        updateQuery(
+                          business?.location?.latitude,
+                          business?.location?.longitude
+                        );
+                      }
+                    },
+                  }}
+                >
+                  <Popup className="sm:w-sm">
+                    <BusinessPopUp business={business} className="sm:w-86" />
+                  </Popup>
+                  <Tooltip>{business?.name}</Tooltip>
+                </Marker>
+              );
+            })}
+          </MarkerClusterGroup>
+        )}
+
+        {/* <AutoFitMarkers
+          markerPositions={mapBusinesses
+            .filter((b) => b.location?.latitude && b.location?.longitude)
+            .map((b) => ({
+              lat: b.location.latitude,
+              lng: b.location.longitude,
+            }))}
+          maxZoom={MAX_ZOOM}
+        /> */}
 
         <RecenterButton
           onLocate={(coords) => {
             setMarker(coords);
             setCoordinates(coords);
-            debouncedSelect(coords.lat, coords.lng);
+            emitSelect({ lat: coords.lat, lng: coords.lng });
           }}
         />
+
+        {isLoading && (
+          <div className="absolute inset-0 bg-background/60 flex items-center justify-center z-50">
+            <CircularLoader text="Loading business data" />
+          </div>
+        )}
       </MapContainer>
 
       {showSearchPlaces && (
         <div className="absolute top-2.5 left-1/2 transform -translate-x-1/2 bg-background backdrop-blur-md rounded-lg shadow-md text-xs overflow-auto flex items-center max-w-56 sm:max-w-[18rem] w-full">
-          <SearchPlacesWithAutocomplete />
+          <SearchPlacesWithAutocomplete
+            onSelectLocation={(lat, lng) => {
+              handleSearchMove(lat, lng); // ✅ MOVE CAMERA
+              setCoordinates({ lat, lng }); // ✅ UPDATE STATE
+            }}
+          />
         </div>
       )}
+
       {showLegend && (
         <div className="absolute bottom-4.5 right-0.5 bg-background backdrop-blur-md p-2 rounded shadow-md text-xs space-y-2 max-h-60 sm:max-h-max overflow-auto">
           {Object.entries(icons).map(([key]) => {

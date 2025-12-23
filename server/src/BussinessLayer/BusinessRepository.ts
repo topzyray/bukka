@@ -9,6 +9,7 @@ import {
   UpdateBusinessDto,
   FilterBusinessDto,
   FilterFeaturedBusinessDto,
+  FilterBusinessBoundsDto,
 } from 'src/DomainLayer/Dtos/BusinessDto';
 import { FileRepository } from './FileRepository';
 import {
@@ -138,6 +139,7 @@ export class BusinessRepository {
     );
 
     await invalidateCache('businesses', {});
+    await invalidateCache('businesses-bounds', {});
 
     return BukkaResponse.CreateResponse('Business', business);
   }
@@ -240,6 +242,7 @@ export class BusinessRepository {
     );
 
     await invalidateCache('businesses', {});
+    await invalidateCache('businesses-bounds', {});
 
     return BukkaResponse.CreateResponse(
       'Business',
@@ -324,6 +327,7 @@ export class BusinessRepository {
     );
 
     await invalidateCache('businesses', {});
+    await invalidateCache('businesses-bounds', {});
   }
 
   async getBusinessById(id: number): Promise<BukkaResponse<Business>> {
@@ -424,6 +428,23 @@ export class BusinessRepository {
     );
   }
 
+  async getBusinessesBounds(filterDto: FilterBusinessBoundsDto) {
+    const { pageSize, pageNumber } =
+      FilterQueryHelper.extractPagination(filterDto);
+    return handleCache(
+      'businesses-bounds',
+      this.normalizeBounds(filterDto),
+      () => {
+        return this.businessDataAgent.findBusinessesWithBounds(
+          filterDto,
+          pageSize,
+          pageNumber,
+        );
+      },
+      CacheTTLPolicyEnum.BUSINESS_BOUNDS,
+    );
+  }
+
   async updateBusiness(
     id: number,
     dto: UpdateBusinessDto,
@@ -473,6 +494,7 @@ export class BusinessRepository {
     await invalidateCache('business', { id });
     await invalidateCache('businesses', {});
     await invalidateCache('my-businesses', {});
+    await invalidateCache('businesses-bounds', {});
     return BukkaResponse.UpdateResponse('Business', updated);
   }
 
@@ -527,6 +549,7 @@ export class BusinessRepository {
 
     await invalidateCache('featured-businesses', {});
     await invalidateCache('businesses', {});
+    await invalidateCache('businesses-bounds', {});
 
     return BukkaResponse.UpdateResponse('Business Featured Status', updated);
   }
@@ -576,7 +599,19 @@ export class BusinessRepository {
     await invalidateCache('business', { id });
     await invalidateCache('businesses', {});
     await invalidateCache('my-businesses', {});
+    await invalidateCache('businesses-bounds', {});
     return BukkaResponse.DeleteResponse('Business', true);
+  }
+
+  private normalizeBounds(b: FilterBusinessBoundsDto) {
+    const precision = 3; // ~100m
+    return {
+      ...b,
+      north: Number(b.north.toFixed(precision)),
+      south: Number(b.south.toFixed(precision)),
+      east: Number(b.east.toFixed(precision)),
+      west: Number(b.west.toFixed(precision)),
+    };
   }
 
   // async addFileToRestaurant(

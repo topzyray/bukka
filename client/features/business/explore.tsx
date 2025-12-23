@@ -290,11 +290,22 @@ export function ExplorePage() {
                           />
                         ))}
 
+                      {isFetchingNextPage && (
+                        <div className="flex justify-center items-center py-8">
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="w-10 h-10 lg:w-16 lg:h-16 animate-spin text-muted-foreground" />
+                            <span className="animate-pulse lg:text-lg">
+                              Loading more...
+                            </span>
+                          </span>
+                        </div>
+                      )}
+
                       {/* Infinite Scroll Sentinel */}
                       <div ref={observerRef} className="h-0" />
 
                       {/* Loader */}
-                      {isFetchingNextPage && (
+                      {/* {isFetchingNextPage && (
                         <div className="flex justify-center items-center py-8">
                           <span className="flex items-center gap-2">
                             <Loader2
@@ -304,7 +315,7 @@ export function ExplorePage() {
                             Loading more data...
                           </span>
                         </div>
-                      )}
+                      )} */}
 
                       {/* <div className="col-span-full place-content-center mx-auto">
                         <BukkaButton
