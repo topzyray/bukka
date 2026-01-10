@@ -4,7 +4,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { create } from "zustand";
 import { StorageUtilsHelper } from "@/utils";
-import { User } from "@/data/interfaces/User";
+import { AuthStatus, User } from "@/data/interfaces/User";
 import { File } from "@/data/interfaces/File";
 import { authRoutes } from "@/constants/routes";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
@@ -15,15 +15,9 @@ import { useReactQueryClient } from "@/providers";
 
 interface AuthState {
   user: User | null;
-  isAuthenticated: boolean;
-  isError: boolean;
-  isLoading: boolean;
-  userFiles: File[];
-  isLoadingUserFiles: boolean;
-  isUserFilesError: boolean;
-  logout: () => Promise<void>;
+  status: AuthStatus;
   setUser: (user: User | null) => void;
-  setUserFiles: (files: File[]) => void;
+  logout: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -32,7 +26,7 @@ export const useAuthStore = create<AuthState>()(
       (set, _get) => {
         const pathname =
           typeof window !== "undefined" ? window.location.pathname : "/";
-        const queryClient = new QueryClient();
+        // const queryClient = new QueryClient();
 
         const logout = async () => {
           try {
@@ -62,13 +56,16 @@ export const useAuthStore = create<AuthState>()(
           }
 
           try {
-            queryClient.clear();
+            // queryClient.clear();
             Cookies.remove("sidebarState");
           } catch {}
 
           EventHelper.broadcastLogout();
 
-          set({ user: null, isAuthenticated: false });
+          set({
+            user: null,
+            status: "unauthenticated",
+          });
 
           if (pathname.startsWith("/dashboard")) {
             window.location.href = "/signin";
@@ -79,28 +76,20 @@ export const useAuthStore = create<AuthState>()(
 
         return {
           user: null,
-          isAuthenticated: false,
-          isError: false,
-          isLoading: true,
-          userFiles: [],
-          isLoadingUserFiles: false,
-          isUserFilesError: false,
+          status: "bootstrapping",
           logout,
           setUser: (user) =>
             set({
               user,
-              isAuthenticated: !!user,
-              isError: !user ? true : false,
-              isLoading: false,
+              status: "authenticated",
             }),
-          setUserFiles: (files) => set({ userFiles: files }),
         };
       },
       {
         name: "auth-store",
         partialize: (state) => ({
           user: state.user,
-          isAuthenticated: state.isAuthenticated,
+          status: state.status,
         }),
       }
     )

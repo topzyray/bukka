@@ -19,7 +19,7 @@ export function RouteGuard({
   isProtected = false,
   roles = [],
 }: RouteGuardProps) {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated, status } = useAuth();
   const router = useRouter();
   const pathname = usePathname() ?? "/";
 
@@ -32,7 +32,13 @@ export function RouteGuard({
 
   useEffect(() => {
     // Wait until we know whether current user is loaded
-    if (isLoading) return;
+    if (isLoading && status === "bootstrapping") return;
+
+    // Unauthenticated users on protected routes → redirect
+    if (status === "unauthenticated" && isProtected) {
+      router.replace("/signin");
+      return;
+    }
 
     // If the route is PUBLIC (isProtected === false)
     // and user is authenticated, route them to their dashboard.
@@ -96,6 +102,7 @@ export function RouteGuard({
       }
     }
   }, [
+    status,
     isLoading,
     isAuthenticated,
     user,
@@ -110,7 +117,7 @@ export function RouteGuard({
   // if (isLoading) {
   //   return null;
   // }
-  if (isLoading) {
+  if (isLoading || status === "bootstrapping") {
     // Instead of returning null, render a minimal loader so we don't show a blank page
     return (
       <div className="flex min-h-screen items-center justify-center">

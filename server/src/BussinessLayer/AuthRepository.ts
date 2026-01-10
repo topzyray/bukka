@@ -166,7 +166,7 @@ export class AuthRepository {
 
     const LoginResponse = new LoginResponseDto();
     LoginResponse.user = TypeSafeMapper.mapObject(user, {
-      exclude: ['password'],
+      exclude: ['password', 'locationId'],
     });
     LoginResponse.accessToken = accessToken;
     LoginResponse.refreshToken = refreshToken;
