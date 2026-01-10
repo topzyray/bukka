@@ -67,6 +67,7 @@
     "react-google-autocomplete": "^2.7.5",
     "react-hook-form": "^7.63.0",
     "react-leaflet": "^5.0.0",
+    "react-leaflet-cluster": "^4.0.0",
     "react-phone-input-2": "^2.15.1",
     "react-spinners": "^0.17.0",
     "react-type-animation": "^3.2.0",
