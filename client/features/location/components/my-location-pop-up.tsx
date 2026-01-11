@@ -15,10 +15,10 @@ export const MyLocationPopUp = memo(function ({
   lng: number;
 }) {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuth();
+  const { user, status } = useAuth();
 
   const goToRecommendation = () => {
-    if (!user && !isAuthenticated) {
+    if (!user && status === "unauthenticated") {
       toast("Sign in required", {
         description: "You need to sign in to recommend a business",
       });
