@@ -1,11 +1,10 @@
 "use client";
 
-import { ReactNode, useEffect, useMemo } from "react";
+import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { RouteHelper } from "@/helpers";
 import { UserRole } from "@/data/interfaces/Auth";
 import { useAuth } from "@/providers/auth-provider";
-import { User } from "@/data/interfaces/User";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 
 interface RouteGuardProps {
@@ -27,7 +26,7 @@ export function RouteGuard({
   const userRole = user?.role?.toLowerCase();
 
   useEffect(() => {
-    // 🚫 Never redirect during bootstrap
+    // Never redirect during bootstrap
     if (status === "bootstrapping") return;
 
     // Unauthenticated users on protected routes → redirect
@@ -36,74 +35,7 @@ export function RouteGuard({
       return;
     }
 
-    // If the route is PUBLIC (isProtected === false)
-    // and user is authenticated, route them to their dashboard.
-    // if (!isProtected && isAuthenticated && user) {
-    //   const target = RouteHelper.getDashboardPath(user);
-    //   // only redirect if not already within dashboard of the same role
-    //   if (!pathname.startsWith("/dashboard") || pathname !== target) {
-    //     router.replace(target);
-    //   }
-    //   return;
-    // }
-    // if (!isProtected && status === "authenticated" && user) {
-    //   router.replace(RouteHelper.getPostAuthPath(user));
-    //   return;
-    // }
-
-    // For protected routes:
-    // if (isProtected) {
-    //   // Not authenticated → force signin
-    //   // if (!isAuthenticated) {
-    //   if (status === "unauthenticated") {
-    //     router.replace("/signin");
-    //     return;
-    //   }
-
-    //   // Ensure we have a user object (should if isAuthenticated)
-    //   if (!user) {
-    //     // Defensive: revalidate current user query or sign out
-    //     router.replace("/signin");
-    //     return;
-    //   }
-
-    //   // If user has not completed onboarding, they must be on their onboarding path
-    //   if (user?.isOnboarded === false) {
-    //     const onboardingPath = `/onboarding/${user?.role.toLowerCase()}`;
-    //     if (!pathname.startsWith(onboardingPath)) {
-    //       router.replace(onboardingPath);
-    //     }
-    //     return;
-    //   }
-
-    //   // If user has completed onboarding, they must NOT be on any /onboarding/* page
-    //   if (user?.isOnboarded === true && pathname.startsWith("/onboarding")) {
-    //     const target = RouteHelper.getDashboardPath(user);
-    //     router.replace(target);
-    //     return;
-    //   }
-
-    //   // Enforce role-based path isolation when path includes role segment
-    //   if (roleFromPath && userRole && roleFromPath !== userRole) {
-    //     // Role mismatch — take user to their dashboard
-    //     const target = RouteHelper.getDashboardPath(user as User);
-    //     router.replace(target);
-    //     return;
-    //   }
-
-    //   // If explicit roles were passed to RouteGuard (component-level),
-    //   // ensure user role is included.
-    //   if (roles.length > 0) {
-    //     const normalizedAllowed = roles.map((r) => String(r).toLowerCase());
-    //     if (!normalizedAllowed.includes(userRole ?? "")) {
-    //       const target = RouteHelper.getDashboardPath(user as User);
-    //       router.replace(target);
-    //       return;
-    //     }
-    //   }
-    // }
-
-    // 🔓 Public auth pages → redirect authenticated users
+    // Public auth pages → redirect authenticated users
     if (
       !isProtected &&
       status === "authenticated" &&
@@ -118,19 +50,19 @@ export function RouteGuard({
 
     const expectedPath = RouteHelper.getPostAuthPath(user);
 
-    // 🧭 Enforce onboarding/dashboard correctness
+    // Enforce onboarding/dashboard correctness
     if (!pathname.startsWith(expectedPath.split("/").slice(0, 3).join("/"))) {
       router.replace(expectedPath);
       return;
     }
 
-    // 🧑‍🎓 Role isolation (URL role ≠ user role)
+    // Role isolation (URL role ≠ user role)
     if (roleFromPath && roleFromPath.toLowerCase() !== userRole) {
       router.replace(expectedPath);
       return;
     }
 
-    // 🔒 Component-level role enforcement
+    // Component-level role enforcement
     if (roles.length > 0) {
       const allowed = roles.map((r) => r.toLowerCase());
       if (!allowed.includes(userRole ?? "")) {
