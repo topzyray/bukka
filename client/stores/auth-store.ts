@@ -5,13 +5,10 @@ import Cookies from "js-cookie";
 import { create } from "zustand";
 import { StorageUtilsHelper } from "@/utils";
 import { AuthStatus, User } from "@/data/interfaces/User";
-import { File } from "@/data/interfaces/File";
 import { authRoutes } from "@/constants/routes";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import { devtools, persist } from "zustand/middleware";
 import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
 import { EventHelper } from "@/helpers/event-helper";
-import { useReactQueryClient } from "@/providers";
 
 interface AuthState {
   user: User | null;
@@ -26,7 +23,27 @@ export const useAuthStore = create<AuthState>()(
       (set, _get) => {
         const pathname =
           typeof window !== "undefined" ? window.location.pathname : "/";
-        // const queryClient = new QueryClient();
+
+        // const bootstrap = async () => {
+        //   set({ status: "bootstrapping" });
+        //   try {
+        //     const hasSession = !!localStorage.getItem(
+        //       STORE_KEYS.HAS_SESSION_KEY
+        //     );
+        //     if (hasSession) {
+        //       // Optional: fetch user from API here
+        //       // const { data } = await axios.get(`${envConfig.NEXT_PUBLIC_API_BASE_URL}/me`, { withCredentials: true });
+        //       // set({ user: data, status: "authenticated" });
+        //       set({ status: "authenticated" });
+        //     } else {
+        //       set({ status: "unauthenticated" });
+        //     }
+        //   } catch {
+        //     set({ status: "unauthenticated" });
+        //   } finally {
+        //     set({ status: "bootstrapping" });
+        //   }
+        // };
 
         const logout = async () => {
           try {
@@ -74,9 +91,11 @@ export const useAuthStore = create<AuthState>()(
           }
         };
 
+        // bootstrap();
+
         return {
           user: null,
-          status: "bootstrapping",
+          status: "unauthenticated",
           logout,
           setUser: (user) =>
             set({

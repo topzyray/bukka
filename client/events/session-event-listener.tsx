@@ -1,26 +1,37 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui";
 import { toast } from "sonner";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 export function SessionExpirationModal() {
   const [open, setOpen] = useState(false);
-  const [countdown, setCountdown] = useState(20);
-  const hasHandled = useRef(false); // ✅ prevents duplicate triggers
+  const [countdown, setCountdown] = useState(10);
+  const hasHandled = useRef(false); // prevents duplicate triggers
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isDashboardRoute = pathname?.startsWith("/dashboard");
 
   useEffect(() => {
+    if (!isDashboardRoute) {
+      // Reset when leaving dashboard
+      hasHandled.current = false;
+      setOpen(false);
+      setCountdown(20);
+      return;
+    }
+
     const handleSessionExpired = () => {
-      if (hasHandled.current) return; // ✅ ignore repeats
+      if (hasHandled.current) return; // ignore repeats
 
       hasHandled.current = true;
       setOpen(true);
@@ -28,10 +39,11 @@ export function SessionExpirationModal() {
     };
 
     window.addEventListener("sessionExpired", handleSessionExpired);
+
     return () => {
       window.removeEventListener("sessionExpired", handleSessionExpired);
     };
-  }, []);
+  }, [isDashboardRoute]);
 
   const handleReLogin = useCallback(() => {
     setOpen(false);
@@ -40,19 +52,24 @@ export function SessionExpirationModal() {
 
   useEffect(() => {
     if (!open) return;
+
     if (countdown <= 0) {
       handleReLogin();
       return;
     }
 
     const timer = setTimeout(() => setCountdown((prev) => prev - 1), 1000);
+
     return () => clearTimeout(timer);
-  }, [countdown, handleReLogin, open]);
+  }, [open, countdown, handleReLogin]);
 
   const handleStay = () => {
     toast("You can still view this page, but data may be outdated.");
     setOpen(false);
   };
+
+  // Never render outside dashboard
+  if (!isDashboardRoute) return null;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

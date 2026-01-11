@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { RouteHelper } from "@/helpers";
 import { UserRole } from "@/data/interfaces/Auth";
@@ -25,23 +25,38 @@ export function RouteGuard({
   const roleFromPath = RouteHelper.extractRoleFromPath(pathname);
   const userRole = user?.role?.toLowerCase();
 
+  const redirectingRef = useRef(false);
+
   useEffect(() => {
+    if (redirectingRef.current) return; // already redirecting
+
     // Never redirect during bootstrap
     if (status === "bootstrapping") return;
 
     // Unauthenticated users on protected routes → redirect
     if (isProtected && status === "unauthenticated") {
+      redirectingRef.current = true;
       router.replace("/signin");
       return;
     }
 
     // Public auth pages → redirect authenticated users
+    const authPages = [
+      "/signin",
+      "/signup",
+      "/forgot-password",
+      "/confirm-email",
+      "/request-email-verification",
+      "/reset-password",
+    ];
+
     if (
       !isProtected &&
       status === "authenticated" &&
       user &&
-      (pathname === "/signin" || pathname === "/signup")
+      authPages.includes(pathname)
     ) {
+      redirectingRef.current = true;
       router.replace(RouteHelper.getPostAuthPath(user));
       return;
     }
@@ -52,12 +67,14 @@ export function RouteGuard({
 
     // Enforce onboarding/dashboard correctness
     if (!pathname.startsWith(expectedPath.split("/").slice(0, 3).join("/"))) {
+      redirectingRef.current = true;
       router.replace(expectedPath);
       return;
     }
 
     // Role isolation (URL role ≠ user role)
     if (roleFromPath && roleFromPath.toLowerCase() !== userRole) {
+      redirectingRef.current = true;
       router.replace(expectedPath);
       return;
     }
@@ -66,6 +83,7 @@ export function RouteGuard({
     if (roles.length > 0) {
       const allowed = roles.map((r) => r.toLowerCase());
       if (!allowed.includes(userRole ?? "")) {
+        redirectingRef.current = true;
         router.replace(expectedPath);
       }
     }
@@ -80,7 +98,7 @@ export function RouteGuard({
     router,
   ]);
 
-  if (isLoading || status === "bootstrapping") {
+  if ((isLoading || status === "bootstrapping") && isProtected) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <CircularLoader text="Verifying session..." />

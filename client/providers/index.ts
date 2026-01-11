@@ -6,4 +6,3 @@ export * from "./service-worker";
 export * from "./theme-provider";
 export * from "./user-location-provider";
 export * from "./root-provider";
-export * from "./auth-sync-provider";

@@ -15,6 +15,7 @@ import { File } from "@/data/interfaces/File";
 import { useCurrentUser } from "@/data/queries/use-current-user";
 import { useAuthStore } from "@/stores/auth-store";
 import { QueryKeyEnum } from "@/data/enums";
+import { EventHelper } from "@/helpers/event-helper";
 
 interface IAuthContextType {
   status: AuthStatus;
@@ -51,6 +52,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       useAuthStore.getState().setUser(storeUser);
     }
   }, [storeUser]);
+
+  useEffect(() => {
+    EventHelper.listenForLogout(() => {
+      useAuthStore.getState().logout();
+    });
+  }, []);
 
   const logout = useCallback(async () => {
     // try {
