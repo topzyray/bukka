@@ -1,6 +1,5 @@
 import {
   AuthProvider,
-  AuthSyncProvider,
   GlobalStateProvider,
   ReactQueryProvider,
   ThemeProvider,
@@ -18,7 +17,6 @@ export function RootProvider({ children }: { children: React.ReactNode }) {
         enableSystem
         disableTransitionOnChange
       >
-        {/* <AuthSyncProvider /> */}
         <SessionExpirationModal />
         <UserLocationProvider>
           {/* <LocationConsent /> */}
