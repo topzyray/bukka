@@ -38,7 +38,7 @@ function PageWrapperContentWithFramer({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={cn("space-y-6", className)}
+      className={cn("space-y-4 lg:space-y-6", className)}
       {...props}
     />
   );

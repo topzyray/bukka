@@ -1,7 +1,5 @@
 "use client";
 
-import axios from "axios";
-import Cookies from "js-cookie";
 import {
   createContext,
   useMemo,
@@ -10,24 +8,20 @@ import {
   ReactNode,
   useEffect,
 } from "react";
-import { StorageUtilsHelper } from "@/utils";
-import { authRoutes } from "@/constants/routes";
 import { useUserFiles } from "@/data/queries";
 import { AuthStatus, User } from "@/data/interfaces/User";
 import { useQueryClient } from "@tanstack/react-query";
 import { File } from "@/data/interfaces/File";
-import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
 import { useCurrentUser } from "@/data/queries/use-current-user";
-import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
+import { QueryKeyEnum } from "@/data/enums";
 
 interface IAuthContextType {
+  status: AuthStatus;
   user: User | null;
-  isAuthenticated: boolean;
   isError: boolean;
   logout: () => void;
   isLoading: boolean;
-  status: AuthStatus;
   userFiles: File[];
   isLoadingUserFiles: boolean;
   isUserFilesError: boolean;
@@ -89,27 +83,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     //   window.location.href = "/";
     // }
     useAuthStore.getState().logout();
+    queryClient.removeQueries({
+      queryKey: [QueryKeyEnum.CURRENT_USER],
+      exact: true,
+    });
     queryClient.clear();
   }, [queryClient]);
 
   const value = useMemo(
     () => ({
+      status,
       user: storeUser ?? null,
-      isAuthenticated: !!storeUser && !isError,
       isError: !!isError,
       logout,
       isLoading: isFirstLoad,
-      status,
       userFiles,
       isLoadingUserFiles,
       isUserFilesError,
     }),
     [
+      status,
       storeUser,
       isError,
       logout,
       isFirstLoad,
-      status,
       userFiles,
       isLoadingUserFiles,
       isUserFilesError,

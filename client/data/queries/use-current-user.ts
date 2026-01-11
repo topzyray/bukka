@@ -19,7 +19,6 @@ export const useCurrentUser = () => {
     async () => {
       try {
         const user = await UserApiService.getLoggedInUser();
-
         return user;
       } catch (err: any) {
         // if (err?.status === 401) {
@@ -36,7 +35,7 @@ export const useCurrentUser = () => {
           });
           setUser(null);
         }
-        throw err;
+        throw Error("Error fetching user: ", err);
       }
     },
     {
@@ -44,7 +43,6 @@ export const useCurrentUser = () => {
       staleTime: ACCESS_TOKEN_MAX_AGE,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      // placeholderData: (prev) => prev,
       placeholderData: () =>
         queryClient.getQueryData([QueryKeyEnum.CURRENT_USER]),
     }

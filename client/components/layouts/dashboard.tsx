@@ -35,12 +35,12 @@ export function DashboardLayout({
       <main className="relative max-h-screen w-full">
         <DashboardHeader dashboardTitle={title} userData={user as User} />
         <PageWrapper className="pt-14 w-full">
-          <PageWrapperHeader className="mt-4">
+          <PageWrapperHeader className="mt-3">
             <BackButton />
           </PageWrapperHeader>
-          <PageWrapperContent className="h-full">
+          <PageWrapperContent className="h-full py-2">
             <PageWrapperContentWithFramer className="h-full">
-              <Separator className="border-2" />
+              <Separator className="border" />
               {children}
             </PageWrapperContentWithFramer>
           </PageWrapperContent>

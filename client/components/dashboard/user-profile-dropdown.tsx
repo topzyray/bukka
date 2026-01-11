@@ -123,10 +123,20 @@ export function UserProfileDropdown({ userData }: IUserProfileDropdown) {
         >
           <UserCircle /> Profile
         </DropdownMenuItem>
-        <DropdownMenuItem className="py-2 text-sm">
+        <DropdownMenuItem
+          onClick={() =>
+            router.push(`/dashboard/${userData?.role.toLowerCase()}/settings`)
+          }
+          className="py-2 text-sm"
+        >
           <Settings /> Settings
         </DropdownMenuItem>
-        <DropdownMenuItem className="py-2 text-sm">
+        <DropdownMenuItem
+          onClick={() =>
+            router.push(`/dashboard/${userData?.role.toLowerCase()}/tickets`)
+          }
+          className="py-2 text-sm"
+        >
           <Ticket /> Raise a ticket
         </DropdownMenuItem>
         <DropdownMenuItem className="py-2 text-sm">

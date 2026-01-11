@@ -1,10 +1,8 @@
 "use client";
 
 import React, {
-  forwardRef,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -15,12 +13,9 @@ import {
   Marker,
   Popup,
   useMapEvents,
-  Tooltip,
-  useMap,
 } from "react-leaflet";
 import L from "leaflet";
 import Image from "next/image";
-import MarkerClusterGroup from "react-leaflet-cluster";
 import "leaflet/dist/leaflet.css";
 import { debounce } from "@/utils";
 import { envConfig } from "@/configs";
@@ -30,7 +25,6 @@ import { IconHelper } from "@/helpers/icon-helper";
 import { Business } from "@/data/interfaces/Business";
 import { MapBounds } from "@/data/interfaces/MapBounds";
 import { BoundsWatcher } from "../components/bounds-watcher";
-import { BusinessPopUp } from "../components/business-pop-up";
 import { useGlobalState, useUserLocation } from "@/providers";
 import { CustomZoomControl } from "../components/custom-zoom";
 import { RecenterButton } from "../components/recenter-button";
@@ -43,12 +37,12 @@ import { LocationCoordsHelper } from "@/helpers/location-coords-helper";
 import { SearchPlacesWithAutocomplete } from "../search-places-with-autocomplete";
 import { HeatmapLayer } from "../headmap-layer";
 import { ZoomWatcher } from "../components/zoom-water";
-import { AutoFitMarkers } from "../components/auto-fit-markers";
 import { useIsMobile } from "@/hooks";
 import {
   MapCameraController,
   MapCameraRef,
 } from "../components/map-camera-controller";
+import { ClusterLayer } from "../components/cluster-layer";
 
 const ICONS: Record<Partial<BusinessTypeEnum | string>, L.Icon> = {
   [BusinessTypeEnum.RESTAURANT]: IconHelper.createColoredIcon(
@@ -116,28 +110,28 @@ function MapClickHandler({
   return null;
 }
 
-export function RecenterOnMarker({
-  lat,
-  lng,
-  enabled,
-}: {
-  lat: number;
-  lng: number;
-  enabled: boolean;
-}) {
-  const map = useMap();
-  const didRecenter = useRef(false);
+// export function RecenterOnMarker({
+//   lat,
+//   lng,
+//   enabled,
+// }: {
+//   lat: number;
+//   lng: number;
+//   enabled: boolean;
+// }) {
+//   const map = useMap();
+//   const didRecenter = useRef(false);
 
-  useEffect(() => {
-    if (!enabled) return;
-    if (didRecenter.current) return;
+//   useEffect(() => {
+//     if (!enabled) return;
+//     if (didRecenter.current) return;
 
-    map.setView([lat, lng], map.getZoom(), { animate: true });
-    didRecenter.current = true;
-  }, [lat, lng, enabled, map]);
+//     map.setView([lat, lng], map.getZoom(), { animate: true });
+//     didRecenter.current = true;
+//   }, [lat, lng, enabled, map]);
 
-  return null;
-}
+//   return null;
+// }
 
 interface ILocationIQMap {
   zoom?: number;
@@ -174,8 +168,6 @@ export function LocationIQMap({
   const { coordinates, setCoordinates } = useGlobalState();
   const { userCoordinates } = useUserLocation();
   const { theme } = useTheme();
-  const isMobile = useIsMobile();
-  const MAX_ZOOM = isMobile ? 15 : 18;
 
   const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(
     initial ?? null
@@ -193,6 +185,14 @@ export function LocationIQMap({
   const initialZoomRef = useRef<number>(zoom);
 
   const cameraRef = useRef<MapCameraRef>(null);
+
+  const center = useMemo<[number, number]>(
+    () =>
+      initial
+        ? [initial.lat, initial.lng]
+        : [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
+    [initial]
+  );
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -358,7 +358,11 @@ export function LocationIQMap({
         style={{ height }}
         className="flex items-center justify-center text-sm text-muted-foreground"
       >
-        <CircularLoader text="Loading map..." />
+        <CircularLoader
+          text="Loading map..."
+          textClassName="text-primary"
+          parentClassName="border-primary"
+        />
       </div>
     );
   }
@@ -372,9 +376,10 @@ export function LocationIQMap({
       className="relative w-full rounded-md overflow-hidden"
     >
       <MapContainer
-        center={
-          initialCenterRef.current ?? [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng]
-        }
+        // center={
+        //   initialCenterRef.current ?? [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng]
+        // }
+        center={center}
         zoomControl={false}
         zoom={initialZoomRef.current}
         scrollWheelZoom
@@ -388,12 +393,10 @@ export function LocationIQMap({
         <CustomZoomControl />
 
         <MapCameraController ref={cameraRef} />
-
+        <BoundsWatcher onBoundsChanged={handleBoundsChanged} />
         <ZoomWatcher onZoom={setZoomLevel} />
 
-        <BoundsWatcher onBoundsChanged={handleBoundsChanged} />
-
-        <MapClickHandler onClick={handleMapClick} disabled={disabled} />
+        {/* <MapClickHandler onClick={handleMapClick} disabled={disabled} /> */}
 
         <Marker
           position={[marker.lat, marker.lng]}
@@ -426,7 +429,7 @@ export function LocationIQMap({
           <HeatmapLayer businesses={mapBusinesses} enabled={showHeatmap} />
         )}
 
-        {showMarkers && (
+        {/* {showMarkers && (
           <MarkerClusterGroup
             chunkedLoading
             showCoverageOnHover={false}
@@ -486,17 +489,13 @@ export function LocationIQMap({
               );
             })}
           </MarkerClusterGroup>
+        )} */}
+        {showMarkers && (
+          <ClusterLayer
+            businesses={mapBusinesses}
+            onMarkerClick={onMarkerClick}
+          />
         )}
-
-        {/* <AutoFitMarkers
-          markerPositions={mapBusinesses
-            .filter((b) => b.location?.latitude && b.location?.longitude)
-            .map((b) => ({
-              lat: b.location.latitude,
-              lng: b.location.longitude,
-            }))}
-          maxZoom={MAX_ZOOM}
-        /> */}
 
         <RecenterButton
           onLocate={(coords) => {
@@ -506,9 +505,13 @@ export function LocationIQMap({
           }}
         />
 
-        {isLoading && (
+        {!isLoading && (
           <div className="absolute inset-0 bg-background/60 flex items-center justify-center z-50">
-            <CircularLoader text="Loading business data" />
+            <CircularLoader
+              text="Loading business data"
+              textClassName="text-primary dark:text-muted-foreground"
+              rollerClassName="border-primary dark:border-muted-foreground"
+            />
           </div>
         )}
       </MapContainer>

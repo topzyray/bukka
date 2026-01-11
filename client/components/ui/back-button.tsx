@@ -9,8 +9,9 @@ export function BackButton() {
   return (
     <BukkaButton
       variant="link"
+      size="sm"
       onClick={() => router.back()}
-      className="dark:text-foreground text-base sm:text-lg"
+      className="dark:text-foreground"
     >
       <ArrowBigLeft />
       Back

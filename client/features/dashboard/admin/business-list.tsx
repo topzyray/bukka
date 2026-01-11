@@ -14,11 +14,13 @@ import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { QueryKeyEnum } from "@/data/enums";
 import { BukkaButton } from "@/components/ui";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/providers";
 
 export function BusinessList() {
   const PAGE_SIZE = 10;
   const queryClient = useQueryClient();
   const router = useRouter();
+  const { user } = useAuth();
 
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -119,7 +121,8 @@ export function BusinessList() {
         handleDelete,
         deleteBusinessMutation.isPending,
         currentItemDeleting,
-        QueryKeyEnum.BUSINESSES
+        QueryKeyEnum.BUSINESSES,
+        user
       ),
     [currentItemDeleting, deleteBusinessMutation.isPending, handleDelete]
   );

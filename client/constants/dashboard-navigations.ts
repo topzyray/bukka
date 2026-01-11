@@ -124,6 +124,13 @@ export const VENDOR: TDashboardNavigation = [
   //   isSidebarNav: true,
   // },
   {
+    title: "Favourites",
+    url: "/dashboard/vendor/favourites",
+    icon: "Heart",
+    hasSubmenu: false,
+    isSidebarNav: true,
+  },
+  {
     title: "Reviews",
     url: "/dashboard/vendor/reviews",
     icon: "Star",

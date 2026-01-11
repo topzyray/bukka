@@ -19,92 +19,126 @@ export function RouteGuard({
   isProtected = false,
   roles = [],
 }: RouteGuardProps) {
-  const { user, isLoading, isAuthenticated, status } = useAuth();
+  const { user, isLoading, status } = useAuth();
   const router = useRouter();
   const pathname = usePathname() ?? "/";
 
-  const roleFromPath = useMemo(() => {
-    const matched = pathname.match(/\/(dashboard|onboarding)\/([^/]+)/);
-    return (matched?.[2]?.toLowerCase() ?? undefined) as UserRole | undefined;
-  }, [pathname]);
-
+  const roleFromPath = RouteHelper.extractRoleFromPath(pathname);
   const userRole = user?.role?.toLowerCase();
 
   useEffect(() => {
-    // Wait until we know whether current user is loaded
-    if (isLoading && status === "bootstrapping") return;
+    // 🚫 Never redirect during bootstrap
+    if (status === "bootstrapping") return;
 
     // Unauthenticated users on protected routes → redirect
-    if (status === "unauthenticated" && isProtected) {
+    if (isProtected && status === "unauthenticated") {
       router.replace("/signin");
       return;
     }
 
     // If the route is PUBLIC (isProtected === false)
     // and user is authenticated, route them to their dashboard.
-    if (!isProtected && isAuthenticated && user) {
-      const target = RouteHelper.getDashboardPath(user);
-      // only redirect if not already within dashboard of the same role
-      if (!pathname.startsWith("/dashboard") || pathname !== target) {
-        router.replace(target);
-      }
+    // if (!isProtected && isAuthenticated && user) {
+    //   const target = RouteHelper.getDashboardPath(user);
+    //   // only redirect if not already within dashboard of the same role
+    //   if (!pathname.startsWith("/dashboard") || pathname !== target) {
+    //     router.replace(target);
+    //   }
+    //   return;
+    // }
+    // if (!isProtected && status === "authenticated" && user) {
+    //   router.replace(RouteHelper.getPostAuthPath(user));
+    //   return;
+    // }
+
+    // For protected routes:
+    // if (isProtected) {
+    //   // Not authenticated → force signin
+    //   // if (!isAuthenticated) {
+    //   if (status === "unauthenticated") {
+    //     router.replace("/signin");
+    //     return;
+    //   }
+
+    //   // Ensure we have a user object (should if isAuthenticated)
+    //   if (!user) {
+    //     // Defensive: revalidate current user query or sign out
+    //     router.replace("/signin");
+    //     return;
+    //   }
+
+    //   // If user has not completed onboarding, they must be on their onboarding path
+    //   if (user?.isOnboarded === false) {
+    //     const onboardingPath = `/onboarding/${user?.role.toLowerCase()}`;
+    //     if (!pathname.startsWith(onboardingPath)) {
+    //       router.replace(onboardingPath);
+    //     }
+    //     return;
+    //   }
+
+    //   // If user has completed onboarding, they must NOT be on any /onboarding/* page
+    //   if (user?.isOnboarded === true && pathname.startsWith("/onboarding")) {
+    //     const target = RouteHelper.getDashboardPath(user);
+    //     router.replace(target);
+    //     return;
+    //   }
+
+    //   // Enforce role-based path isolation when path includes role segment
+    //   if (roleFromPath && userRole && roleFromPath !== userRole) {
+    //     // Role mismatch — take user to their dashboard
+    //     const target = RouteHelper.getDashboardPath(user as User);
+    //     router.replace(target);
+    //     return;
+    //   }
+
+    //   // If explicit roles were passed to RouteGuard (component-level),
+    //   // ensure user role is included.
+    //   if (roles.length > 0) {
+    //     const normalizedAllowed = roles.map((r) => String(r).toLowerCase());
+    //     if (!normalizedAllowed.includes(userRole ?? "")) {
+    //       const target = RouteHelper.getDashboardPath(user as User);
+    //       router.replace(target);
+    //       return;
+    //     }
+    //   }
+    // }
+
+    // 🔓 Public auth pages → redirect authenticated users
+    if (
+      !isProtected &&
+      status === "authenticated" &&
+      user &&
+      (pathname === "/signin" || pathname === "/signup")
+    ) {
+      router.replace(RouteHelper.getPostAuthPath(user));
       return;
     }
 
-    // For protected routes:
-    if (isProtected) {
-      // Not authenticated → force signin
-      if (!isAuthenticated) {
-        router.replace("/signin");
-        return;
-      }
+    if (!isProtected || !user) return;
 
-      // Ensure we have a user object (should if isAuthenticated)
-      if (!user) {
-        // Defensive: revalidate current user query or sign out
-        router.replace("/signin");
-        return;
-      }
+    const expectedPath = RouteHelper.getPostAuthPath(user);
 
-      // If user has not completed onboarding, they must be on their onboarding path
-      if (user?.isOnboarded === false) {
-        const onboardingPath = `/onboarding/${user?.role.toLowerCase()}`;
-        if (!pathname.startsWith(onboardingPath)) {
-          router.replace(onboardingPath);
-        }
-        return;
-      }
+    // 🧭 Enforce onboarding/dashboard correctness
+    if (!pathname.startsWith(expectedPath.split("/").slice(0, 3).join("/"))) {
+      router.replace(expectedPath);
+      return;
+    }
 
-      // If user has completed onboarding, they must NOT be on any /onboarding/* page
-      if (user?.isOnboarded === true && pathname.startsWith("/onboarding")) {
-        const target = RouteHelper.getDashboardPath(user);
-        router.replace(target);
-        return;
-      }
+    // 🧑‍🎓 Role isolation (URL role ≠ user role)
+    if (roleFromPath && roleFromPath.toLowerCase() !== userRole) {
+      router.replace(expectedPath);
+      return;
+    }
 
-      // Enforce role-based path isolation when path includes role segment
-      if (roleFromPath && userRole && roleFromPath !== userRole) {
-        // Role mismatch — take user to their dashboard
-        const target = RouteHelper.getDashboardPath(user as User);
-        router.replace(target);
-        return;
-      }
-
-      // If explicit roles were passed to RouteGuard (component-level),
-      // ensure user role is included.
-      if (roles.length > 0) {
-        const normalizedAllowed = roles.map((r) => String(r).toLowerCase());
-        if (!normalizedAllowed.includes(userRole ?? "")) {
-          const target = RouteHelper.getDashboardPath(user as User);
-          router.replace(target);
-          return;
-        }
+    // 🔒 Component-level role enforcement
+    if (roles.length > 0) {
+      const allowed = roles.map((r) => r.toLowerCase());
+      if (!allowed.includes(userRole ?? "")) {
+        router.replace(expectedPath);
       }
     }
   }, [
     status,
-    isLoading,
-    isAuthenticated,
     user,
     pathname,
     roleFromPath,
@@ -114,11 +148,7 @@ export function RouteGuard({
     router,
   ]);
 
-  // if (isLoading) {
-  //   return null;
-  // }
   if (isLoading || status === "bootstrapping") {
-    // Instead of returning null, render a minimal loader so we don't show a blank page
     return (
       <div className="flex min-h-screen items-center justify-center">
         <CircularLoader text="Verifying session..." />
