@@ -2,7 +2,7 @@ import { QueryKeyEnum } from "@/data/enums";
 import { useCustomMutation } from "@/data/mutations/base";
 import { BusinessApiService } from "@/data/services/BusinessApiService";
 import { PlaceAdminApiService } from "@/data/services/PlaceAdminApiService";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 
 export const useCreateBusiness = ({
   resetForm,
@@ -11,7 +11,6 @@ export const useCreateBusiness = ({
   resetForm: () => void;
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(BusinessApiService.createBusiness, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
@@ -43,7 +42,6 @@ export const useImportBusiness = ({
 }: {
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(PlaceAdminApiService.importOne, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
@@ -76,7 +74,6 @@ export const useUpdateBusiness = ({
   resetForm: () => void;
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(
     ({ id, payload }: { id: number; payload: any }) =>
       BusinessApiService.updateBusiness(id, payload),
@@ -110,7 +107,6 @@ export const useAddFeaturedBusiness = ({
   onSuccess?: () => void;
   onError?: (error: unknown) => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(
     ({ id, payload }: { id: number; payload: any }) =>
       BusinessApiService.setBusinessAsFeatured(id, payload),
@@ -149,7 +145,6 @@ export const useDeleteBusiness = ({
 }: {
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(BusinessApiService.deleteBusiness, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({

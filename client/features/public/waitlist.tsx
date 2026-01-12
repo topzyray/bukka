@@ -25,7 +25,7 @@ import ContactSection from "@/features/public/components/contact-section";
 import { TypeAnimation } from "react-type-animation";
 import { Processing } from "@/components/loaders/processing";
 import { useCustomQuery } from "@/data/queries/base";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { CircleLoader } from "react-spinners";
 import { ThemeToggle } from "@/components/ui/mode-toggle";
 import { TextHelper } from "@/helpers";
@@ -58,8 +58,6 @@ type ForgotPasswordFormData = z.infer<typeof joinWaitlistSchema>;
 export function BukkaWaitList() {
   const [success, setSuccess] = useState(false);
   const [contact, showContact] = useState(false);
-
-  const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useCustomQuery(["waitlistCount"], () =>
     WaitlistApiService.getWaitlistCount()

@@ -1,5 +1,6 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { formatDistanceToNow } from "date-fns";
 import {
   MonitorSmartphone,
@@ -23,6 +24,9 @@ import { motion } from "framer-motion";
 import { useRevokeSession } from "@/data/mutations/userSession/use-revoke-session";
 import { useState } from "react";
 import { SettingsPageTitleCard } from "../components/setting-title-card";
+import { queryClient } from "@/lib";
+import { EventHelper } from "@/helpers/event-helper";
+import { useAuthStore } from "@/stores/auth-store";
 
 export function SessionsSettings() {
   const [itemToDeleteId, setItemToDeleteId] = useState<number | null>(null);
@@ -61,9 +65,31 @@ export function SessionsSettings() {
     },
   });
 
-  const revokeAccess = (sessionId: number) => {
+  const handleCurrentSessionLogout = () => {
+    StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.DEVICE_ID);
+    StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
+    queryClient.clear();
+    Cookies.remove("sidebarState");
+    EventHelper.broadcastLogout();
+
+    useAuthStore.getState().setUser(null);
+    useAuthStore.getState().setStatus("unauthenticated");
+
+    window.location.href = "/signin";
+  };
+
+  const revokeAccess = (sessionId: number, isCurrentSession: boolean) => {
     setItemToDeleteId(sessionId);
-    revokeAccessMutation.mutate(sessionId);
+
+    revokeAccessMutation.mutate(sessionId, {
+      onSuccess: () => {
+        setItemToDeleteId(null);
+
+        if (isCurrentSession) {
+          handleCurrentSessionLogout();
+        }
+      },
+    });
   };
 
   return (
@@ -190,10 +216,12 @@ export function SessionsSettings() {
                           <BukkaButton
                             variant="destructive"
                             size="sm"
-                            onClick={() => {
-                              revokeAccess(session?.id);
-                              if (isCurrent) logout();
-                            }}
+                            onClick={() =>
+                              revokeAccess(
+                                session?.id,
+                                currentSession?.id === session.id
+                              )
+                            }
                             className="text-white transition-colors dark:bg-destructive"
                             aria-label={`Revoke session ${session.id}`}
                             title="Revoke Session Access"

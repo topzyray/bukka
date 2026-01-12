@@ -9,11 +9,14 @@ import { authRoutes } from "@/constants/routes";
 import { devtools, persist } from "zustand/middleware";
 import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
 import { EventHelper } from "@/helpers/event-helper";
+import { queryClient } from "@/lib";
+import { QueryKeyEnum } from "@/data/enums";
 
 interface AuthState {
   user: User | null;
   status: AuthStatus;
   setUser: (user: User | null) => void;
+  setStatus: (status: AuthStatus) => void;
   logout: () => Promise<void>;
 }
 
@@ -73,7 +76,11 @@ export const useAuthStore = create<AuthState>()(
           }
 
           try {
-            // queryClient.clear();
+            queryClient.clear();
+            queryClient.removeQueries({
+              queryKey: [QueryKeyEnum.CURRENT_USER],
+              exact: true,
+            });
             Cookies.remove("sidebarState");
           } catch {}
 
@@ -102,6 +109,11 @@ export const useAuthStore = create<AuthState>()(
               user,
               status: "authenticated",
             }),
+          setStatus: (status) => {
+            set({
+              status,
+            });
+          },
         };
       },
       {

@@ -10,7 +10,7 @@ import {
 } from "react";
 import { useUserFiles } from "@/data/queries";
 import { AuthStatus, User } from "@/data/interfaces/User";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { File } from "@/data/interfaces/File";
 import { useCurrentUser } from "@/data/queries/use-current-user";
 import { useAuthStore } from "@/stores/auth-store";
@@ -31,11 +31,12 @@ interface IAuthContextType {
 const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const queryClient = useQueryClient();
-
   const { isFirstLoad, isError } = useCurrentUser();
 
-  const { user: storeUser, status } = useAuthStore();
+  const storeUser = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
+  const status = useAuthStore((s) => s.status);
+  const logout = useAuthStore((s) => s.logout);
 
   // const { data: user, isFirstLoad, isError } = useCurrentUser();
 
@@ -49,53 +50,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (storeUser) {
-      useAuthStore.getState().setUser(storeUser);
+      setUser(storeUser);
     }
   }, [storeUser]);
 
   useEffect(() => {
     EventHelper.listenForLogout(() => {
-      useAuthStore.getState().logout();
+      logout();
     });
   }, []);
-
-  const logout = useCallback(async () => {
-    // try {
-    //   await axios.post(
-    //     `${envConfig.NEXT_PUBLIC_API_BASE_URL}${authRoutes.signOut}`,
-    //     {},
-    //     { withCredentials: true }
-    //   );
-    //   StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.DEVICE_ID);
-    //   try {
-    //     StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
-    //     window.dispatchEvent(new Event("sessionHandledReset"));
-    //     HttpClient.resetSessionExpiredFlag();
-    //   } catch {}
-    // } catch (error) {
-    //   try {
-    //     StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
-    //     window.dispatchEvent(new Event("sessionHandledReset"));
-    //     HttpClient.resetSessionExpiredFlag();
-    //   } catch {}
-    //   throw error;
-    // }
-    // try {
-    //   queryClient.clear();
-    //   Cookies.remove("sidebarState");
-    // } catch {}
-    // if (pathname.startsWith("/dashboard")) {
-    //   window.location.href = "/signin";
-    // } else {
-    //   window.location.href = "/";
-    // }
-    useAuthStore.getState().logout();
-    queryClient.removeQueries({
-      queryKey: [QueryKeyEnum.CURRENT_USER],
-      exact: true,
-    });
-    queryClient.clear();
-  }, [queryClient]);
 
   const value = useMemo(
     () => ({

@@ -1,11 +1,9 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { useCustomMutation } from "../base";
 import { FavoriteApiService } from "@/data/services";
 import { QueryKeyEnum } from "@/data/enums";
 
 export const useToggleFavorite = () => {
-  const queryClient = useQueryClient();
-
   return useCustomMutation(FavoriteApiService.toggleFavorite, {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [QueryKeyEnum.FAVOURITES] });

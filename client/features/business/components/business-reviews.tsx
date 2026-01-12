@@ -11,13 +11,12 @@ import { TextHelper } from "@/helpers";
 import { useAuth } from "@/providers";
 import { toast } from "sonner";
 import { Business } from "@/data/interfaces/Business";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { QueryKeyEnum } from "@/data/enums";
 
 export function BusinessReviews({ business }: { business: Business }) {
   const PAGE_SIZE = 10;
   const { user } = useAuth();
-  const queryClient = useQueryClient();
 
   const [showUpdateReviewForm, setShowUpdateReviewForm] = useState<{
     reviewId: null | number;

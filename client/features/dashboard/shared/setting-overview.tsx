@@ -39,13 +39,12 @@ import { useRouter } from "next/navigation";
 import { File } from "@/data/interfaces/File";
 import { FileApiService } from "@/data/services";
 import { useAuth } from "@/providers/auth-provider";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { SettingsPageTitleCard } from "./components/setting-title-card";
 import { useUserActivitySummary } from "@/data/queries/use-analytics-query";
 
 export function SettingsOverview() {
-  const queryClient = useQueryClient();
   const { user, logout, userFiles, isLoadingUserFiles } = useAuth();
   const profileAvatar: File | null | undefined =
     !isLoadingUserFiles && userFiles && userFiles.length

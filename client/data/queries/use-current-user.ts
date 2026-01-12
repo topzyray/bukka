@@ -2,13 +2,12 @@
 
 import { UserApiService } from "@/data/services";
 import { useCustomQuery } from "./base";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { QueryKeyEnum } from "../enums";
 import { useAuthStore } from "@/stores/auth-store";
 import { useEffect } from "react";
 
 export const useCurrentUser = () => {
-  const queryClient = useQueryClient();
   const setUser = useAuthStore((state) => state.setUser);
   const storeUser = useAuthStore((state) => state.user);
 

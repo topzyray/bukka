@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { UseFormReset } from "react-hook-form";
 import { extractErrorMessage } from "@/utils";
 import { useCustomMutation } from "../base";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { QueryKeyEnum } from "@/data/enums";
 
 export const useAccountVerification = ({
@@ -13,7 +13,6 @@ export const useAccountVerification = ({
     token: string;
   }>;
 }) => {
-  const queryClient = useQueryClient();
   const router = useRouter();
   const { mutate: verifyNewUser, isPending: isVerifyingUser } =
     useCustomMutation(AuthApiService.confirmEmail, {

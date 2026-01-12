@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { DataTable } from "@/components/ui/data-table";
 import { useAuth } from "@/providers";
 import { PaginationHelper } from "@/helpers/pagination-helper";
@@ -20,7 +20,7 @@ import { BusinessClaim } from "@/data/interfaces/BusinessClaim";
 
 export function BusinessClaimsList() {
   const PAGE_SIZE = 10;
-  const queryClient = useQueryClient();
+
   const { user } = useAuth();
 
   const [page, setPage] = useState(1);

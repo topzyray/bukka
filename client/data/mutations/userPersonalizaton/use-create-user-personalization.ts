@@ -1,5 +1,5 @@
 import { useCustomMutation } from "../base";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { UserPersonalizationApiService } from "@/data/services/UserPersonalizationApiService";
 import { QueryKeyEnum } from "@/data/enums";
 
@@ -10,7 +10,6 @@ export const useCreateUserPersonalization = ({
   onSuccess: () => void;
   userId?: number;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(
     UserPersonalizationApiService.createUserPersonalization,
     {

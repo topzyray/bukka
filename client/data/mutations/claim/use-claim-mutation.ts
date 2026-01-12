@@ -1,10 +1,9 @@
 import { QueryKeyEnum } from "@/data/enums";
 import { useCustomMutation } from "@/data/mutations/base";
 import { ClaimApiService } from "@/data/services";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 
 export const useApproveClaim = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(ClaimApiService.approveClaim, {
     onSuccessCallback: async () => {
       await queryClient.invalidateQueries({
@@ -19,7 +18,6 @@ export const useApproveClaim = ({ onSuccess }: { onSuccess?: () => void }) => {
 };
 
 export const useRejectClaim = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(ClaimApiService.rejectClaim, {
     onSuccessCallback: async () => {
       await queryClient.invalidateQueries({
@@ -34,7 +32,6 @@ export const useRejectClaim = ({ onSuccess }: { onSuccess?: () => void }) => {
 };
 
 export const useDeleteClaim = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(ClaimApiService.deleteClaim, {
     onSuccessCallback: async () => {
       await queryClient.invalidateQueries({

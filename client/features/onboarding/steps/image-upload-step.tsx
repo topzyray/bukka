@@ -23,7 +23,7 @@ import {
 } from "@/data/enums";
 import { useFileUpload } from "@/data/mutations/file/use-file-uploader";
 import { FileApiService } from "@/data/services";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
 import { useOnboardingProgress } from "@/data/queries/use-onboarding-progress-query";
 import { UpdateUserDto } from "@/data/dtos";
@@ -45,7 +45,6 @@ export function ImageUploadStep({
   stepIndex?: number;
 }) {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
 
   const form = useForm<ImageUploadFormData>({
     resolver: zodResolver(imageUploadSchema),

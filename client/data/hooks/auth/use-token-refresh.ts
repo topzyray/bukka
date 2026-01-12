@@ -1,14 +1,12 @@
 import { useEffect } from "react";
 import { StorageUtilsHelper } from "@/utils/storage-utils";
 import { STORE_KEYS } from "@/configs/store.config";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import axios from "axios";
 import { authRoutes } from "@/constants/routes";
 import { QueryKeyEnum } from "@/data/enums";
 
 export const useTokenRefresh = () => {
-  const queryClient = useQueryClient();
-
   useEffect(() => {
     const refresh = async () => {
       const refreshToken = StorageUtilsHelper.getItemFromLocalStorage(

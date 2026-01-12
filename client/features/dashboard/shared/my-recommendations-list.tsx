@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { DataTable } from "@/components/ui/data-table";
 import { PaginationHelper } from "@/helpers/pagination-helper";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 export function MyRecommendationsList() {
   const PAGE_SIZE = 10;
   const router = useRouter();
-  const queryClient = useQueryClient();
+
   const { user } = useAuth();
 
   const [currentItemDeleting, setCurrentItemDeleting] = useState<number | null>(

@@ -12,7 +12,7 @@ import {
   QueryKeyEnum,
   UserRoleEnum,
 } from "@/data/enums";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { useAuth } from "@/providers";
 import { Recommendation } from "@/data/interfaces/Recommendation";
 import { DataHelper } from "@/helpers";
@@ -32,7 +32,6 @@ export function BusinessHero({
 }) {
   const data = DataHelper.normalizeBusiness(business);
 
-  const queryClient = useQueryClient();
   const { user } = useAuth();
 
   const handleShare = async () => {

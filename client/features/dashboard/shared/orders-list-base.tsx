@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { Loader2, PackageSearch } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BukkaButton } from "@/components/ui";
@@ -24,7 +24,6 @@ export function OrdersListBase({
   basePath: string;
 }) {
   const PAGE_SIZE = 10;
-  const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
 

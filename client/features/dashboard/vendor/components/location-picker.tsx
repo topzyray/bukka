@@ -1,15 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import dynamic from "next/dynamic";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 // const EditableMap = dynamic(() => import("./EditableMap"), { ssr: false });
 
 export const LocationPicker: React.FC<{ business: any }> = ({ business }) => {
-  const qc = useQueryClient();
   const [pos, setPos] = useState<{ lat: number; lng: number }>(() => ({
     lat: business.location?.latitude ?? 0,
     lng: business.location?.longitude ?? 0,

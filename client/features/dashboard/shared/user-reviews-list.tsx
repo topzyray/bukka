@@ -14,7 +14,7 @@ import { usePathname } from "next/navigation";
 import { Review } from "@/data/interfaces/Review";
 import { RouteHelper, TextHelper } from "@/helpers";
 import { Star, Loader2, Edit, X } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { PaginationHelper } from "@/helpers/pagination-helper";
 import { UpdateReviewModal } from "./modals/update-review-modal";
 import { useUserAllReviewsQuery } from "@/data/queries/use-reviews";
@@ -23,7 +23,7 @@ import { QueryKeyEnum } from "@/data/enums";
 export function UserReviewsList() {
   const PAGE_SIZE = 10;
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+
   const pathname = usePathname();
 
   const [page, setPage] = useState<number>(1);

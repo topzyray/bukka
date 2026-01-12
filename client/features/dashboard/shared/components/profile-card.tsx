@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import type { User } from "@/data/interfaces/User";
 import { Coordinate, useUserLocation } from "@/providers";
 import { Button, Card, Separator } from "@/components/ui";
+import { UserRoleEnum } from "@/data/enums";
 
 interface IUserProfileCard {
   user: User;
@@ -117,11 +118,20 @@ export function UserProfileCard({ user, setEditProfile }: IUserProfileCard) {
         <div className="w-full bg-gray-200 dark:bg-neutral-800 rounded-full h-3">
           <div
             className="bg-primary dark:bg-muted-foreground h-3 rounded-full transition-all"
-            style={{ width: `${(user?.onboardingProgress / 3) * 100 || 0}%` }}
+            style={{
+              width: `${
+                (user?.onboardingProgress /
+                  (user?.role === UserRoleEnum.ADMIN ? 2 : 3)) *
+                  100 || 0
+              }%`,
+            }}
           ></div>
         </div>
         <p className="text-xs text-muted-foreground mt-1">
-          {(user?.onboardingProgress / 3) * 100 || 0}% completed
+          {(user?.onboardingProgress /
+            (user?.role === UserRoleEnum.ADMIN ? 2 : 3)) *
+            100 || 0}
+          % completed
         </p>
       </div>
 

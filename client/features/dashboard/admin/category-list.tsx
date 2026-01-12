@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { BusinessCategory } from "@/data/interfaces/BusinessCategory";
 import { DataTable } from "@/components/ui/data-table";
 import { categoryColumns } from "./components/category-columns";
@@ -15,7 +15,6 @@ import { QueryKeyEnum } from "@/data/enums";
 
 export function CategoryList() {
   const PAGE_SIZE = 10;
-  const queryClient = useQueryClient();
 
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [isModalOpen, setIsModalOpen] = useState(false);

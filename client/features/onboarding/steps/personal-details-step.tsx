@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { Form } from "@/components/ui/form";
 import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
 import { TextHelper } from "@/helpers";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { useOnboardingProgress } from "@/data/queries/use-onboarding-progress-query";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { Loader2 } from "lucide-react";
@@ -66,7 +66,6 @@ export function PersonalDetailsStep({
   stepIndex?: number;
 }) {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
 
   const form = useForm({
     resolver: zodResolver(personalDetailsSchema),

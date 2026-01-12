@@ -31,7 +31,6 @@ const data: { items: { id: number; name: string; description: string }[] } = {
 };
 
 export const MenuManager: React.FC<{ business: Business }> = ({ business }) => {
-  // const qc = useQueryClient();
   // const { data } = useQuery(["menu", businessId], async () => {
   //   const { data } = await axiosClient.get(
   //     `/api/vendor/businesses/${businessId}/menu`

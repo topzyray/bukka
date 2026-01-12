@@ -1,10 +1,9 @@
 import { UserNotificationApiService } from "@/data/services";
 import { useCustomMutation } from "../base";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { QueryKeyEnum } from "@/data/enums";
 
 export const useClearAllNotifications = ({ userId }: { userId?: number }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(UserNotificationApiService.deleteAllNofifications, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
@@ -30,7 +29,6 @@ export const useDeleteNotification = ({
   userId?: number;
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(UserNotificationApiService.deleteNotificationById, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
