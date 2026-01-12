@@ -12,25 +12,23 @@ import {
   SheetHeader,
   SheetTitle,
   SheetFooter,
-  Skeleton,
   DialogClose,
   SheetClose,
   Separator,
 } from "@/components/ui";
 import { STORE_KEYS } from "@/configs";
-import { useIsMobile, useLocationPermission } from "@/hooks";
-import { useUserLocation } from "@/providers";
 import { StorageUtilsHelper } from "@/utils";
 import React, { useEffect, useState } from "react";
+import { useIsMobile, useLocationPermission } from "@/hooks";
 
-type Props = {
+type LocationConsentProps = {
   promptText?: string;
   mobileSheet?: boolean;
   enableLocation?: boolean;
   setEnableLocation?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const LocationConsent: React.FC<Props> = ({
+export const LocationConsent: React.FC<LocationConsentProps> = ({
   promptText,
   mobileSheet = true,
   enableLocation,
@@ -38,7 +36,7 @@ export const LocationConsent: React.FC<Props> = ({
 }) => {
   const { loading, position, error, request, hasCooldownExpired } =
     useLocationPermission();
-  const { setUserCoordinates } = useUserLocation();
+  // const { setUserCoordinates } = useUserLocation();
 
   const isMobile = useIsMobile();
 
@@ -63,7 +61,7 @@ export const LocationConsent: React.FC<Props> = ({
       maximumAge: 60_000,
     });
     if (geo) {
-      setUserCoordinates({ lat: geo.latitude, lng: geo.longitude });
+      // setUserCoordinates({ lat: geo.latitude, lng: geo.longitude });
       setOpen(false);
     }
   }

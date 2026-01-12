@@ -6,13 +6,16 @@ import { Business } from "@/data/interfaces/Business";
 import { Button } from "@/components/ui/button";
 import { Edit, Loader2, Sparkles, Trash, View } from "lucide-react";
 import { FeatureBusinessDialog } from "../../admin/modals/featured-business-dialog";
+import { UserRoleEnum } from "@/data/enums";
+import { User } from "@/data/interfaces/User";
 
 export const businessColumns = (
   onEdit: (data: Business) => void,
   onDelete: (id: number) => void,
   isdeleting: boolean,
   currentItemDeleting: number | null,
-  parentPath: "businesses" | "my-businesses"
+  parentPath: "businesses",
+  user: User | null
 ): ColumnDef<Business>[] => [
   {
     accessorKey: "name",
@@ -111,14 +114,20 @@ export const businessColumns = (
               <View size={16} />
             </Button>
           </Link>
-          <FeatureBusinessDialog
-            trigger={
-              <Button variant="outline" size="sm" title="Add to Featured List">
-                <Sparkles size={16} />
-              </Button>
-            }
-            business={business}
-          />
+          {user?.role === UserRoleEnum.ADMIN && (
+            <FeatureBusinessDialog
+              trigger={
+                <Button
+                  variant="outline"
+                  size="sm"
+                  title="Add to Featured List"
+                >
+                  <Sparkles size={16} />
+                </Button>
+              }
+              business={business}
+            />
+          )}
           <Button
             variant="outline"
             size="sm"

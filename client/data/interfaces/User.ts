@@ -1,5 +1,7 @@
 import { UserRole } from "./Auth";
 
+export type AuthStatus = "bootstrapping" | "authenticated" | "unauthenticated";
+
 export interface User {
   id: number;
   email: string;

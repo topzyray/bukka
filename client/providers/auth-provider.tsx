@@ -1,27 +1,25 @@
 "use client";
 
-import axios from "axios";
-import Cookies from "js-cookie";
 import {
   createContext,
   useMemo,
   useContext,
   useCallback,
   ReactNode,
+  useEffect,
 } from "react";
-import { StorageUtilsHelper } from "@/utils";
-import { authRoutes } from "@/constants/routes";
 import { useUserFiles } from "@/data/queries";
-import { User } from "@/data/interfaces/User";
+import { AuthStatus, User } from "@/data/interfaces/User";
 import { useQueryClient } from "@tanstack/react-query";
 import { File } from "@/data/interfaces/File";
-import { envConfig, HttpClient, STORE_KEYS } from "@/configs";
 import { useCurrentUser } from "@/data/queries/use-current-user";
-import { usePathname, useRouter } from "next/navigation";
+import { useAuthStore } from "@/stores/auth-store";
+import { QueryKeyEnum } from "@/data/enums";
+import { EventHelper } from "@/helpers/event-helper";
 
 interface IAuthContextType {
+  status: AuthStatus;
   user: User | null;
-  isAuthenticated: boolean;
   isError: boolean;
   logout: () => void;
   isLoading: boolean;
@@ -33,53 +31,76 @@ interface IAuthContextType {
 const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const pathname = usePathname();
-  const router = useRouter();
   const queryClient = useQueryClient();
-  const { data: user, isFirstLoad, isError } = useCurrentUser();
-  let {
-    data: userFiles,
+
+  const { isFirstLoad, isError } = useCurrentUser();
+
+  const { user: storeUser, status } = useAuthStore();
+
+  // const { data: user, isFirstLoad, isError } = useCurrentUser();
+
+  const {
+    data: userFilesData,
     isLoading: isLoadingUserFiles,
     isError: isUserFilesError,
-  } = useUserFiles({ userId: user?.id });
-  userFiles = userFiles?.data;
+  } = useUserFiles({ userId: storeUser?.id });
+
+  const userFiles = userFilesData?.data ?? [];
+
+  useEffect(() => {
+    if (storeUser) {
+      useAuthStore.getState().setUser(storeUser);
+    }
+  }, [storeUser]);
+
+  useEffect(() => {
+    EventHelper.listenForLogout(() => {
+      useAuthStore.getState().logout();
+    });
+  }, []);
 
   const logout = useCallback(async () => {
-    try {
-      await axios.post(
-        `${envConfig.NEXT_PUBLIC_API_BASE_URL}${authRoutes.signOut}`,
-        {},
-        { withCredentials: true }
-      );
-      StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.DEVICE_ID);
-      try {
-        StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
-        window.dispatchEvent(new Event("sessionHandledReset"));
-        HttpClient.resetSessionExpiredFlag();
-      } catch {}
-    } catch (error) {
-      try {
-        StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
-        window.dispatchEvent(new Event("sessionHandledReset"));
-        HttpClient.resetSessionExpiredFlag();
-      } catch {}
-      throw error;
-    }
-    try {
-      queryClient.clear();
-      Cookies.remove("sidebarState");
-    } catch {}
-    if (pathname.startsWith("/dashboard")) {
-      window.location.href = "/signin";
-    } else {
-      window.location.href = "/";
-    }
+    // try {
+    //   await axios.post(
+    //     `${envConfig.NEXT_PUBLIC_API_BASE_URL}${authRoutes.signOut}`,
+    //     {},
+    //     { withCredentials: true }
+    //   );
+    //   StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.DEVICE_ID);
+    //   try {
+    //     StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
+    //     window.dispatchEvent(new Event("sessionHandledReset"));
+    //     HttpClient.resetSessionExpiredFlag();
+    //   } catch {}
+    // } catch (error) {
+    //   try {
+    //     StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
+    //     window.dispatchEvent(new Event("sessionHandledReset"));
+    //     HttpClient.resetSessionExpiredFlag();
+    //   } catch {}
+    //   throw error;
+    // }
+    // try {
+    //   queryClient.clear();
+    //   Cookies.remove("sidebarState");
+    // } catch {}
+    // if (pathname.startsWith("/dashboard")) {
+    //   window.location.href = "/signin";
+    // } else {
+    //   window.location.href = "/";
+    // }
+    useAuthStore.getState().logout();
+    queryClient.removeQueries({
+      queryKey: [QueryKeyEnum.CURRENT_USER],
+      exact: true,
+    });
+    queryClient.clear();
   }, [queryClient]);
 
   const value = useMemo(
     () => ({
-      user: user ?? null,
-      isAuthenticated: !!user && !isError,
+      status,
+      user: storeUser ?? null,
       isError: !!isError,
       logout,
       isLoading: isFirstLoad,
@@ -88,7 +109,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isUserFilesError,
     }),
     [
-      user,
+      status,
+      storeUser,
       isError,
       logout,
       isFirstLoad,

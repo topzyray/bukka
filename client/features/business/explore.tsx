@@ -58,7 +58,7 @@ export function ExplorePage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  const PAGE_SIZE = 6;
+  const PAGE_SIZE = 10;
 
   // debounce query updates
   const [debouncedQ, setDebouncedQ] = useState(q);

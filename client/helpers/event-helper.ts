@@ -1,19 +1,38 @@
 export class EventHelper {
-  public static AUTH_EVENTS = {
-    LOGOUT: "auth:logout",
-  };
+  private static CHANNEL_NAME = "auth-session";
+  private static LOGOUT_EVENT = "logout";
 
-  static broadcastLogout = () => {
-    // Modern browsers
-    if (typeof BroadcastChannel !== "undefined") {
-      const channel = new BroadcastChannel(this.AUTH_EVENTS.LOGOUT);
-      channel.postMessage("logout");
-      channel.close();
+  private static channel: BroadcastChannel | null =
+    typeof BroadcastChannel !== "undefined"
+      ? new BroadcastChannel(EventHelper.CHANNEL_NAME)
+      : null;
+
+  static broadcastLogout() {
+    if (this.channel) {
+      this.channel.postMessage(this.LOGOUT_EVENT);
     }
 
-    // Fallback (also triggers storage event)
     try {
-      localStorage.setItem(this.AUTH_EVENTS.LOGOUT, Date.now().toString());
+      localStorage.setItem(
+        `${this.CHANNEL_NAME}:${this.LOGOUT_EVENT}`,
+        Date.now().toString()
+      );
     } catch {}
-  };
+  }
+
+  static listenForLogout(cb: () => void) {
+    if (this.channel) {
+      this.channel.onmessage = (event) => {
+        if (event.data === this.LOGOUT_EVENT) {
+          cb();
+        }
+      };
+    }
+
+    window.addEventListener("storage", (event) => {
+      if (event.key === `${this.CHANNEL_NAME}:${this.LOGOUT_EVENT}`) {
+        cb();
+      }
+    });
+  }
 }

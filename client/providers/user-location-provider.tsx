@@ -1,6 +1,5 @@
 "use client";
 
-import { STORE_KEYS } from "@/configs";
 import React, {
   createContext,
   useCallback,
@@ -8,6 +7,11 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { toast } from "sonner";
+import { STORE_KEYS } from "@/configs";
+import { usePathname } from "next/navigation";
+import { useAuthStore } from "@/stores/auth-store";
+import { EventHelper } from "@/helpers/event-helper";
 
 export interface Coordinate {
   lat: number;
@@ -16,15 +20,18 @@ export interface Coordinate {
 
 interface CachedLocation {
   coords: Coordinate;
+  accuracy: number;
   timestamp: number;
 }
 
 interface IUserLocationContext {
-  userCoordinates: Coordinate | null;
-  setUserCoordinates: React.Dispatch<React.SetStateAction<Coordinate | null>>;
   loading: boolean;
+  userCoordinates: Coordinate | null;
+  accuracy?: number;
+  isOfflineFallback?: boolean;
   error: string | null;
   refreshUserLocation: () => void;
+  ensureFreshLocation: () => Promise<Coordinate | null>;
 }
 
 const UserLocationContext = createContext<IUserLocationContext>(
@@ -34,88 +41,249 @@ const UserLocationContext = createContext<IUserLocationContext>(
 interface IUserLocationProvider {
   children: React.ReactNode;
   cacheDurationMs?: number;
+  autoRefreshMs?: number;
 }
 
 export const UserLocationProvider = ({
   children,
-  cacheDurationMs = 60 * 60 * 1000, // 1 hour default
+  cacheDurationMs = 10 * 60 * 1000, // 10 minutes default - for "live"
+  autoRefreshMs = 5 * 60 * 1000, // 5 minutes
 }: IUserLocationProvider) => {
+  const pathname = usePathname();
+  const status = useAuthStore.getState().status;
+
   const [userCoordinates, setUserCoordinates] = useState<Coordinate | null>(
     null
   );
+  const [accuracy, setAccuracy] = useState<number | undefined>(undefined);
+  const [isOfflineFallback, setIsOfflineFallback] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fallbackToastShown, setFallbackToastShown] = useState(false);
+
+  const getCachedLocation = (): CachedLocation | null => {
+    try {
+      const cached = localStorage.getItem(STORE_KEYS.USER_LAST_LOCATION);
+      if (!cached) return null;
+      return JSON.parse(cached) as CachedLocation;
+    } catch {
+      return null;
+    }
+  };
+
+  const saveCachedLocation = (data: CachedLocation) => {
+    try {
+      localStorage.setItem(STORE_KEYS.USER_LAST_LOCATION, JSON.stringify(data));
+    } catch {}
+  };
+
+  const showFallbackToast = () => {
+    if (!fallbackToastShown) {
+      toast("Using last known location.", {
+        description: "Some results may be outdated.",
+      });
+      setFallbackToastShown(true);
+    }
+  };
 
   const fetchLocation = useCallback(
-    (forceRefresh = false) => {
+    async (forceRefresh = false): Promise<Coordinate | null> => {
       setLoading(true);
       setError(null);
+      setIsOfflineFallback(false);
 
-      if (!forceRefresh) {
-        const cached = localStorage.getItem(STORE_KEYS.USER_LAST_LOCATION);
+      const cached = getCachedLocation();
+
+      if (!forceRefresh && cached && !navigator.onLine) {
+        setFallbackToastShown(false);
+      }
+
+      if (!navigator.onLine) {
         if (cached) {
-          try {
-            const parsed: CachedLocation = JSON.parse(cached);
-            const isExpired = Date.now() - parsed.timestamp > cacheDurationMs;
+          setIsOfflineFallback(true);
+          setUserCoordinates(cached.coords);
+          setAccuracy(cached.accuracy);
+          setLoading(false);
+          showFallbackToast();
+          return Promise.resolve(cached.coords);
+        }
+        setError("Offline and no cached location available.");
+        setLoading(false);
+        return Promise.resolve(null);
+      }
 
-            if (!isExpired && parsed.coords?.lat && parsed.coords?.lng) {
-              setUserCoordinates(parsed.coords);
-              setLoading(false);
-              return;
-            } else {
-              localStorage.removeItem(STORE_KEYS.USER_LAST_LOCATION);
-            }
-          } catch {}
+      if (!forceRefresh && cached) {
+        const isExpired = Date.now() - cached.timestamp > cacheDurationMs;
+
+        if (!isExpired) {
+          setUserCoordinates(cached.coords);
+          setAccuracy(cached.accuracy);
+          setLoading(false);
+          return Promise.resolve(cached.coords);
         }
       }
 
-      if ("geolocation" in navigator) {
+      if (!("geolocation" in navigator)) {
+        setError("Geolocation is not supported.");
+        setLoading(false);
+        if (cached) {
+          setIsOfflineFallback(true);
+          showFallbackToast();
+          return Promise.resolve(cached.coords);
+        } // offline fallback
+        return Promise.resolve(null);
+      }
+
+      try {
+        // Check for permission status first
+        if (navigator.permissions) {
+          const permission = await navigator.permissions.query({
+            name: "geolocation",
+          });
+          if (permission.state === "denied") {
+            setError("Geolocation access denied.");
+            setLoading(false);
+            if (cached) {
+              setIsOfflineFallback(true);
+              showFallbackToast();
+              return Promise.resolve(cached.coords);
+            }
+            return Promise.resolve(null);
+          }
+        }
+      } catch {
+        // Permissions API not supported, proceed to request
+      }
+
+      return new Promise((resolve) => {
         navigator.geolocation.getCurrentPosition(
           (position) => {
-            const newCoords = {
+            const coords = {
               lat: position.coords.latitude,
               lng: position.coords.longitude,
             };
+            const acc = position.coords.accuracy;
 
-            const data: CachedLocation = {
-              coords: newCoords,
+            saveCachedLocation({
+              coords,
+              accuracy: position.coords.accuracy,
               timestamp: Date.now(),
-            };
-            localStorage.setItem(
-              STORE_KEYS.USER_LAST_LOCATION,
-              JSON.stringify(data)
-            );
+            });
 
-            setUserCoordinates(newCoords);
+            setUserCoordinates(coords);
+            setAccuracy(acc);
+            setIsOfflineFallback(false);
             setLoading(false);
+            resolve(coords);
           },
           (err) => {
-            setError(err.message);
+            setError(err.message ?? "Failed to retrieve location.");
             setLoading(false);
+            if (cached) {
+              setIsOfflineFallback(true);
+              setUserCoordinates(cached.coords);
+              setAccuracy(cached.accuracy);
+              showFallbackToast();
+              resolve(cached.coords); // fallback to cached coords
+            } else {
+              resolve(null);
+            }
           },
           { enableHighAccuracy: true }
         );
-      } else {
-        setError("Geolocation is not supported by your browser.");
-        setLoading(false);
-      }
+      });
     },
     [cacheDurationMs]
   );
+
+  /*
+   * POINT OF USAGE:
+   * Place order	await ensureFreshLocation()
+   * Confirm delivery	await ensureFreshLocation()
+   * Directions / visit	await ensureFreshLocation()
+   */
+  const ensureFreshLocation = async (): Promise<Coordinate | null> => {
+    const cached = getCachedLocation();
+
+    if (!cached) {
+      return await fetchLocation(true);
+    }
+
+    const isExpired = Date.now() - cached.timestamp > cacheDurationMs;
+    const isLowAccuracy = cached.accuracy > 1000; // meters
+
+    if ((!navigator.onLine && cached) || isExpired || isLowAccuracy) {
+      if (!navigator.onLine) {
+        setIsOfflineFallback(true);
+        toast("Using last known location (offline)", {
+          description: "Some results may be outdated.",
+        });
+        setUserCoordinates(cached.coords);
+        setAccuracy(cached.accuracy);
+        return cached.coords;
+      }
+      return await fetchLocation(true);
+    }
+
+    setUserCoordinates(cached.coords);
+    setAccuracy(cached.accuracy);
+    setIsOfflineFallback(false);
+    return cached.coords;
+  };
 
   useEffect(() => {
     fetchLocation();
   }, [fetchLocation]);
 
-  const refreshUserLocation = () => fetchLocation(true);
+  // Auto-refresh only if dashboard and session active
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    if (!pathname?.startsWith("/dashboard")) return;
 
-  const value = {
-    userCoordinates,
-    setUserCoordinates,
-    loading,
-    error,
-    refreshUserLocation,
-  };
+    const interval = setInterval(() => {
+      if (status === "authenticated") {
+        ensureFreshLocation().catch(() => {});
+      }
+    }, autoRefreshMs);
+
+    return () => clearInterval(interval);
+  }, [pathname, autoRefreshMs, ensureFreshLocation, status]);
+
+  // Stop auto-refresh on multi-tab logout
+  useEffect(() => {
+    const stopLocationUpdates = () => {
+      setLoading(false);
+      setUserCoordinates(null);
+      setAccuracy(undefined);
+    };
+
+    EventHelper.listenForLogout(stopLocationUpdates);
+    return () => {
+      // nothing to clean here; EventHelper handles channel cleanup if needed in the future
+    };
+  }, []);
+
+  const value = React.useMemo(
+    () => ({
+      loading,
+      userCoordinates,
+      accuracy,
+      isOfflineFallback,
+      error,
+      refreshUserLocation: () => fetchLocation(true),
+      ensureFreshLocation,
+    }),
+    [
+      loading,
+      userCoordinates,
+      accuracy,
+      isOfflineFallback,
+      error,
+      fetchLocation,
+      ensureFreshLocation,
+    ]
+  );
+
   return (
     <UserLocationContext.Provider value={value}>
       {children}
@@ -126,183 +294,6 @@ export const UserLocationProvider = ({
 export const useUserLocation = () => {
   const ctx = useContext(UserLocationContext);
   if (!ctx)
-    throw new Error("useUserLocation must be used within UseLocationProvider");
+    throw new Error("useUserLocation must be used within UserLocationProvider");
   return ctx;
 };
-
-// "use client";
-
-// import React, {
-//   createContext,
-//   useCallback,
-//   useContext,
-//   useEffect,
-//   useState,
-// } from "react";
-// import { STORE_KEYS } from "@/configs";
-// import { StorageUtilsHelper } from "@/utils";
-// import { LocationPermissionEnum } from "@/enums/LocationPermissionEnum";
-
-// export interface Coordinate {
-//   lat: number;
-//   lng: number;
-// }
-
-// interface CachedLocation {
-//   coords: Coordinate;
-//   timestamp: number;
-// }
-
-// interface IUserLocationContext {
-//   userCoordinates: Coordinate | null;
-//   setUserCoordinates: React.Dispatch<React.SetStateAction<Coordinate | null>>;
-//   loading: boolean;
-//   error: string | null;
-//   refreshUserLocation: () => void;
-//   manualSetLocation: (coords: Coordinate) => void;
-// }
-
-// const UserLocationContext = createContext<IUserLocationContext | undefined>(
-//   undefined
-// );
-
-// interface IUserLocationProvider {
-//   children: React.ReactNode;
-//   cacheDurationMs?: number;
-// }
-
-// export const UserLocationProvider = ({
-//   children,
-//   cacheDurationMs = 60 * 60 * 1000, // 1 hour default
-// }: IUserLocationProvider) => {
-//   const [userCoordinates, setUserCoordinates] = useState<Coordinate | null>(
-//     null
-//   );
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState<string | null>(null);
-
-//   const persistLocation = useCallback((coords: Coordinate) => {
-//     try {
-//       const data: CachedLocation = { coords, timestamp: Date.now() };
-//       if (typeof window !== "undefined") {
-//         StorageUtilsHelper.saveToLocalStorage([
-//           STORE_KEYS.USER_LAST_LOCATION,
-//           data,
-//         ]);
-//       }
-//     } catch (e) {
-//       console.warn("Persist Location failed", e);
-//     }
-//   }, []);
-
-//   const manualSetLocation = useCallback(
-//     (coords: Coordinate) => {
-//       setUserCoordinates(coords);
-//       persistLocation(coords);
-//     },
-//     [persistLocation]
-//   );
-
-//   const fetchLocation = useCallback(
-//     (forceRefresh = false) => {
-//       if (typeof window === "undefined") return;
-//       setLoading(true);
-//       setError(null);
-
-//       if (!forceRefresh) {
-//         const cachedUserLocation = StorageUtilsHelper.getItemFromLocalStorage(
-//           STORE_KEYS.USER_LAST_LOCATION
-//         ) as CachedLocation;
-//         if (cachedUserLocation) {
-//           try {
-//             const isExpired =
-//               Date.now() - cachedUserLocation.timestamp > cacheDurationMs;
-
-//             if (
-//               !isExpired &&
-//               cachedUserLocation.coords?.lat &&
-//               cachedUserLocation.coords?.lng
-//             ) {
-//               setUserCoordinates(cachedUserLocation.coords);
-//               setLoading(false);
-//               return;
-//             } else {
-//               localStorage.removeItem(STORE_KEYS.USER_LAST_LOCATION);
-//             }
-//           } catch (e) {
-//             console.warn("Failed to read cached location", e);
-//           }
-//         }
-//       }
-
-//       if ("geolocation" in navigator) {
-//         navigator.geolocation.getCurrentPosition(
-//           (position) => {
-//             const newCoords = {
-//               lat: position.coords.latitude,
-//               lng: position.coords.longitude,
-//             };
-
-//             persistLocation(newCoords);
-
-//             setUserCoordinates(newCoords);
-//             setLoading(false);
-//           },
-//           (err) => {
-//             setError(err.message ?? "Failed to retrieve location.");
-//             setLoading(false);
-//           },
-//           { enableHighAccuracy: true }
-//         );
-//       } else {
-//         setError("Geolocation is not supported by your browser.");
-//         setLoading(false);
-//       }
-//     },
-//     [cacheDurationMs, persistLocation]
-//   );
-
-//   useEffect(() => {
-//     if (typeof window === "undefined") {
-//       setLoading(false);
-//       return;
-//     }
-
-//     try {
-//       const permission = StorageUtilsHelper.getItemFromLocalStorage(
-//         STORE_KEYS.USER_LOCATION_PERMISSION
-//       );
-//       if (permission === LocationPermissionEnum.GRANTED) {
-//         fetchLocation();
-//       } else {
-//         setLoading(false);
-//       }
-//     } catch (e) {
-//       console.warn("UserLocationProvider init error", e);
-//       setLoading(false);
-//     }
-//   }, [fetchLocation]);
-
-//   const refreshUserLocation = () => fetchLocation(true);
-
-//   const value = {
-//     userCoordinates,
-//     setUserCoordinates,
-//     loading,
-//     error,
-//     refreshUserLocation,
-//     manualSetLocation,
-//   };
-//   return (
-//     <UserLocationContext.Provider value={value}>
-//       {children}
-//     </UserLocationContext.Provider>
-//   );
-// };
-
-// export const useUserLocation = () => {
-//   const ctx = useContext(UserLocationContext);
-//   if (!ctx)
-//     throw new Error("useUserLocation must be used within UseLocationProvider");
-//   return ctx;
-// };

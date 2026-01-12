@@ -8,6 +8,7 @@ import { MapBounds } from "@/data/interfaces/MapBounds";
 import { useBusinessesByBounds } from "@/data/queries/use-businesses-query";
 import { debounce } from "@/utils";
 import { useIsMobile } from "@/hooks";
+import { useUserLocation } from "@/providers";
 
 type IMapSelectorProps = {
   zoom?: number;
@@ -35,6 +36,9 @@ export function MapSelector({
   onMarkerClick,
 }: IMapSelectorProps) {
   const PAGE_SIZE = 300;
+
+  const { userCoordinates } = useUserLocation();
+  initial = userCoordinates;
 
   const isMobile = useIsMobile();
   const ZOOM = zoom ?? (isMobile ? 13 : 13);

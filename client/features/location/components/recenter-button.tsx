@@ -120,7 +120,7 @@ export function RecenterButton({
   const map = useMap();
   const {
     userCoordinates,
-    setUserCoordinates,
+    // setUserCoordinates,
     loading,
     error,
     refreshUserLocation,
@@ -173,7 +173,7 @@ export function RecenterButton({
         onClick={handleLocate}
         onContextMenu={(e) => {
           e.preventDefault();
-          setUserCoordinates(null);
+          // setUserCoordinates(null);
           toast("Next click will fetch your live location again");
         }}
         className="relative rounded-full"

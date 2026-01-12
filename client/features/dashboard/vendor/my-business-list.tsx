@@ -12,10 +12,12 @@ import { useDeleteBusiness } from "@/data/mutations/business/use-business-mutati
 import { PaginationHelper } from "@/helpers/pagination-helper";
 import { BusinessTypeEnum } from "@/data/enums/BusinessTypeEnum";
 import { QueryKeyEnum } from "@/data/enums";
+import { useAuth } from "@/providers";
 
 export function MyBusinessList() {
   const PAGE_SIZE = 10;
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -116,7 +118,8 @@ export function MyBusinessList() {
         handleDelete,
         deleteBusinessMutation.isPending,
         currentItemDeleting,
-        "my-businesses"
+        "businesses",
+        user
       ),
     [currentItemDeleting, deleteBusinessMutation.isPending, handleDelete]
   );

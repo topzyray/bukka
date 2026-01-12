@@ -11,6 +11,7 @@ import { useCustomMutation } from "@/data/mutations/base";
 import { useQueryClient } from "@tanstack/react-query";
 import { STORE_KEYS } from "@/configs";
 import { QueryKeyEnum } from "@/data/enums";
+import { useAuthStore } from "@/stores/auth-store";
 
 export const useSignIn = () => {
   const queryClient = useQueryClient();
@@ -34,6 +35,7 @@ export const useSignIn = () => {
         }
 
         queryClient.setQueryData([QueryKeyEnum.CURRENT_USER], user);
+        useAuthStore.getState().setUser(user);
 
         await Promise.allSettled([
           queryClient.prefetchQuery({

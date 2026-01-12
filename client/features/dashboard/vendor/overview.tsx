@@ -112,7 +112,7 @@ export function VendorOverview() {
             Manage your business presence on Bukka
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <BukkaButton
             variant="outline"
             onClick={() => router.push(`settings/profile`)}

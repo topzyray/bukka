@@ -17,53 +17,85 @@ export class RouteHelper {
     return param ? `${route}/${param}` : route;
   }
 
-  static getDashboardPath<T extends User>(user: T): string {
-    if (!user) return "/signin";
+  /**
+   * 🔐 Centralized post-auth redirect
+   * Used by:
+   * - RouteGuard
+   * - AuthProvider
+   * - Login success handler
+   */
+  static getPostAuthPath(user?: User | null): string {
+    if (!user?.role) return "/signin";
 
-    const role = user?.role;
-    if (!role) return "/signin";
+    if (!user.isOnboarded) {
+      return `/onboarding/${user.role.toLowerCase()}`;
+    }
 
-    if (!user.isOnboarded) return `/onboarding/${role?.toLowerCase()}`;
+    return this.getDashboardPath(user);
+  }
 
-    switch (role) {
-      case UserRoleEnum.ADMIN:
-        return `/dashboard/admin/overview`;
-      case UserRoleEnum.VENDOR:
-        return `/dashboard/vendor/overview`;
-      case UserRoleEnum.INVESTOR:
-        return `/dashboard/investor/overview`;
-      case UserRoleEnum.RIDER:
-        return `/dashboard/rider/overview`;
+  /**
+   * 📊 Dashboard root resolver
+   * Always returns a valid path
+   */
+  static getDashboardPath(user?: User | null): string {
+    if (!user?.role) return "/signin";
+
+    // switch (user.role) {
+    //   case UserRoleEnum.ADMIN:
+    //     return `/dashboard/admin/overview`;
+    //   case UserRoleEnum.VENDOR:
+    //     return `/dashboard/vendor/overview`;
+    //   case UserRoleEnum.INVESTOR:
+    //     return `/dashboard/investor/overview`;
+    //   case UserRoleEnum.RIDER:
+    //     return `/dashboard/rider/overview`;
+    //   case UserRoleEnum.USER:
+    //     return `/dashboard/user/overview`;
+    //   default:
+    //     throw new Error("Invalid role!");
+    // }
+
+    return user?.role
+      ? `/dashboard/${user?.role?.toLowerCase()}/overview`
+      : "/signin";
+  }
+  /**
+   * 🏢 Business details routing
+   * Context-aware (dashboard vs public)
+   */
+  static businessDetailsLink(
+    pathname: string,
+    userRole: UserRoleEnum | string | undefined,
+    businessId?: number
+  ): string {
+    if (!businessId) return "#";
+
+    const isDashboard = pathname.startsWith("/dashboard");
+    const idSegment = `/${businessId}`;
+
+    if (!isDashboard) {
+      return `/businesses${idSegment}`;
+    }
+
+    switch (userRole) {
       case UserRoleEnum.USER:
-        return `/dashboard/user/overview`;
+        return `/dashboard/user/favourites${idSegment}`;
+      case UserRoleEnum.ADMIN:
+      case UserRoleEnum.VENDOR:
+      case UserRoleEnum.INVESTOR:
+        return `/dashboard/${userRole.toLowerCase()}/businesses${idSegment}`;
       default:
-        throw new Error("Invalid role!");
+        return `/businesses${idSegment}`;
     }
   }
 
-  static businessDetailsLink(
-    pathname: string,
-    userRole: string,
-    businessId: number
-  ) {
-    if (!businessId) return "#";
-
-    const businessIdSegment = `/${businessId}`;
-    const isDashboard = pathname.startsWith("/dashboard");
-
-    if (userRole === UserRoleEnum.USER && isDashboard) {
-      return `/dashboard/user/favourites${businessIdSegment}`;
-    }
-
-    if (
-      (userRole === UserRoleEnum.ADMIN ||
-        userRole === UserRoleEnum.VENDOR ||
-        userRole === UserRoleEnum.VENDOR) &&
-      isDashboard
-    ) {
-      return `/dashboard/${userRole.toLowerCase()}/businesses${businessIdSegment}`;
-    }
-
-    return `/businesses${businessIdSegment}`;
+  /**
+   * 🧭 Role extracted from URL
+   * Used by RouteGuard
+   */
+  static extractRoleFromPath(pathname: string): UserRoleEnum | undefined {
+    const match = pathname.match(/\/(dashboard|onboarding)\/([^/]+)/);
+    return match?.[2]?.toUpperCase() as UserRoleEnum | undefined;
   }
 }

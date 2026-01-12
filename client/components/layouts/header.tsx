@@ -33,7 +33,7 @@ export function Header({ className }: HeaderProps) {
   const [searchValue, setSearchValue] = useState("");
   const router = useRouter();
   const { user, logout } = useAuth();
-  const route = RouteHelper.getDashboardPath(user as User);
+  const route = RouteHelper.getPostAuthPath(user as User);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
