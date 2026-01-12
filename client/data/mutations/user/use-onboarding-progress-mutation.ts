@@ -2,7 +2,7 @@ import { QueryKeyEnum } from "@/data/enums";
 import { User } from "@/data/interfaces/User";
 import { useCustomMutation } from "@/data/mutations/base";
 import { UserApiService } from "@/data/services/UserApiService";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 
 export const useSaveOnboardingProgress = ({
   user,
@@ -11,7 +11,6 @@ export const useSaveOnboardingProgress = ({
   user: User;
   toastStatusMessage?: boolean;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(UserApiService.updateUser, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({

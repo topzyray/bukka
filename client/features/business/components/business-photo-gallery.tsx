@@ -21,7 +21,7 @@ import { Recommendation } from "@/data/interfaces/Recommendation";
 import { useDeleteFile } from "@/data/mutations/file/use-file-mutations";
 import { FileApiService } from "@/data/services";
 import { useAuth } from "@/providers";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { Camera, Loader2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -36,7 +36,6 @@ export function BusinessPhotoGallery({
 }: IBusinessPhotoGallery) {
   const { user } = useAuth();
   const pathname = usePathname();
-  const queryClient = useQueryClient();
 
   const hasAccessToUpdate =
     [UserRoleEnum.ADMIN, UserRoleEnum.VENDOR].includes(

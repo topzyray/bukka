@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useAuth } from "@/providers";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { useOnboardingProgress } from "@/data/queries/use-onboarding-progress-query";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
@@ -18,7 +18,6 @@ export function UserPersonalizedDetailsStep({
   onBack?: () => void;
   stepIndex?: number;
 }) {
-  const queryClient = useQueryClient();
   const { user } = useAuth();
 
   const {

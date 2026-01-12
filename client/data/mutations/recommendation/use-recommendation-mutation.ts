@@ -1,7 +1,7 @@
 import { QueryKeyEnum } from "@/data/enums";
 import { useCustomMutation } from "@/data/mutations/base";
 import { RecommendationApiService } from "@/data/services";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 
 export const useAddRecommendation = ({
   resetForm,
@@ -10,7 +10,6 @@ export const useAddRecommendation = ({
   resetForm: () => void;
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(RecommendationApiService.createRecommenation, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
@@ -42,7 +41,6 @@ export const useApproveRecommendation = ({
 }: {
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(RecommendationApiService.approveRecommendation, {
     onSuccessCallback: async () => {
       await queryClient.invalidateQueries({
@@ -61,7 +59,6 @@ export const useRejectRecommendation = ({
 }: {
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(RecommendationApiService.rejectRecommendation, {
     onSuccessCallback: async () => {
       await queryClient.invalidateQueries({
@@ -80,7 +77,6 @@ export const useDeleteRecommendation = ({
 }: {
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(RecommendationApiService.deleteRecommendation, {
     onSuccessCallback: async () => {
       await queryClient.invalidateQueries({

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { Business } from "@/data/interfaces/Business";
 import { CreateUpdateBusinessModal } from "./modals/create-update-business-modal";
 import { DataTable } from "@/components/ui/data-table";
@@ -16,7 +16,7 @@ import { useAuth } from "@/providers";
 
 export function MyBusinessList() {
   const PAGE_SIZE = 10;
-  const queryClient = useQueryClient();
+
   const { user } = useAuth();
 
   const [mode, setMode] = useState<"create" | "edit">("create");

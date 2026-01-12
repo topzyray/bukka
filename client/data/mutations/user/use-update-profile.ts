@@ -1,11 +1,9 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { UserApiService } from "@/data/services";
 import { useCustomMutation } from "../base";
 import { QueryKeyEnum } from "@/data/enums";
 
 export const useUpdateUserProfile = () => {
-  const queryClient = useQueryClient();
-
   return useCustomMutation(UserApiService.updateUserProfile, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({

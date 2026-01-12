@@ -1,10 +1,9 @@
 import { UserNotificationApiService } from "@/data/services";
 import { useCustomMutation } from "../base";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { QueryKeyEnum } from "@/data/enums";
 
 export const useReadAllNotificaiton = ({ userId }: { userId?: number }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(UserNotificationApiService.readAllMyNotification, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
@@ -28,7 +27,6 @@ export const useReadNotificaiton = ({
 }: {
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(
     (id: number) => UserNotificationApiService.readNotificationById(id),
     {

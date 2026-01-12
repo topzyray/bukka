@@ -9,7 +9,7 @@ import { useBusinessById } from "@/data/queries/use-businesses-query";
 import { ErrorBox, BukkaButton } from "@/components/ui";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { CreateUpdateBusinessModal } from "../vendor/modals/create-update-business-modal";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { Business } from "@/data/interfaces/Business";
 import { BusinessReviews } from "@/features/business/components/business-reviews";
 import { FileCategoryEnum, QueryKeyEnum, UserRoleEnum } from "@/data/enums";
@@ -29,7 +29,7 @@ import { useAuth } from "@/providers";
 
 export const BusinessDetails: React.FC = () => {
   const { id } = useParams() as unknown as { id: number };
-  const queryClient = useQueryClient();
+
   const { user } = useAuth();
 
   const [mode, setMode] = useState<"create" | "edit">("edit");

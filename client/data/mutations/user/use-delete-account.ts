@@ -1,11 +1,10 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { UserApiService } from "@/data/services";
 import { useCustomMutation } from "../base";
 import { useAuth } from "@/providers";
 import { QueryKeyEnum } from "@/data/enums";
 
 export const useDeleteMyAccount = () => {
-  const queryClient = useQueryClient();
   const { logout } = useAuth();
 
   return useCustomMutation(UserApiService.deleteUserAccount, {

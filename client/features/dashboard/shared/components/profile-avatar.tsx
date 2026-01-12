@@ -16,7 +16,7 @@ import {
 import { File } from "@/data/interfaces/File";
 import { User } from "@/data/interfaces/User";
 import { FileApiService } from "@/data/services";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { Shield } from "lucide-react";
 
 interface IProfileAvatar {
@@ -30,7 +30,6 @@ export function ProfileAvatar({
   profileAvatar,
 }: IProfileAvatar) {
   const fullName = `${user?.firstName} ${user?.lastName}`.trim();
-  const queryClient = useQueryClient();
 
   return (
     <Card className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-6 border-b dark:border-sidebar-accent">

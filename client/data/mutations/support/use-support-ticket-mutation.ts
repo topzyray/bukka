@@ -1,10 +1,9 @@
 import { QueryKeyEnum } from "@/data/enums";
 import { useCustomMutation } from "../base";
 import { SupportApiService } from "@/data/services";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 
 export const useCreateTicket = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(SupportApiService.createTicket, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
@@ -32,7 +31,6 @@ export const useAssignTicketToTeam = ({
 }: {
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(SupportApiService.assignTicket, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
@@ -47,7 +45,6 @@ export const useAssignTicketToTeam = ({
 };
 
 export const useResolveTicket = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(SupportApiService.resolveTicket, {
     onSuccessCallback() {
       queryClient.invalidateQueries({
@@ -62,7 +59,6 @@ export const useResolveTicket = ({ onSuccess }: { onSuccess?: () => void }) => {
 };
 
 export const useDeleteTicket = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(SupportApiService.deleteSupport, {
     onSuccessCallback() {
       queryClient.invalidateQueries({

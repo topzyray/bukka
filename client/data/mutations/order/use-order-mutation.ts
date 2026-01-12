@@ -1,6 +1,6 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { toast } from "sonner";
 import { useCustomMutation } from "../base";
 import { OrderApiService } from "@/data/services";
@@ -8,8 +8,6 @@ import { Order } from "@/data/interfaces/Order";
 import { QueryKeyEnum } from "@/data/enums";
 
 export const useOrderMutation = () => {
-  const queryClient = useQueryClient();
-
   const mutation = useCustomMutation(OrderApiService.createOrder, {
     onMutate: async (newOrder) => {
       await queryClient.cancelQueries({ queryKey: [QueryKeyEnum.ORDERS] });
@@ -75,8 +73,6 @@ export const useOrderMutation = () => {
 };
 
 export const useOrderStatusMutation = (businessId: number) => {
-  const queryClient = useQueryClient();
-
   const mutation = useCustomMutation(OrderApiService.createOrder, {
     onMutate: async (newOrder) => {
       await queryClient.cancelQueries({ queryKey: [QueryKeyEnum.ORDERS] });

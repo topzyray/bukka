@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Review } from "@/data/interfaces/Review";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { InputComponent } from "@/components/form-ui/base/input-component";
 import { FileApiService } from "@/data/services";
 import {
@@ -43,7 +43,6 @@ export function AddEditMenuForm({
   onSuccess,
   onClose,
 }: IAddEditReviewForm) {
-  const queryClient = useQueryClient();
   const { user } = useAuth();
 
   const form = useForm<ReviewFormValues>({

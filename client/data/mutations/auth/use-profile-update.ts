@@ -7,8 +7,6 @@ import parsePhoneNumberFromString from "libphonenumber-js";
 import { GenderEnum } from "@/data/enums";
 
 export const useProfileUpdate = () => {
-  // const queryClient = useQueryClient();
-
   const singleProfilePictureSchema = z.object({
     image: z
       .instanceof(File, { message: "A file is required." })

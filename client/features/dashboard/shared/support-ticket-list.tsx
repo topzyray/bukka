@@ -5,7 +5,7 @@ import { BukkaButton } from "@/components/ui";
 import { QueryKeyEnum, UserRoleEnum } from "@/data/enums";
 import { Support } from "@/data/interfaces/Support";
 import { DataTable } from "@/components/ui/data-table";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { useCallback, useMemo, useState } from "react";
 import { supportColumns } from "./components/support-columns";
 import { PaginationHelper } from "@/helpers/pagination-helper";
@@ -16,7 +16,7 @@ import { useDeleteTicket } from "@/data/mutations/support/use-support-ticket-mut
 
 export function SupportTicketList() {
   const PAGE_SIZE = 10;
-  const queryClient = useQueryClient();
+
   const { user } = useAuth();
 
   const [mode, setMode] = useState<"create" | "edit">("create");

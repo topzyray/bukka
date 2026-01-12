@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ErrorBox, BukkaButton } from "@/components/ui";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { CreateUpdateBusinessModal } from "../vendor/modals/create-update-business-modal";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { FileCategoryEnum, QueryKeyEnum, UserRoleEnum } from "@/data/enums";
 import { useBusinessFiles } from "@/data/queries/use-business-files";
 import { File } from "@/data/interfaces/File";
@@ -22,7 +22,7 @@ import { Recommendation } from "@/data/interfaces/Recommendation";
 
 export const RecommendationDetails: React.FC = () => {
   const { id } = useParams() as unknown as { id: number };
-  const queryClient = useQueryClient();
+
   const { user } = useAuth();
 
   const [mode, setMode] = useState<"create" | "edit">("edit");

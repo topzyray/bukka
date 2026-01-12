@@ -57,7 +57,7 @@ export default function RoleBasedOnboardingLayout({
 
         {/* Main Card */}
         <motion.section
-          className="w-full max-w-[66rem] h-[75vh] bg-card text-card-foreground rounded-2xl shadow-elegant overflow-hidden flex flex-col md:flex-row"
+          className="w-full max-w-264 h-[75vh] bg-card text-card-foreground rounded-2xl shadow-elegant overflow-hidden flex flex-col md:flex-row"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { Loader2, PackageSearch } from "lucide-react";
 import { BukkaButton } from "@/components/ui";
 import { PaginationHelper } from "@/helpers/pagination-helper";
@@ -31,7 +31,6 @@ export function OrdersTableBase({
   basePath: string;
 }) {
   const PAGE_SIZE = 10;
-  const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
 

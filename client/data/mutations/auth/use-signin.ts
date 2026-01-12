@@ -8,13 +8,12 @@ import {
 } from "@/data/services";
 import { extractErrorMessage, StorageUtilsHelper } from "@/utils";
 import { useCustomMutation } from "@/data/mutations/base";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { STORE_KEYS } from "@/configs";
 import { QueryKeyEnum } from "@/data/enums";
 import { useAuthStore } from "@/stores/auth-store";
 
 export const useSignIn = () => {
-  const queryClient = useQueryClient();
   const router = useRouter();
 
   const { mutate: signInUser, isPending: isSigningIn } = useCustomMutation(

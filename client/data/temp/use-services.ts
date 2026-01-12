@@ -1,4 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
 export interface Service {
@@ -26,7 +27,6 @@ export function useGetServices(businessId: number) {
 }
 
 export function useCreateService() {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: Partial<Service>) => {
       const { data } = await api.post("/", payload);
@@ -41,7 +41,6 @@ export function useCreateService() {
 }
 
 export function useUpdateService() {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: Partial<Service> & { id: number }) => {
       const { data } = await api.put(`/${payload.id}`, payload);
@@ -56,7 +55,6 @@ export function useUpdateService() {
 }
 
 export function useDeleteService() {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: number) => {
       await api.delete(`/${id}`);

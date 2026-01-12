@@ -1,10 +1,9 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { useCustomMutation } from "../base";
 import { ReviewApiService } from "@/data/services";
 import { QueryKeyEnum } from "@/data/enums";
 
 export const useCreateReview = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(ReviewApiService.addReview, {
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -32,7 +31,6 @@ export const useCreateReview = ({ onSuccess }: { onSuccess?: () => void }) => {
 };
 
 export const useUpdateReview = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(ReviewApiService.updateReview, {
     onSuccess: () => {
       queryClient.invalidateQueries({

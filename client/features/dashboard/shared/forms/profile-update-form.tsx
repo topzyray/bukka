@@ -10,7 +10,7 @@ import { Card, Form } from "@/components/ui";
 import { User } from "@/data/interfaces/User";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { InputComponent } from "@/components/form-ui/base/input-component";
 import { SelectComponent } from "@/components/form-ui/base/select-component";
 import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
@@ -64,8 +64,6 @@ export function ProfileUpdateForm({
   user,
   setEditProfile,
 }: IProfileUpdateForm) {
-  const queryClient = useQueryClient();
-
   const form = useForm({
     resolver: zodResolver(personalDetailsSchema),
     mode: "onSubmit",

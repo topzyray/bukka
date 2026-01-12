@@ -1,7 +1,7 @@
 import { QueryKeyEnum } from "@/data/enums";
 import { useCustomMutation } from "@/data/mutations/base";
 import { BusinessCategoryApiService } from "@/data/services/BusinessCategoryApiService";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 
 export const useCreateCategory = ({
   resetForm,
@@ -10,8 +10,6 @@ export const useCreateCategory = ({
   resetForm: () => void;
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
-
   return useCustomMutation(BusinessCategoryApiService.createCategory, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
@@ -43,7 +41,6 @@ export const useUpdateCategory = ({
 }: {
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(BusinessCategoryApiService.updateCategory, {
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
@@ -65,7 +62,6 @@ export const useDeleteCategory = ({
 }: {
   onSuccess?: () => void;
 }) => {
-  const queryClient = useQueryClient();
   return useCustomMutation(BusinessCategoryApiService.deleteCategory, {
     onSuccessCallback: async () => {
       queryClient.removeQueries({

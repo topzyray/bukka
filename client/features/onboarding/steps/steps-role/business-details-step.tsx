@@ -5,7 +5,7 @@ import { CreateEditBusinessForm } from "@/features/dashboard/admin/forms/create-
 import { useOnboardingProgress } from "@/data/queries/use-onboarding-progress-query";
 import { useUpdateUserData } from "@/data/mutations/user/use-update-user-data";
 import { useAuth } from "@/providers";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib";
 import { CircularLoader } from "@/components/loaders/circular-loader";
 import { QueryKeyEnum } from "@/data/enums";
 
@@ -18,7 +18,6 @@ export default function BusinessDetailsStep({
   stepIndex?: number;
 }) {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
 
   const { data: savedProgress, isLoading: isFetchingProgress } =
     useOnboardingProgress(user?.id as number);
