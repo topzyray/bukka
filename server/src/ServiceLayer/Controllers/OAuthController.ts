@@ -1,5 +1,4 @@
 import type { Request, Response } from 'express';
-import { AuthGuard } from '@nestjs/passport';
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { AuthRepository } from 'src/BussinessLayer/AuthRepository';
@@ -7,15 +6,14 @@ import { RequestInfoHelper } from 'src/InfrastructureLayer/Helpers/RequestInfoHe
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
-import { SocialAccountProviderEnum } from 'src/DomainLayer/Enums/SocialAccountProviderEnum';
 import { GoogleAuthGuard } from 'src/MiddlewareLayer/Guards/GoogleAuthGuard';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/auth`)
 export class OAuthController {
-  private isProd: boolean;
-  private cookieOptions: any;
-  private ACCESS_TOKEN_MAX_AGE: number;
-  private REFRESH_TOKEN_MAX_AGE: number;
+  private readonly isProd: boolean;
+  private readonly cookieOptions: any;
+  private readonly ACCESS_TOKEN_MAX_AGE: number;
+  private readonly REFRESH_TOKEN_MAX_AGE: number;
 
   constructor(
     private readonly _authRepo: AuthRepository,
@@ -66,6 +64,8 @@ export class OAuthController {
     );
 
     const state = req.query.state;
+
+    console.log('CURRENT STATE IN QUERY: ', state);
 
     // redirect to client - you can attach state to redirect if needed
     return res.redirect(

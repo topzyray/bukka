@@ -25,8 +25,6 @@ export class GoogleStrategy extends PassportStrategy(
     profile: any,
     done: Function,
   ) {
-    console.log('PROFILE: ', profile);
-
     const user = {
       provider: SocialAccountProviderEnum.GOOGLE,
       providerId: profile.id,
