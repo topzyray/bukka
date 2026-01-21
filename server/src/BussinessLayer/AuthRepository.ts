@@ -35,6 +35,7 @@ import { QueueService } from 'src/InfrastructureLayer/Services/queue/QueueServic
 import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
 import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
 import { ProfileQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/ProfileQueueMessageTypeEnum';
+import { SocialAccountDataAgent } from 'src/DataLayer/DataAgents/SocialAccountDataAgent';
 
 @Injectable()
 export class AuthRepository {
@@ -45,6 +46,7 @@ export class AuthRepository {
     private readonly _queue: QueueService,
     private readonly _notifSetting: NotificationSettingsDataAgent,
     private readonly _configService: AppConfigurationService,
+    private readonly _socialAccountAgent: SocialAccountDataAgent,
   ) {}
 
   async signUp(userDto: CreateUserDto): Promise<BukkaResponse<User>> {
@@ -179,6 +181,127 @@ export class AuthRepository {
       LoginResponse,
       true,
       `Welcome back, ${firstName} 👋`,
+    );
+  }
+
+  async signInWithSocial(
+    profile: {
+      provider: string;
+      providerId: string;
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      profile?: any;
+    },
+    metaData: SigninMetaDataDto,
+  ): Promise<BukkaResponse<LoginResponseDto<User>>> {
+    console.log('PROFILE IN AUTH REPO: ', profile);
+
+    let social = await this._socialAccountAgent.findByProvider(
+      profile.provider,
+      profile.providerId,
+    );
+    let user: User | null = null;
+
+    if (social) {
+      user = await this._userRepository.findUserById(social.userId);
+    } else {
+      if (profile?.email) {
+        user = await this._userRepository.findUserByEmail(profile?.email);
+      }
+
+      if (!user) {
+        const randomPasswordHash = await Generator.Hash(
+          Generator.GenerateSecurePassword(),
+          10,
+        );
+        user = await this._userRepository.createUserFromSocial({
+          email:
+            profile.email ??
+            `${profile.provider}-${profile.providerId}@noemail.local`,
+          password: randomPasswordHash,
+          firstName: profile.firstName ?? '',
+          lastName: profile.lastName ?? '',
+          emailConfirmed: true,
+          userStatus: UserStatusEnum.ACTIVE,
+        });
+
+        await this._notifSetting.createNotificationSetting({
+          userId: user.id,
+          settings: {
+            isEmailTurnedOn: true,
+            isInAppTurnedOn: true,
+            isPushTurnedOn: true,
+          },
+        });
+      }
+
+      await this._socialAccountAgent.create({
+        provider: profile?.provider,
+        providerId: profile?.providerId,
+        userId: user?.id,
+        profileJson: profile?.profile ?? null,
+      });
+    }
+
+    const claims = TypeSafeMapper.mapObject(user as User, {
+      include: ['id', 'email', 'firstName', 'lastName', 'role'],
+    }) as TokenClaims;
+
+    const accessToken =
+      await this._tokenRepository.generateAccessTokenAsync(claims);
+    const refreshToken =
+      await this._tokenRepository.generateRefreshTokenAsync();
+    const deviceId = Generator.RandomUUID();
+    const encryptedToken = await Generator.Encrypt(refreshToken);
+
+    // session cleanup logic reused
+    const existingSessions =
+      await this._userSessionRepository.findUserSessionBy(user?.id as number);
+
+    if (existingSessions.length >= this._configService.maxSessionCount) {
+      const sorted = existingSessions?.sort(
+        (a: UserSession, b: UserSession) =>
+          new Date(a?.createdAt).getTime() - new Date(b?.createdAt).getTime(),
+      );
+      const toDelete = sorted.slice(
+        0,
+        existingSessions?.length - (this._configService.maxSessionCount - 1),
+      );
+      await Promise.all(
+        toDelete.map((s) =>
+          this._userSessionRepository.deleteSessionById(s.id),
+        ),
+      );
+    }
+
+    await this._userSessionRepository.createUserSession({
+      userId: user?.id as number,
+      deviceId,
+      refreshToken: encryptedToken,
+      userAgent: metaData.userAgent,
+      ipAddress: metaData.ip,
+      expiresAt: Generator.CalculateExpirationTime(20160),
+    });
+
+    await this._userRepository.updateOtherUserAsync(user?.id as number, {
+      lastLoginAt: new Date(),
+    });
+
+    const response = new LoginResponseDto();
+    response.user = TypeSafeMapper.mapObject(user as User, {
+      exclude: ['password', 'locationId'],
+    });
+    response.accessToken = accessToken;
+    response.refreshToken = refreshToken;
+    response.deviceId = deviceId;
+
+    const first = TextHelper.capitalize(user?.firstName);
+    return BukkaResponse.LoginResponse(
+      'User',
+      response,
+      true,
+      `Welcome back, ${first} 👋`,
     );
   }
 

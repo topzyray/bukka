@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { Logger, Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { ScheduleModule } from '@nestjs/schedule';
+import { PassportModule } from '@nestjs/passport';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 // MODULES
@@ -17,6 +18,7 @@ import { UserController } from './ServiceLayer/Controllers/UserController';
 import { AuthController } from './ServiceLayer/Controllers/AuthController';
 import { FileController } from './ServiceLayer/Controllers/FileController';
 import { MenuController } from './ServiceLayer/Controllers/MenuController';
+import { OAuthController } from './ServiceLayer/Controllers/OAuthController';
 import { OrderController } from './ServiceLayer/Controllers/OrderController';
 import { ReviewController } from './ServiceLayer/Controllers/ReviewController';
 import { HealthController } from './ServiceLayer/Controllers/HealthController';
@@ -70,6 +72,7 @@ import { WaitlistDataAgent } from './DataLayer/DataAgents/WaitlistDataAgent';
 import { BusinessDataAgent } from './DataLayer/DataAgents/BusinessDataAgent';
 import { FavoriteDataAgent } from './DataLayer/DataAgents/FavoriteDataAgent';
 import { UserSessionDataAgent } from './DataLayer/DataAgents/UserSessionDataAgent';
+import { SocialAccountDataAgent } from './DataLayer/DataAgents/SocialAccountDataAgent';
 import { RecommendationDataAgent } from './DataLayer/DataAgents/RecommendationDataAgent';
 import { BusinessCategoryDataAgent } from './DataLayer/DataAgents/BusinessCategoryDataAgent';
 import { UserNotificationDataAgent } from './DataLayer/DataAgents/UserNotificationDataAgent';
@@ -133,6 +136,9 @@ import { ProfileNotificationHelper } from './InfrastructureLayer/Helpers/Profile
 import { BusinessNotificationHelper } from './InfrastructureLayer/Helpers/BusinessNotificationHelper';
 import { RecommendationNotificationHelper } from './InfrastructureLayer/Helpers/RecommendationNotificationHelper';
 
+// STRATEGY
+import { GoogleStrategy } from './InfrastructureLayer/Passport/GoogleStrategy';
+
 // OTHERS
 import { DbAdapterEnum } from './DomainLayer/Enums/DbAdapterEnum';
 import { HandlebarsEngine } from './InfrastructureLayer/Services/email/template-engine/HandleBarsEngine';
@@ -154,6 +160,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     ConfigModule,
     TerminusModule,
     AppConfigurationModule,
+    PassportModule.register({ session: false }),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{ ttl: 60, limit: 5 }]),
     DatabaseModule.forRoot({ adapter: DbAdapterEnum.PRISMA }),
@@ -164,6 +171,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     SupportController,
     WaitListController,
     AuthController,
+    OAuthController,
     FileController,
     UserController,
     UserSessionController,
@@ -189,6 +197,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    GoogleStrategy,
     JwtService,
     AppService,
     EmailService,
@@ -253,6 +262,7 @@ import { ManualTemplateEngine } from './InfrastructureLayer/Services/email/templ
     FavoriteDataAgent,
     BusinessDataAgent,
     UserSessionDataAgent,
+    SocialAccountDataAgent,
     RecommendationDataAgent,
     BusinessCategoryDataAgent,
     UserNotificationDataAgent,

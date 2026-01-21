@@ -12,6 +12,7 @@ import { queryClient } from "@/lib";
 import { STORE_KEYS } from "@/configs";
 import { QueryKeyEnum } from "@/data/enums";
 import { useAuthStore } from "@/stores/auth-store";
+import { toast } from "sonner";
 
 export const useSignIn = () => {
   const router = useRouter();
@@ -29,6 +30,7 @@ export const useSignIn = () => {
               deviceId,
             ]);
           } catch (e) {
+            toast.error("Failed to persist device ID");
             console.error("Failed to persist device ID", e);
           }
         }
@@ -69,7 +71,7 @@ export const useSignIn = () => {
           }, 2000);
         }
       },
-    }
+    },
   );
 
   return {

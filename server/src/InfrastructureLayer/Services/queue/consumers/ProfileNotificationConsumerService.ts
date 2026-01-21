@@ -46,6 +46,12 @@ export class ProfileNotificationConsumerService
             envelope.messageType,
           );
           break;
+        case ProfileQueueMessageTypeEnum.OAUTH_USER_ROLE_ASSIGNMENT:
+          await this.helper.processOAuthRoleAssignment(
+            envelope.payload,
+            envelope.messageType,
+          );
+          break;
         default:
           this.logger.warn(
             `[ProfileNotification] Unknown message type '${envelope.messageType}'`,
