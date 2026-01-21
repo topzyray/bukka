@@ -16,7 +16,9 @@ export class KeepAliveService {
   @Cron(BukkaCronExpression.EVERY_14_MINUTES)
   async pingSelf() {
     try {
-      const res = await this.httpService.get(this.configService.appUrl);
+      const res = await this.httpService.get(
+        this.configService.appUrl + '/api/v1/health',
+      );
       this.logger.log(`Keep-alive ping successful: ${res.status}`);
     } catch (error) {
       this.logger.warn(`Keep-alive ping failed: ${error.message}`);
