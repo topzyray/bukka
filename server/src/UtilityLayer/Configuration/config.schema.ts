@@ -33,6 +33,18 @@ export const configSchema = z.object({
     .string({ error: 'GEOAPIFY_KEY is required' })
     .min(1, 'GeoAPIFY must be provided'),
 
+  CLIENT_BASE_URL: z
+    .string({ error: 'CLIENT_BASE_URL is required' })
+    .min(1, 'Client Base Url must be provided'),
+
+  GOOGLE_CLIENT_ID: z
+    .string({ error: 'GOOGLE_CLIENT_ID is required' })
+    .min(1, 'Google Client Id must be provided'),
+
+  GOOGLE_CLIENT_SECRET: z
+    .string({ error: 'GOOGLE_CLIENT_SECRET is required' })
+    .min(1, 'Google Client Secret must be provided'),
+
   TOKEN_SECRET: z
     .string({ error: 'TOKEN_SECRET is required' })
     .min(32, 'TOKEN_SECRET must be at least 32 characters long'),

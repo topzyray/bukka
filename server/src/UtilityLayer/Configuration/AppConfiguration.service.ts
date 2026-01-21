@@ -14,6 +14,10 @@ export class AppConfigurationService {
     return this.configService.get<string>('APP_URL')?.trim() as string;
   }
 
+  get clientBaseUrl(): string {
+    return this.configService.get<string>('CLIENT_BASE_URL')?.trim() as string;
+  }
+
   get databaseUri(): string {
     return this.configService.get<string>('DATABASE_URL')?.trim() as string;
   }
@@ -34,6 +38,16 @@ export class AppConfigurationService {
 
   get geoApiFy(): string {
     return this.configService.get<string>('GEOAPIFY_KEY')?.trim() as string;
+  }
+
+  get googleClientId(): string {
+    return this.configService.get<string>('GOOGLE_CLIENT_ID')?.trim() as string;
+  }
+
+  get googleClientSecret(): string {
+    return this.configService
+      .get<string>('GOOGLE_CLIENT_SECRET')
+      ?.trim() as string;
   }
 
   get encryptionKey(): string {

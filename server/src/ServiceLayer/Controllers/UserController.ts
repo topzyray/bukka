@@ -18,6 +18,7 @@ import {
 import type { Response } from 'express';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import {
+  AssignRoleDto,
   ProfileUpdateDto,
   UpdateUserDto,
   UserFilterDto,
@@ -29,16 +30,17 @@ import { TypeSafeMapper } from 'src/MiddlewareLayer/Mappings/TypeSafeMapper';
 import { User } from 'src/DomainLayer/Models/User';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { UserHelper } from 'src/InfrastructureLayer/Helpers/UserHelper';
+import { JwtIdentityGuard } from 'src/MiddlewareLayer/Guards/JwtIdentityGuard';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/users`)
 @ApiBearerAuth(TokenTypeEnum.ACCESS_TOKEN)
-@ApiSecurity('device-id')
-@UseGuards(JwtAuthGuard)
 @ApiTags('User')
 export class UserController {
   constructor(private readonly _userRepository: UserRepository) {}
 
   @Get()
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get user profiles by filters' })
   async getUserByFilters(
     @Query() request: UserFilterDto,
@@ -63,6 +65,7 @@ export class UserController {
   }
 
   @Get('me/profile')
+  @UseGuards(JwtIdentityGuard)
   @ApiOperation({ summary: 'Get logged in user data' })
   async getUserData(@Res() res: Response) {
     const user = await this._userRepository.getLoggedInUserData();
@@ -77,6 +80,28 @@ export class UserController {
     });
     const data = BukkaResponse.GetSingleDataResponse('User', mappedData);
     return BukkaResponse.GetStatusResponse(data, res);
+  }
+
+  @Put('me/assign-role')
+  @UseGuards(JwtIdentityGuard)
+  @ApiOperation({ summary: 'Assign role to new Oauth user' })
+  @ApiBody({ type: AssignRoleDto })
+  async assignMyRole(
+    @Body() profileUpdateDto: AssignRoleDto,
+    @Res() res: Response,
+  ) {
+    const response =
+      await this._userRepository.assignRoleToOauthUserAsync(profileUpdateDto);
+    response.responseData = TypeSafeMapper.mapObject(response?.responseData, {
+      exclude: [
+        'password',
+        'confirmationCode',
+        'confirmationCodeExpires',
+        'passwordResetToken',
+        'passwordResetExpires',
+      ],
+    });
+    return BukkaResponse.GetStatusResponse(response, res);
   }
 
   // @Get('/getByEmail/:email')
@@ -98,6 +123,8 @@ export class UserController {
   // }
 
   @Put()
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'User details updates' })
   @ApiBody({ type: UpdateUserDto })
   async updateUser(@Body() updateUserDto: UpdateUserDto, @Res() res: Response) {
@@ -116,6 +143,8 @@ export class UserController {
   }
 
   @Put('profile')
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'User profile update details' })
   @ApiBody({ type: ProfileUpdateDto })
   async userProfileUpdate(
@@ -137,6 +166,8 @@ export class UserController {
   }
 
   @Put('profile/complete-onboarding')
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Complete logged in user onboarding' })
   async completeProfileOnboarding(@Res() res: Response) {
     const response = await this._userRepository.completeProfileOnboarding();
@@ -153,6 +184,8 @@ export class UserController {
   }
 
   @Delete()
+  @ApiSecurity('device-id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete a user by user account' })
   async deleteUserAccount(@Res() res: Response) {
     const loggedInUser = await UserHelper.getLoggedInUser();

@@ -1,11 +1,20 @@
 import { HttpClient } from "@/configs";
 import { UpdateUserDto } from "../dtos";
 import { userRoutes } from "@/constants/routes";
+import { UserRoleEnum } from "../enums";
 
 export class UserApiService {
   static async getLoggedInUser() {
     const response = await HttpClient.getClient().get(
-      `${userRoutes.getLoggedInUser}`
+      `${userRoutes.getLoggedInUser}`,
+    );
+    return response.data?.responseData;
+  }
+
+  static async assignMyRole(payload: { role: UserRoleEnum }) {
+    const response = await HttpClient.getClient().put(
+      `${userRoutes.assignMyRole}`,
+      payload,
     );
     return response.data?.responseData;
   }
@@ -17,7 +26,7 @@ export class UserApiService {
 
   static async completeProfileOnboarding() {
     const response = await HttpClient.getClient().put(
-      `${userRoutes.completeOnboarding}`
+      `${userRoutes.completeOnboarding}`,
     );
     return response.data;
   }
@@ -25,7 +34,7 @@ export class UserApiService {
   static async updateUser(payload: UpdateUserDto) {
     const response = await HttpClient.getClient().put(
       `${userRoutes.updateUser}`,
-      payload
+      payload,
     );
     return response.data;
   }
@@ -33,14 +42,14 @@ export class UserApiService {
   static async updateUserProfile(payload: UpdateUserDto) {
     const response = await HttpClient.getClient().put(
       `${userRoutes.updateUserProfile}`,
-      payload
+      payload,
     );
     return response.data;
   }
 
   static async deleteUserAccount() {
     const response = await HttpClient.getClient().delete(
-      `${userRoutes.deleteUserAccount}`
+      `${userRoutes.deleteUserAccount}`,
     );
     return response.data;
   }

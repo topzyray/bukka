@@ -6,6 +6,7 @@ const BACKEND_SVC_PATH = BackendUrlEnum.BACKEND;
 type IUserApi =
   | "getUsers"
   | "getLoggedInUser"
+  | "assignMyRole"
   | "updateUser"
   | "updateUserProfile"
   | "completeOnboarding"
@@ -14,6 +15,7 @@ type IUserApi =
 const rawUserRoutes: Record<IUserApi, string> = {
   getUsers: "/users",
   getLoggedInUser: "/users/me/profile",
+  assignMyRole: "/users/me/assign-role",
   updateUser: "/users",
   updateUserProfile: "/users",
   completeOnboarding: "/users/profile/complete-onboarding",
@@ -22,5 +24,5 @@ const rawUserRoutes: Record<IUserApi, string> = {
 
 export const userRoutes: Record<IUserApi, string> = RouteHelper.createRoutes(
   BACKEND_SVC_PATH,
-  rawUserRoutes
+  rawUserRoutes,
 );

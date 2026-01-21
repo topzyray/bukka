@@ -30,6 +30,7 @@ export interface User {
   userNotifications: any;
   favorites: any;
   ownedBusinesses: any;
+  authSessions: any;
   recommendedBusinesses: any;
   createdAt: string;
   updatedAt: string;
