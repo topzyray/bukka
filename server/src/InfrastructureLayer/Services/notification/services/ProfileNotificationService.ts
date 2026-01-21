@@ -67,6 +67,29 @@ export class ProfileNotificationService extends NotificationService {
     });
   }
 
+  async processOAuthRoleAssignment(
+    data: ProcessProfileUpdateDto,
+    category: string,
+  ) {
+    await this.dispatchNotification({
+      channels: [NotificationTypeEnum.IN_APP],
+      inapp: {
+        userId: data.userId,
+        title: 'Role Assignment Success',
+        message: `Your role has been set successfully.`,
+        notificationCategory: category,
+      },
+      email: {
+        template: 'profileUpdate',
+        subject: `Role Assignment Success`,
+        to: data.email,
+        context: {
+          ...data,
+        },
+      },
+    });
+  }
+
   async processProfileOnboarding(
     data: ProcessProfileOnboardingDto,
     category: string,

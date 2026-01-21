@@ -15,7 +15,7 @@ export class ProcessProfileUpdateDto {
   lastName: string;
   email: string;
   role: UserRoleEnum;
-  link: string;
+  link?: string;
 }
 
 export class ProcessProfileOnboardingDto {

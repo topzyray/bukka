@@ -22,6 +22,8 @@ import { useGlobalState } from "@/providers/global-state-provider";
 import { Processing } from "../../../components/loaders/processing";
 import { InputComponent } from "../../../components/form-ui/base/input-component";
 import { SelectComponent } from "../../../components/form-ui/base/select-component";
+import Image from "next/image";
+import { GoogleSignIn } from "./google-sign-in";
 
 const signUpSchema = z.object({
   role: z.enum(UserRoleEnum),
@@ -37,7 +39,7 @@ const signUpSchema = z.object({
     .regex(/[0-9]/, "Password must contain at least one number")
     .regex(
       /[^A-Za-z0-9]/,
-      "Password must contain at least one special character"
+      "Password must contain at least one special character",
     ),
 });
 
@@ -161,6 +163,21 @@ export const SignUpForm = ({ onBack }: { onBack: () => void }) => {
               </BukkaButton>
             </form>
           </Form>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t dark:border-muted-foreground" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground dark:text-white">
+                Or
+              </span>
+            </div>
+          </div>
+
+          {/* Social Sign In */}
+          <GoogleSignIn />
 
           <div className="text-center">
             <p className="text-sm text-muted-foreground">

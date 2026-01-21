@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { UserDataAgent } from 'src/DataLayer/DataAgents/UserDataAgent';
 import {
+  AssignRoleDto,
   CreateUserDto,
   ProfileUpdateDto,
   UserDto,
@@ -69,6 +70,19 @@ export class UserRepository {
       true,
       result,
     );
+  }
+
+  async createUserFromSocial(data: Partial<User>): Promise<User> {
+    // minimal fields expected: email, firstName, lastName, username?
+    // Use userDataAgent directly to avoid creating confirmationCode / sending email
+    const created = await this.userDataAgent.createUserAsync({
+      ...data,
+      emailConfirmed: true,
+      confirmationCode: null,
+      confirmationCodeExpires: null,
+      isOnboarded: false,
+    } as Partial<User>);
+    return created;
   }
 
   async findUserById(userId: number) {
@@ -275,6 +289,39 @@ export class UserRepository {
       QueueEnum.PROFILE_NOTIFICATION,
       {
         messageType: ProfileQueueMessageTypeEnum.PROFILE_UPDATED,
+        payload: {
+          userId: updatedUser?.id,
+          email: updatedUser?.email,
+          firstName: updatedUser?.firstName,
+          lastName: updatedUser?.lastName,
+          role: updatedUser?.role,
+        },
+      },
+      {
+        provider: QueueProviderEnum.BULLMQ,
+      },
+    );
+
+    await invalidateCache('user:profile', { id: loggedInUser.id });
+    return BukkaResponse.UpdateResponse('User', updatedUser);
+  }
+
+  async assignRoleToOauthUserAsync(
+    userRoleDto: AssignRoleDto,
+  ): Promise<BukkaResponse<User | null>> {
+    const loggedInUser = await UserHelper.getLoggedInUser();
+
+    const roleAssignedAt = new Date();
+
+    const updatedUser = await this.userDataAgent.updateUser(loggedInUser?.id, {
+      ...userRoleDto,
+      roleAssignedAt,
+    });
+
+    this._queue.publishToQueue(
+      QueueEnum.PROFILE_NOTIFICATION,
+      {
+        messageType: ProfileQueueMessageTypeEnum.OAUTH_USER_ROLE_ASSIGNMENT,
         payload: {
           userId: updatedUser?.id,
           email: updatedUser?.email,

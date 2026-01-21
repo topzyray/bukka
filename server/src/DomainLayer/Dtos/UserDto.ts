@@ -171,6 +171,24 @@ export class ProfileUpdateDto {
   bio?: string;
 }
 
+export class AssignRoleDto {
+  @ApiProperty({
+    example: UserRoleEnum.USER,
+    enum: [
+      UserRoleEnum.USER,
+      UserRoleEnum.VENDOR,
+      UserRoleEnum.RIDER,
+      UserRoleEnum.INVESTOR,
+    ],
+    required: true,
+  })
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(1)
+  @Transform(({ value }) => value?.trim())
+  role: UserRoleEnum.USER | UserRoleEnum.VENDOR;
+}
+
 export class UserFilterDto extends PaginationDto {
   @ApiProperty({ example: 12, required: false })
   @IsOptional()

@@ -27,4 +27,11 @@ export class ProfileNotificationHelper {
   async processProfileUpdate(data: ProcessProfileUpdateDto, category: string) {
     await this.svc.processProfileUpdate(data, category);
   }
+
+  async processOAuthRoleAssignment(
+    data: ProcessProfileUpdateDto,
+    category: string,
+  ) {
+    await this.svc.processOAuthRoleAssignment(data, category);
+  }
 }
