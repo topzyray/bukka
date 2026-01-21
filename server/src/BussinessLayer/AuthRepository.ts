@@ -195,8 +195,6 @@ export class AuthRepository {
     },
     metaData: SigninMetaDataDto,
   ): Promise<BukkaResponse<LoginResponseDto<User>>> {
-    console.log('PROFILE IN AUTH REPO: ', profile);
-
     let social = await this._socialAccountAgent.findByProvider(
       profile.provider,
       profile.providerId,
