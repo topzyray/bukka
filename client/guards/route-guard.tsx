@@ -17,7 +17,7 @@ export function RouteGuard({
   children,
   isProtected = false,
   roles = [],
-}: RouteGuardProps) {
+}: Readonly<RouteGuardProps>) {
   const { user, isLoading, status } = useAuth();
   const router = useRouter();
   const pathname = usePathname() ?? "/";
@@ -34,7 +34,7 @@ export function RouteGuard({
     if (status === "bootstrapping") return;
 
     // Unauthenticated users on protected routes → redirect
-    if (isProtected && status === "unauthenticated") {
+    if (isProtected && (!user || status === "unauthenticated")) {
       redirectingRef.current = true;
       router.replace("/signin");
       return;
