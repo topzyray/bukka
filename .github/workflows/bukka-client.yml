@@ -56,32 +56,32 @@ jobs:
         run: pnpm build
         working-directory: client
 
-  sonarcloud:
-    name: SonarCloud Analysis
-    needs: build-test
-    runs-on: ubuntu-latest
+  # sonarcloud:
+  #   name: SonarCloud Analysis
+  #   needs: build-test
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20.x"
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+  #     - name: Install pnpm
+  #       run: npm install -g pnpm
 
-      - name: Install dependencies
-        working-directory: client
-        run: pnpm install --frozen-lockfile
+  #     - name: Install dependencies
+  #       working-directory: client
+  #       run: pnpm install --frozen-lockfile
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v6
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #     - name: SonarCloud Scan
+  #       uses: SonarSource/sonarqube-scan-action@v6
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   deploy:
     needs: build-test

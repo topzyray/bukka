@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Logger, Req, Res, UseGuards } from '@nestjs/common';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { AuthRepository } from 'src/BussinessLayer/AuthRepository';
 import { RequestInfoHelper } from 'src/InfrastructureLayer/Helpers/RequestInfoHelper';
@@ -14,6 +14,8 @@ export class OAuthController {
   private readonly cookieOptions: any;
   private readonly ACCESS_TOKEN_MAX_AGE: number;
   private readonly REFRESH_TOKEN_MAX_AGE: number;
+
+  private readonly logger = new Logger(OAuthController.name);
 
   constructor(
     private readonly _authRepo: AuthRepository,
@@ -65,7 +67,9 @@ export class OAuthController {
 
     const state = req.query.state;
 
-    console.log('CURRENT STATE IN QUERY: ', state);
+    this.logger.log(
+      `Redirecting to: ${this._config.clientBaseUrl}${state ?? '/Oauth/bootstrap'}`,
+    );
 
     // redirect to client - you can attach state to redirect if needed
     return res.redirect(
