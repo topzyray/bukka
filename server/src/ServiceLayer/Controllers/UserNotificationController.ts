@@ -26,7 +26,7 @@ import {
   CreateNotificationDto,
   UserNotificationFilterDto,
 } from 'src/DomainLayer/Dtos/UserNotificationDto';
-import { UserNotificationRepository } from 'src/BussinessLayer/UserNotificationRepository';
+import { UserNotificationRepository } from 'src/BusinessLayer/UserNotificationRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 

@@ -9,8 +9,8 @@ import { InMemoryCacheService } from '../../InfrastructureLayer/Services/InMemor
 import { UserTypeEnum } from '../../DomainLayer/Enums/UserTypeEnum';
 import { JwtAuthGuard } from './JwtAuthGuard';
 import { Reflector } from '@nestjs/core';
-import { TokenRepository } from 'src/BussinessLayer/TokenRepository';
-import { UserSessionRepository } from 'src/BussinessLayer/UserSessionRepository';
+import { TokenRepository } from 'src/BusinessLayer/TokenRepository';
+import { UserSessionRepository } from 'src/BusinessLayer/UserSessionRepository';
 
 @Injectable()
 export class AdminAuthGuard extends JwtAuthGuard implements CanActivate {

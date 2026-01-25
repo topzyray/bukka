@@ -40,24 +40,24 @@ import { UserPersonalizationController } from './ServiceLayer/Controllers/UserPe
 import { NotificationSettingsController } from './ServiceLayer/Controllers/NotificationSettingsController';
 
 // REPOSITORIES
-import { UserRepository } from './BussinessLayer/UserRepository';
-import { AuthRepository } from './BussinessLayer/AuthRepository';
-import { MenuRepository } from './BussinessLayer/MenuRepository';
-import { TokenRepository } from './BussinessLayer/TokenRepository';
-import { OrderRepository } from './BussinessLayer/OrderRepository';
-import { ReviewRepository } from './BussinessLayer/ReviewRepository';
-import { ServiceRepository } from './BussinessLayer/ServiceRepository';
-import { SupportRepository } from './BussinessLayer/SupportRepository';
-import { FavoriteRepository } from './BussinessLayer/FavoriteRepository';
-import { WaitlistRepository } from './BussinessLayer/WaitlistRepository';
-import { BusinessRepository } from './BussinessLayer/BusinessRepository';
-import { LocationRepository } from './BussinessLayer/LocationRepository';
-import { UserSessionRepository } from './BussinessLayer/UserSessionRepository';
-import { RecommendationRepository } from './BussinessLayer/RecommendationRepository';
-import { BusinessCategoryRepository } from './BussinessLayer/BusinessCategoryRepository';
-import { UserNotificationRepository } from './BussinessLayer/UserNotificationRepository';
-import { UserPersonalizationRepository } from './BussinessLayer/UserPersonalizationRepository';
-import { NotificationSettingsRepository } from './BussinessLayer/NotificationSettingsRepository';
+import { UserRepository } from './BusinessLayer/UserRepository';
+import { AuthRepository } from './BusinessLayer/AuthRepository';
+import { MenuRepository } from './BusinessLayer/MenuRepository';
+import { TokenRepository } from './BusinessLayer/TokenRepository';
+import { OrderRepository } from './BusinessLayer/OrderRepository';
+import { ReviewRepository } from './BusinessLayer/ReviewRepository';
+import { ServiceRepository } from './BusinessLayer/ServiceRepository';
+import { SupportRepository } from './BusinessLayer/SupportRepository';
+import { FavoriteRepository } from './BusinessLayer/FavoriteRepository';
+import { WaitlistRepository } from './BusinessLayer/WaitlistRepository';
+import { BusinessRepository } from './BusinessLayer/BusinessRepository';
+import { LocationRepository } from './BusinessLayer/LocationRepository';
+import { UserSessionRepository } from './BusinessLayer/UserSessionRepository';
+import { RecommendationRepository } from './BusinessLayer/RecommendationRepository';
+import { BusinessCategoryRepository } from './BusinessLayer/BusinessCategoryRepository';
+import { UserNotificationRepository } from './BusinessLayer/UserNotificationRepository';
+import { UserPersonalizationRepository } from './BusinessLayer/UserPersonalizationRepository';
+import { NotificationSettingsRepository } from './BusinessLayer/NotificationSettingsRepository';
 
 // DATA AGENTS
 import { FileDataAgent } from './DataLayer/DataAgents/FileDataAgent';
@@ -109,7 +109,7 @@ import { RecommendationNotificationService } from './InfrastructureLayer/Service
 import { RecommendationNotificationConsumerService } from './InfrastructureLayer/Services/queue/consumers/RecommendationNotificationConsumerService';
 
 // FACTORIES
-import { FileRepository } from './BussinessLayer/FileRepository';
+import { FileRepository } from './BusinessLayer/FileRepository';
 import { FileFactory } from './InfrastructureLayer/Services/upload/FileFactory';
 import { QueueFactory } from './InfrastructureLayer/Services/queue/QueueFactory';
 import { EmailFactory } from './InfrastructureLayer/Services/email/EmailFactory';

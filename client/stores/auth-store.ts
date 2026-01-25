@@ -48,54 +48,115 @@ export const useAuthStore = create<AuthState>()(
         //   }
         // };
 
+        // const logout = async () => {
+        //   try {
+        //     await axios.post(
+        //       `${envConfig.NEXT_PUBLIC_API_BASE_URL}${authRoutes.signOut}`,
+        //       {},
+        //       { withCredentials: true },
+        //     );
+
+        //     StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.DEVICE_ID);
+        //     StorageUtilsHelper.deleteFromLocalStorage(
+        //       STORE_KEYS.OAUTH_CODE_VERIFIER,
+        //     );
+        //     try {
+        //       StorageUtilsHelper.deleteFromLocalStorage(
+        //         STORE_KEYS.HAS_SESSION_KEY,
+        //       );
+        //       window.dispatchEvent(new Event("sessionHandledReset"));
+        //       HttpClient.resetSessionExpiredFlag();
+        //     } catch {}
+        //   } catch (error) {
+        //     try {
+        //       StorageUtilsHelper.deleteFromLocalStorage(
+        //         STORE_KEYS.HAS_SESSION_KEY,
+        //       );
+        //       window.dispatchEvent(new Event("sessionHandledReset"));
+        //       HttpClient.resetSessionExpiredFlag();
+        //     } catch {}
+        //     throw error;
+        //   }
+
+        //   try {
+        //     queryClient.clear();
+        //     queryClient.removeQueries({
+        //       queryKey: [QueryKeyEnum.CURRENT_USER],
+        //       exact: true,
+        //     });
+        //     Cookies.remove("sidebarState");
+        //   } catch {}
+
+        //   EventHelper.broadcastLogout();
+
+        //   set({
+        //     user: null,
+        //     status: "unauthenticated",
+        //   });
+
+        //   if (pathname.startsWith("/dashboard")) {
+        //     window.location.href = "/signin";
+        //   } else {
+        //     window.location.href = "/";
+        //   }
+        // };
         const logout = async () => {
           try {
             await axios.post(
               `${envConfig.NEXT_PUBLIC_API_BASE_URL}${authRoutes.signOut}`,
               {},
-              { withCredentials: true }
+              { withCredentials: true },
             );
+          } catch (err) {
+            console.warn("Backend logout failed:", err);
+          }
 
-            StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.DEVICE_ID);
+          [
+            STORE_KEYS.DEVICE_ID,
+            STORE_KEYS.OAUTH_CODE_VERIFIER,
+            STORE_KEYS.HAS_SESSION_KEY,
+          ].forEach((key) => {
             try {
-              StorageUtilsHelper.deleteFromLocalStorage(
-                STORE_KEYS.HAS_SESSION_KEY
-              );
-              window.dispatchEvent(new Event("sessionHandledReset"));
-              HttpClient.resetSessionExpiredFlag();
-            } catch {}
-          } catch (error) {
-            try {
-              StorageUtilsHelper.deleteFromLocalStorage(
-                STORE_KEYS.HAS_SESSION_KEY
-              );
-              window.dispatchEvent(new Event("sessionHandledReset"));
-              HttpClient.resetSessionExpiredFlag();
-            } catch {}
-            throw error;
+              StorageUtilsHelper.deleteFromLocalStorage(key);
+              StorageUtilsHelper.clearLocalStorage();
+            } catch (err) {
+              console.warn(`Failed to delete localStorage key ${key}:`, err);
+            }
+          });
+
+          try {
+            window.dispatchEvent(new Event("sessionHandledReset"));
+            HttpClient.resetSessionExpiredFlag();
+          } catch (err) {
+            console.warn("Failed to reset session flags:", err);
           }
 
           try {
-            queryClient.clear();
             queryClient.removeQueries({
               queryKey: [QueryKeyEnum.CURRENT_USER],
               exact: true,
             });
+            queryClient.clear();
             Cookies.remove("sidebarState");
-          } catch {}
+          } catch (err) {
+            console.warn("Failed to clear queries or cookies:", err);
+          }
 
-          EventHelper.broadcastLogout();
+          try {
+            EventHelper.broadcastLogout();
+          } catch (err) {
+            console.warn("Failed to broadcast logout event:", err);
+          }
 
           set({
             user: null,
             status: "unauthenticated",
           });
 
-          if (pathname.startsWith("/dashboard")) {
-            window.location.href = "/signin";
-          } else {
-            window.location.href = "/";
-          }
+          // const redirectTo = pathname.startsWith("/dashboard")
+          //   ? "/signin"
+          //   : "/";
+          window.location.href = "/";
         };
 
         // bootstrap();
@@ -122,7 +183,7 @@ export const useAuthStore = create<AuthState>()(
           user: state.user,
           status: state.status,
         }),
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

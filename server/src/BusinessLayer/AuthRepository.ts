@@ -36,6 +36,7 @@ import { QueueEnum } from 'src/DomainLayer/Enums/Queue/QueueEnum';
 import { QueueProviderEnum } from 'src/DomainLayer/Enums/QueueProviderEnum';
 import { ProfileQueueMessageTypeEnum } from 'src/DomainLayer/Enums/Queue/ProfileQueueMessageTypeEnum';
 import { SocialAccountDataAgent } from 'src/DataLayer/DataAgents/SocialAccountDataAgent';
+import axios from 'axios';
 
 @Injectable()
 export class AuthRepository {
@@ -727,5 +728,36 @@ export class AuthRepository {
       return user;
     }
     return null;
+  }
+
+  // Only use if the code exchange is being performed manually instead of with Passport
+  async exchangeGoogleCodeForTokens(
+    code: string,
+    codeVerifier: string | null,
+    redirectUri: string,
+  ): Promise<{
+    access_token: string;
+    id_token?: string;
+    refresh_token?: string;
+    expires_in?: number;
+  }> {
+    const tokenEndpoint = 'https://oauth2.googleapis.com/token';
+
+    const params = new URLSearchParams();
+    params.append('client_id', this._configService.googleClientId);
+    params.append('client_secret', this._configService.googleClientSecret);
+    params.append('code', code);
+    params.append('grant_type', 'authorization_code');
+    params.append('redirect_uri', redirectUri);
+
+    if (codeVerifier) params.append('code_verifier', codeVerifier);
+
+    const { data } = await axios.post(tokenEndpoint, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+
+    return data;
   }
 }

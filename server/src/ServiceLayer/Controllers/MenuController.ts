@@ -25,7 +25,7 @@ import {
   MenuFilterDto,
   UpdateMenuDto,
 } from 'src/DomainLayer/Dtos/MenuDto';
-import { MenuRepository } from 'src/BussinessLayer/MenuRepository';
+import { MenuRepository } from 'src/BusinessLayer/MenuRepository';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';

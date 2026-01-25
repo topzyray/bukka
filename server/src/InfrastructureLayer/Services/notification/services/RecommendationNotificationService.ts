@@ -3,9 +3,9 @@ import { NotificationService } from '../NotificationService';
 import { NotificationTypeEnum } from 'src/DomainLayer/Enums/NotificationTypeEnum';
 import { RoleResolverService } from '../../RoleResolverService';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
-import { UserNotificationRepository } from 'src/BussinessLayer/UserNotificationRepository';
+import { UserNotificationRepository } from 'src/BusinessLayer/UserNotificationRepository';
 import { EmailService } from '../../email/EmailService';
-import { NotificationSettingsRepository } from 'src/BussinessLayer/NotificationSettingsRepository';
+import { NotificationSettingsRepository } from 'src/BusinessLayer/NotificationSettingsRepository';
 import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
 import {
   ProcessNewRecommendationDto,

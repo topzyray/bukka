@@ -8,7 +8,7 @@ import {
 import type { Response } from 'express';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
-import { UserRepository } from 'src/BussinessLayer/UserRepository';
+import { UserRepository } from 'src/BusinessLayer/UserRepository';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { AdminAuthGuard } from 'src/MiddlewareLayer/Guards/AdminAuthGuard';
