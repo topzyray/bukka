@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { STORE_KEYS } from "./store.config";
 import { StorageUtilsHelper } from "@/utils";
 import { QueryKeyEnum } from "@/data/enums";
+import { ClientTypeEnum } from "@/enums/ClientTypeEnum";
 
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
@@ -29,20 +30,22 @@ class HttpClient {
 
     this.client.interceptors.request.use(
       (config) => {
+        config.headers["x-client-type"] = ClientTypeEnum.WEB;
+
         const deviceId = StorageUtilsHelper.getItemFromLocalStorage(
-          STORE_KEYS.DEVICE_ID
+          STORE_KEYS.DEVICE_ID,
         );
         if (deviceId) {
           config.headers["x-device-id"] = deviceId;
         }
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => Promise.reject(error),
     );
 
     this.client.interceptors.response.use(
       (response) => response,
-      async (error: AxiosError) => this.handleErrorResponse(error)
+      async (error: AxiosError) => this.handleErrorResponse(error),
     );
   }
 
@@ -73,7 +76,7 @@ class HttpClient {
     ) {
       const hadSession =
         StorageUtilsHelper.getItemFromLocalStorage(
-          STORE_KEYS.HAS_SESSION_KEY
+          STORE_KEYS.HAS_SESSION_KEY,
         ) === "1";
 
       if (!hadSession) {
@@ -84,7 +87,7 @@ class HttpClient {
 
       try {
         const deviceId = StorageUtilsHelper.getItemFromLocalStorage(
-          STORE_KEYS.DEVICE_ID
+          STORE_KEYS.DEVICE_ID,
         ) as string;
 
         const response = await axios.post(
@@ -92,8 +95,11 @@ class HttpClient {
           {},
           {
             withCredentials: true,
-            headers: deviceId ? { "x-device-id": deviceId } : {},
-          }
+            headers: {
+              "x-client-type": ClientTypeEnum.WEB,
+              ...(deviceId ? { "x-device-id": deviceId } : {}),
+            },
+          },
         );
         const newDeviceId = response?.data?.responseData?.deviceId;
 
@@ -126,7 +132,7 @@ class HttpClient {
           await axios.post(
             `${envConfig.NEXT_PUBLIC_API_BASE_URL}${authRoutes.signOut}`,
             {},
-            { withCredentials: true }
+            { withCredentials: true },
           );
           StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.DEVICE_ID);
           if (this.queryClient) {
@@ -144,7 +150,7 @@ class HttpClient {
         try {
           hadSession =
             StorageUtilsHelper.getItemFromLocalStorage(
-              STORE_KEYS.HAS_SESSION_KEY
+              STORE_KEYS.HAS_SESSION_KEY,
             ) === "1";
         } catch {}
 

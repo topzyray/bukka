@@ -28,7 +28,7 @@ import {
   FilterLocationDto,
   SearchLocationDto,
 } from 'src/DomainLayer/Dtos/LocationDto';
-import { LocationRepository } from 'src/BussinessLayer/LocationRepository';
+import { LocationRepository } from 'src/BusinessLayer/LocationRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 

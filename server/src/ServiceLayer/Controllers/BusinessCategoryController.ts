@@ -27,7 +27,7 @@ import {
   UpdateBusinessCategoryDto,
   FilterBusinessCategoryDto,
 } from 'src/DomainLayer/Dtos/BusinessCategoryDto';
-import { BusinessCategoryRepository } from 'src/BussinessLayer/BusinessCategoryRepository';
+import { BusinessCategoryRepository } from 'src/BusinessLayer/BusinessCategoryRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { AdminAuthGuard } from 'src/MiddlewareLayer/Guards/AdminAuthGuard';

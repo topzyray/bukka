@@ -14,25 +14,27 @@ export class GoogleStrategy extends PassportStrategy(
       clientID: config.googleClientId,
       clientSecret: config.googleClientSecret,
       callbackURL: config.appUrl + '/api/v1/auth/google/callback',
-      userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo',
       scope: ['profile', 'email'],
+      passReqToCallback: true,
     });
   }
 
   async validate(
+    _req: any,
     _accessToken: string,
     _refreshToken: string,
     profile: any,
-    done: Function,
+    _done: Function,
   ) {
     const user = {
       provider: SocialAccountProviderEnum.GOOGLE,
       providerId: profile.id,
       email: profile.emails?.[0]?.value,
+      photo: profile.photos?.[0]?.value,
       firstName: profile.name?.givenName,
       lastName: profile.name?.familyName,
       profile,
     };
-    done(null, user);
+    return user;
   }
 }

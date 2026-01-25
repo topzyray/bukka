@@ -5,9 +5,9 @@ import { RoleResolverService } from '../../RoleResolverService';
 import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
 import { NotificationTypeEnum } from 'src/DomainLayer/Enums/NotificationTypeEnum';
 import { ProcessNewReviewDto } from 'src/DomainLayer/Dtos/ReviewNotifictaionHelperDto';
-import { UserNotificationRepository } from 'src/BussinessLayer/UserNotificationRepository';
+import { UserNotificationRepository } from 'src/BusinessLayer/UserNotificationRepository';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
-import { NotificationSettingsRepository } from 'src/BussinessLayer/NotificationSettingsRepository';
+import { NotificationSettingsRepository } from 'src/BusinessLayer/NotificationSettingsRepository';
 import { TextHelper } from 'src/InfrastructureLayer/Helpers/TextHelper';
 
 @Injectable()

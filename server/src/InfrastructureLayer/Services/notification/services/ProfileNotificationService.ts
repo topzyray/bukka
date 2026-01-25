@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { NotificationService } from '../NotificationService';
 import { NotificationTypeEnum } from 'src/DomainLayer/Enums/NotificationTypeEnum';
-import { UserNotificationRepository } from 'src/BussinessLayer/UserNotificationRepository';
+import { UserNotificationRepository } from 'src/BusinessLayer/UserNotificationRepository';
 import { EmailService } from '../../email/EmailService';
-import { NotificationSettingsRepository } from 'src/BussinessLayer/NotificationSettingsRepository';
+import { NotificationSettingsRepository } from 'src/BusinessLayer/NotificationSettingsRepository';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
 import {
   ProcessPasswordChangeDto,

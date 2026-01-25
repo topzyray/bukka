@@ -4,7 +4,7 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { TokenRepository } from 'src/BussinessLayer/TokenRepository';
+import { TokenRepository } from 'src/BusinessLayer/TokenRepository';
 import { InMemoryCacheService } from 'src/InfrastructureLayer/Services/InMemoryCacheService';
 
 @Injectable()

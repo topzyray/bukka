@@ -19,7 +19,7 @@ import {
   ApiSecurity,
 } from '@nestjs/swagger';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
-import { NotificationSettingsRepository } from 'src/BussinessLayer/NotificationSettingsRepository';
+import { NotificationSettingsRepository } from 'src/BusinessLayer/NotificationSettingsRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 

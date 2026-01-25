@@ -8,7 +8,7 @@ import { handleCache } from '../cache/CacheUtils';
 import { Location } from 'src/DomainLayer/Models/Location';
 import { PlaceProviderFactory } from './PlaceProviderFactory';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
-import { BusinessRepository } from 'src/BussinessLayer/BusinessRepository';
+import { BusinessRepository } from 'src/BusinessLayer/BusinessRepository';
 import { PlaceProviderEnum } from 'src/DomainLayer/Enums/PlaceProviderEnum';
 import { CacheTTLPolicyEnum } from 'src/DomainLayer/Enums/CacheTTLPolicyEnum';
 import { BusinessDataAgent } from 'src/DataLayer/DataAgents/BusinessDataAgent';

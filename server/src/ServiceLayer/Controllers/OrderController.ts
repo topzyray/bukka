@@ -27,7 +27,7 @@ import {
 } from 'src/DomainLayer/Dtos/OrderDto';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
-import { OrderRepository } from 'src/BussinessLayer/OrderRepository';
+import { OrderRepository } from 'src/BusinessLayer/OrderRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 

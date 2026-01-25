@@ -31,7 +31,7 @@ import {
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
-import { BusinessRepository } from 'src/BussinessLayer/BusinessRepository';
+import { BusinessRepository } from 'src/BusinessLayer/BusinessRepository';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { AdminAuthGuard } from 'src/MiddlewareLayer/Guards/AdminAuthGuard';
 
