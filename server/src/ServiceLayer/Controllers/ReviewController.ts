@@ -27,7 +27,7 @@ import {
   UpdateReviewDto,
   ReviewFilterDto,
 } from 'src/DomainLayer/Dtos/ReviewDto';
-import { ReviewRepository } from 'src/BussinessLayer/ReviewRepository';
+import { ReviewRepository } from 'src/BusinessLayer/ReviewRepository';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 

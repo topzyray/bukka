@@ -23,10 +23,10 @@ export class StorageUtilsHelper {
     }
 
     const encryptedAccessToken = localStorage.getItem(
-      STORE_KEYS.USER_ACCESS_TOKEN
+      STORE_KEYS.USER_ACCESS_TOKEN,
     );
     const encryptedRefreshToken = localStorage.getItem(
-      STORE_KEYS.USER_REFRESH_TOKEN
+      STORE_KEYS.USER_REFRESH_TOKEN,
     );
 
     return {
@@ -41,7 +41,7 @@ export class StorageUtilsHelper {
 
   static getItemFromLocalStorage<T>(
     key: string,
-    decrypt: boolean = true
+    decrypt: boolean = true,
   ): T | null {
     if (typeof window === "undefined") {
       console.log("Server environment — skip localStorage");
@@ -69,7 +69,7 @@ export class StorageUtilsHelper {
 
   static getItemsFromLocalStorage<T>(
     keys: string[],
-    decrypt: boolean = true
+    decrypt: boolean = true,
   ): Record<string, T | null> {
     const result: Record<string, T | null> = {};
 
@@ -80,7 +80,7 @@ export class StorageUtilsHelper {
         if (
           decrypt &&
           key.includes(
-            STORE_KEYS.USER_ACCESS_TOKEN || STORE_KEYS.USER_REFRESH_TOKEN
+            STORE_KEYS.USER_ACCESS_TOKEN || STORE_KEYS.USER_REFRESH_TOKEN,
           )
         ) {
           result[key] = TokenEncryptionHelper.decryptToken(item) as T;
@@ -109,5 +109,9 @@ export class StorageUtilsHelper {
     } else if (typeof data === "string") {
       localStorage.removeItem(data);
     }
+  }
+
+  static clearLocalStorage(): void {
+    localStorage.clear();
   }
 }

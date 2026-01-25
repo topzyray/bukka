@@ -26,7 +26,7 @@ import {
   AdminPlaceSearchDto,
 } from 'src/DomainLayer/Dtos/Admin/AdminPlaceDto';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
-import { BusinessRepository } from 'src/BussinessLayer/BusinessRepository';
+import { BusinessRepository } from 'src/BusinessLayer/BusinessRepository';
 import { CreateBusinessDto } from 'src/DomainLayer/Dtos/BusinessDto';
 
 @Controller(`${AdminApiRoutesConstant.BASE_URL}/places`)

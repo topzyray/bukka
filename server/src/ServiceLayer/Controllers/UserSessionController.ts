@@ -18,7 +18,7 @@ import {
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
-import { UserSessionRepository } from 'src/BussinessLayer/UserSessionRepository';
+import { UserSessionRepository } from 'src/BusinessLayer/UserSessionRepository';
 import { ActiveSessionDto } from 'src/DomainLayer/Dtos/UserSessionDto';
 import { TypeSafeMapper } from 'src/MiddlewareLayer/Mappings/TypeSafeMapper';
 

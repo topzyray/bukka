@@ -30,7 +30,7 @@ import {
   UserFileFilterDto,
 } from 'src/DomainLayer/Dtos/FileDto';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
-import { FileRepository } from 'src/BussinessLayer/FileRepository';
+import { FileRepository } from 'src/BusinessLayer/FileRepository';
 import { FileReferenceTypeEnum } from 'src/DomainLayer/Enums/FileReferenceTypeEnum';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';

@@ -32,7 +32,7 @@ export function SessionsSettings() {
   const [itemToDeleteId, setItemToDeleteId] = useState<number | null>(null);
 
   const deviceId = StorageUtilsHelper.getItemFromLocalStorage(
-    STORE_KEYS.DEVICE_ID
+    STORE_KEYS.DEVICE_ID,
   ) as string;
 
   const { user, logout } = useAuth();
@@ -68,6 +68,7 @@ export function SessionsSettings() {
   const handleCurrentSessionLogout = () => {
     StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.DEVICE_ID);
     StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.HAS_SESSION_KEY);
+    StorageUtilsHelper.deleteFromLocalStorage(STORE_KEYS.OAUTH_CODE_VERIFIER);
     queryClient.clear();
     Cookies.remove("sidebarState");
     EventHelper.broadcastLogout();
@@ -153,7 +154,7 @@ export function SessionsSettings() {
                         key={session.id}
                         className={cn(
                           "flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 p-6 hover:bg-muted/30 transition-colors duration-150",
-                          isCurrent && "bg-primary/5"
+                          isCurrent && "bg-primary/5",
                         )}
                       >
                         <div className="flex flex-col gap-1 min-w-0">
@@ -202,14 +203,14 @@ export function SessionsSettings() {
                               "text-sm font-medium",
                               isExpired
                                 ? "text-destructive dark:bg-foreground p-1.5 rounded-md"
-                                : "text-green-600 dark:bg-foreground p-1.5 rounded-md"
+                                : "text-green-600 dark:bg-foreground p-1.5 rounded-md",
                             )}
                           >
                             {isExpired
                               ? "Expired"
                               : `Expires ${formatDistanceToNow(
                                   new Date(session.expiresAt),
-                                  { addSuffix: true }
+                                  { addSuffix: true },
                                 )}`}
                           </div>
 
@@ -219,7 +220,7 @@ export function SessionsSettings() {
                             onClick={() =>
                               revokeAccess(
                                 session?.id,
-                                currentSession?.id === session.id
+                                currentSession?.id === session.id,
                               )
                             }
                             className="text-white transition-colors dark:bg-destructive"

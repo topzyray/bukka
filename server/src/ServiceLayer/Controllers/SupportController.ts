@@ -19,7 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
-import { SupportRepository } from 'src/BussinessLayer/SupportRepository';
+import { SupportRepository } from 'src/BusinessLayer/SupportRepository';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import {
   AssignSupportDto,

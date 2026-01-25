@@ -30,12 +30,14 @@ import {
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { CreateUserDto } from 'src/DomainLayer/Dtos/UserDto';
-import { AuthRepository } from 'src/BussinessLayer/AuthRepository';
+import { AuthRepository } from 'src/BusinessLayer/AuthRepository';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { AppConfigurationService } from 'src/UtilityLayer/Configuration/AppConfiguration.service';
 import { EnvironmentTypeEnum } from 'src/DomainLayer/Enums/EnvironmentTypeEnum';
 import { Throttle } from '@nestjs/throttler';
 import { RequestInfoHelper } from 'src/InfrastructureLayer/Helpers/RequestInfoHelper';
+import { ClientTypeHelper } from 'src/InfrastructureLayer/Helpers/ClientTypeHelper';
+import { ClientTypeEnum } from 'src/DomainLayer/Enums/ClientTypeEnum';
 
 @Controller(`${BaseApiRoutesConstant.BASE_URL}/auth`)
 @ApiTags('Auth')
@@ -90,27 +92,45 @@ export class AuthController {
     };
     const response = await this._authRepository.signIn(request, metaData);
 
-    res.cookie(TokenTypeEnum.ACCESS_TOKEN, response.responseData?.accessToken, {
-      ...this.cookieOptions,
-      maxAge: this.ACCESS_TOKEN_MAX_AGE,
-      expires: new Date(Date.now() + this.ACCESS_TOKEN_MAX_AGE),
-    });
-    res.cookie(
-      TokenTypeEnum.REFRESH_TOKEN,
-      response.responseData?.refreshToken,
-      {
+    // If signIn failed return early
+    if (!response?.status) {
+      return BukkaResponse.GetStatusResponse(response, res);
+    }
+
+    const clientType = ClientTypeHelper.getClientType(req);
+    const tokens = {
+      accessToken: response.responseData?.accessToken,
+      refreshToken: response.responseData?.refreshToken,
+    };
+
+    if (clientType === ClientTypeEnum.WEB) {
+      // WEB: set cookies
+      res.cookie(TokenTypeEnum.ACCESS_TOKEN, tokens.accessToken, {
+        ...this.cookieOptions,
+        maxAge: this.ACCESS_TOKEN_MAX_AGE,
+        expires: new Date(Date.now() + this.ACCESS_TOKEN_MAX_AGE),
+      });
+      res.cookie(TokenTypeEnum.REFRESH_TOKEN, tokens.refreshToken, {
         ...this.cookieOptions,
         maxAge: this.REFRESH_TOKEN_MAX_AGE,
         expires: new Date(Date.now() + this.REFRESH_TOKEN_MAX_AGE),
-      },
-    );
+      });
 
-    const newResponse = {
+      response.responseData = {
+        user: response.responseData?.user,
+        deviceId: response.responseData?.deviceId,
+      };
+
+      return BukkaResponse.GetStatusResponse(response, res);
+    }
+
+    // MOBILE: do NOT set cookies. Return tokens in response body
+    response.responseData = {
       user: response.responseData?.user,
       deviceId: response.responseData?.deviceId,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     };
-
-    response.responseData = response?.status ? newResponse : null;
 
     return BukkaResponse.GetStatusResponse(response, res);
   }
@@ -119,32 +139,50 @@ export class AuthController {
   @Post('refresh-token')
   @ApiOperation({ summary: 'Refreshes user token' })
   async refreshToken(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.cookies?.refreshToken;
+    // Accept cookie (web), body.refreshToken (mobile), or Authorization: Bearer <refreshToken>
+    const refreshToken = ClientTypeHelper.getRefreshTokenFromRequest(req);
+
     if (!refreshToken) {
       throw new BadRequestException('Refresh token not found.');
     }
+
     const response = await this._authRepository.refreshToken(refreshToken);
-    res.cookie(
-      TokenTypeEnum.ACCESS_TOKEN,
-      response?.responseData?.accessToken,
-      {
+
+    if (!response?.status) {
+      return BukkaResponse.GetStatusResponse(response, res);
+    }
+
+    const clientType = ClientTypeHelper.getClientType(req);
+    const tokens = {
+      accessToken: response?.responseData?.accessToken,
+      refreshToken: response?.responseData?.refreshToken,
+    };
+    const deviceId = response?.responseData?.deviceId;
+
+    if (clientType === ClientTypeEnum.WEB) {
+      res.cookie(TokenTypeEnum.ACCESS_TOKEN, tokens.accessToken, {
         ...this.cookieOptions,
         maxAge: this.ACCESS_TOKEN_MAX_AGE,
         expires: new Date(Date.now() + this.ACCESS_TOKEN_MAX_AGE),
-      },
-    );
-    res.cookie(
-      TokenTypeEnum.REFRESH_TOKEN,
-      response?.responseData?.refreshToken,
-      {
+      });
+      res.cookie(TokenTypeEnum.REFRESH_TOKEN, tokens.refreshToken, {
         ...this.cookieOptions,
         maxAge: this.REFRESH_TOKEN_MAX_AGE,
         expires: new Date(Date.now() + this.REFRESH_TOKEN_MAX_AGE),
-      },
-    );
+      });
+      response.responseData = {
+        deviceId,
+      };
+      return BukkaResponse.GetStatusResponse(response, res);
+    }
+
+    // mobile: return new tokens in body (no cookies)
     response.responseData = {
-      deviceId: response?.responseData?.deviceId,
+      deviceId,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     };
+
     return BukkaResponse.GetStatusResponse(response, res);
   }
 
@@ -152,7 +190,8 @@ export class AuthController {
   @Post('signout')
   @ApiOperation({ summary: 'Sign out logged in user' })
   async signOut(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.cookies?.refreshToken;
+    // Accept cookie (web), body.refreshToken (mobile), or Authorization: Bearer <refreshToken>
+    const refreshToken = ClientTypeHelper.getRefreshTokenFromRequest(req);
 
     if (!refreshToken) {
       return BukkaResponse.GetStatusResponse(
@@ -166,10 +205,14 @@ export class AuthController {
       );
     }
 
-    res.clearCookie(TokenTypeEnum.ACCESS_TOKEN, this.clearCookieOptions);
-    res.clearCookie(TokenTypeEnum.REFRESH_TOKEN, this.clearCookieOptions);
-
     const response = await this._authRepository.signOut(refreshToken);
+
+    const clientType = ClientTypeHelper.getClientType(req);
+    if (clientType === ClientTypeEnum.WEB) {
+      res.clearCookie(TokenTypeEnum.ACCESS_TOKEN, this.clearCookieOptions);
+      res.clearCookie(TokenTypeEnum.REFRESH_TOKEN, this.clearCookieOptions);
+    }
+
     return BukkaResponse.GetStatusResponse(response, res);
   }
 

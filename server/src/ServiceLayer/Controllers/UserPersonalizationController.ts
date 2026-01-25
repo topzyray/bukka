@@ -21,7 +21,7 @@ import {
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
-import { UserPersonalizationRepository } from 'src/BussinessLayer/UserPersonalizationRepository';
+import { UserPersonalizationRepository } from 'src/BusinessLayer/UserPersonalizationRepository';
 import {
   CreateUserPersonalizationDto,
   UpdateUserPersonalizationDto,

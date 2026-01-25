@@ -24,7 +24,7 @@ import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
-import { RecommendationRepository } from 'src/BussinessLayer/RecommendationRepository';
+import { RecommendationRepository } from 'src/BusinessLayer/RecommendationRepository';
 import {
   CreateRecommendationDto,
   FilterRecommendationDto,

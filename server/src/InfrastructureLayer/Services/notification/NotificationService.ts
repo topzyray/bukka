@@ -2,8 +2,8 @@ import { EmailService } from '../email/EmailService';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { CreateNotificationDto } from 'src/DomainLayer/Dtos/UserNotificationDto';
 import { NotificationTypeEnum } from 'src/DomainLayer/Enums/NotificationTypeEnum';
-import { UserNotificationRepository } from 'src/BussinessLayer/UserNotificationRepository';
-import { NotificationSettingsRepository } from 'src/BussinessLayer/NotificationSettingsRepository';
+import { UserNotificationRepository } from 'src/BusinessLayer/UserNotificationRepository';
+import { NotificationSettingsRepository } from 'src/BusinessLayer/NotificationSettingsRepository';
 
 interface ChannelInput {
   channels: NotificationTypeEnum[];

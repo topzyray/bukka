@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { UserRepository } from 'src/BussinessLayer/UserRepository';
+import { UserRepository } from 'src/BusinessLayer/UserRepository';
 import { UserRoleEnum } from 'src/DomainLayer/Enums/UserRoleEnum';
 
 /**

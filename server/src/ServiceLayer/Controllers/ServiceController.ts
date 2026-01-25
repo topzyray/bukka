@@ -24,7 +24,7 @@ import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
-import { ServiceRepository } from 'src/BussinessLayer/ServiceRepository';
+import { ServiceRepository } from 'src/BusinessLayer/ServiceRepository';
 import {
   CreateServiceDto,
   ServiceFilterDto,

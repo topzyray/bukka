@@ -23,7 +23,7 @@ import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { JwtAuthGuard } from 'src/MiddlewareLayer/Guards/JwtAuthGuard';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
-import { FavoriteRepository } from 'src/BussinessLayer/FavoriteRepository';
+import { FavoriteRepository } from 'src/BusinessLayer/FavoriteRepository';
 import {
   CreateFavoriteDto,
   FavoriteFilterDto,

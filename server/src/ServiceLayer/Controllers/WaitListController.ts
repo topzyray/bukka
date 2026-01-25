@@ -21,7 +21,7 @@ import type { Response } from 'express';
 import { Public } from 'src/DomainLayer/Decorators/PublicDecorator';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
-import { WaitlistRepository } from 'src/BussinessLayer/WaitlistRepository';
+import { WaitlistRepository } from 'src/BusinessLayer/WaitlistRepository';
 import {
   CreateWaitlistDto,
   WaitlistFilterDto,

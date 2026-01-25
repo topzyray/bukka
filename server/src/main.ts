@@ -65,6 +65,7 @@ async function bootstrap() {
       'Set-Cookie',
       'x-device-id',
       'X-Device-Id',
+      'x-client-type',
     ],
   });
   app.use(helmet());

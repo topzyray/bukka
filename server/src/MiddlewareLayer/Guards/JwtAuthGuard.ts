@@ -4,9 +4,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtIdentityGuard } from './JwtIdentityGuard';
-import { UserSessionRepository } from 'src/BussinessLayer/UserSessionRepository';
+import { UserSessionRepository } from 'src/BusinessLayer/UserSessionRepository';
 import { InMemoryCacheService } from 'src/InfrastructureLayer/Services/InMemoryCacheService';
-import { TokenRepository } from 'src/BussinessLayer/TokenRepository';
+import { TokenRepository } from 'src/BusinessLayer/TokenRepository';
 
 @Injectable()
 export class JwtAuthGuard extends JwtIdentityGuard {

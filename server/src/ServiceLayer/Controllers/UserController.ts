@@ -25,7 +25,7 @@ import {
 } from 'src/DomainLayer/Dtos/UserDto';
 import { BaseApiRoutesConstant } from 'src/DomainLayer/Constants/BaseApiRoutesConstant';
 import { BukkaResponse } from 'src/DomainLayer/Models/BukkaResponse';
-import { UserRepository } from 'src/BussinessLayer/UserRepository';
+import { UserRepository } from 'src/BusinessLayer/UserRepository';
 import { TypeSafeMapper } from 'src/MiddlewareLayer/Mappings/TypeSafeMapper';
 import { User } from 'src/DomainLayer/Models/User';
 import { TokenTypeEnum } from 'src/DomainLayer/Enums/TokenTypeEnum';
