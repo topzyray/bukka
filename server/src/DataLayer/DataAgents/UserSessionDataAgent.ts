@@ -81,7 +81,7 @@ export class UserSessionDataAgent {
     const spec: QuerySpec = {
       filter: {
         AND: [
-          { field: 'id', op: 'eq', value: userId },
+          { field: 'userId', op: 'eq', value: userId },
           { field: 'deviceId', op: 'eq', value: deviceId },
         ],
       },
